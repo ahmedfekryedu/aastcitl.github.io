@@ -1,0 +1,23 @@
+{
+  "name": "كلية النقل الدولي واللوجستيات - النظام الذكي لإدارة الأصول التعليمية ومركز اتخاذ القرار",
+  "short_name": "نظام CITL الذكي",
+  "description": "النظام الذكي الموحد لإدارة الأصول التعليمية ومركز اتخاذ القرار بكلية النقل الدولي واللوجستيات.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2A3475",
+  "icons": [
+    {
+      "src": "CITL_Logo.gif",
+      "sizes": "192x192",
+      "type": "image/gif",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "CITL_Logo.gif",
+      "sizes": "512x512",
+      "type": "image/gif",
+      "purpose": "any maskable"
+    }
+  ]
+}

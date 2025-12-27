@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# إرشاد جوجل لمكان خريطة الموقع
+Sitemap: https://aastcitl.me/sitemap.xml

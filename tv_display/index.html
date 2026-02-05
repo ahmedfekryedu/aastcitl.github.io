@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاشة العرض المركزية</title>
+    <meta name="description" content="النظام الذكي الموحد لإدارة الأصول التعليمية ومركز اتخاذ القرار بكلية النقل الدولي واللوجستيات.">
+    <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات, مركز اتخاذ القرار, الأكاديمية العربية">
+    <meta name="language" content="Arabic">
+    <meta name="theme-color" content="#1e255a">
+    <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
+    <meta property="og:description" content="النظام الذكي لإدارة الأصول التعليمية ومركز اتخاذ القرار">
+    <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://aastcitl.me/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://aastcitl.me/CITL_Banner.png">
+    <link rel="shortcut icon" type="image/png" href="CITL_Logo-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="CITL_Logo-192.png">
+    <link rel="apple-touch-icon" href="CITL_Logo-192.png">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+/* 1. منع التمرير نهائياً ورفع الفوتر */
+body { 
+    font-family: 'Cairo', sans-serif; 
+    background: #0f172a; 
+    color: white; 
+    overflow: hidden !important; 
+    height: 100vh;
+    padding-bottom: 100px; /* مسافة أمان للفوتر الأكبر */
+}
+
+        .font-english { font-family: 'Roboto', sans-serif; }
+        .bg-navy { background-color: #1e293b; }
+        .text-navy { color: #2A3475; }
+        .text-gold { color: #F3A628; }
+        .border-gold { border-color: #F3A628; }
+        
+        /* خلفية متحركة */
+        .bg-animated {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(125deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* الكارت الزجاجي وضبط الارتفاع ليناسب الشاشة */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+/* 2. ضبط ارتفاع الجدول ليكون فوق الفوتر بالظبط */
+.room-card {
+    height: calc(100vh - 220px) !important; /* محسوبة للهيدر والفوتر الجديد */
+    display: flex;
+    flex-direction: column; /* تصحيح الخطأ البرمجي */
+    overflow: hidden;
+}
+
+        /* تصغير حشو الجدول ليناسب عدد محاضرات أكبر في مساحة أقل */
+        .stagger-row td {
+            padding-top: 0.6rem !important;
+            padding-bottom: 0.6rem !important;
+        }
+
+        /* أنيميشن */
+        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .stagger-row { opacity: 0; animation: slideInRight 0.5s ease-out forwards; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* شريط التقدم */
+        .progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 6px; background: rgba(255,255,255,0.1); }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #F3A628, #fbbf24); width: 0%; transition: width 0.1s linear; }
+        
+        /* حالة المحاضرة الحالية */
+        .status-live { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* تنسيقات خاصة للإلغاء */
+        .row-cancelled { background-color: #fef2f2 !important; border-left: 4px solid #ef4444; }
+        .text-cancelled { text-decoration: line-through; color: #9ca3af !important; }
+        .badge-cancelled { background-color: #ef4444; color: white; padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; }
+
+        /* المودال (لوحة التحكم) */
+        .settings-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            z-index: 100; display: none; align-items: center; justify-content: center;
+        }
+        .settings-modal.show { display: flex; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* تخصيص الـ Checkbox */
+        .room-checkbox:checked + div { background-color: #2A3475; border-color: #2A3475; color: white; }
+        .room-checkbox:checked + div:hover { background-color: #1e293b; border-color: #1e293b; } 
+/* 3. شريط الأخبار المقتبس من الداشبورد (تكبير درجة) */
+.ticker-text {
+    position: absolute;
+    left: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    animation: ticker-pass-through var(--ticker-speed, 25s) linear infinite;
+    will-change: transform;
+}
+
+        @keyframes ticker-pass-through {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .news-separator {
+            color: #F3A628;
+            margin: 0 30px;
+            font-size: 1rem;
+            filter: drop-shadow(0 0 3px rgba(243, 166, 40, 0.3));
+        }
+
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <div class="bg-animated"></div>
+    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 z-0"></div>
+
+<header class="relative z-10 px-8 py-5 flex justify-between items-center border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div class="flex items-center gap-6">
+            <div onclick="openSettings()" class="bg-white p-1 rounded-xl shadow-lg h-20 w-20 flex items-center justify-center transform hover:scale-105 hover:rotate-3 transition-all duration-300 cursor-pointer group relative overflow-hidden" title="اضغط لضبط القاعات">
+                <img src="/CITL.png" alt="Logo" class="h-full w-full object-contain transform scale-125">
+                <div class="absolute inset-0 bg-black/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                    <i class="fas fa-cog text-navy text-2xl animate-spin"></i>
+                </div>
+            </div>
+                        <div>
+                <h1 class="text-3xl font-black tracking-wide text-white drop-shadow-md">الجداول الدراسية اليومية</h1>
+                <p class="text-gold text-lg font-medium tracking-widest mt-1 font-english uppercase">COLLEGE OF INTERNATIONAL TRANSPORT & LOGISTICS</p>
+            </div>
+        </div>
+        <div class="text-left">
+            <div id="current-time" class="text-5xl font-black text-white font-english tracking-wider drop-shadow-lg">00:00</div>
+            <div id="current-date" class="text-xl text-blue-200 font-bold mt-1 text-right opacity-90">...</div>
+        </div>
+    </header>
+
+    <main class="flex-1 relative flex overflow-hidden p-6 z-10">
+        <div id="content-container" class="w-full h-full flex flex-col justify-center">
+            <div class="flex flex-col items-center justify-center space-y-6 animate-pulse">
+                <div class="w-20 h-20 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-lg text-gray-300">جاري تحميل القاعات...</p>
+            </div>
+        </div>
+    </main>
+
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-black/90 backdrop-blur-xl border-t border-white/5 text-white overflow-hidden shadow-[0_-15px_40px_rgba(0,0,0,0.7)]">
+    <div class="progress-container top-0 absolute opacity-60">
+        <div id="slide-progress" class="progress-bar" style="height: 3px;"></div>
+    </div>
+
+    <div class="w-full bg-white/5 h-12 flex items-center overflow-hidden relative border-b border-white/5">
+        <div class="bg-[#F3A628] text-[#2A3475] h-full px-5 flex items-center justify-center text-sm font-black z-30 shrink-0 shadow-2xl relative">
+            <i class="fas fa-bullhorn ml-2 animate-pulse"></i> آخر التحديثات
+        </div>
+        
+        <div class="flex-1 h-full relative overflow-hidden flex items-center">
+            <div id="news-ticker-content" class="ticker-text text-white text-sm font-bold px-4 flex items-center">
+                جارٍ مزامنة شريط الأخبار...
+            </div>
+        </div>
+        
+        <div class="absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-black via-black/50 to-transparent z-20"></div>
+    </div>
+
+    <div class="px-8 py-2 flex justify-between items-center bg-black/20">
+        <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+            <span class="flex h-1.5 w-1.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+            </span>
+            <span>تحديث تلقائي مباشر</span>
+        </div>
+
+        <div class="text-[10px] font-medium text-gray-500 flex items-center gap-3">
+            <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2025</span>
+            <span class="text-white/10">|</span>
+            <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+        </div>
+    </div>
+</footer>
+
+    <div id="settings-modal" class="settings-modal">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-fade-in-up">
+            <div class="bg-[#2A3475] p-5 flex justify-between items-center border-b-4 border-gold">
+                <h3 class="text-2xl font-bold text-white"><i class="fas fa-desktop ml-2"></i> اختيار القاعات للعرض</h3>
+                <button onclick="closeSettings()" class="text-white/70 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            
+            <div class="p-6 flex-1 overflow-y-auto bg-gray-50">
+                <p class="text-gray-600 mb-4 text-sm font-bold">حدد القاعات التي تريد أن تظهر في شاشة العرض الدوارة:</p>
+                
+                <div class="flex gap-3 mb-6">
+                    <button onclick="toggleAll(true)" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-200 transition-colors">تحديد الكل</button>
+                    <button onclick="toggleAll(false)" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-300 transition-colors">إلغاء التحديد</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="rooms-selection-grid"></div>
+            </div>
+
+            <div class="p-5 bg-white border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeSettings()" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-gray-50">إلغاء</button>
+                <button onclick="saveSettings()" class="px-8 py-2.5 bg-[#2A3475] text-white rounded-xl font-bold hover:bg-blue-900 shadow-lg transform active:scale-95 transition-all">حفظ وتشغيل</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // =======================================================
+        // 1. إعدادات الاتصال بـ Supabase (النسخة الموحدة للشاشات)
+        // =======================================================
+        const SUPABASE_URL = 'https://xgqukdbonzukxrpjovmb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
+
+        const supabaseFactory = window.supabase;
+
+        // تهيئة العميل (بدون تخزين جلسة لتخفيف الحمل على الشاشة)
+        const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: {
+                persistSession: false, 
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        });
+
+        // الربط العام (هذا يحل محل const supabase = ...)
+        window.supabase = sb;
+
+        // =======================================================
+        // إعدادات العرض
+        // =======================================================
+        const SLIDE_DURATION = 10000; 
+        const REFRESH_INTERVAL = 2 * 60 * 1000; // تحديث احتياطي كل دقيقتين
+
+        const MASTER_ROOMS_LIST = [
+            "G004", "H 001 Hall", "H 002 Lab", "H 101 L", "H 104", 
+            "H 106 L", "H 107", "H 108", "H 109", "H 205", 
+            "H 207 L", "H 208", "H 209", "H 210", "H 211",
+            "IMO 001", "IMO 002", "IMO 003", "IMO 004", "IMO 005", "IMO 006",
+            "M 124", "M 128", "M 130", "M 132", "M 135", "M 136",
+            "PH 201", "PH 401", "PH 404", "PH 501"
+        ];
+
+        let activeRooms = [];
+        let roomsData = {};
+        let currentRoomIndex = 0;
+        let progressInterval;
+        const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        // --- الساعة ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+            document.getElementById('current-date').textContent = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- إدارة الإعدادات ---
+        function loadSettings() {
+            const saved = localStorage.getItem('tv_display_rooms');
+            if (saved) {
+                activeRooms = JSON.parse(saved);
+            } else {
+                activeRooms = [...MASTER_ROOMS_LIST];
+            }
+            renderSettingsGrid();
+        }
+
+        function renderSettingsGrid() {
+            const grid = document.getElementById('rooms-selection-grid');
+            grid.innerHTML = '';
+            MASTER_ROOMS_LIST.forEach(room => {
+                const isChecked = activeRooms.includes(room);
+                
+                const cardClass = isChecked 
+                    ? "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-[#2A3475] text-white border-[#2A3475]" 
+                    : "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-white text-gray-700 border-gray-200 hover:border-navy/50";
+                
+                const iconHtml = isChecked ? '<i class="fas fa-check text-[10px]"></i>' : '';
+
+                grid.innerHTML += `
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="room-checkbox absolute opacity-0 w-0 h-0" value="${room}" ${isChecked ? 'checked' : ''} onchange="updateRoomCard(this)">
+                        <div class="${cardClass}">
+                            <span class="font-bold text-sm font-english">${room}</span>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center check-circle">
+                                ${iconHtml}
+                            </div>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+
+        window.updateRoomCard = function(checkbox) {
+            const card = checkbox.nextElementSibling;
+            const circle = card.querySelector('.check-circle');
+            
+            if (checkbox.checked) {
+                card.className = "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-[#2A3475] text-white border-[#2A3475]";
+                circle.innerHTML = '<i class="fas fa-check text-[10px]"></i>';
+            } else {
+                card.className = "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-white text-gray-700 border-gray-200 hover:border-navy/50";
+                circle.innerHTML = '';
+            }
+        }
+
+        function toggleAll(state) {
+            const checkboxes = document.querySelectorAll('.room-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = state;
+                updateRoomCard(cb);
+            });
+        }
+
+        function openSettings() {
+            loadSettings();
+            document.getElementById('settings-modal').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.remove('show');
+        }
+
+        function saveSettings() {
+            const checked = document.querySelectorAll('.room-checkbox:checked');
+            activeRooms = Array.from(checked).map(cb => cb.value);
+            
+            if (activeRooms.length === 0) {
+                alert("يجب اختيار قاعة واحدة على الأقل!");
+                return;
+            }
+
+            localStorage.setItem('tv_display_rooms', JSON.stringify(activeRooms));
+            closeSettings();
+            
+            currentRoomIndex = 0;
+            fetchData();
+        }
+
+        // --- جلب البيانات (والتحديث) ---
+        async function fetchData() {
+            if (activeRooms.length === 0) loadSettings();
+
+            const todayNameEn = daysMap[new Date().getDay()];
+            
+            const { data, error } = await supabase
+                .from('academic_schedule')
+                .select('*')
+                .eq('day_of_week', todayNameEn);
+
+            if (error) { console.error(error); return; }
+
+            roomsData = {};
+            activeRooms.forEach(room => roomsData[room] = []);
+
+            if (data) {
+                data.forEach(item => {
+                    if (roomsData[item.room_name] !== undefined) {
+                        roomsData[item.room_name].push(item);
+                    }
+                });
+            }
+
+            for (let room in roomsData) {
+                roomsData[room].sort((a, b) => a.period_order - b.period_order);
+            }
+            
+            if(!document.querySelector('.room-card')) {
+                showRoom(0);
+                startSlideshow();
+            } else {
+                const currentRoomName = activeRooms[currentRoomIndex];
+                if (currentRoomName) {
+                    showRoom(currentRoomIndex);
+                }
+            }
+        }
+
+        // --- عرض الغرفة ---
+// --- عرض الغرفة (معدلة لتوحيد التوقيتات مع الكروت) ---
+function showRoom(index) {
+    const container = document.getElementById('content-container');
+    
+    if (activeRooms.length === 0) {
+        container.innerHTML = '<div class="text-white text-2xl text-center">لم يتم اختيار قاعات للعرض</div>';
+        return;
+    }
+
+    const roomName = activeRooms[index];
+    const schedule = roomsData[roomName] || [];
+    
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    // حساب تاريخ اليوم
+    const todayStr = now.toLocaleDateString('en-CA'); 
+
+    // 🔥 دالة توحيد التوقيت (نفس المنطق الموجود في الكروت) 🔥
+    const formatTimeDisplay = (time) => {
+        if (!time) return "00:00 - 00:00";
+        const t = time.trim();
+
+        // توحيد الفترات الخمس الرسمية
+        if (t.startsWith("08:30") || t.startsWith("8:30")) return "08:30 - 10:20";
+        if (t.startsWith("10:30")) return "10:30 - 12:20";
+        if (t.startsWith("12:30")) return "12:30 - 02:20";
+        if (t.startsWith("02:30") || t.startsWith("14:30")) return "02:30 - 04:20";
+        if (t.startsWith("04:30") || t.startsWith("16:30")) return "04:30 - 06:20";
+
+        return t; // لو وقت مختلف نرجعه زي ما هو
+    };
+
+    let rowsHTML = '';
+    let currentStatus = '<div class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-bold"><span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span> القاعة فارغة حالياً</div>';
+
+    if (schedule.length > 0) {
+        schedule.forEach((item, i) => {
+            // 1. تحويل التوقيت الخام إلى التوقيت الرسمي الموحد
+            const displayTime = formatTimeDisplay(item.time_slot);
+            
+            // 2. استخدام التوقيت الموحد في الحسابات (عشان كلمة "الآن" تظهر صح)
+            const times = displayTime.split('-');
+            let isCurrent = false;
+            
+            // فحص الإلغاء
+            const isCancelled = (item.status === 'cancelled') || 
+                                (item.cancelled_dates && item.cancelled_dates.includes(todayStr));
+
+            if (times.length === 2 && !isCancelled) {
+                const startParts = times[0].trim().split(':');
+                const endParts = times[1].trim().split(':');
+                
+                // تحويل لـ 24 ساعة للحساب الصحيح (خصوصاً لفترات بعد الظهر)
+                let startH = parseInt(startParts[0]);
+                let endH = parseInt(endParts[0]);
+                
+                // تصحيح التوقيت المسائي (النظام 12 ساعة في العرض، بس لازم نحسبه 24)
+                // أي وقت يبدأ 01, 02, 03, 04 ورقم الفترة مش 08, 10, 12 يبقى مساءً
+                if (startH < 7) startH += 12; 
+                if (endH < 7) endH += 12;
+                // حالة خاصة: 12 ظهراً بتفضل 12، مش بنزود عليها
+                if (startH === 24) startH = 12; 
+                if (endH === 24) endH = 12;
+
+                const startMins = startH * 60 + parseInt(startParts[1]);
+                const endMins = endH * 60 + parseInt(endParts[1]);
+                
+                if (currentMinutes >= startMins && currentMinutes < endMins) {
+                    isCurrent = true;
+                    currentStatus = `<div class="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-xl font-bold status-live"><span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span> مشغولة: ${item.course_name}</div>`;
+                }
+            }
+
+            const delay = i * 100; 
+            
+            const rowClass = isCancelled ? 'row-cancelled' : 'bg-white border-b border-gray-50';
+            const titleClass = isCancelled ? 'text-cancelled' : 'text-gray-800';
+            const instructorClass = isCancelled ? 'opacity-50' : 'text-gray-700';
+            
+            let statusBadge = '';
+            if (isCancelled) {
+                statusBadge = '<span class="badge-cancelled"><i class="fas fa-ban"></i> ملغاة</span>';
+            } else if (isCurrent) {
+                statusBadge = '<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full font-bold shadow-sm">الآن</span>';
+            } else {
+                statusBadge = '<span class="text-gray-300"><i class="fas fa-clock"></i></span>';
+            }
+
+            rowsHTML += `
+                <tr class="${rowClass} transition-colors stagger-row" style="animation-delay: ${delay}ms">
+                    <td class="py-5 px-6 font-black text-[#2A3475] text-2xl font-english text-left w-1/4 ${isCancelled ? 'opacity-50' : ''}" dir="ltr">${displayTime}</td>
+                    <td class="py-5 px-6 w-1/2">
+                        <div class="font-extrabold ${titleClass} text-2xl mb-1">${item.course_name}</div>
+                        <div class="text-sm text-gray-500 font-english tracking-wider opacity-70">${item.course_code || ''}</div>
+                    </td>
+                    <td class="py-5 px-6 w-1/4">
+                        <div class="flex items-center gap-4 ${isCancelled ? 'opacity-50' : ''}">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-[#2A3475] font-bold text-xl shadow-sm">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <span class="font-bold text-xl truncate ${instructorClass}">${item.instructor}</span>
+                        </div>
+                    </td>
+                    <td class="py-5 px-4 text-center">
+                        ${statusBadge}
+                    </td>
+                </tr>
+            `;
+        });
+    } else {
+        rowsHTML = `
+            <tr class="bg-white">
+                <td colspan="4" class="py-20 text-center text-gray-400">
+                    <i class="fas fa-calendar-check text-6xl mb-4 opacity-20"></i>
+                    <p class="text-xl font-bold">لا توجد محاضرات مجدولة في هذه القاعة اليوم</p>
+                </td>
+            </tr>
+        `;
+    }
+
+const html = `
+    <div class="glass-panel rounded-3xl overflow-hidden flex flex-col w-full max-w-6xl mx-auto fade-in-up room-card">
+            <div class="bg-white border-b border-gray-100 p-8 flex justify-between items-center">
+                <div class="flex items-center gap-6">
+                    <div class="bg-[#2A3475] p-4 rounded-2xl shadow-lg text-white">
+                        <i class="fas fa-door-open text-4xl text-gold"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-6xl font-black tracking-tighter text-navy font-english">${roomName}</h2>
+                        <p class="text-gray-400 text-xl font-medium mt-1">جدول محاضرات اليوم</p>
+                    </div>
+                </div>
+                <div class="transform scale-110 origin-left">
+                    ${currentStatus}
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-2 bg-white">
+                <table class="w-full text-right border-collapse">
+                    <thead class="sticky top-0 bg-white z-10 shadow-sm">
+                        <tr class="text-gray-400 text-sm uppercase tracking-wider border-b border-gray-100">
+                            <th class="py-4 px-6 font-bold text-left">Time</th>
+                            <th class="py-4 px-6 font-bold">Subject</th>
+                            <th class="py-4 px-6 font-bold">Instructor</th>
+                            <th class="py-4 px-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        ${rowsHTML}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+        function startSlideshow() {
+            const bar = document.getElementById('slide-progress');
+            let width = 0;
+            clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                width += 100 / (SLIDE_DURATION / 50); 
+                bar.style.width = width + '%';
+                
+                if (width >= 100) {
+                    width = 0;
+                    const card = document.querySelector('.room-card');
+                    if(card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(-20px)';
+                    }
+                    setTimeout(() => {
+                        currentRoomIndex = (currentRoomIndex + 1) % activeRooms.length;
+                        showRoom(currentRoomIndex);
+                    }, 400);
+                }
+            }, 50);
+        }
+
+        // --- كود التحديث اللحظي السحري (Realtime) ---
+        // ده بيخلي الشاشة تحس بأي تغيير يحصل في الداتابيز وتحدث نفسها فوراً
+        const mySubscription = supabase
+            .channel('public:academic_schedule')
+            .on(
+                'postgres_changes', 
+                { event: '*', schema: 'public', table: 'academic_schedule' }, 
+                (payload) => {
+                    console.log('🔔 تغيير تم رصده:', payload);
+                    // إعادة تحميل البيانات فوراً لكي يظهر التعديل (إلغاء/تفعيل)
+                    fetchData(); 
+                }
+            )
+            .subscribe();
+
+        // التشغيل المبدئي والمؤقت الاحتياطي
+        fetchData();
+        setInterval(fetchData, REFRESH_INTERVAL);
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('السيستم جاهز للعمل أوفلاين'))
+        .catch(err => console.log('حدث خطأ في التسجيل: ', err));
+    });
+  }
+  
+  async function syncDashboardData() {
+    // ---------------------------------------------------------
+    // 1. التحديث الفوري للأرقام (من الذاكرة)
+    // ---------------------------------------------------------
+    const cachedHalls = localStorage.getItem('last_halls') || "0";
+    const cachedMeetings = localStorage.getItem('last_meetings') || "0";
+    const cachedLectures = localStorage.getItem('last_lectures') || "0";
+
+    if(document.getElementById('count-halls')) document.getElementById('count-halls').innerText = cachedHalls;
+    if(document.getElementById('count-meetings')) document.getElementById('count-meetings').innerText = cachedMeetings;
+    if(document.getElementById('count-live-lectures')) document.getElementById('count-live-lectures').innerText = cachedLectures;
+
+    // ---------------------------------------------------------
+    // 2. تحديث شريط الأخبار (نطاق سرعة واسع جداً: سلحفاة 🐢 -> صاروخ 🚀)
+    // ---------------------------------------------------------
+    const newsEl = document.getElementById('news-ticker-content');
+    if (newsEl) {
+        try {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('setting_value')
+                .eq('setting_key', 'news_config')
+                .maybeSingle();
+
+            if (data && data.setting_value) {
+                const newsData = data.setting_value;
+                const newText = newsData.text || "";
+                const currentText = newsEl.getAttribute('data-last-text');
+
+                // التحديث لو النص اتغير أو الشريط فاضي
+                if (currentText !== newText || newsEl.innerHTML.trim() === "") {
+                    
+                    const sentences = newText.split('\n').filter(s => s.trim() !== '');
+                    const singleSet = sentences.join(' <span class="news-separator">✦</span> ');
+                    
+                    // وضع النص (نسخة واحدة)
+                    newsEl.innerHTML = `<span>${singleSet}</span>`;
+                    
+                    newsEl.setAttribute('data-last-text', newText);
+
+                    // ============================================================
+                    // 🚀 المعادلة الجديدة (Wide Dynamic Range)
+                    // ============================================================
+                    
+                    // 1. حساب المسافة (النص + الشاشة)
+                    const textWidth = newsEl.scrollWidth; 
+                    const containerWidth = newsEl.parentElement.offsetWidth || window.innerWidth;
+                    const totalDistance = textWidth + containerWidth;
+
+                    // 2. حساب السرعة (المعدلة لتكون محسوسة جداً)
+                    const sliderVal = parseInt(newsData.sliderVal) || 50;
+                    
+                    // المعادلة القديمة كانت: 50 + (Val * 3) -> أقصى حاجة 350 (بطيء نسبياً)
+                    // المعادلة الجديدة: تبدأ من 10 (زحف) وتصل إلى 1200+ (صاروخ)
+                    const pixelsPerSecond = 10 + (sliderVal * 12); 
+
+                    // 3. الزمن
+                    const duration = totalDistance / pixelsPerSecond;
+                    
+                    document.documentElement.style.setProperty('--ticker-speed', `${duration}s`);
+                    
+                    console.log(`🚀 سرعة: ${pixelsPerSecond}px/s | زمن الرحلة: ${duration.toFixed(1)}s`);
+                }
+            }
+        } catch (e) {
+            console.warn("⚠️ News Sync Error:", e);
+        }
+    }
+
+    // ---------------------------------------------------------
+    // 3. تحديث الإحصائيات (قاعات، حجوزات، محاضرات)
+    // ---------------------------------------------------------
+    try {
+        // أ. عدد القاعات
+        const { data: halls } = await supabase.from('academic_schedule').select('room_name');
+        if (halls) {
+            const uniqueHalls = [...new Set(halls.map(h => h.room_name))].length;
+            if (uniqueHalls > 0 || halls.length === 0) {
+                document.getElementById('count-halls').innerText = uniqueHalls;
+                localStorage.setItem('last_halls', uniqueHalls);
+            }
+        }
+
+        // ب. اجتماعات المجلس
+        const today = new Date().toISOString().split('T')[0];
+        const { count: mCount } = await supabase.from('smrm_reservations').select('*', { count: 'exact', head: true }).eq('date', today);
+        document.getElementById('count-meetings').innerText = mCount || 0;
+        localStorage.setItem('last_meetings', mCount || 0);
+
+        // ج. محاضرات جارية
+        const now = new Date();
+        const dayEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+
+        const { data: lectures } = await supabase.from('academic_schedule').select('time_slot').eq('day_of_week', dayEn);
+        if (lectures) {
+            const activeCount = lectures.filter(item => {
+                if (!item.time_slot) return false;
+                const parts = item.time_slot.split(' - ');
+                if (parts.length < 1) return false;
+                const [h, m] = parts[0].split(':').map(Number);
+                const startMins = h * 60 + (m || 0);
+                return currentMins >= startMins && currentMins <= (startMins + 110);
+            }).length;
+            document.getElementById('count-live-lectures').innerText = activeCount;
+            localStorage.setItem('last_lectures', activeCount);
+        }
+    } catch (e) { 
+        console.error("Stats Sync Error:", e); 
+    }
+}
+
+// تشغيل الدالة
+document.addEventListener('DOMContentLoaded', syncDashboardData);
+setInterval(syncDashboardData, 60000);
+
+// ==========================================
+// 🚀 تحديث لحظي للسرعة (بنفس المعادلة القوية)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    supabase.channel('realtime-news')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, (payload) => {
+            const newConfig = payload.new.setting_value;
+            if (!newConfig) return;
+
+            const newsEl = document.getElementById('news-ticker-content');
+            if (newsEl) {
+                // 1. تحديث النص
+                const currentText = newsEl.getAttribute('data-last-text');
+                const newText = newConfig.text || "";
+                
+                if (currentText !== newText) {
+                    const sentences = newText.split('\n').filter(s => s.trim() !== '');
+                    const singleSet = sentences.join(' <span class="news-separator">✦</span> ');
+                    newsEl.innerHTML = `<span>${singleSet}</span>`;
+                    newsEl.setAttribute('data-last-text', newText);
+                }
+
+                // 2. تحديث السرعة لحظياً (المعادلة الجديدة)
+                const sliderVal = parseInt(newConfig.sliderVal) || 50;
+                
+                // من 10 (سلحفاة) لـ 1200+ (صاروخ)
+                const pixelsPerSecond = 10 + (sliderVal * 12); 
+                
+                const contentWidth = newsEl.scrollWidth;
+                const containerWidth = newsEl.parentElement.offsetWidth || window.innerWidth;
+                const totalDistance = contentWidth + containerWidth;
+                const duration = totalDistance / pixelsPerSecond;
+
+                document.documentElement.style.setProperty('--ticker-speed', `${duration}s`);
+                console.log(`🚀 تحديث لحظي: ${pixelsPerSecond} px/s`);
+            }
+        })
+        .subscribe();
+});
+// معادلة تحويل قيمة الشريط (0-100) إلى ثواني (60s - 5s)
+// كل ما الرقم يزيد (سرعة)، الوقت يقل (ثواني)
+function calculateDuration(sliderVal) {
+    // المعادلة: 65 - (قيمة الشريط * 0.6)
+    // لو 0 -> 65 ثانية (بطيء جداً)
+    // لو 50 -> 35 ثانية (متوسط)
+    // لو 100 -> 5 ثواني (صاروخ)
+    return Math.max(5, 65 - (sliderVal * 0.6)) + 's';
+}
+
+// دالة لتحديث النص فوق الشريط أثناء السحب
+function updateSpeedLabel(val) {
+    const label = document.getElementById('speed-display');
+    if(val < 20) { label.innerText = 'بطيء جداً'; label.className = 'text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md'; }
+    else if(val < 40) { label.innerText = 'بطيء'; label.className = 'text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md'; }
+    else if(val < 60) { label.innerText = 'سرعة متوسطة'; label.className = 'text-xs font-bold text-[#2A3475] bg-[#2A3475]/10 px-2 py-1 rounded-md'; }
+    else if(val < 80) { label.innerText = 'سريع'; label.className = 'text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md'; }
+    else { label.innerText = 'سريع جداً (صاروخ)'; label.className = 'text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-md'; }
+}
+
+// 1. دالة الحفظ (تكتب في الجدول الجديد)
+async function saveNewsConfig() {
+    const text = document.getElementById('news-input-multi').value;
+    const sliderVal = document.getElementById('news-speed-slider').value;
+    const calculatedSpeed = calculateDuration(sliderVal);
+
+    if (!text.trim()) {
+        alert('اكتب نص للخبر الأول!');
+        return;
+    }
+
+    const config = {
+        text: text,
+        speed: calculatedSpeed,
+        sliderVal: sliderVal,
+        updatedAt: Date.now()
+    };
+
+    // حفظ في الذاكرة المؤقتة (للسرعة)
+    localStorage.setItem('news_config', JSON.stringify(config));
+
+    // حفظ في قاعدة البيانات (Upsert)
+    const { error } = await supabase
+        .from('site_settings')
+        .upsert({ 
+            setting_key: 'news_config', 
+            setting_value: config 
+        }, { onConflict: 'setting_key' });
+
+    if (!error) {
+        showNotification('تم الحفظ وتحديث الشريط ✅');
+    } else {
+        console.error(error);
+        showNotification('تم الحفظ محلياً فقط (تأكد من النت)', 'warning');
+    }
+}
+
+// 2. دالة التحميل (تقرأ من الجدول الجديد عند فتح الصفحة)
+async function loadCurrentNews() {
+    const { data } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'news_config')
+        .maybeSingle();
+
+    if (data && data.setting_value) {
+        const config = data.setting_value;
+        
+        // تعبئة البيانات في الصفحة
+        if(document.getElementById('news-input-multi')) 
+            document.getElementById('news-input-multi').value = config.text || '';
+        
+        if(document.getElementById('news-speed-slider')) {
+            document.getElementById('news-speed-slider').value = config.sliderVal || 50;
+            if (typeof updateSpeedLabel === "function") updateSpeedLabel(config.sliderVal || 50);
+        }
+        
+        // تحديث الكاش
+        localStorage.setItem('news_config', JSON.stringify(config));
+    }
+}
+
+// تشغيل التحميل تلقائياً
+document.addEventListener('DOMContentLoaded', loadCurrentNews);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,2792 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النظام الذكي لإدارة جداول القاعات الدراسية</title>
+    <meta name="description" content="النظام الذكي الموحد لإدارة الأصول التعليمية ومركز اتخاذ القرار بكلية النقل الدولي واللوجستيات.">
+    <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات, مركز اتخاذ القرار, الأكاديمية العربية">
+    <meta name="language" content="Arabic">
+    <meta name="theme-color" content="#2A3475">
+    <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
+    <meta property="og:description" content="النظام الذكي لإدارة الأصول التعليمية ومركز اتخاذ القرار">
+    <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://aastcitl.me/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://aastcitl.me/CITL_Banner.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" type="image/png" href="CITL_Logo-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="CITL_Logo-192.png">
+    <link rel="apple-touch-icon" href="CITL_Logo-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* إضافات لتصميم المودال الجديد */
+        .bg-navy { background-color: #2A3475; }
+        .text-navy { color: #2A3475; }
+        .text-gold { color: #F3A628; }
+        .bg-gold { background-color: #F3A628; }
+        
+        /* تأثيرات الحركة للمودال */
+        .modal-enter { animation: modalPop 0.3s ease-out forwards; }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+body {
+    box-sizing: border-box;
+    font-family: 'Cairo', sans-serif;
+    background-color: #f9fafb;
+}
+
+/* لضمان تطبيق الخط على العناوين أيضاً */
+h1, h2, h3, h4, h5, h6, input, select, button, textarea {
+    font-family: 'Cairo', sans-serif;
+}
+.bg-navy { background-color: #2A3475; }
+.text-navy { color: #2A3475; }
+.text-gold { color: #F3A628; }
+.border-gold { border-color: #F3A628; }
+
+        
+        /* تأثيرات حركية */
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(42, 52, 117, 0.1); }
+        .ai-pulse { animation: pulse-gold 2s infinite; }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(243, 166, 40, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(243, 166, 40, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(243, 166, 40, 0); }
+        }
+        
+        /* تخصيص السكرول بار */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #2A3475; border-radius: 4px; }
+        
+        /* عناصر التحكم - مخفية افتراضياً */
+        .admin-controls-panel { display: none; }
+        .admin-card-btns { display: none !important; }
+
+        /* تظهر فقط عند تفعيل كلاس الأدمن */
+        .admin-mode-active .admin-controls-panel { display: flex; }
+        .admin-mode-active .admin-card-btns { display: flex !important; }
+
+        /* أنميشن لخطأ الباسورد */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .input-error {
+            animation: shake 0.5s;
+            border-color: #ef4444 !important; /* لون أحمر */
+            background-color: #fef2f2 !important;
+        }
+
+        /* تصميم القوائم الاحترافية */
+        .custom-dropdown { position: relative; width: 100%; }
+        .custom-dropdown-display { 
+            width: 100%; padding: 10px 16px; background-color: white; 
+            border: 1px solid #e5e7eb; border-radius: 0.75rem; /* rounded-xl */
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; transition: all 0.2s; 
+        }
+        .custom-dropdown-display:hover { border-color: #2A3475; }
+        .custom-dropdown-options { 
+            position: absolute; top: 100%; left: 0; width: 100%; 
+            background-color: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; 
+            margin-top: 4px; max-height: 250px; overflow-y: auto; 
+            z-index: 50; display: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+        }
+        .custom-dropdown-options.show { display: block; }
+        .custom-option { 
+            padding: 10px 16px; cursor: pointer; font-size: 0.875rem; 
+            color: #374151; border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s; 
+        }
+        .custom-option:hover { background-color: #f0fdf4; color: #2A3475; font-weight: bold; }
+
+.table-scroll thead th {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 20;
+}
+
+/* --- أنماط الإشعارات (تم إصلاح مشكلة منع اللمس) --- */
+.notification-toast {
+    position: fixed; 
+    bottom: 20px; 
+    left: 50%; 
+    transform: translateX(-50%) translateY(100px);
+    background: white; 
+    padding: 12px 24px; 
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+    z-index: 9999; 
+    opacity: 0;
+    font-weight: bold;
+    border: 1px solid #f3f4f6;
+    
+    /* 🔥 هذا السطر هو الحل: يمنع الرسالة المخفية من اعتراض اللمس 🔥 */
+    pointer-events: none; 
+}
+
+.notification-toast.show { 
+    transform: translateX(-50%) translateY(0); 
+    opacity: 1; 
+    
+    /* 🔥 لما تظهر بس، تستقبل اللمس 🔥 */
+    pointer-events: auto; 
+}
+
+.notification-icon-box { 
+    width: 24px; 
+    height: 24px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    color: white; 
+    font-size: 12px;
+}
+
+.bg-success { background-color: #10B981; } /* لون أخضر للنجاح */
+.bg-error { background-color: #EF4444; }   /* لون أحمر للخطأ */
+
+/* عند تفعيل وضع الأدمن، الكروت تصبح قابلة للضغط */
+.admin-mode-active .schedule-card {
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.admin-mode-active .schedule-card:hover {
+    border-color: #F3A628 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(243, 166, 40, 0.3);
+}
+
+/* إضافة أيقونة تعديل صغيرة عائمة تظهر تلقائياً في وضع الأدمن */
+.admin-mode-active .schedule-card::after {
+    content: '\f044'; /* كود أيقونة القلم FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #F3A628;
+    color: #2A3475;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 20;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+/* 🔥 أنيميشن اللودر الجديد 🔥 */
+@keyframes logo-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+/* لمنع السكرول أثناء التحميل */
+.loading-active { overflow: hidden; }
+        /* إضافات لتصميم المودال الجديد */
+        .bg-navy { background-color: #2A3475; }
+        .text-navy { color: #2A3475; }
+        .text-gold { color: #F3A628; }
+        .bg-gold { background-color: #F3A628; }
+        
+        /* تأثيرات الحركة للمودال */
+        .modal-enter { animation: modalPop 0.3s ease-out forwards; }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+       
+        /* تخصيص السكرول بار */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #2A3475; border-radius: 4px; }
+        
+        /* عناصر التحكم - مخفية افتراضياً */
+        .admin-controls-panel { display: none; }
+        .admin-card-btns { display: none !important; }
+
+        /* تظهر فقط عند تفعيل كلاس الأدمن */
+        .admin-mode-active .admin-controls-panel { display: flex; }
+        .admin-mode-active .admin-card-btns { display: flex !important; }
+
+        /* أنميشن لخطأ الباسورد */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .input-error {
+            animation: shake 0.5s;
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        /* تصميم القوائم الاحترافية */
+        .custom-dropdown { position: relative; width: 100%; }
+        .custom-dropdown-display { 
+            width: 100%; padding: 10px 16px; background-color: white; 
+            border: 1px solid #e5e7eb; border-radius: 0.75rem; 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; transition: all 0.2s; 
+        }
+        .custom-dropdown-display:hover { border-color: #2A3475; }
+        .custom-dropdown-options { 
+            position: absolute; top: 100%; left: 0; width: 100%; 
+            background-color: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; 
+            margin-top: 4px; max-height: 250px; overflow-y: auto; 
+            z-index: 50; display: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+        }
+        .custom-dropdown-options.show { display: block; }
+        .custom-option { 
+            padding: 10px 16px; cursor: pointer; font-size: 0.875rem; 
+            color: #374151; border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s; 
+        }
+        .custom-option:hover { background-color: #f0fdf4; color: #2A3475; font-weight: bold; }
+
+        .table-scroll thead th {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 20;
+        }
+        
+        /* --- أنماط الإشعارات (Toast) --- */
+        .notification-toast {
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(100px);
+            background: white; 
+            padding: 12px 24px; 
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            z-index: 9999; 
+            opacity: 0;
+            font-weight: bold;
+            border: 1px solid #f3f4f6;
+        }
+
+        .notification-toast.show { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+
+        .notification-icon-box { 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 12px;
+        }
+
+        .bg-success { background-color: #10B981; } 
+        .bg-error { background-color: #EF4444; }   
+
+        /* عند تفعيل وضع الأدمن، الكروت تصبح قابلة للضغط */
+        .admin-mode-active .schedule-card {
+            cursor: pointer !important;
+            transition: all 0.3s ease;
+        }
+
+        .admin-mode-active .schedule-card:hover {
+            border-color: #F3A628 !important;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(243, 166, 40, 0.3);
+        }
+
+        /* إضافة أيقونة تعديل صغيرة عائمة تظهر تلقائياً في وضع الأدمن */
+        .admin-mode-active .schedule-card::after {
+            content: '\f044'; 
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #F3A628;
+            color: #2A3475;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+/* --- هوية النظام المعدنية (المطورة) --- */
+.metallic-blue-fill {
+    background: linear-gradient(to bottom, #2A3475, #1e255a);
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.5),
+                inset 0px 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.random-slanted-lines {
+    position: relative;
+    overflow: hidden;
+}
+
+/* دي أهم حتة.. هي اللي بترسم الخطوط المائلة */
+.random-slanted-lines::before {
+    content: ''; 
+    position: absolute; 
+    top: 0; left: 0; width: 100%; height: 100%; 
+    z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+        -30deg, transparent, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 11px
+    );
+    opacity: 1;
+}
+
+/* أنيميشن شاشة التحميل (Smart Engine) - سيبها زي ما هي */
+@keyframes logo-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+.loader-logo { 
+    animation: logo-pulse 2s infinite ease-in-out; 
+}
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-gray-800">
+<div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
+    <div class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center border border-gray-100 transform scale-95 transition-transform duration-300 min-w-[85vw] md:min-w-[400px] gap-0">
+        
+        <div class="mb-0 -mt-6 md:-mt-10">
+            <img src="/CITL.png" alt="Loading..." class="h-28 md:h-48 w-auto object-contain mix-blend-multiply brightness-110 contrast-110 saturate-110 loader-logo">
+        </div>
+
+        <div class="text-center -mt-2 md:-mt-6">
+            <h3 class="text-[#2A3475] font-black text-lg md:text-2xl tracking-wide leading-tight">جاري التحميل</h3>
+            <p id="loader-text" class="text-gray-400 text-[11px] md:text-sm font-bold mt-1 md:mt-2">يرجى الانتظار لحظات...</p>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    
+        // التحقق: هل توجد بيانات مستخدم أو توكن محفوظ؟
+        const token = localStorage.getItem('sessionToken');
+        const user = localStorage.getItem('currentUser');
+
+        // لو مفيش بيانات، نطرده لصفحة اللوجن فوراً
+        if (!token || !user) {
+            window.location.href = '/';
+        }
+    </script>
+<header class="metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
+    <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
+
+    <div class="absolute top-[15px] left-[-30px] w-[110px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1 shadow-md border-b-2 border-[#2A3475] tracking-wider">
+
+        نسخة تجريبية
+
+    </div>
+
+</div>
+    <div class="w-full max-w-[98%] mx-auto px-3 py-5 md:px-6 md:py-5">
+        <div class="hidden lg:flex flex-row items-center justify-between gap-3">
+            <div class="flex items-center justify-start gap-4 text-right">
+                <div class="bg-white p-2 rounded-xl shadow-lg shrink-0 group hover:scale-105 transition-transform duration-300">
+                    <img src="/CITL.png" alt="Logo" class="h-16 w-auto object-contain transform scale-110">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-white font-black text-[24px] leading-tight tracking-wide drop-shadow-md">كلية النقل الدولي واللوجستيات</h1>
+                    <h2 class="text-[#F3A628] text-xs font-bold tracking-[2px] uppercase font-sans mt-0.5 opacity-90">College of International Transport & Logistics</h2>
+                    <p class="text-xs text-blue-100/90 font-bold mt-1 tracking-tighter">النظام الذكي لإدارة جداول القاعات الدراسية</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 h-full">
+                <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="bg-white/10 hover:bg-white/20 text-white border border-white/10 px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px] hidden"> 
+                    <i class="fas fa-cogs text-base text-[#F3A628] ml-2"></i> وضع التعديل 
+                </button>
+                <button onclick="openMyScheduleModal()" class="bg-white/10 hover:bg-white/20 text-white border border-white/10 px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px]"> 
+                    <i class="fas fa-chalkboard-user text-base text-[#F3A628] ml-2"></i> الجداول الدراسية 
+                </button>
+                <a href="/dashboard/" class="bg-gradient-to-b from-[#F3A628] to-[#d48a1b] text-[#2A3475] px-4 py-2 rounded-lg font-black hover:brightness-110 shadow-lg border border-white/20 text-[13px]"> 
+                    <i class="fas fa-home ml-2"></i> الرئيسية 
+                </a>
+
+                <div class="w-px h-8 bg-white/20 mx-1"></div>
+                
+                <div class="flex items-center gap-3 bg-black/20 rounded-full pl-2 pr-5 py-1.5 border border-white/10 shrink-0 backdrop-blur-md self-center shadow-inner">
+                    <div class="flex flex-col text-right">
+                        <span id="profile-name" class="text-[13px] font-bold text-white leading-tight">جاري التحميل...</span>
+                        <span id="profile-role" class="text-[11px] text-[#F3A628] leading-tight opacity-90">...</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-[#2A3475] flex items-center justify-center text-white font-bold shadow-md border border-white/20 relative">
+                        <i class="fas fa-user"></i>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#2A3475] rounded-full animate-pulse"></span>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="bg-white/5 hover:bg-red-600 text-red-100 hover:text-white border border-white/10 p-2.5 rounded-xl transition-all shadow-sm ml-1">
+    <i class="fas fa-sign-out-alt text-lg"></i>
+</button>
+            </div>
+        </div>
+
+<div class="lg:hidden flex flex-row items-center justify-between w-full gap-1">
+    <div class="flex items-center gap-1.5 flex-1 min-w-0">
+        <div class="relative shrink-0">
+<div class="bg-white p-1 rounded-lg shadow-md relative h-11 w-11 flex items-center justify-center border border-white/20">
+<div id="mobileEditBtn" onclick="event.stopPropagation(); toggleAdminMode();" class="absolute -top-1.5 -left-1.5 bg-white text-[#2A3475] w-6 h-6 rounded-full flex items-center justify-center text-[10px] border border-gray-200 shadow-md cursor-pointer z-30 transition-all active:scale-125">
+    <i class="fas fa-edit"></i>
+</div>
+    <img src="/CITL.png" onclick="toggleMobileMenu()" alt="Logo" class="h-8 w-auto object-contain cursor-pointer">
+    <div onclick="toggleMobileMenu()" class="absolute -bottom-1 -right-1 bg-[#2A3475] text-[#F3A628] w-5 h-5 rounded-full flex items-center justify-center text-[8px] border border-white shadow-sm cursor-pointer">
+        <i class="fas fa-bars"></i>
+    </div>
+</div>
+        </div>
+
+        <div class="flex flex-col text-right leading-tight overflow-hidden flex-1 min-w-0">
+            <h1 class="text-white font-black text-[clamp(10.5px,3.5vw,13.5px)] whitespace-nowrap drop-shadow-sm">كلية النقل الدولي واللوجستيات</h1>
+            <h2 class="text-[#F3A628] text-[clamp(7.25px,2.05vw,8.75px)] font-bold uppercase opacity-90 leading-none mt-0.5 whitespace-nowrap">College of International Transport & Logistics</h2>
+            <p class="text-[clamp(8px,2.3vw,9.2px)] text-blue-100/70 font-bold leading-none mt-0.5 whitespace-nowrap">النظام الذكي لإدارة جداول القاعات الدراسية</p>
+        </div>
+
+        <div id="mob-profile-capsule" onclick="toggleProfileInfoMenu()" class="flex flex-col justify-center text-left leading-tight bg-black/20 px-2.5 h-11 rounded-xl border border-white/10 backdrop-blur-md shadow-inner w-[clamp(82px,23.5vw,95px)] overflow-hidden shrink-0 cursor-pointer active:bg-black/40 transition-all ml-1">
+            <span id="profile-name-mob" class="text-[10.5px] font-bold text-white truncate block w-full">...</span>
+            <span id="profile-role-mob" class="text-[8.5px] text-[#F3A628] font-bold uppercase truncate block w-full">...</span>
+        </div>
+    </div>
+</div>
+</header>
+
+<div id="profile-info-menu" class="hidden fixed w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300">
+    <div class="metallic-blue-fill p-4 border-b border-[#F3A628] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full -ml-10 -mt-10"></div>
+        <div class="flex items-center gap-3 relative z-10">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/20 shadow-inner">
+                <i class="fas fa-user-circle text-xl"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-blue-200 font-bold">بيانات الحساب</p>
+                <h4 id="full-profile-name" class="text-white font-black text-sm leading-tight truncate w-40">...</h4>
+            </div>
+        </div>
+    </div>
+    <div class="p-4 bg-white">
+        <div class="flex items-start gap-3 mb-4">
+            <div class="bg-gray-50 p-2 rounded-lg text-[#2A3475]"><i class="fas fa-id-badge text-sm"></i></div>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">المسمى الوظيفي والجهة</p>
+                <p id="full-profile-role" class="text-xs text-gray-700 font-bold leading-relaxed break-words">...</p>
+            </div>
+        </div>
+        <button id="mob-edit-btn" class="w-full py-2.5 bg-[#2A3475]/5 text-[#2A3475] rounded-xl text-[11px] font-bold border border-[#2A3475]/10 hover:bg-[#2A3475] hover:text-white transition-all transform active:scale-95 flex items-center justify-center gap-2">
+            <i class="fas fa-user-edit"></i> تعديل بياناتي
+        </button>
+    </div>
+</div>
+
+<div id="mobile-menu" class="hidden fixed inset-0 z-[10002] lg:hidden">
+    <div class="absolute inset-0 bg-[#2A3475]/60 backdrop-blur-sm transition-opacity" onclick="toggleMobileMenu()"></div>
+    
+    <div id="mobile-menu-content" class="absolute right-0 top-0 bottom-0 w-60 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        
+        <div class="metallic-blue-fill p-5 relative overflow-hidden shrink-0 border-b-2 border-[#F3A628]">
+            <div class="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-10 -mt-10"></div>
+            <div class="flex flex-col items-center text-center gap-3 relative z-10">
+                <img src="CITL.png" class="h-14 w-auto bg-white p-1 rounded-lg shadow-sm" alt="Logo">
+                <div class="flex flex-col gap-1">
+                    <h1 class="text-white font-black text-[12px] leading-tight drop-shadow-md">كلية النقل الدولي واللوجستيات</h1>
+                    <h2 class="text-[#F3A628] text-[8px] font-bold uppercase opacity-90">College of International Transport & Logistics</h2>
+                    <p class="text-[9px] text-blue-100/90 font-bold leading-tight">النظام الذكي لإدارة جداول القاعات الدراسية</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 py-5 px-4 space-y-3 overflow-y-auto custom-scrollbar">
+            
+            <a href="/dashboard/" class="w-full flex items-center justify-between p-4 rounded-xl bg-orange-50 text-[#d48a1b] font-bold text-sm border border-orange-100 transform active:scale-95 transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>الرئيسية</span>
+                </div>
+                <i class="fas fa-chevron-left text-[10px] opacity-50"></i>
+            </a>
+            
+            <button onclick="openMyScheduleModal(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-chalkboard-user text-lg text-[#2A3475]"></i>
+                    <span>الجداول الدراسية</span>
+                </div>
+            </button>
+
+            <button id="admin-toggle-mob" onclick="toggleAdminMode(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right hidden">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-cogs text-lg text-[#2A3475]"></i>
+                    <span>وضع التعديل</span>
+                </div>
+            </button>
+
+            <div class="border-t border-gray-100 my-4"></div>
+            
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors text-right">
+                <i class="fas fa-sign-out-alt text-lg"></i>
+                <span>تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<main class="flex-1 w-full max-w-[96%] mx-auto px-4 py-6"> <section class="bg-white rounded-xl shadow-lg border border-gray-100 mb-8 relative overflow-visible">
+    <div class="p-5 md:p-8">
+        
+        <div class="flex items-center justify-between mb-6 md:mb-8 border-b border-gray-100 pb-4 md:pb-6">
+            <div class="flex items-center gap-3 md:gap-4 w-full overflow-hidden">
+                <div class="bg-[#2A3475]/5 p-2.5 md:p-3 rounded-xl text-[#2A3475] shrink-0 border border-[#2A3475]/10 shadow-sm">
+                    <i class="fas fa-sliders-h text-lg md:text-2xl"></i>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <h2 class="text-base md:text-xl font-bold text-[#2A3475] truncate leading-tight">
+                        تصفية واستعراض الجداول
+                    </h2>
+                    <p class="text-[10px] md:text-sm text-gray-500 font-bold mt-0.5 md:mt-1 truncate opacity-80">
+                        اختر المعايير لعرض المحاضرات المطلوبة بدقة
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-6 md:mb-8">
+            
+            <div class="group">
+                <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">اليوم</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-3 border border-gray-200 rounded-xl text-xs md:text-sm font-bold text-gray-700 bg-gray-50 flex items-center justify-between cursor-pointer transition-all hover:border-[#2A3475]/50 active:scale-[0.99]">
+                        <span class="truncate">كل الأيام</span>
+                        <i class="fas fa-chevron-down text-[10px] md:text-xs text-gray-400 transition-transform duration-200"></i>
+                    </div>
+                    
+                    <ul class="custom-dropdown-options custom-scrollbar">
+                        <li class="custom-option" data-value="">كل الأيام</li>
+                        <li class="custom-option" data-value="Saturday">السبت</li>
+                        <li class="custom-option" data-value="Sunday">الأحد</li>
+                        <li class="custom-option" data-value="Monday">الاثنين</li>
+                        <li class="custom-option" data-value="Tuesday">الثلاثاء</li>
+                        <li class="custom-option" data-value="Wednesday">الأربعاء</li>
+                        <li class="custom-option" data-value="Thursday">الخميس</li>
+                    </ul>
+
+                    <select id="filter-day" class="hidden" onchange="applyFilters()">
+                        <option value="">كل الأيام</option>
+                        <option value="Saturday">السبت</option>
+                        <option value="Sunday">الأحد</option>
+                        <option value="Monday">الاثنين</option>
+                        <option value="Tuesday">الثلاثاء</option>
+                        <option value="Wednesday">الأربعاء</option>
+                        <option value="Thursday">الخميس</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="group">
+                <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">المحاضر</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all hover:border-[#2A3475]/50 active:scale-[0.99]">
+                        <span class="truncate">كل المحاضرين</span>
+                        <i class="fas fa-chevron-down text-[10px] md:text-xs text-gray-400 transition-transform duration-200"></i>
+                    </div>
+                    <ul class="custom-dropdown-options custom-scrollbar"></ul>
+                    <select id="filter-instructor" class="hidden" onchange="applyFilters()">
+                        <option value="">كل المحاضرين</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="group">
+                <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">المادة الدراسية</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all hover:border-[#2A3475]/50 active:scale-[0.99]">
+                        <span class="truncate">كل المواد</span>
+                        <i class="fas fa-chevron-down text-[10px] md:text-xs text-gray-400 transition-transform duration-200"></i>
+                    </div>
+                    <ul class="custom-dropdown-options custom-scrollbar"></ul>
+                    <select id="filter-course" class="hidden" onchange="applyFilters()">
+                        <option value="">كل المواد</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="group">
+                <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">القاعة</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all hover:border-[#2A3475]/50 active:scale-[0.99]">
+                        <span class="truncate">كل القاعات</span>
+                        <i class="fas fa-chevron-down text-[10px] md:text-xs text-gray-400 transition-transform duration-200"></i>
+                    </div>
+                    <ul class="custom-dropdown-options custom-scrollbar"></ul>
+                    <select id="filter-room" class="hidden" onchange="applyFilters()">
+                        <option value="">كل القاعات</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="group">
+                <label class="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">التوقيت</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all hover:border-[#2A3475]/50 active:scale-[0.99]">
+                        <span class="truncate">كل الأوقات</span>
+                        <i class="fas fa-chevron-down text-[10px] md:text-xs text-gray-400 transition-transform duration-200"></i>
+                    </div>
+                    
+                    <ul class="custom-dropdown-options custom-scrollbar">
+                        <li class="custom-option" data-value="">كل الأوقات</li>
+                        <li class="custom-option" data-value="08:30">صباحاً (بعد 08:30)</li>
+                        <li class="custom-option" data-value="12:30">الظهيرة (بعد 12:30)</li>
+                        <li class="custom-option" data-value="16:30">المساء (بعد 04:30)</li>
+                    </ul>
+                    
+                    <select id="filter-time" class="hidden" onchange="applyFilters()">
+                        <option value="">كل الأوقات</option>
+                        <option value="08:30">صباحاً (بعد 08:30)</option>
+                        <option value="12:30">الظهيرة (بعد 12:30)</option>
+                        <option value="16:30">المساء (بعد 04:30)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 md:gap-4 border-t border-gray-100 pt-5 md:pt-6">
+            <button onclick="applyFilters()" class="flex-1 bg-[#2A3475] text-white py-3.5 md:py-3 rounded-xl font-bold text-sm md:text-base hover:bg-[#1e255a] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-3 group active:scale-95">
+                <i class="fas fa-search group-hover:scale-110 transition-transform"></i> عرض النتائج
+            </button>
+            
+            <button onclick="resetFilters()" class="w-full md:w-auto px-8 py-3.5 md:py-3 text-gray-600 hover:text-[#2A3475] hover:bg-gray-50 bg-white border-2 border-gray-200 rounded-xl transition-colors font-bold flex items-center justify-center gap-2 active:scale-95" title="إعادة تعيين">
+                <i class="fas fa-undo"></i> 
+                <span>إعادة تعيين</span>
+            </button>
+        </div>
+
+    </div>
+</section>
+
+<section class="mb-6 md:mb-10">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8 min-h-[400px] relative">
+        
+        <div class="flex justify-between items-center mb-6 md:mb-8 border-b border-gray-100 pb-4">
+            <h3 class="text-base md:text-xl font-bold text-[#2A3475] flex items-center gap-2 md:gap-3">
+                <div class="bg-[#F3A628]/10 p-1.5 md:p-2 rounded-lg text-[#F3A628]">
+                    <i class="fas fa-table text-lg md:text-xl"></i>
+                </div>
+                الجداول الدراسية
+            </h3>
+            
+            <span id="results-count" class="text-[10px] md:text-xs font-bold bg-[#2A3475] text-white px-2.5 py-1 md:px-4 md:py-1.5 rounded-full shadow-sm">
+                0 نتيجة
+            </span>
+        </div>
+
+        <div id="loading-spinner" class="hidden flex justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 md:h-14 md:w-14 border-4 border-gray-200 border-t-[#2A3475]"></div>
+        </div>
+
+        <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div class="col-span-full text-center py-16 md:py-24 flex flex-col items-center justify-center text-gray-400">
+                <div class="bg-gray-50 p-5 md:p-6 rounded-full mb-4 shadow-inner">
+                    <i class="fas fa-layer-group text-3xl md:text-5xl opacity-30 text-[#2A3475]"></i>
+                </div>
+                <p class="font-bold text-sm md:text-lg text-gray-500">لم يتم تحديد معايير العرض</p>
+                <p class="text-[10px] md:text-sm text-gray-400 mt-1 md:mt-2">استخدم أدوات التصفية بالأعلى للبدء</p>
+            </div>
+        </div>
+
+<section class="mt-auto">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 relative overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <div class="absolute top-0 right-0 w-1.5 h-full bg-[#2A3475]"></div>
+        
+        <div class="p-4 md:p-6">
+            
+            <div class="flex items-center justify-between mb-4 md:mb-6 border-b border-gray-100 pb-3 md:pb-4">
+                <div class="flex items-center space-x-3 space-x-reverse min-w-0">
+                    <div class="bg-[#2A3475]/10 p-2 md:p-2.5 rounded-lg text-[#2A3475] shrink-0">
+                        <i class="fas fa-robot text-lg md:text-2xl animate-pulse"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm md:text-lg font-bold text-[#2A3475] truncate">المساعد الذكي</h3>
+                        <p class="text-[10px] md:text-xs text-gray-500 truncate">اسأل عن المواعيد والقاعات (AI)</p>
+                    </div>
+                </div>
+                
+                <span class="px-2 py-1 bg-blue-50 text-[#2A3475] text-[9px] md:text-[10px] font-bold rounded border border-blue-100 flex items-center gap-1 shrink-0">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> ONLINE
+                </span>
+            </div>
+
+            <div class="relative group mb-4">
+                <input type="text" id="smart-search" 
+                    class="w-full px-4 py-3 md:px-5 md:py-4 pr-10 md:pr-12 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#2A3475] focus:bg-white focus:ring-4 focus:ring-[#2A3475]/10 transition-all outline-none text-xs md:text-base font-bold text-gray-700 placeholder-gray-400 shadow-inner"
+                    placeholder="اكتب سؤالك هنا... (مثال: فين دكتورة ن..؟)">
+                <div class="absolute inset-y-0 right-3 md:right-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400 text-sm md:text-lg group-focus-within:text-[#2A3475] transition-colors"></i>
+                </div>
+            </div>
+
+            <div id="ai-response-area" class="hidden">
+                <div class="bg-gradient-to-br from-[#2A3475]/5 to-[#F3A628]/5 border border-[#2A3475]/10 rounded-xl p-3 md:p-4 flex items-start gap-3 text-right shadow-sm">
+                    <div class="bg-white p-1.5 md:p-2 rounded-full shadow-md text-[#F3A628] shrink-0 border border-gray-100">
+                        <i class="fas fa-sparkles text-sm md:text-lg"></i>
+                    </div>
+                    <div class="flex-1 pt-0.5 min-w-0">
+                        <h4 class="font-bold text-[#2A3475] text-[10px] md:text-xs mb-1">الإجابة المقترحة:</h4>
+                        <p id="ai-response-text" class="text-gray-800 font-bold text-xs md:text-sm leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    </main>
+
+<footer class="metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50">
+    <div class="w-full max-w-[98%] mx-auto px-6 py-2 md:py-3">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+
+            <div class="hidden md:flex items-center gap-4">
+                <div class="bg-white p-1 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/20">
+                    <img src="CITL.png" alt="CITL Logo" class="h-10 w-auto object-contain transform scale-110">
+                </div>
+                <div class="text-right leading-tight">
+                    <h3 class="font-black text-white text-xs md:text-sm tracking-wide">كلية النقل الدولي واللوجستيات</h3>
+                    <p class="text-[#F3A628] text-[9px] md:text-[10px] font-bold font-sans tracking-wider uppercase opacity-90">College of International Transport & Logistics</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-4 text-[11px] md:text-xs">
+                
+                <p class="text-blue-100/90 text-center md:text-right font-medium leading-relaxed">
+                    جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2025
+                    <span class="hidden md:inline mx-1">|</span> <br class="md:hidden"> تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).
+                </p>
+
+                <div class="hidden md:block w-px h-5 bg-white/20"></div>
+
+                <div class="flex items-center gap-1.5 md:gap-3 bg-black/20 px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-white/10 shadow-inner">
+                    <a href="https://www.facebook.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.linkedin.com/in/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[10px] md:text-[13px]"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.youtube.com/@CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-youtube"></i></a>
+                    <div class="w-px h-3 bg-white/10 mx-0.5"></div>
+                    <a href="https://www.aast.edu/en/colleges/citl/alex" target="_blank" class="text-[#F3A628] hover:scale-125 transition-all text-[12px] md:text-sm"><i class="fas fa-globe"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div id="my-schedule-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="absolute inset-0 bg-[#2A3475]/90 backdrop-blur-sm transition-opacity" onclick="closeMyScheduleModal()"></div>
+
+    <div class="bg-white rounded-2xl shadow-2xl w-[95%] md:w-full md:max-w-[80%] h-[90vh] flex flex-col overflow-hidden relative z-10 modal-enter mx-auto">
+        
+        <div class="metallic-blue-fill random-slanted-lines px-4 py-4 md:px-6 flex justify-between items-center shadow-md shrink-0 z-30">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/10 p-2 rounded-lg">
+                    <i class="fas fa-chalkboard-user text-[#F3A628] text-lg md:text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-base md:text-lg font-bold text-white">إدارة جدولي الدراسي</h3>
+                    <p class="text-[10px] md:text-xs text-blue-200">تفعيل وإلغاء المحاضرات</p>
+                </div>
+            </div>
+            <button onclick="closeMyScheduleModal()" class="text-white/70 hover:text-white transition-colors"><i class="fas fa-times text-lg md:text-xl"></i></button>
+        </div>
+
+        <div class="flex-1 overflow-hidden bg-[#f8fafc] relative flex flex-col w-full">
+            
+<div id="my-schedule-setup" class="hidden flex-col h-full w-full overflow-hidden bg-white">
+    
+    <div class="shrink-0 p-4 md:p-6 pb-2 text-center bg-white border-b border-gray-100 shadow-sm z-10">
+        <h4 id="setup-welcome-msg" class="text-base md:text-xl font-bold text-gray-800 mb-1 md:mb-2">مرحباً بك! 👋</h4>
+        <p class="text-gray-500 text-[10px] md:text-sm mb-3 md:mb-4 font-bold">لإدارة جدولك، اختر اسمك (أو الأسماء التي تنوب عنها) من القائمة:</p>
+        
+        <div class="relative max-w-xl mx-auto w-full">
+            <input type="text" id="instructor-search-input" onkeyup="filterInstructorGrid()" placeholder="ابحث عن الاسم..." class="w-full px-4 py-2.5 md:py-3 pl-10 border-2 border-gray-200 rounded-xl focus:border-[#2A3475] outline-none font-bold text-gray-700 text-xs md:text-sm transition-all shadow-sm">
+            <i class="fas fa-search absolute left-3 top-3 md:top-3.5 text-gray-400 text-xs md:text-sm"></i>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-3 md:p-6 custom-scrollbar bg-[#f8fafc]">
+        <div id="instructor-selection-grid" class="grid grid-cols-4 lg:grid-cols-6 gap-1.5 md:gap-2 pb-10"></div>
+    </div>
+
+    <div class="shrink-0 p-4 bg-white border-t border-gray-200 flex flex-col md:flex-row gap-3 justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.1)] relative z-[100]">
+        <span id="selection-count-badge" class="w-full md:w-auto text-center px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100">
+            تم اختيار: 0
+        </span>
+        
+        <button onclick="saveInstructorSelection()" class="w-full md:w-auto px-8 py-2.5 bg-[#2A3475] text-white rounded-xl font-bold hover:bg-[#1f2658] shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2 relative z-[101] cursor-pointer">
+            <i class="fas fa-check"></i> حفظ وبدء العمل
+        </button>
+    </div>
+</div>
+
+            <div id="my-schedule-content" class="hidden flex-col h-full overflow-hidden bg-[#f8fafc]">
+                
+                <div class="shrink-0 bg-white p-4 border-b border-gray-200 shadow-sm z-20">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-2 w-full md:flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-users-cog text-[#2A3475] text-sm"></i>
+                                <span class="text-xs font-bold text-gray-500">الأسماء التي تدير جدولها:</span>
+                            </div>
+                            <div id="managed-names-chips" class="flex flex-wrap gap-2 max-h-24 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        
+                        <button onclick="resetInstructorLink()" class="w-full md:w-auto shrink-0 bg-[#2A3475] text-white px-5 py-2.5 rounded-lg shadow-lg hover:bg-[#1f2658] transition-all flex items-center justify-center text-xs md:text-sm font-bold hover:shadow-xl transform active:scale-95 whitespace-nowrap self-end md:self-auto">
+                            <i class="fas fa-edit ml-2"></i> تعديل القائمة
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mobile-schedule-list" class="md:hidden flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar pb-20">
+                    </div>
+
+                <div class="hidden md:block bg-white border border-gray-200 rounded-xl shadow-sm m-6 overflow-hidden flex-1 relative">
+                    <div class="table-scroll h-full overflow-y-auto custom-scrollbar" style="max-height: 680px;">
+                        <table class="min-w-full text-sm text-right relative">
+                            <thead class="bg-gray-50 text-gray-700 font-bold text-xs uppercase sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50">اليوم</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50 text-center">الموعد</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50">المادة</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50">المحاضر</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50 text-center">القاعة</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50 text-center">الحالة</th>
+                                    <th class="px-6 py-4 whitespace-nowrap bg-gray-50 text-center">تحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-schedule-rows" class="divide-y divide-gray-100 text-gray-700 bg-white">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="empty-schedule-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-white/50 backdrop-blur-sm z-30 pointer-events-none">
+                    <div class="bg-gray-100 p-6 rounded-full mb-4">
+                        <i class="fas fa-calendar-times text-4xl opacity-30 text-[#2A3475]"></i>
+                    </div>
+                    <p class="font-bold text-lg text-[#2A3475]">لا توجد محاضرات في جدولك</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-[#2A3475]/90 backdrop-blur-sm transition-opacity">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm transform scale-100 transition-all overflow-hidden border-t-4 border-[#F3A628]">
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <i class="fas fa-question text-3xl text-[#2A3475]"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">تأكيد الإجراء</h3>
+            <p id="custom-confirm-message" class="text-sm text-gray-500 leading-relaxed mb-6">هل أنت متأكد؟</p>
+            <div class="flex gap-3">
+                <button id="btn-confirm-yes" class="flex-1 bg-[#2A3475] text-white py-2.5 rounded-xl font-bold hover:bg-[#1f2658] shadow-md transition-all">نعم، متأكد</button>
+                <button id="btn-confirm-no" class="flex-1 bg-gray-100 text-gray-600 py-2.5 rounded-xl font-bold hover:bg-gray-200 border border-gray-200 transition-all">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="admin-edit-modal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeAdminEditModal()"></div>
+
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 mx-4 overflow-hidden transform scale-100 transition-all">        
+        <div class="bg-[#2A3475] px-6 py-4 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fas fa-edit text-[#F3A628]"></i> تعديل بيانات المحاضرة
+            </h3>
+            <button onclick="closeAdminEditModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <div class="p-6 space-y-4 bg-gray-50">
+            <input type="hidden" id="edit-id">
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">اسم المحاضر</label>
+                <input type="text" id="edit-instructor" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#2A3475] font-bold text-gray-700">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">المادة الدراسية</label>
+                <input type="text" id="edit-course" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#2A3475] font-bold text-gray-700">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">القاعة</label>
+                    <input type="text" id="edit-room" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#2A3475] font-bold text-gray-700">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">التوقيت</label>
+                    <input type="text" id="edit-time" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#2A3475] font-bold text-gray-700">
+                </div>
+            </div>
+
+             <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1">اليوم</label>
+                <select id="edit-day" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#2A3475] font-bold text-gray-700 bg-white">
+                    <option value="Saturday">السبت</option>
+                    <option value="Sunday">الأحد</option>
+                    <option value="Monday">الاثنين</option>
+                    <option value="Tuesday">الثلاثاء</option>
+                    <option value="Wednesday">الأربعاء</option>
+                    <option value="Thursday">الخميس</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-white border-t border-gray-100 flex gap-3">
+            <button onclick="saveAdminChanges()" class="flex-1 bg-[#2A3475] text-white py-2.5 rounded-xl font-bold hover:bg-[#1e255a] shadow-md transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-save"></i> حفظ التعديلات
+            </button>
+            <button onclick="closeAdminEditModal()" class="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all">
+                إلغاء
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =======================================================
+    // 1. إعدادات الاتصال بـ Supabase (النسخة الموحدة والاحترافية)
+    // =======================================================
+    const SUPABASE_URL = 'https://xgqukdbonzukxrpjovmb.supabase.co';
+    
+    // المفتاح العادي (Public anon key)
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
+    
+    // مفتاح الأدمن (Service Role) - ضروري لعمليات الحذف والتعديل
+    const SUPABASE_SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Mzg5ODgwMywiZXhwIjoyMDc5NDc0ODAzfQ.5scdGp3iWsHq45xpO4K92UuvA3cLm13zl6brA1i87C0';
+
+    // حفظ factory الأصلي
+    const supabaseFactory = window.supabase;
+
+    // -------------------------------------------------------
+    // أ. تهيئة العميل الأساسي (sb) - للمستخدم العادي
+    // -------------------------------------------------------
+    const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+            storageKey: 'sb-main-auth',
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+        }
+    });
+
+    // -------------------------------------------------------
+    // ب. تهيئة عميل الأدمن (sbAdmin) - للعمليات الحساسة
+    // -------------------------------------------------------
+    const sbAdmin = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+        auth: {
+            persistSession: false, // لا يحفظ الجلسة لمنع التضارب
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    });
+
+    // -------------------------------------------------------
+    // 🔥 الربط العام (Global Exposure) - هذا يحل المشكلة 🔥
+    // -------------------------------------------------------
+    window.supabase = sb;
+    window.supabaseAdmin = sbAdmin;
+
+    // متغيرات عامة
+    let currentUser = null;
+    let cachedData = []; 
+    let searchTimeout;
+    let loaderStartTime = 0;
+
+// --- دوال التحكم في شاشة التحميل (نسخة index المتطورة) ---
+window.showLoader = function(text = "يرجى الانتظار لحظات...") {
+    const loader = document.getElementById('global-loader');
+    const textEl = document.getElementById('loader-text');
+    
+    if(textEl) textEl.textContent = text;
+
+    if(loader) {
+        loader.classList.remove('hidden');
+        loader.classList.add('flex');
+        
+        // تفعيل أنيميشن الـ Zoom In
+        setTimeout(() => {
+            loader.classList.remove('opacity-0');
+            const inner = loader.querySelector('.relative');
+            if(inner) {
+                inner.classList.remove('scale-95');
+                inner.classList.add('scale-100');
+            }
+        }, 10);
+    }
+};
+
+window.hideLoader = function() {
+    const loader = document.getElementById('global-loader');
+    if(loader) {
+        loader.classList.add('opacity-0');
+        const inner = loader.querySelector('.relative');
+        if(inner) {
+            inner.classList.remove('scale-100');
+            inner.classList.add('scale-95');
+        }
+        
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }, 300);
+    }
+};
+    // دالة مساعدة
+    window.showLoading = function(show) {
+        if (show) { window.showLoader('جاري البحث...'); } 
+        else { window.hideLoader(); }
+    };
+
+    // --- قاموس الترجمة للبحث ---
+    const nameDictionary = {
+        "ندى": "Nada", "عمر": "Omar", "دينا": "Dina", "نورهان": "Nourhan", "مروة": "Marwa", "شروق": "Shrouk", "بسنت": "Passent", "هايدي": "Haidy", "شهد": "Shahd", "أحمد": "Ahmed", "حبيبة": "Habiba", "شهاب": "Chehab", "محمد": "Mohamed", "سمر": "Summer", "آمنة": "Amnh", "شيرين": "Sherine", "جمال": "Gamal", "نانسي": "Nancy", "مها": "Maha", "مي": "Mai", "كيرلس": "Kerolous", "سلمى": "Salma", "لارا": "Lara", "أنطوان": "Antoine", "باهر": "Baher", "روان": "Rowan", "إيمان": "Iman", "عمرو": "Amr", "بسمة": "Basma", "ياسمين": "Yasmin", "زينة": "Zeina", "سيلفيا": "Silvia", "حسين": "Hussien", "أبانوب": "Abanob", "تامر": "Tamer", "صبحي": "Sobhy", "سالي": "Sally", "علاء": "Alaa", "ميرهان": "Merhan", "خالد": "Khaled", "مصطفى": "Moustafa", "هبة الله": "Heba-tallah", "لبنى": "Lubna", "إبراهيم": "Ibrahim", "سارة": "Sarah", "ميار": "Mayar", "هدير": "Hadeer", "هالة": "Halah", "محمود": "Mahmoud", "يارا": "Yara", "يمنى": "Yomna", "ريمون": "Remon", "هبة": "Heba", "أميرة": "Amira", "معتصم": "Moataseem", "نادر": "Nader", "إسلام": "Islam", "جيلان": "Jilan", "سلسبيل": "Salsabil", "مهند": "Mohannad", "جاسر": "Gasser", "سهيلة": "Sohaila", "جيهان": "Gehan", "جهاد": "Gehad", "أمينة": "Amina", "عبد الوهاب": "Abd El-Wahab", "رامي": "Ramy", "شيماء": "Shaimaa", "علي": "Ali", "مجدي": "Magdy", "عادل": "Adel", "فاروق": "Farouk", "دعاء": "Doaa", "دارين": "Dareen", "داليا": "Dalia", "عبد الرحمن": "Abdelrahman", "جنى": "Jana"
+    };
+
+    const daysMapAr = { 'Saturday': 'السبت', 'Sunday': 'الأحد', 'Monday': 'الاثنين', 'Tuesday': 'الثلاثاء', 'Wednesday': 'الأربعاء', 'Thursday': 'الخميس', 'Friday': 'الجمعة' };
+    const daysMapEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    // 1. تعريف الأقسام
+    const departments = {
+        'dean': { name: 'مكتب العميد', priority: 1, color: 'dean-priority' },
+        'transport-logistics': { name: 'قسم إدارة لوجستيات النقل', priority: 3, color: 'department-priority' },
+        'trade-logistics': { name: 'قسم إدارة لوجستيات التجارة الدولية', priority: 3, color: 'department-priority' },
+        'supply-chain': { name: 'قسم إدارة لوجستيات سلاسل الإمداد', priority: 3, color: 'department-priority' },
+        'energy-logistics': { name: 'قسم إدارة لوجستيات الطاقة والبترول', priority: 3, color: 'department-priority' },
+        'admin-followup': { name: 'قسم المتابعة الإدارية', priority: 3, color: 'department-priority' },
+        'training-agency': { name: 'وكالة شؤون التدريب وخدمة المجتمع', priority: 2, color: 'vice-dean-priority' },
+        'postgrad-agency': { name: 'وكالة الدراسات العليا والبحث العلمي', priority: 2, color: 'vice-dean-priority' },
+        'education-agency': { name: 'وكالة شؤون التعليم', priority: 2, color: 'vice-dean-priority' },
+        'students-agency': { name: 'وكالة شؤون الطلاب', priority: 2, color: 'vice-dean-priority' },
+        'assistants-office': { name: 'مكتب المعيدين', priority: 4, color: 'assistant-priority' },
+        'visitor': { name: 'زائر خارجي', priority: 5, color: 'bg-gray-500 text-white' },
+        'computer-lab': { name: 'معمل الحاسب', priority: 3, color: 'department-priority' },
+    };
+
+// ============================================================
+// 🔥 دالة التشغيل الرئيسية (تطابق smrm.html تماماً) 🔥
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    if (typeof window.showLoader === 'function') window.showLoader('جاري تهيئة النظام...');
+
+    try {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            
+            // 🔥 الخطوة التصحيحية: تعريف المتغير العام وتشغيل تحديث البروفايل للموبايل والكمبيوتر 🔥
+            currentUser = user; 
+            if (typeof updateSystemProfile === 'function') {
+                updateSystemProfile(currentUser);
+            }
+
+            const nameEl = document.getElementById('profile-name');
+            const roleEl = document.getElementById('profile-role');
+            
+            // 1. إضافة "مرحباً، " قبل الاسم لتطابق smrm
+            if (nameEl) nameEl.textContent = `مرحباً، ${user.full_name}`;
+
+            // 2. تغيير الفاصل إلى "-" وحذف المسافات الزائدة لتطابق smrm
+            if (roleEl) {
+                const deptName = (typeof departments !== 'undefined' && departments[user.department]) 
+                                 ? departments[user.department].name 
+                                 : (user.department || 'مستخدم');
+                const userPos = user.position ? ` - ${user.position}` : '';
+                roleEl.textContent = `${deptName}${userPos}`;
+            }
+
+            // إظهار زر الإدارة
+            const adminBtn = document.getElementById('admin-toggle-btn');
+            if ((user.role === 'manager' || user.is_admin) && adminBtn) {
+                adminBtn.classList.remove('hidden');
+            }
+        } else {
+            window.location.href = '/';
+            return;
+        }
+
+        // تحميل بيانات الصفحة الأصلية
+        if (typeof loadFilterOptions === 'function') await loadFilterOptions();
+        if (typeof refreshCache === 'function') await refreshCache();
+        if (typeof setupCustomDropdowns === 'function') setupCustomDropdowns(); 
+
+    } catch (error) {
+        console.error("Error initializing:", error);
+    } finally {
+        if (typeof window.hideLoader === 'function') window.hideLoader();
+    }
+});
+
+// تسجيل الخروج المباشر والآمن لمسح الجلسة بالكامل
+async function handleLogout() {
+    try {
+        // 1. تسجيل الخروج من سيرفر Supabase لمسح التوكن
+        // ملاحظة: تأكد أن اسم المتغير هو supabase كما في ملفاتك الداخلية
+        if (window.supabase) {
+            await supabase.auth.signOut();
+        }
+
+        // 2. مسح كافة البيانات المخزنة محلياً في المتصفح
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('sessionToken');
+        
+        // مسح مفتاح التخزين الخاص بـ Supabase (الذي حددناه في index.html)
+        localStorage.removeItem('sb-main-auth');
+
+        // 3. التوجيه لصفحة الدخول الرئيسية
+        // استخدم '../' إذا كان الملف داخل فولدر مثل smrm، أو '/' إذا كان في المسار الرئيسي
+        window.location.href = '../'; 
+
+    } catch (error) {
+        console.error("خطأ أثناء تسجيل الخروج:", error);
+        // في حالة حدوث خطأ، نقوم بمسح البيانات يدوياً وتحويل المستخدم على أي حال
+        localStorage.clear();
+        window.location.href = '../';
+    }
+}
+
+        async function refreshCache() {
+            const { data } = await supabase.from('academic_schedule').select('*');
+            if(data) cachedData = data;
+        }
+       
+        // --- 3. البحث الذكي المتطور ---
+        function normalizeArabic(text) {
+            if (!text) return "";
+            return text
+                .replace(/(آ|إ|أ)/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/[\u064B-\u065F\u0640]/g, '')
+                .toLowerCase()
+                .trim();
+        }
+
+        document.getElementById('smart-search').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
+            const aiArea = document.getElementById('ai-response-area');
+            
+            if (query.length < 2) {
+                aiArea.classList.add('hidden');
+                if(query.length === 0) resetView();
+                return;
+            }
+
+            document.getElementById('smart-search').parentElement.classList.add('ai-pulse');
+
+            searchTimeout = setTimeout(() => {
+                processAIQuery(query);
+                document.getElementById('smart-search').parentElement.classList.remove('ai-pulse');
+            }, 600);
+        });
+
+// ============================================================
+// دالة processAIQuery المُعدَّلة (التأسيس الاحترافي لدقة البحث)
+// ============================================================
+async function processAIQuery(query) {
+    const aiArea = document.getElementById('ai-response-area');
+    const aiText = document.getElementById('ai-response-text');
+    
+    // 1. التجهيز والترجمة المبدئية
+    let mappedQuery = normalizeArabic(query);
+    
+    // 🔥🔥 أ. منطق معالجة القاعات والأرقام والاختصارات 🔥🔥
+    // نستخدم تعابير منتظمة للبحث عن الأرقام أو اختصارات القاعات الكبيرة (002, LAP, IMO)
+    const roomMatch = query.match(/(\d{3})|(\d{1,2})|(\bLAP\b|\bIMO\b)/i);
+    
+    if (roomMatch) {
+        // نأخذ التطابق الأول ونحوله لحروف كبيرة لزيادة احتمالية العثور عليه في room_name
+        mappedQuery = roomMatch[0].toUpperCase().replace("قاعة", "").trim();
+    } else if (mappedQuery.includes("لاب")) {
+        // إذا بحث بالعربي "لاب"
+        mappedQuery = "LAP";
+    }
+
+    // 🔥🔥 ب. محاولة الترجمة (للأسماء القصيرة والعربية) 🔥🔥
+    for (const [arabicName, englishName] of Object.entries(nameDictionary)) {
+        // نستخدم startsWith لزيادة احتمالية العثور على اسم قصير (مثل ن)
+        if (mappedQuery.startsWith(arabicName) || mappedQuery.includes(arabicName)) {
+            mappedQuery = englishName; 
+            break; 
+        }
+    }
+    // --------------------------------------------------
+
+    // 2. إعدادات Fuse.js الاحترافية
+    const fuseOptions = {
+        // 🔥 زيادة الأوزان للعناصر المفتاحية لـ (المحاضر والقاعة)
+        keys: [
+            { name: 'instructor', weight: 15 }, // الأولوية القصوى
+            { name: 'room_name', weight: 10 },   // أولوية عالية
+            { name: 'course_name', weight: 0.3 }
+        ],
+        
+        // 🔥 تقليل حد التسامح لدقة أعلى
+        threshold: 0.1, 
+        shouldSort: true, 
+        includeScore: true, 
+        ignoreLocation: true, 
+        distance: 100, 
+        // البحث عن كلمات تبدأ بـ حرفين على الأقل (لـ ن أو 00)
+        minMatchCharLength: 2 
+    };
+    
+    // 3. تنفيذ البحث
+    const fuse = new Fuse(cachedData, fuseOptions);
+    const searchResults = fuse.search(mappedQuery); 
+    let filteredData = searchResults.map(r => r.item);
+    
+    // 4. بحث احتياطي في حال فشل Fuse (للتطابق العربي المباشر)
+    if (filteredData.length === 0 && mappedQuery.length > 1) {
+        const normQ = normalizeArabic(query);
+        filteredData = cachedData.filter(item => 
+            normalizeArabic(item.instructor).includes(normQ) ||
+            normalizeArabic(item.course_name).includes(normQ) ||
+            normalizeArabic(item.room_name).includes(normQ)
+        );
+    }
+
+    // 🔥🔥 5. التغيير الجوهري: إخفاء صندوق الرد اللفظي والتحول للبحث الفوري 🔥🔥
+    // هذا يحل مشكلة أن المساعد كان "مش عملي"
+    aiArea.classList.add('hidden'); 
+
+    if (query.length > 0) {
+        // إذا كان هناك شيء مكتوب، اعرض النتائج المفلترة
+        renderResults(filteredData);
+    } else {
+        // إذا كان مربع البحث فارغاً، عد للعرض الافتراضي
+        resetView(); 
+    }
+}
+
+        // --- دوال مساعدة للعرض ---
+async function loadFilterOptions() {
+            const { data } = await supabase.from('academic_schedule').select('instructor, course_name, room_name');
+            if (data) {
+                // استخراج القوائم الفريدة
+                const instructors = [...new Set(data.map(i => i.instructor).filter(i => i))].sort();
+                const courses = [...new Set(data.map(i => i.course_name).filter(i => i))].sort();
+                const rooms = [...new Set(data.map(i => i.room_name).filter(i => i))].sort();
+                
+                // تعبئة فلاتر البحث (كما كان سابقاً)
+                populateSelect('filter-instructor', instructors);
+                populateSelect('filter-course', courses);
+                populateSelect('filter-room', rooms);
+
+                // === الإضافة الجديدة: تعبئة قائمة القاعات داخل المودال ===
+                // populateSelect('input-room', rooms);
+            }
+        }
+
+function populateSelect(id, items) {
+    const select = document.getElementById(id);
+    if (!select) return;
+
+    // 1. ملء القائمة المخفية
+    const defaultText = select.options[0].text;
+    select.innerHTML = `<option value="">${defaultText}</option>`;
+    items.forEach(i => select.innerHTML += `<option value="${i}">${i}</option>`);
+
+    // 2. ملء القائمة الظاهرة
+    const dropdown = select.closest('.custom-dropdown');
+    if (dropdown) {
+        const ul = dropdown.querySelector('.custom-dropdown-options');
+        ul.innerHTML = `<li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50 font-bold" data-value="">${defaultText}</li>`;
+        
+        items.forEach(i => {
+            ul.innerHTML += `<li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="${i}">${i}</li>`;
+        });
+    }
+
+    // 3. إعادة تشغيل التفاعل
+    if (typeof setupCustomDropdowns === 'function') setupCustomDropdowns();
+}
+
+// ============================================================
+// الدالة المُعدَّلة: applyFilters
+// (تمت إضافة فلتر timeFilter الذي يعمل بعد جلب البيانات)
+// ============================================================
+async function applyFilters() {
+    
+    // دالة مساعدة لتحويل الوقت إلى دقائق للمقارنة
+    const timeToMinutes = (time) => {
+        if (!time || typeof time !== 'string' || !time.includes(':')) return 0;
+        try {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        } catch (e) {
+            return 0;
+        }
+    };
+    
+    // 1. جلب القيم الحالية
+    const day = document.getElementById('filter-day').value;
+    const instructor = document.getElementById('filter-instructor').value;
+    const course = document.getElementById('filter-course').value;
+    const room = document.getElementById('filter-room').value;
+    
+    // 🔥 جديد: قراءة قيمة فلتر التوقيت
+    const timeFilter = document.getElementById('filter-time') ? document.getElementById('filter-time').value : '';
+    const container = document.getElementById('results-grid');
+
+    // 2. التحقق من الاختيار
+    if (!day && !instructor && !course && !room && !timeFilter) { 
+        // ... (رسالة التحذير - كما هي) ...
+        document.getElementById('results-count').innerText = '0 نتيجة';
+        container.innerHTML = `
+            <div class="col-span-full bg-amber-50 border-r-4 border-[#F3A628] p-6 rounded-lg shadow-sm flex items-start gap-4 animate-pulse">
+                <div class="bg-white p-2 rounded-full shadow-sm text-[#F3A628]">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold text-[#2A3475] mb-1">عفواً، يجب تحديد معيار للبحث!</h4>
+                    <p class="text-gray-600 text-sm">يرجى اختيار (يوم، محاضر، مادة، أو قاعة) من القوائم أعلاه لعرض النتائج.</p>
+                </div>
+            </div>
+        `;
+        return; 
+    }
+
+    showLoading(true);
+
+    // 3. بناء الاستعلام على السيرفر (بدون التوقيت)
+    let query = supabase.from('academic_schedule').select('*');
+    if(day) query = query.eq('day_of_week', day);
+    if(instructor) query = query.eq('instructor', instructor);
+    if(course) query = query.eq('course_name', course);
+    if(room) query = query.eq('room_name', room);
+
+    query = query.order('period_order', { ascending: true });
+
+    const { data, error } = await query;
+    if (error) console.error(error);
+    
+    let filteredData = data || [];
+
+    // 4. 🔥 جديد: فلترة النتائج بعد الجلب بناءً على التوقيت (برمجياً)
+    if (timeFilter) {
+        const filterMinutes = timeToMinutes(timeFilter);
+        
+        filteredData = filteredData.filter(item => {
+            // نأخذ وقت بداية المحاضرة للمقارنة (مهم جداً استخدام split(' - ')[0])
+            const lectureStartTime = (item.time_slot || "").split(' - ')[0]; 
+            const lectureMinutes = timeToMinutes(lectureStartTime);
+            
+            // شرط الفلترة: وقت المحاضرة (بداية) أكبر من أو يساوي وقت الفلتر
+            return lectureMinutes >= filterMinutes;
+        });
+    }
+    // -----------------------------------------------------------------
+
+    renderResults(filteredData);
+    showLoading(false);
+}
+// ============================================================
+
+// ============================================================
+// دالة عرض الكروت (مع إجبار التوقيتات الرسمية المزدوجة 🕒) - نسخة محسنة للموبايل
+// ============================================================
+function renderResults(data) {
+    const container = document.getElementById('results-grid');
+    document.getElementById('results-count').innerText = `${data.length} نتيجة`;
+    container.innerHTML = '';
+
+    const getNextDate = (dayNameEn) => {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const targetIndex = days.indexOf(dayNameEn);
+        if (targetIndex === -1) return '';
+        const today = new Date();
+        const currentDayIndex = today.getDay();
+        let daysUntil = targetIndex - currentDayIndex;
+        if (daysUntil < 0) daysUntil += 7;
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + daysUntil);
+        return targetDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric' });
+    };
+
+    // 🔥 المترجم الذكي للتوقيتات (يحول القديم للجديد المزدوج) 🔥
+    const formatTimeDisplay = (time) => {
+        if (!time) return "غير محدد";
+        
+        const t = time.trim(); // تنظيف المسافات
+
+        // 1. الفترة الصباحية الأولى (08:30 - 10:20)
+        if (t.startsWith("08:30") || t.startsWith("8:30")) return "08:30 - 10:20";
+
+        // 2. الفترة الصباحية الثانية (10:30 - 12:20)
+        if (t.startsWith("10:30")) return "10:30 - 12:20";
+
+        // 3. فترة الظهيرة الأولى (12:30 - 02:20)
+        if (t.startsWith("12:30")) return "12:30 - 02:20";
+
+        // 4. فترة الظهيرة الثانية (02:30 - 04:20)
+        if (t.startsWith("02:30") || t.startsWith("14:30")) return "02:30 - 04:20";
+
+        // 5. الفترة المسائية (04:30 - 06:20)
+        if (t.startsWith("04:30") || t.startsWith("16:30")) return "04:30 - 06:20";
+
+        // لو وقت مختلف عن دول، بنحاول نظبطه 12 ساعة بس
+        return t
+            .replace("13:", "01:")
+            .replace("14:", "02:")
+            .replace("15:", "03:")
+            .replace("16:", "04:")
+            .replace("17:", "05:")
+            .replace("18:", "06:");
+    };
+
+    if (data.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-20 flex flex-col items-center justify-center text-gray-400 bg-white rounded-3xl border-2 border-dashed border-gray-200"><i class="fas fa-search text-6xl mb-4 opacity-20"></i><p class="font-bold text-lg">لا توجد نتائج مطابقة للبحث</p></div>`;
+        return;
+    }
+
+    data.forEach(item => {
+        const dateStr = getNextDate(item.day_of_week);
+        const displayTime = formatTimeDisplay(item.time_slot);
+
+        // ==========================================================
+        // 🔥 هنا التعديل: HTML الكارت متجاوب للموبايل والكمبيوتر 🔥
+        // ==========================================================
+        const cardHTML = `
+        <div onclick="handleCardClick('${item.id}')" class="schedule-card relative bg-white rounded-xl md:rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 cursor-pointer hover:-translate-y-1 h-full flex flex-col">
+            
+            <div class="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-[#F3A628]/10 rounded-bl-[60px] md:rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-150 duration-500 pointer-events-none"></div>
+            
+            <div class="p-4 md:p-6 relative z-10 pointer-events-none flex flex-col h-full">
+                
+                <div class="flex justify-between items-start mb-3 md:mb-4 pb-3 border-b border-gray-50">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] md:text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-0.5 md:mb-1">اليوم والتاريخ</span>
+                        <div class="flex items-center gap-1.5 md:gap-2">
+                            <span class="text-sm md:text-base font-black text-[#2A3475]">
+                                ${daysMapAr[item.day_of_week] || item.day_of_week}
+                            </span>
+                            <span class="text-[10px] md:text-xs font-bold text-[#F3A628] bg-[#F3A628]/10 px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-md">
+                                ${dateStr}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 border border-gray-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg flex flex-col items-end gap-0.5 shadow-sm group-hover:bg-[#2A3475] group-hover:text-white transition-colors duration-300 min-w-[90px] md:min-w-[100px] text-left">
+                        <div class="flex items-center gap-1.5 md:gap-2">
+                            <i class="far fa-clock text-[10px] md:text-xs text-[#F3A628]"></i>
+                            <span class="text-xs md:text-sm font-bold" dir="ltr">${displayTime}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="text-sm md:text-lg font-black text-gray-800 leading-snug mb-3 min-h-[2.5rem] md:min-h-[3rem] line-clamp-2 group-hover:text-[#2A3475] transition-colors flex-grow">
+                    ${item.course_name}
+                </h3>
+                
+                <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-3 md:mb-4"></div>
+
+                <div class="space-y-3 md:space-y-4 mt-auto">
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#2A3475] shrink-0">
+                            <i class="fas fa-chalkboard-teacher text-sm md:text-lg"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-[9px] md:text-xs text-gray-500 font-bold">المحاضر</span>
+                            <span class="text-xs md:text-base font-bold text-gray-800 truncate max-w-[150px] md:max-w-[200px]">${item.instructor}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#F3A628]/20 flex items-center justify-center text-[#d48a1b] shrink-0">
+                            <i class="fas fa-map-marker-alt text-sm md:text-lg"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-[9px] md:text-xs text-gray-500 font-bold">القاعة</span>
+                            <span class="text-xs md:text-base font-black text-[#2A3475] bg-gray-50 px-2 py-0.5 md:px-3 md:py-0.5 rounded border border-gray-100 w-fit">
+                                ${item.room_name}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        container.innerHTML += cardHTML;
+    });
+}
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loading-spinner');
+            const grid = document.getElementById('results-grid');
+            if(show) {
+                spinner.classList.remove('hidden');
+                grid.classList.add('opacity-50');
+            } else {
+                spinner.classList.add('hidden');
+                grid.classList.remove('opacity-50');
+            }
+        }
+
+function resetFilters() {
+            // 1. تصفير القوائم
+            document.querySelectorAll('select').forEach(s => s.value = '');
+            
+            // 2. إرجاع الشكل الافتراضي (نفس الشكل عند فتح الصفحة)
+            document.getElementById('results-grid').innerHTML = `
+                <div class="col-span-full text-center py-24 flex flex-col items-center justify-center text-gray-400">
+                    <div class="bg-gray-50 p-6 rounded-full mb-4 shadow-inner">
+                        <i class="fas fa-layer-group text-5xl opacity-30 text-[#2A3475]"></i>
+                    </div>
+                    <p class="font-bold text-lg text-gray-500">لم يتم تحديد معايير العرض</p>
+                    <p class="text-sm text-gray-400 mt-2">استخدم أدوات التصفية بالأعلى للبدء</p>
+                </div>
+            `;
+
+            // 3. تنظيف البحث الذكي
+            document.getElementById('ai-response-area').classList.add('hidden');
+            document.getElementById('smart-search').value = '';
+            
+            // 4. تصفير العداد
+            document.getElementById('results-count').innerText = '0 نتيجة';
+        }
+
+        // دالة تشغيل القوائم المنسدلة
+        function setupCustomDropdowns() {
+            document.querySelectorAll('.custom-dropdown-display').forEach(display => {
+                // إزالة المستمعين القدامى (لضمان عدم التكرار)
+                const newDisplay = display.cloneNode(true);
+                display.parentNode.replaceChild(newDisplay, display);
+
+                newDisplay.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const dropdown = newDisplay.closest('.custom-dropdown');
+                    const options = dropdown.querySelector('.custom-dropdown-options');
+                    document.querySelectorAll('.custom-dropdown-options').forEach(opt => {
+                        if(opt !== options) opt.classList.remove('show');
+                    });
+                    options.classList.toggle('show');
+                    
+                    // تدوير السهم
+                    const arrow = newDisplay.querySelector('.fa-chevron-down');
+                    if(arrow) arrow.style.transform = options.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                });
+            });
+
+            document.querySelectorAll('.custom-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const dropdown = this.closest('.custom-dropdown');
+                    const hiddenSelect = dropdown.querySelector('select');
+                    const displayText = dropdown.querySelector('.custom-dropdown-display span');
+                    
+                    // تحديث الشكل
+                    displayText.textContent = this.innerText;
+                    
+                    // تحديث القيمة وتشغيل الفلتر
+                    hiddenSelect.value = this.dataset.value;
+                    hiddenSelect.dispatchEvent(new Event('change')); // مهم جداً عشان applyFilters تشتغل
+                    
+                    dropdown.querySelector('.custom-dropdown-options').classList.remove('show');
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-dropdown-options').forEach(opt => opt.classList.remove('show'));
+            });
+        }
+        
+// ============================================================
+    // 🔥 تعريف المتغير العام (Global) لمنع الخطأ 🔥
+    // ============================================================
+    let selectedInstructors = new Set(); // تم توحيد الاسم
+
+    // 1. فتح المودال وتوجيه المستخدم
+    async function openMyScheduleModal() {
+        const userStr = localStorage.getItem('currentUser');
+        if (!userStr) {
+            alert('يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        const user = JSON.parse(userStr);
+
+        // نحدث بيانات المستخدم من السيرفر للتأكد
+        const { data: profile } = await supabase.from('profiles').select('linked_instructors').eq('id', user.id).single();
+        
+        const modal = document.getElementById('my-schedule-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (profile && profile.linked_instructors && profile.linked_instructors.length > 0) {
+            // تحديث اللوكال ستوريج
+            user.linked_instructors = profile.linked_instructors;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            showMyScheduleView(profile.linked_instructors);
+        } else {
+            showSetupView();
+        }
+    }
+
+function closeMyScheduleModal() {
+        const modal = document.getElementById('my-schedule-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+// 2. دالة عرض شاشة الإعداد (Setup)
+    async function showSetupView() {
+        document.getElementById('my-schedule-setup').classList.remove('hidden');
+        document.getElementById('my-schedule-setup').classList.add('flex');
+        document.getElementById('my-schedule-content').classList.add('hidden');
+        
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const welcomeMsg = document.getElementById('setup-welcome-msg');
+        if (welcomeMsg && user) {
+            welcomeMsg.textContent = `مرحباً بك، ${user.full_name || 'يا بطل'}! 👋`;
+        }
+
+        const grid = document.getElementById('instructor-selection-grid');
+        grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div>';
+
+        const { data } = await supabase.from('academic_schedule').select('instructor');
+        
+        if (data) {
+            const uniqueNames = [...new Set(data.map(i => i.instructor).filter(n => n && n.trim() !== ''))].sort();
+            grid.innerHTML = '';
+            
+            // استخدام المتغير الموحد
+            selectedInstructors.clear(); 
+            if(user.linked_instructors) user.linked_instructors.forEach(n => selectedInstructors.add(n));
+
+            uniqueNames.forEach(name => {
+                const isSelected = selectedInstructors.has(name);
+                
+                // إنشاء الكارت (نفس تصميم الموبايل الصغير اللي اتفقنا عليه)
+                const btn = document.createElement('button');
+                btn.className = `instructor-card relative w-full rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 md:gap-2 group cursor-pointer h-20 md:h-28 p-2 md:p-3 ${isSelected ? 'border-[#2A3475] bg-[#2A3475]/5' : 'border-gray-100 bg-white hover:border-[#2A3475]/30 shadow-sm'}`;
+                
+                btn.onclick = () => toggleInstructorSelection(name, btn); // تم تصحيح الاستدعاء
+
+                btn.innerHTML = `
+                    <div class="selection-check absolute top-1.5 right-1.5 md:top-2 md:right-2 w-4 h-4 md:w-5 md:h-5 rounded-full border-2 ${isSelected ? 'bg-[#2A3475] border-[#2A3475]' : 'border-gray-200'} flex items-center justify-center transition-colors">
+                        ${isSelected ? '<i class="fas fa-check text-white text-[8px] md:text-[10px]"></i>' : ''}
+                    </div>
+                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gray-50 flex items-center justify-center text-[#2A3475] transition-transform group-hover:scale-110">
+                        <i class="fas fa-user-tie text-xs md:text-lg"></i>
+                    </div>
+                    <span class="font-bold text-[9px] md:text-xs text-gray-700 text-center leading-tight line-clamp-2 w-full px-1">${name}</span>
+                `;
+                grid.appendChild(btn);
+            });
+            updateCountBadge();
+        }
+    }
+
+// ============================================================
+// 1. دالة رسم شبكة الأسماء (نسخة مضغوطة وسريعة جداً) 🚀
+// ============================================================
+function renderInstructorGrid(instructorsList) {
+    const grid = document.getElementById('instructor-selection-grid');
+    if (!grid) return;
+    
+    // استخدام Fragment لتسريع الأداء ومنع التهنيج
+    const fragment = document.createDocumentFragment();
+    grid.innerHTML = ''; 
+
+    const uniqueList = [...new Set(instructorsList)].sort();
+
+    uniqueList.forEach(instructor => {
+        const isSelected = selectedInstructors.has(instructor);
+        const btn = document.createElement('button');
+        
+        // كلاس البحث (مهم جداً للفلتر)
+        btn.classList.add('instructor-card');
+
+        // تصميم صغير جداً (Compact)
+        // h-16 للموبايل، h-20 للكمبيوتر
+        btn.className = `instructor-card relative w-full rounded-lg border transition-all duration-150 flex flex-col items-center justify-center gap-1 cursor-pointer 
+            h-16 md:h-20 p-1 
+            ${isSelected 
+                ? 'border-[#2A3475] bg-[#2A3475]/10' 
+                : 'border-gray-100 bg-white hover:border-[#2A3475]/30'}`;
+        
+        btn.onclick = () => toggleInstructorSelection(instructor, btn);
+
+        btn.innerHTML = `
+            <div class="selection-check absolute top-1 right-1 w-3 h-3 md:w-4 md:h-4 rounded-full border ${isSelected ? 'bg-[#2A3475] border-[#2A3475]' : 'border-gray-200'} flex items-center justify-center transition-colors">
+                ${isSelected ? '<i class="fas fa-check text-white text-[6px] md:text-[8px]"></i>' : ''}
+            </div>
+            
+            <div class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-gray-50 flex items-center justify-center text-[#2A3475]">
+                <i class="fas fa-user-tie text-[10px] md:text-sm"></i>
+            </div>
+            
+            <span class="font-bold text-[8px] md:text-[10px] text-gray-700 text-center leading-tight line-clamp-2 w-full px-0.5">
+                ${instructor}
+            </span>
+        `;
+
+        fragment.appendChild(btn);
+    });
+
+    grid.appendChild(fragment);
+}
+
+// ============================================================
+// 3. دالة تفعيل/إلغاء الاختيار (متوافقة مع التصميم الخفيف)
+// ============================================================
+function toggleInstructorSelection(name, btnElement) {
+    const checkDiv = btnElement.querySelector('.selection-check');
+    
+    if (selectedInstructors.has(name)) {
+        // عملية الإلغاء
+        selectedInstructors.delete(name);
+        
+        // ستايل غير مختار
+        btnElement.classList.remove('border-[#2A3475]', 'bg-[#2A3475]/10', 'shadow-inner');
+        btnElement.classList.add('border-gray-100', 'bg-white');
+        
+        checkDiv.classList.remove('bg-[#2A3475]', 'border-[#2A3475]');
+        checkDiv.classList.add('border-gray-300');
+        checkDiv.innerHTML = '';
+        
+    } else {
+        // عملية الاختيار
+        selectedInstructors.add(name);
+        
+        // ستايل مختار
+        btnElement.classList.remove('border-gray-100', 'bg-white');
+        btnElement.classList.add('border-[#2A3475]', 'bg-[#2A3475]/10', 'shadow-inner');
+        
+        checkDiv.classList.remove('border-gray-300');
+        checkDiv.classList.add('bg-[#2A3475]', 'border-[#2A3475]');
+        checkDiv.innerHTML = '<i class="fas fa-check text-white text-[10px]"></i>';
+    }
+    
+    updateCountBadge();
+}
+
+function updateCountBadge() {
+        document.getElementById('selection-count-badge').innerText = `تم اختيار: ${selectedInstructors.size}`;
+    }
+// ============================================================
+// 2. دالة الفلتر (بحث) - دي اللي كانت عندك بس متظبطة
+// ============================================================
+function filterInstructorGrid() {
+    const input = document.getElementById('instructor-search-input');
+    if (!input) return;
+    
+    const query = input.value.toLowerCase();
+    const cards = document.querySelectorAll('.instructor-card'); // الكلاس اللي ضفناه فوق
+
+    cards.forEach(card => {
+        // بنبحث جوه النص اللي في الكارت
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// ============================================================
+// 4. دالة الحفظ (تم السماح بتصفير القائمة) ✅
+// ============================================================
+async function saveInstructorSelection() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const selectedArray = Array.from(selectedInstructors);
+
+    // تغيير الزر لوضع التحميل
+    const saveBtn = document.querySelector('button[onclick="saveInstructorSelection()"]');
+    let originalText = '';
+    if(saveBtn) {
+        originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+        saveBtn.disabled = true;
+    }
+
+    try {
+        // تحديث قاعدة البيانات (نقبل المصفوفة الفارغة [])
+        const { error } = await supabase
+            .from('profiles')
+            .update({ linked_instructors: selectedArray })
+            .eq('id', user.id);
+
+        if (!error) {
+            // تحديث بيانات المستخدم محلياً
+            user.linked_instructors = selectedArray;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // التعامل مع الذاكرة المؤقتة
+            if(selectedArray.length > 0) {
+                localStorage.setItem('my_linked_instructors', JSON.stringify(selectedArray));
+                showNotification('تم حفظ القائمة بنجاح', 'success');
+            } else {
+                // 🔥 هنا الحل: لو القائمة فاضية، نمسحها من الذاكرة 🔥
+                localStorage.removeItem('my_linked_instructors');
+                showNotification('تم تصفير القائمة بنجاح', 'success');
+            }
+
+            // تحديث العرض فوراً
+            await showMyScheduleView(selectedArray);
+            
+        } else {
+            throw error;
+        }
+    } catch (err) {
+        console.error(err);
+        showNotification('فشل الحفظ، حاول مرة أخرى', 'error');
+    } finally {
+        // إرجاع الزر لحالته
+        if(saveBtn) {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+    }
+}
+
+// 5. دالة العرض الرئيسية (التي قمنا بتعديلها)
+    async function showMyScheduleView(names) {
+        // ... (نفس دالة showMyScheduleView اللي بعتهالك في الرد اللي فات، حطها هنا) ...
+        // اختصاراً للمساحة مش هكررها تاني، استخدم اللي فاتت، هي سليمة 100%
+        // أهم حاجة إنها بتنادي على mobileContainer و desktopBody
+        
+        // --- سأعيد كتابة الجزء المهم للتأكيد ---
+        let targetNames = names;
+        if (!targetNames || !Array.isArray(targetNames) || targetNames.length === 0) {
+            const saved = localStorage.getItem('my_linked_instructors');
+            targetNames = saved ? JSON.parse(saved) : [];
+        }
+    if (targetNames.length > 0) localStorage.setItem('my_linked_instructors', JSON.stringify(targetNames));
+
+    // 2. التبديل بين الشاشات
+    document.getElementById('my-schedule-setup').classList.replace('flex', 'hidden');
+    document.getElementById('my-schedule-content').classList.replace('hidden', 'flex');
+
+    // 3. عرض الأسماء (Chips)
+    const chipsContainer = document.getElementById('managed-names-chips');
+    if (chipsContainer) {
+        chipsContainer.innerHTML = targetNames.length > 0 
+            ? targetNames.map(name => `<span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#2A3475]/5 text-[#2A3475] text-[11px] font-bold border border-[#2A3475]/10 whitespace-nowrap shadow-sm"><i class="fas fa-user-circle text-xs ml-1.5 opacity-60"></i>${name}</span>`).join('')
+            : '<span class="text-xs text-gray-400 font-bold py-1">لم يتم اختيار أسماء</span>';
+    }
+
+    // 4. إمساك الحاويات
+    const mobileContainer = document.getElementById('mobile-schedule-list');
+    const desktopBody = document.getElementById('my-schedule-rows');
+    const emptyMsg = document.getElementById('empty-schedule-msg');
+
+    // لودينج
+    if (mobileContainer) mobileContainer.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-[#2A3475] text-2xl"></i></div>';
+    if (desktopBody) desktopBody.innerHTML = '<tr><td colspan="7" class="text-center py-10"><i class="fas fa-spinner fa-spin text-[#2A3475] text-2xl"></i></td></tr>';
+    if (emptyMsg) emptyMsg.classList.add('hidden');
+
+    try {
+        if (targetNames.length === 0) {
+            if (mobileContainer) mobileContainer.innerHTML = '';
+            if (desktopBody) desktopBody.innerHTML = '';
+            if (emptyMsg) emptyMsg.classList.remove('hidden');
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('academic_schedule')
+            .select('*')
+            .in('instructor', targetNames)
+            .order('day_of_week', { ascending: true });
+
+        if (error) throw error;
+
+        // تفريغ الحاويات
+        if (mobileContainer) mobileContainer.innerHTML = '';
+        if (desktopBody) desktopBody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            if (emptyMsg) emptyMsg.classList.remove('hidden');
+            return;
+        }
+
+        // ترتيب الأيام
+        const dayOrder = { "Saturday": 1, "Sunday": 2, "Monday": 3, "Tuesday": 4, "Wednesday": 5, "Thursday": 6, "Friday": 7 };
+        data.sort((a, b) => (dayOrder[a.day_of_week] || 8) - (dayOrder[b.day_of_week] || 8));
+
+        data.forEach((item) => {
+            const nextDate = (typeof getNextDateForDay === 'function') ? getNextDateForDay(item.day_of_week) : '';
+            const isCancelled = item.cancelled_dates && item.cancelled_dates.includes(nextDate);
+            const isActive = !isCancelled;
+            
+            let displayTime = item.time_slot;
+            if (typeof formatTimeDisplay === 'function') displayTime = formatTimeDisplay(item.time_slot);
+
+            // ==========================================
+            // 1. الموبايل (كروت)
+            // ==========================================
+            if (mobileContainer) {
+                const actionBtn = isActive 
+                    ? `<button onclick="toggleLectureStatus('${item.id}', '${item.day_of_week}')" class="w-full mt-3 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
+                         <i class="fas fa-ban"></i> إلغاء هذا الأسبوع
+                       </button>`
+                    : `<button onclick="toggleLectureStatus('${item.id}', '${item.day_of_week}')" class="w-full mt-3 py-2.5 bg-green-50 text-green-600 border border-green-200 rounded-xl text-xs font-bold hover:bg-green-100 transition-colors flex items-center justify-center gap-2">
+                         <i class="fas fa-check"></i> تفعيل المحاضرة
+                       </button>`;
+
+                const statusBadge = isActive 
+                    ? '<span class="text-green-700 bg-green-100 px-2 py-0.5 rounded text-[10px] font-bold">نشط</span>' 
+                    : '<span class="text-red-700 bg-red-100 px-2 py-0.5 rounded text-[10px] font-bold">ملغي</span>';
+
+                const mobileCard = `
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-bold text-[#2A3475] text-sm leading-snug w-[75%]">${item.course_name}</div>
+                        ${statusBadge}
+                    </div>
+                    <div class="text-xs text-gray-500 font-bold mb-3 flex items-center gap-1">
+                        <i class="fas fa-user-tie text-[10px]"></i> ${item.instructor}
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-[10px] font-bold">
+                        <span class="bg-gray-50 px-2 py-1 rounded border border-gray-100 text-gray-700">${typeof daysMapAr !== 'undefined' ? (daysMapAr[item.day_of_week] || item.day_of_week) : item.day_of_week}</span>
+                        <span class="bg-gray-50 px-2 py-1 rounded border border-gray-100 text-gray-700 dir-ltr">${displayTime}</span>
+                        <span class="bg-orange-50 px-2 py-1 rounded border border-orange-100 text-orange-700">${item.room_name}</span>
+                    </div>
+                    ${actionBtn}
+                </div>`;
+                
+                mobileContainer.innerHTML += mobileCard;
+            }
+
+            // ==========================================
+            // 2. الكمبيوتر (جدول) - هنا التعديل 👇
+            // ==========================================
+            if (desktopBody) {
+                // تعديل هنا: خلينا النص "إلغاء هذا الأسبوع" بدلاً من "إلغاء" فقط
+                const actionBtn = isActive 
+                    ? `<button onclick="toggleLectureStatus('${item.id}', '${item.day_of_week}')" class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg border border-red-200 hover:bg-red-100 text-xs font-bold transition-colors whitespace-nowrap flex items-center justify-center gap-1 mx-auto">
+                         <i class="fas fa-ban"></i> إلغاء هذا الأسبوع
+                       </button>`
+                    : `<button onclick="toggleLectureStatus('${item.id}', '${item.day_of_week}')" class="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg border border-green-200 hover:bg-green-100 text-xs font-bold transition-colors whitespace-nowrap flex items-center justify-center gap-1 mx-auto">
+                         <i class="fas fa-check"></i> تفعيل المحاضرة
+                       </button>`;
+
+                const statusBadge = isActive 
+                    ? '<span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-bold whitespace-nowrap">نشط</span>'
+                    : '<span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-[10px] font-bold whitespace-nowrap">ملغي</span>';
+
+                const tableRow = `
+                <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 text-sm">
+                    <td class="px-6 py-4 font-bold text-[#2A3475] whitespace-nowrap">
+                        ${typeof daysMapAr !== 'undefined' ? (daysMapAr[item.day_of_week] || item.day_of_week) : item.day_of_week}
+                    </td>
+                <td class="px-6 py-4 font-bold text-gray-600 dir-ltr text-center whitespace-nowrap">
+                        ${displayTime}
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-800 truncate max-w-[200px]" title="${item.course_name}">
+                        ${item.course_name}
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-500 text-xs truncate max-w-[150px]">
+                        ${item.instructor}
+                    </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        <span class="text-xs font-bold bg-[#F3A628]/10 text-[#d48a1b] px-2 py-1 rounded border border-[#F3A628]/20">
+                            ${item.room_name}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        ${statusBadge}
+                    </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        ${actionBtn}
+                    </td>
+                </tr>`;
+                desktopBody.innerHTML += tableRow;
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        const errorMsg = '<div class="text-center text-red-500 py-10 font-bold">حدث خطأ أثناء تحميل البيانات</div>';
+        if (mobileContainer) mobileContainer.innerHTML = errorMsg;
+        if (desktopBody) desktopBody.innerHTML = `<tr><td colspan="7">${errorMsg}</td></tr>`;
+    }
+}
+
+// 5. تغيير الحالة (إلغاء / تفعيل) - النسخة الذكية بالتاريخ
+async function toggleLectureStatus(id, dayOfWeek) {
+    if (!id) return;
+
+    // 1. حساب التاريخ المستهدف (القادم)
+    const targetDate = getNextDateForDay(dayOfWeek);
+    if (!targetDate) {
+        showNotification('تعذر تحديد تاريخ المحاضرة', 'error');
+        return;
+    }
+
+    document.body.style.cursor = 'wait';
+
+    try {
+        // 2. جلب القائمة الحالية للتواريخ الملغاة
+        const { data: currentData, error: fetchError } = await supabase
+            .from('academic_schedule')
+            .select('cancelled_dates')
+            .eq('id', id)
+            .single();
+
+        if (fetchError) throw fetchError;
+
+        let datesArray = currentData.cancelled_dates || [];
+        let isCurrentlyCancelled = datesArray.includes(targetDate);
+        let msg = '';
+
+        // 3. تحديث المصفوفة (إضافة أو إزالة التاريخ)
+        if (isCurrentlyCancelled) {
+            // إعادة تفعيل (إزالة التاريخ من القائمة)
+            datesArray = datesArray.filter(d => d !== targetDate);
+            msg = 'هل تريد إعادة تفعيل المحاضرة لهذا التاريخ؟';
+        } else {
+            // إلغاء (إضافة التاريخ للقائمة)
+            datesArray.push(targetDate);
+            msg = `هل أنت متأكد من إلغاء محاضرة يوم ${targetDate}؟\nستعود للعمل تلقائياً في الأسبوع التالي.`;
+        }
+
+        // تأكيد المستخدم
+        const isConfirmed = await showCustomConfirm(msg);
+        if (!isConfirmed) {
+            document.body.style.cursor = 'default';
+            return;
+        }
+
+        // 4. الحفظ في قاعدة البيانات
+        const { error: updateError } = await supabase
+            .from('academic_schedule')
+            .update({ cancelled_dates: datesArray })
+            .eq('id', id);
+
+        if (updateError) throw updateError;
+
+        showNotification(
+            isCurrentlyCancelled ? 'تم إعادة تفعيل المحاضرة' : 'تم إلغاء المحاضرة لهذا اليوم',
+            'success'
+        );
+
+        // تحديث الجدول
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (user && user.linked_instructors) {
+            await showMyScheduleView(user.linked_instructors);
+        }
+
+    } catch (err) {
+        console.error('Error:', err);
+        showNotification('حدث خطأ: ' + err.message, 'error');
+    } finally {
+        document.body.style.cursor = 'default';
+    }
+}
+        
+        function resetInstructorLink() {
+            showSetupView();
+        }
+
+// ============================================================
+// 4. دالة التأكيد الاحترافية (نسخة الإجبار - تظهر فوق كل شيء)
+// ============================================================
+function showCustomConfirm(message) {
+    return new Promise((resolve) => {
+        // 1. تنظيف أي نافذة قديمة عالقة
+        const oldModal = document.getElementById('custom-confirm-modal');
+        if (oldModal) oldModal.remove();
+
+        // 2. بناء النافذة ديناميكياً مع Z-Index أعلى من نافذة التعديل
+        // لاحظ: z-[2147483648] أعلى بواحد من نافذة التعديل
+        const modalHTML = `
+        <div id="custom-confirm-modal" class="fixed inset-0 z-[2147483648] flex items-center justify-center bg-[#2A3475]/90 backdrop-blur-sm" style="font-family: 'Cairo', sans-serif;">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm transform scale-100 transition-all overflow-hidden border-t-4 border-[#F3A628] animate-[modalPop_0.3s_ease-out]">
+                
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm animate-bounce">
+                        <i class="fas fa-question text-3xl text-[#2A3475]"></i>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">تأكيد الإجراء</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6 font-semibold whitespace-pre-line">${message}</p>
+                    
+                    <div class="flex gap-3">
+                        <button id="btn-confirm-yes" class="flex-1 bg-[#2A3475] text-white py-3 rounded-xl font-bold hover:bg-[#1f2658] shadow-lg transition-all transform active:scale-95">
+                            نعم، متأكد
+                        </button>
+                        <button id="btn-confirm-no" class="flex-1 bg-white text-gray-500 py-3 rounded-xl font-bold hover:bg-gray-100 border-2 border-gray-200 transition-all">
+                            إلغاء
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        `;
+
+        // 3. حقن الكود في الصفحة
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // 4. التعامل مع الأزرار
+        document.getElementById('btn-confirm-yes').onclick = () => {
+            document.getElementById('custom-confirm-modal').remove();
+            resolve(true); // المستخدم وافق
+        };
+
+        document.getElementById('btn-confirm-no').onclick = () => {
+            document.getElementById('custom-confirm-modal').remove();
+            resolve(false); // المستخدم رفض
+        };
+    });
+}
+
+function showNotification(message, type = 'success') {
+    let toast = document.getElementById('notification-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'notification-toast';
+        // !w-max بتخلي العرض على قد المحتوى بالظبط عشان يفضل سطر واحد
+        toast.className = 'notification-toast !fixed !left-1/2 !-translate-x-1/2 !right-auto !bottom-10 !flex !items-center !gap-2 !w-max !max-w-[95vw] !z-[9999]';
+        toast.innerHTML = '<div class="flex items-center gap-2"><div id="notif-icon" class="notification-icon-box shrink-0"><i class="fas"></i></div><span id="notification-message"></span></div>';
+        document.body.appendChild(toast);
+    }
+
+    const messageEl = document.getElementById('notification-message');
+    const iconBox = document.getElementById('notif-icon');
+    const icon = iconBox.querySelector('i');
+
+    messageEl.textContent = message;
+    
+    // ضبط الخط: أسود (!text-black) وسطر واحد (!whitespace-nowrap) وحجم أصغر للموبايل
+    messageEl.className = '!text-black !font-bold !text-[12px] md:!text-[14px] !whitespace-nowrap';
+    
+    if (type === 'error') {
+        iconBox.className = 'notification-icon-box bg-error shrink-0';
+        icon.className = 'fas fa-times';
+    } else {
+        iconBox.className = 'notification-icon-box bg-success shrink-0';
+        icon.className = 'fas fa-check';
+    }
+
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+// ============================================================
+// 🔥 دالة وضع التعديل المحدثة: حل مشكلة الاختفاء وضبط الألوان
+// ============================================================
+let isAdminMode = false; 
+
+function toggleAdminMode() {
+    isAdminMode = !isAdminMode;
+    const btn = document.getElementById('admin-toggle-btn');
+    const mobBtn = document.getElementById('mobileEditBtn');
+
+    if (isAdminMode) {
+        // --- حالة التفعيل (اللون البرتقالي) ---
+        
+        // الكمبيوتر
+        if (btn) {
+            btn.classList.remove('bg-white/10', 'text-white', 'border-white/10');
+            btn.classList.add('bg-[#F3A628]', 'text-[#2A3475]', 'border-[#F3A628]');
+            const icon = btn.querySelector('i');
+            if (icon) icon.classList.replace('text-[#F3A628]', 'text-[#2A3475]');
+        }
+
+        // الموبايل (يتحول برتقالي واضح)
+        if (mobBtn) {
+            mobBtn.className = "absolute -top-1.5 -left-1.5 bg-[#F3A628] text-white w-6 h-6 rounded-full flex items-center justify-center border border-[#F3A628] shadow-md cursor-pointer z-30 transition-all";
+            mobBtn.querySelector('i').className = 'fas fa-check text-[10px]'; // أيقونة حفظ/صح
+        }
+    } else {
+        // --- حالة الإلغاء (يرجع أبيض سادة عشان م يختفيش) ---
+        
+        // الكمبيوتر
+        if (btn) {
+            btn.classList.add('bg-white/10', 'text-white', 'border-white/10');
+            btn.classList.remove('bg-[#F3A628]', 'text-[#2A3475]', 'border-[#F3A628]');
+            const icon = btn.querySelector('i');
+            if (icon) icon.classList.replace('text-[#2A3475]', 'text-[#F3A628]');
+        }
+
+        // الموبايل (يرجع أبيض بحدود رمادية خفيفة عشان يظهر)
+        if (mobBtn) {
+            mobBtn.className = "absolute -top-1.5 -left-1.5 bg-white text-[#2A3475] w-6 h-6 rounded-full flex items-center justify-center border border-gray-200 shadow-md cursor-pointer z-30 transition-all";
+            mobBtn.querySelector('i').className = 'fas fa-edit text-[10px]'; // أيقونة القلم
+        }
+    }
+    
+    if (typeof refreshCache === 'function') refreshCache(); 
+}
+
+// ============================================================
+// 1. دالة توليد القوائم المخصصة (نسخة الهوية البصرية المحسنة)
+// ============================================================
+function generateCustomDropdownHTML(id, label, optionsArray, selectedValue) {
+    let selectedText = label; 
+    const selectedOption = optionsArray.find(opt => opt.value === selectedValue);
+    if (selectedOption) selectedText = selectedOption.text;
+
+    let listItems = '';
+    optionsArray.forEach(opt => {
+        const isActive = opt.value === selectedValue ? 'bg-[#2A3475]/10 text-[#2A3475]' : 'text-gray-700';
+        // إضافة style="font-family: 'Cairo'" لكل عنصر لضمان شكل الخط
+        listItems += `<li class="custom-option px-4 py-3 hover:bg-[#2A3475] hover:text-white cursor-pointer text-sm font-bold border-b border-gray-50 transition-all last:border-0 ${isActive}" data-value="${opt.value}" style="font-family: 'Cairo', sans-serif;">${opt.text}</li>`;
+    });
+
+    return `
+    <div class="relative custom-dropdown w-full" style="font-family: 'Cairo', sans-serif;">
+        <div class="custom-dropdown-display w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all hover:border-[#F3A628] hover:shadow-sm hover:bg-white group">
+            <span class="truncate ml-2 pt-1">${selectedText}</span>
+            <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center text-gray-400 group-hover:text-[#F3A628] shadow-sm transition-colors">
+                <i class="fas fa-chevron-down text-[10px]"></i>
+            </div>
+        </div>
+        
+        <ul class="custom-dropdown-options absolute top-[110%] left-0 w-full bg-white border border-gray-100 rounded-xl max-h-52 overflow-y-auto z-[99999] shadow-2xl hidden custom-scrollbar">
+            ${listItems}
+        </ul>
+
+        <select id="${id}" class="hidden">
+            <option value="${selectedValue || ''}">${selectedText}</option>
+        </select>
+    </div>
+    `;
+}
+
+// ============================================================
+// 2. دالة فتح مودال التعديل (تحافظ على شكل الكمبيوتر وتظبط الموبايل) 💻📱
+// ============================================================
+function openAdminEditModal(id, instructor, course, room, time, day) {
+    const oldModal = document.getElementById('admin-edit-modal');
+    if (oldModal) oldModal.remove();
+
+    // --- 1. معالجة وتوحيد التوقيت ---
+    let formattedTime = time || "";
+    if (formattedTime) {
+        formattedTime = formattedTime
+            .replace("13:", "01:").replace("14:", "02:").replace("15:", "03:")
+            .replace("16:", "04:").replace("17:", "05:").replace("18:", "06:");
+    }
+
+    // --- 2. قائمة المواعيد الموحدة ---
+    const standardSlots = [
+        "08:30 - 10:20", "10:30 - 12:20", "12:30 - 02:20", "02:30 - 04:20", "04:30 - 06:20"
+    ];
+
+    if (formattedTime && !standardSlots.includes(formattedTime)) {
+        const cleanTime = formattedTime.split('(')[0].trim(); 
+        const match = standardSlots.find(s => s.startsWith(cleanTime.split('-')[0].trim()));
+        if (match) formattedTime = match; else standardSlots.push(formattedTime);
+    }
+
+    const timeOptions = standardSlots.map(t => ({ value: t, text: t }));
+    const uniqueRooms = [...new Set(cachedData.map(i => i.room_name).filter(r => r))].sort();
+    const roomOptions = uniqueRooms.map(r => ({ value: r, text: r }));
+
+    const dayOptions = [
+        { value: 'Saturday', text: 'السبت' }, { value: 'Sunday', text: 'الأحد' },
+        { value: 'Monday', text: 'الاثنين' }, { value: 'Tuesday', text: 'الثلاثاء' },
+        { value: 'Wednesday', text: 'الأربعاء' }, { value: 'Thursday', text: 'الخميس' }
+    ];
+
+    // --- 4. توليد القوائم ---
+    const roomDropdownHTML = generateCustomDropdownHTML('edit-room', 'اختر القاعة...', roomOptions, room);
+    const timeDropdownHTML = generateCustomDropdownHTML('edit-time', 'اختر التوقيت...', timeOptions, formattedTime);
+    const dayDropdownHTML = generateCustomDropdownHTML('edit-day', 'اختر اليوم...', dayOptions, day);
+
+    // ستايل موحد مع مراعاة حجم الخط في الموبايل
+    const inputStyle = `
+        w-full px-4 py-3 rounded-xl border border-gray-200 
+        focus:border-[#F3A628] focus:bg-white focus:ring-4 focus:ring-[#F3A628]/10
+        outline-none font-bold text-gray-700 text-right bg-gray-50 
+        transition-all duration-300 placeholder-gray-300 text-sm md:text-base
+    `;
+
+    // بناء المودال مع إضافة كلاسات responsive ذكية
+    const modalHTML = `
+    <div id="admin-edit-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center p-2 md:p-0" style="font-family: 'Cairo', sans-serif;">
+        <div class="absolute inset-0 bg-[#2A3475]/60 backdrop-blur-md transition-opacity" onclick="closeAdminEditModal()"></div>
+
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[95vh] md:max-h-none animate-[modalPop_0.4s_cubic-bezier(0.16,1,0.3,1)]">            
+            
+            <div class="metallic-blue-fill random-slanted-lines px-6 py-5 flex justify-between items-center shrink-0 border-b border-white/10">
+                <div class="relative z-10">
+                    <h3 class="text-sm md:text-lg font-black text-white flex items-center gap-2">
+                        <span class="bg-[#F3A628] text-[#2A3475] w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-pen-fancy text-xs md:text-sm"></i></span>
+                        تعديل الجدول الدراسي
+                    </h3>
+                </div>
+                <button onclick="closeAdminEditModal()" class="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-[#F3A628] hover:text-[#2A3475] transition-all flex items-center justify-center backdrop-blur-sm active:scale-90"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-6 md:p-8 space-y-4 md:space-y-5 bg-white overflow-y-auto custom-scrollbar">
+                <input type="hidden" id="edit-id" value="${id || ''}">
+
+                <div class="group">
+                    <label class="flex items-center gap-2 text-[11px] md:text-xs font-black text-[#2A3475] mb-2 mr-1"><i class="fas fa-user-tie text-[#F3A628]"></i> اسم المحاضر</label>
+                    <input type="text" id="edit-instructor" value="${instructor || ''}" class="${inputStyle}">
+                </div>
+
+                <div class="group">
+                    <label class="flex items-center gap-2 text-[11px] md:text-xs font-black text-[#2A3475] mb-2 mr-1"><i class="fas fa-book-open text-[#F3A628]"></i> المادة الدراسية</label>
+                    <input type="text" id="edit-course" value="${course || ''}" class="${inputStyle}">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                    <div class="group relative z-30"> 
+                        <label class="flex items-center gap-2 text-[11px] md:text-xs font-black text-[#2A3475] mb-2 mr-1"><i class="fas fa-map-marker-alt text-[#F3A628]"></i> القاعة</label>
+                        ${roomDropdownHTML}
+                    </div>
+                    
+                    <div class="group relative z-30">
+                        <label class="flex items-center gap-2 text-[11px] md:text-xs font-black text-[#2A3475] mb-2 mr-1"><i class="far fa-clock text-[#F3A628]"></i> التوقيت</label>
+                        ${timeDropdownHTML}
+                    </div>
+                </div>
+
+                <div class="group relative z-20">
+                    <label class="flex items-center gap-2 text-[11px] md:text-xs font-black text-[#2A3475] mb-2 mr-1"><i class="fas fa-calendar-day text-[#F3A628]"></i> اليوم</label>
+                    ${dayDropdownHTML}
+                </div>
+            </div>
+
+            <div class="px-6 md:px-8 py-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse md:flex-row gap-3">
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="deleteLecture('${id}')" class="flex-1 md:flex-none px-4 py-3 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95" title="حذف نهائي"><i class="fas fa-trash-alt"></i></button>
+                    <button onclick="closeAdminEditModal()" class="flex-[2] md:hidden px-6 py-3 bg-white text-gray-500 border border-gray-200 rounded-xl font-bold active:scale-95">إلغاء</button>
+                </div>
+                
+                <button onclick="saveAdminChanges()" class="w-full md:flex-1 bg-[#2A3475] text-white py-3 rounded-xl font-black text-sm md:text-base hover:bg-[#1e255a] shadow-lg shadow-blue-900/10 hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle"></i> حفظ التغييرات
+                </button>
+                
+                <button onclick="closeAdminEditModal()" class="hidden md:flex px-6 py-3 bg-white text-gray-500 border border-gray-200 rounded-xl font-bold hover:bg-gray-100 transition-all">إلغاء</button>
+            </div>
+        </div>
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    if (typeof setupCustomDropdowns === 'function') setupCustomDropdowns();
+}
+
+// --- 1. دالة الإغلاق (التي كانت ناقصة) ---
+function closeAdminEditModal() {
+    const modal = document.getElementById('admin-edit-modal');
+    if (modal) {
+        // تأثير حركي بسيط للاختفاء
+        modal.style.transition = 'opacity 0.2s ease';
+        modal.style.opacity = '0';
+        
+        // ننتظر لحظة ثم نحذفه من الصفحة تماماً
+        setTimeout(() => {
+            modal.remove(); 
+        }, 200);
+    }
+}
+
+// ============================================================
+// دالة جديدة: فحص التعارض (Check Conflict) 🕵️‍♂️
+// ============================================================
+function findConflict(currentId, room, time, day) {
+    // نبحث في كل البيانات المحملة عندنا
+    return cachedData.find(item => 
+        String(item.id) !== String(currentId) && // 1. نتأكد أنها مش نفس المحاضرة اللي بنعدلها
+        item.room_name === room &&               // 2. نفس القاعة
+        item.day_of_week === day &&              // 3. نفس اليوم
+        item.time_slot === time &&               // 4. نفس التوقيت
+        item.status !== 'cancelled'              // 5. نتجاهل المحاضرات الملغاة
+    );
+}
+
+// ============================================================
+// دالة الحفظ الذكية (مع حل التعارض والإحلال التلقائي) 🧠
+// ============================================================
+async function saveAdminChanges() {
+    // 1. جلب القيم من الخانات
+    const id = document.getElementById('edit-id').value;
+    const instructor = document.getElementById('edit-instructor').value;
+    const course = document.getElementById('edit-course').value;
+    const room = document.getElementById('edit-room').value;
+    const time = document.getElementById('edit-time').value;
+    const day = document.getElementById('edit-day').value;
+
+    // ---------------------------------------------------------
+    // 🔥 فحص التعارض وحله (المنطق الجديد) 🔥
+    // ---------------------------------------------------------
+    const conflict = findConflict(id, room, time, day);
+    
+    if (conflict) {
+        // رسالة توضح أننا سنقوم بإلغاء القديم
+        const msg = `⛔ توقف! القاعة مشغولة.\n\nتوجد محاضرة أخرى نشطة:\n📘 المادة: ${conflict.course_name}\n👨‍🏫 المحاضر: ${conflict.instructor}\n\nهل تريد **إلغاء المحاضرة القديمة** وحفظ هذه مكانها؟`;
+        
+        const userAgreed = await showCustomConfirm(msg);
+        
+        if (!userAgreed) return; // لو رفض، نوقف كل حاجة
+
+        // لو وافق، نقوم بإلغاء المحاضرة القديمة فوراً في الخلفية
+        try {
+            await supabase
+                .from('academic_schedule')
+                .update({ status: 'cancelled' }) // نحول القديمة لملغاة
+                .eq('id', conflict.id);
+                
+            console.log(`تم إلغاء المحاضرة المتعارضة رقم ${conflict.id} بنجاح`);
+        } catch (e) {
+            console.error("فشل في إلغاء التعارض", e);
+            showNotification('حدث خطأ أثناء حل التعارض', 'error');
+            return;
+        }
+    }
+    // ---------------------------------------------------------
+
+    // 2. التحكم في الزر (شكل التحميل)
+    const btn = document.querySelector('#admin-edit-modal button[onclick="saveAdminChanges()"]');
+    let originalText = '';
+    
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+        btn.disabled = true;
+    }
+
+    try {
+        // 3. حفظ المحاضرة الحالية (وتأكيد أنها Active)
+        const { error } = await supabase
+            .from('academic_schedule')
+            .update({ 
+                instructor: instructor,
+                course_name: course,
+                room_name: room,
+                time_slot: time,
+                day_of_week: day,
+                status: 'active' // مهم: نتأكد إن المحاضرة دي نشطة
+            })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // 4. نجاح
+        // رسالة مختلفة لو كان فيه تعارض وتم حله
+        const successMsg = conflict ? 'تم حل التعارض وحفظ التعديل' : 'تم تحديث البيانات بنجاح';
+        showNotification(successMsg, 'success');
+        
+        closeAdminEditModal();
+        
+        // تحديث البيانات
+        if (typeof refreshCache === 'function') await refreshCache();
+        if (typeof applyFilters === 'function') applyFilters(); 
+
+    } catch (err) {
+        console.error(err);
+        showNotification('حدث خطأ أثناء الحفظ: ' + err.message, 'error');
+    } finally {
+        // 5. إرجاع الزر لحالته
+        if (btn) {
+            btn.innerHTML = originalText || '<i class="fas fa-check-circle"></i> حفظ التغييرات';
+            btn.disabled = false;
+        }
+    }
+}
+
+// استبدل دالة handleCardClick القديمة بهذه الدالة المحسنة
+function handleCardClick(id) {
+    // التحقق: هل وضع الأدمن مفعل؟
+    if (typeof isAdminMode !== 'undefined' && isAdminMode) {
+        // الوضع مفعل: نفتح التعديل فوراً
+        prepareEdit(id);
+    } else {
+        // الوضع مغلق: نظهر رسالة خطأ واضحة للمستخدم
+        showNotification('يجب تفعيل وضع التعديل أولاً!.', 'error');
+        
+        // (اختياري) عمل تأثير هز لزر الترس للفت الانتباه
+        const btn = document.getElementById('admin-toggle-btn');
+        if(btn) {
+            btn.classList.add('input-error'); // كلاس الهز الموجود في الـ CSS
+            setTimeout(() => btn.classList.remove('input-error'), 500);
+        }
+    }
+}
+
+// 2. تجهيز البيانات (الحل النهائي لمشاكل النصوص)
+function prepareEdit(id) {
+    // البحث باستخدام == للمرونة بين النصوص والأرقام
+    const item = cachedData.find(i => i.id == id);
+    
+    if (!item) {
+        console.error("بيانات المحاضرة غير موجودة في الذاكرة:", id);
+        return;
+    }
+
+    openAdminEditModal(
+        item.id,
+        item.instructor || "",
+        item.course_name || "",
+        item.room_name || "",
+        item.time_slot || "",
+        item.day_of_week || ""
+    );
+}
+
+// ============================================================
+// 3. دالة حذف المحاضرة (محدثة بصلاحيات الأدمن) 🗑️
+// ============================================================
+async function deleteLecture(id) {
+    console.log("تم الضغط على زر الحذف للمحاضرة رقم:", id);
+
+    // 1. طلب تأكيد من المستخدم
+    const confirmed = await showCustomConfirm('تحذير!\nهل أنت متأكد من حذف هذه المحاضرة نهائياً؟\n(لا يمكن التراجع عن هذا الإجراء)');
+    
+    if (!confirmed) return; // لو ضغط إلغاء، نخرج
+
+    // 2. تغيير شكل الزر لإظهار التحميل
+    const deleteBtn = document.querySelector('#admin-edit-modal button[onclick*="deleteLecture"]');
+    let originalIcon = '';
+    
+    if (deleteBtn) {
+        originalIcon = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // أيقونة تحميل
+        deleteBtn.disabled = true; // تعطيل الزر لمنع التكرار
+    }
+
+    try {
+        // 3. الحذف باستخدام مفتاح الأدمن (التعديل الجديد هنا) 🔥
+        // نستخدم window.supabaseAdmin بدلاً من supabase العادي
+        const { error } = await window.supabaseAdmin
+            .from('academic_schedule')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // 4. نجاح العملية
+        showNotification('تم حذف المحاضرة بنجاح', 'success');
+        
+        // إغلاق المودال
+        closeAdminEditModal();
+        
+        // تحديث البيانات في الصفحة
+        if (typeof refreshCache === 'function') await refreshCache();
+        if (typeof applyFilters === 'function') applyFilters();
+
+    } catch (err) {
+        console.error('Error deleting:', err);
+        showNotification('حدث خطأ أثناء الحذف: ' + err.message, 'error');
+        
+        // إعادة الزر لحالته الأصلية عند الخطأ
+        if (deleteBtn) {
+            deleteBtn.innerHTML = originalIcon || '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.disabled = false;
+        }
+    }
+}
+
+// دالة لحساب تاريخ يوم معين في الأسبوع الحالي/القادم (YYYY-MM-DD)
+function getNextDateForDay(dayNameEn) {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetIndex = days.indexOf(dayNameEn);
+    if (targetIndex === -1) return null;
+    
+    const today = new Date();
+    const currentDayIndex = today.getDay();
+    
+    let daysUntil = targetIndex - currentDayIndex;
+    // لو اليوم عدى، هات تاريخ الأسبوع الجاي (أو لو عايز نفس اليوم تعرضه، شيل السطر ده حسب المنطق)
+    // هنا بنفترض إننا بنعرض الجدول القادم
+    if (daysUntil < 0) daysUntil += 7; 
+    
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + daysUntil);
+    
+    // إرجاع التاريخ بصيغة YYYY-MM-DD للمقارنة
+    return targetDate.toLocaleDateString('en-CA'); // en-CA تعطي YYYY-MM-DD دائماً
+}
+
+// دالة لإعادة العرض للوضع الافتراضي عند مسح مربع البحث
+function resetView() {
+    // نعتمد على دالة resetFilters لأنها تنظف كل شيء وتعيد رسالة "لم يتم تحديد معايير"
+    if (typeof resetFilters === 'function') {
+        resetFilters();
+    } else {
+        // كود احتياطي في حالة عدم وجود resetFilters
+        document.getElementById('results-grid').innerHTML = `
+            <div class="col-span-full text-center py-24 flex flex-col items-center justify-center text-gray-400">
+                <div class="bg-gray-50 p-6 rounded-full mb-4 shadow-inner">
+                    <i class="fas fa-layer-group text-5xl opacity-30 text-[#2A3475]"></i>
+                </div>
+                <p class="font-bold text-lg text-gray-500">لم يتم تحديد معايير العرض</p>
+                <p class="text-sm text-gray-400 mt-2">استخدم أدوات التصفية بالأعلى للبدء</p>
+            </div>
+        `;
+        document.getElementById('results-count').innerText = '0 نتيجة';
+    }
+}
+
+// ============================================================
+// دالة: إظهار الترس للإداريين فقط
+// ============================================================
+function applyAdminVisibility(user) {
+    const adminButton = document.getElementById('admin-toggle-btn');
+    
+    // 🔥 الشرط: إذا كان الزر موجوداً AND المستخدم موجوداً AND دوره هو 'manager'
+    if (adminButton && user && user.role === 'manager') {
+        // إذا تحقق الشرط، نزيل كلاس الإخفاء
+        adminButton.classList.remove('hidden');
+    }
+}
+
+// دالة فتح/إغلاق القائمة الجانبية بنمط smrm
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const content = document.getElementById('mobile-menu-content');
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        setTimeout(() => content.classList.remove('translate-x-full'), 10);
+    } else {
+        content.classList.add('translate-x-full');
+        setTimeout(() => menu.classList.add('hidden'), 300);
+    }
+}
+
+// 1. دالة تحديث البيانات (لضمان ظهور الإنجليزية والوظيفة)
+// التعديل النهائي لظهور (الجهة - المسمى الوظيفي) في الخارج والداخل
+function updateSystemProfile(user) {
+    if (!user) return;
+    
+    const fullName = user.full_name || 'مستخدم النظام';
+    
+    // 1. جلب اسم القسم (مثل: معمل الحاسب)
+    const userDeptKey = user.department || 'computer-lab';
+    const deptName = (typeof departments !== 'undefined' && departments[userDeptKey]) 
+                     ? departments[userDeptKey].name 
+                     : (user.department || 'الكلية');
+                     
+    // 2. جلب المسمى الوظيفي (مثل: فني قاعدة بيانات)
+    const jobTitle = user.job_title || user.position || 'موظف مختص';
+    
+    // 3. صياغة الهوية الكاملة (الجهة - الوظيفة)
+    const fullIdentity = `${deptName} - ${jobTitle}`;
+
+    // --- تحديث الكمبيوتر ---
+    if (document.getElementById('profile-name')) document.getElementById('profile-name').innerText = `مرحباً، ${fullName}`;
+    if (document.getElementById('profile-role')) document.getElementById('profile-role').innerText = fullIdentity;
+
+    // --- تحديث الموبايل (الكبسولة الخارجية) - تم التعديل ليظهر المسمى والجهة معاً 🔥 ---
+    const mobName = document.getElementById('profile-name-mob');
+    const mobRole = document.getElementById('profile-role-mob');
+    if (mobName) mobName.innerText = fullName;
+    if (mobRole) {
+        // سيظهر الآن "معمل الحاسب - فني قاعدة بيانات" في الكبسولة من الخارج
+        mobRole.innerText = fullIdentity; 
+    }
+
+    // --- تحديث القائمة المنبثقة (Popup) ---
+    if (document.getElementById('full-profile-name')) document.getElementById('full-profile-name').innerText = fullName;
+    if (document.getElementById('full-profile-role')) document.getElementById('full-profile-role').innerText = fullIdentity;
+
+    // ربط زر التعديل (كما هو)
+    const mobEditBtn = document.getElementById('mob-edit-btn');
+    if (mobEditBtn) {
+        mobEditBtn.onclick = () => {
+            if(typeof toggleProfileInfoMenu === 'function') toggleProfileInfoMenu();
+            if (user.role === 'manager' || user.is_admin) {
+                if (typeof toggleAdminPanel === 'function') toggleAdminPanel();
+            } else {
+                if (typeof openEditUserInfoModal === 'function') openEditUserInfoModal();
+            }
+        };
+    }
+}
+
+// 2. دالة فتح قائمة البروفايل المنبثقة وتحديد موقعها تلقائياً (مثل smrm)
+function toggleProfileInfoMenu() {
+    const menu = document.getElementById('profile-info-menu');
+    const capsule = document.getElementById('mob-profile-capsule');
+    if (!menu || !capsule) return;
+
+    if (menu.classList.contains('hidden')) {
+        const rect = capsule.getBoundingClientRect();
+        // التموضع كما في smrm بالملي
+        menu.style.top = (rect.bottom + 10) + 'px'; 
+        menu.style.left = '20px'; // دي اللي هتظبط الترحل الشمال
+        menu.classList.remove('hidden');
+    } else {
+        menu.classList.add('hidden');
+    }
+}
+document.addEventListener('click', (e) => {
+    const pMenu = document.getElementById('profile-info-menu');
+    const pCapsule = document.getElementById('mob-profile-capsule');
+    
+    if (pMenu && !pMenu.classList.contains('hidden')) {
+        // لو الضغطة مش جوه القائمة ومش جوه البروفايل.. اقفلها
+        if (!pMenu.contains(e.target) && !pCapsule.contains(e.target)) {
+            pMenu.classList.add('hidden');
+        }
+    }
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('السيستم جاهز للعمل أوفلاين'))
+        .catch(err => console.log('حدث خطأ في التسجيل: ', err));
+    });
+  }
+  
+    </script>
+</body>
+</html>

@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
+    <meta name="description" content="CITL Smart System">
+    <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات,الأكاديمية العربية">
+    <meta name="language" content="Arabic">
+    <meta name="theme-color" content="#2A3475">
+    <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
+    <meta property="og:description" content="CITL Smart System">
+    <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://aastcitl.me/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://aastcitl.me/CITL_Banner.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="shortcut icon" type="image/png" href="/CITL_Logo-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/CITL_Logo-192.png">
+<link rel="apple-touch-icon" href="/CITL_Logo-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+/* =====================================================
+   CITL TV DISPLAY - ORGANIZED PROFESSIONAL V3
+   تنظيم أوضح + خطوط أهدأ + بدون سكرول للجدول
+===================================================== */
+:root {
+    --citl-navy: #2A3475;
+    --citl-navy-2: #1e255a;
+    --citl-navy-3: #11183d;
+    --citl-gold: #F3A628;
+    --citl-gold-2: #d48a1b;
+    --citl-ink: #172033;
+    --citl-muted: #64748b;
+    --citl-soft: #f6f8fc;
+    --citl-line: #e6eaf2;
+    --citl-bg: #f3f5fa;
+    --footer-h: 84px;
+    --header-h: 104px;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; }
+body {
+    font-family: 'Cairo', sans-serif;
+    color: var(--citl-ink);
+    overflow: hidden !important;
+    height: 100vh;
+    height: 100svh;
+    background: var(--citl-bg);
+}
+.font-english { font-family: 'Roboto', sans-serif; }
+.bg-navy { background-color: var(--citl-navy); }
+.text-navy { color: var(--citl-navy); }
+.text-gold { color: var(--citl-gold); }
+.border-gold { border-color: var(--citl-gold); }
+
+body.tv-display-page {
+    background:
+        radial-gradient(circle at 7% 8%, rgba(243,166,40,0.14), transparent 25%),
+        radial-gradient(circle at 92% 90%, rgba(42,52,117,0.13), transparent 33%),
+        linear-gradient(135deg, #f8fafc 0%, #eef2f8 52%, #ffffff 100%) !important;
+    padding-bottom: 0 !important;
+}
+body.tv-display-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background-image:
+        linear-gradient(to right, rgba(42,52,117,0.026) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(42,52,117,0.026) 1px, transparent 1px);
+    background-size: 52px 52px;
+}
+.bg-animated { display: none !important; }
+body.tv-display-page > .absolute.inset-0 { opacity: 0.018 !important; pointer-events: none; }
+
+/* Header */
+body.tv-display-page > header {
+    min-height: var(--header-h);
+    background:
+        linear-gradient(135deg, var(--citl-navy-3) 0%, var(--citl-navy) 52%, var(--citl-navy-2) 100%) !important;
+    border-bottom: 4px solid var(--citl-gold) !important;
+    box-shadow: 0 12px 30px rgba(18,24,61,0.22), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+    padding: 14px 30px !important;
+    color: #fff !important;
+    position: relative;
+    overflow: hidden;
+}
+body.tv-display-page > header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-30deg, transparent, transparent 16px, rgba(255,255,255,0.038) 16px, rgba(255,255,255,0.038) 17px);
+    pointer-events: none;
+}
+body.tv-display-page > header > * { position: relative; z-index: 1; }
+body.tv-display-page > header .bg-white {
+    width: 70px !important;
+    height: 70px !important;
+    border-radius: 18px !important;
+    border: 2px solid rgba(243,166,40,0.78) !important;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.20), 0 0 0 4px rgba(255,255,255,0.08) !important;
+}
+body.tv-display-page > header h1 {
+    color: white !important;
+    font-size: clamp(24px, 2.1vw, 34px) !important;
+    line-height: 1.14;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.20) !important;
+}
+body.tv-display-page > header p {
+    color: var(--citl-gold) !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.11em !important;
+    font-size: clamp(12px, 1.05vw, 17px) !important;
+}
+#current-time {
+    color: #fff !important;
+    font-size: clamp(34px, 3.35vw, 54px) !important;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.24) !important;
+    line-height: 1;
+}
+#current-date {
+    color: rgba(255,255,255,0.78) !important;
+    font-size: clamp(13px, 1.05vw, 18px) !important;
+    line-height: 1.2;
+}
+
+/* Main */
+body.tv-display-page > main {
+    height: calc(100svh - var(--header-h));
+    padding: 18px 24px calc(var(--footer-h) + 14px) !important;
+    overflow: hidden !important;
+    background: transparent !important;
+}
+#content-container { height: 100%; min-height: 0; }
+#content-container .animate-pulse p { color: var(--citl-muted) !important; }
+#content-container .border-gold { border-color: var(--citl-gold) !important; border-top-color: transparent !important; }
+
+/* Card */
+.glass-panel {
+    background: #ffffff !important;
+    color: var(--citl-ink) !important;
+    border: 1px solid rgba(42,52,117,0.12) !important;
+    box-shadow: 0 18px 44px rgba(21,27,69,0.14), 0 0 0 6px rgba(255,255,255,0.55) !important;
+    backdrop-filter: none !important;
+}
+.room-card {
+    height: 100% !important;
+    max-width: min(1440px, 100%) !important;
+    border-radius: 26px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    position: relative;
+}
+.room-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--citl-gold), #ffe08a, var(--citl-gold-2));
+    z-index: 5;
+}
+
+.room-hero {
+    flex: 0 0 auto;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbff 58%, #eef3ff 100%);
+    border-bottom: 1px solid var(--citl-line);
+    padding: clamp(14px, 1.55vw, 22px) clamp(18px, 2vw, 30px) clamp(12px, 1.35vw, 18px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+.room-title-wrap { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.room-icon {
+    width: clamp(50px, 4vw, 66px);
+    height: clamp(50px, 4vw, 66px);
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--citl-navy), var(--citl-navy-3));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--citl-gold);
+    box-shadow: 0 10px 20px rgba(42,52,117,0.24), inset 0 1px 0 rgba(255,255,255,0.16);
+    flex-shrink: 0;
+}
+.room-icon i { font-size: clamp(22px, 2vw, 30px); }
+.room-name {
+    color: var(--citl-navy);
+    font-size: clamp(36px, 4vw, 62px);
+    line-height: 0.98;
+    letter-spacing: -1.2px;
+    margin: 0;
+    font-weight: 900;
+}
+.room-subtitle {
+    color: var(--citl-muted);
+    font-size: clamp(12px, 1.05vw, 16px);
+    font-weight: 900;
+    margin-top: 6px;
+}
+.room-status-wrap { flex-shrink: 0; max-width: 44%; }
+.room-status-wrap > div {
+    border-radius: 999px !important;
+    padding: 9px 14px !important;
+    font-size: clamp(11px, 0.95vw, 15px) !important;
+    box-shadow: 0 8px 18px rgba(15,23,42,0.07);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.status-live { animation: pulse-border 2s infinite; }
+@keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.30); } 70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+
+/* Schedule */
+.schedule-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: clamp(10px, 1.1vw, 16px);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+}
+.schedule-head {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(140px, 0.78fr) minmax(0, 2.25fr) minmax(170px, 1.08fr) minmax(74px, 0.42fr);
+    gap: 10px;
+    padding: 0 10px 8px;
+    color: #7b8496;
+    font-size: clamp(10px, 0.74vw, 12px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--citl-line);
+}
+.schedule-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: repeat(var(--row-count, 1), minmax(0, 1fr));
+    gap: var(--row-gap, 8px);
+    padding-top: var(--row-gap, 8px);
+    overflow: hidden !important;
+}
+.schedule-row {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(140px, 0.78fr) minmax(0, 2.25fr) minmax(170px, 1.08fr) minmax(74px, 0.42fr);
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #e9edf5;
+    border-radius: var(--row-radius, 16px);
+    background: #fff;
+    box-shadow: 0 5px 14px rgba(15,23,42,0.035);
+    padding: var(--row-pad-y, 8px) var(--row-pad-x, 10px);
+    overflow: hidden;
+}
+.schedule-row:nth-child(even) { background: #fbfdff; }
+.schedule-row.is-current {
+    border-color: rgba(220,38,38,0.28);
+    background: linear-gradient(180deg, #fff 0%, #fff7f7 100%);
+    box-shadow: 0 8px 18px rgba(220,38,38,0.08);
+}
+.schedule-row.is-cancelled {
+    border-color: rgba(239,68,68,0.30);
+    background: #fff1f2;
+    border-right: 5px solid #ef4444;
+}
+.schedule-time {
+    height: auto;
+    min-height: var(--time-box-h, 42px);
+    border-radius: calc(var(--row-radius, 16px) - 5px);
+    background: #f3f6fb;
+    color: var(--citl-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    direction: ltr;
+    font-family: 'Roboto', sans-serif;
+    font-size: var(--time-size, clamp(17px, 1.55vw, 25px));
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 7px;
+}
+.schedule-main { min-width: 0; overflow: hidden; }
+.schedule-course {
+    color: #111827;
+    font-size: var(--course-size, clamp(16px, 1.38vw, 23px));
+    line-height: 1.18;
+    font-weight: 900;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--course-lines, 2);
+    -webkit-box-orient: vertical;
+}
+.schedule-code {
+    margin-top: 3px;
+    color: #6b7280;
+    font-family: 'Roboto', sans-serif;
+    font-size: var(--code-size, clamp(10px, 0.78vw, 13px));
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.schedule-instructor {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+.instructor-icon {
+    width: var(--teacher-icon, 34px);
+    height: var(--teacher-icon, 34px);
+    border-radius: 999px;
+    background: #eef2ff;
+    color: var(--citl-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: calc(var(--teacher-icon, 34px) * 0.40);
+}
+.instructor-name {
+    min-width: 0;
+    color: #334155;
+    font-size: var(--teacher-size, clamp(13px, 1.08vw, 18px));
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.schedule-status { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: var(--pill-pad, 5px 10px);
+    font-size: var(--pill-size, 10px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+.status-now { background: #dc2626; color: #fff; box-shadow: 0 6px 14px rgba(220,38,38,0.20); }
+.status-wait { background: #f1f5f9; color: #94a3b8; }
+.status-cancelled { background: #ef4444; color: #fff; }
+.is-cancelled .schedule-course,
+.is-cancelled .schedule-code,
+.is-cancelled .instructor-name,
+.is-cancelled .schedule-time { text-decoration: line-through; opacity: 0.55; }
+.empty-schedule {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #94a3b8;
+    border: 1px dashed #d8deea;
+    border-radius: 22px;
+    background: #fbfdff;
+}
+.empty-schedule i { font-size: clamp(44px, 4vw, 70px); opacity: 0.22; margin-bottom: 14px; }
+.empty-schedule p { font-size: clamp(16px, 1.45vw, 24px); font-weight: 900; }
+
+/* Density classes */
+.schedule-list.rows-1, .schedule-list.rows-2, .schedule-list.rows-3, .schedule-list.rows-4, .schedule-list.rows-5 {
+    --row-gap: 8px; --row-pad-y: 8px; --row-pad-x: 11px; --row-radius: 16px; --time-box-h: 44px;
+    --time-size: clamp(17px, 1.45vw, 24px); --course-size: clamp(16px, 1.33vw, 22px); --teacher-size: clamp(13px, 1.05vw, 17px);
+    --teacher-icon: 34px; --pill-size: 10px; --pill-pad: 5px 10px; --course-lines: 2;
+}
+.schedule-list.rows-6, .schedule-list.rows-7 {
+    --row-gap: 7px; --row-pad-y: 7px; --row-pad-x: 10px; --row-radius: 15px; --time-box-h: 38px;
+    --time-size: clamp(15px, 1.2vw, 20px); --course-size: clamp(14px, 1.1vw, 19px); --teacher-size: clamp(12px, 0.95vw, 16px);
+    --teacher-icon: 30px; --pill-size: 9px; --pill-pad: 4px 9px; --course-lines: 2;
+}
+.schedule-list.rows-8, .schedule-list.rows-9, .schedule-list.rows-10 {
+    --row-gap: 6px; --row-pad-y: 5px; --row-pad-x: 8px; --row-radius: 13px; --time-box-h: 32px;
+    --time-size: clamp(13px, 1vw, 17px); --course-size: clamp(12px, 0.92vw, 16px); --teacher-size: clamp(10px, 0.82vw, 14px);
+    --teacher-icon: 24px; --pill-size: 8px; --pill-pad: 3px 7px; --course-lines: 1;
+}
+.schedule-list.rows-many {
+    --row-gap: 4px; --row-pad-y: 4px; --row-pad-x: 7px; --row-radius: 11px; --time-box-h: 28px;
+    --time-size: clamp(11px, 0.85vw, 15px); --course-size: clamp(11px, 0.78vw, 14px); --teacher-size: clamp(9px, 0.72vw, 12px);
+    --teacher-icon: 20px; --pill-size: 7px; --pill-pad: 3px 6px; --course-lines: 1;
+}
+
+/* Footer */
+body.tv-display-page > footer {
+    height: var(--footer-h) !important;
+    background: linear-gradient(135deg, var(--citl-navy-3) 0%, var(--citl-navy) 55%, #172052 100%) !important;
+    color: white !important;
+    border-top: 4px solid var(--citl-gold) !important;
+    box-shadow: 0 -12px 30px rgba(21,27,69,0.20), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+}
+.progress-container { position: absolute; top: 0; left: 0; width: 100%; height: 3px !important; background: rgba(255,255,255,0.12) !important; }
+.progress-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--citl-gold), #ffe08a, var(--citl-gold)) !important;
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+}
+body.tv-display-page > footer .w-full.bg-white\/5 { height: 48px !important; background: rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.10) !important; }
+body.tv-display-page > footer .bg-\[\#F3A628\] { background: linear-gradient(135deg, var(--citl-gold), var(--citl-gold-2)) !important; color: var(--citl-navy) !important; font-size: 12px !important; }
+.ticker-text {
+    position: absolute;
+    left: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    animation: ticker-pass-through var(--ticker-speed, 45s) linear infinite;
+    will-change: transform;
+    transform: translate3d(-100%, 0, 0);
+    backface-visibility: hidden;
+    contain: layout paint style;
+}
+@keyframes ticker-pass-through {
+    0% {
+        transform: translate3d(-100%, 0, 0);
+    }
+    100% {
+        transform: translate3d(100vw, 0, 0);
+    }
+}
+.news-separator {
+    color: var(--citl-gold);
+    margin: 0 30px;
+    font-size: 0.95rem;
+}
+#news-ticker-content { color: #fff !important; font-size: 13px !important; font-weight: 800 !important; }
+body.tv-display-page > footer .bg-gradient-to-r { background: linear-gradient(to right, var(--citl-navy-3), rgba(21,27,69,0.65), transparent) !important; }
+body.tv-display-page > footer .bg-black\/20 { background: rgba(0,0,0,0.16) !important; height: 32px !important; }
+body.tv-display-page > footer .text-gray-400,
+body.tv-display-page > footer .text-gray-500 { color: rgba(255,255,255,0.66) !important; }
+body.tv-display-page > footer .text-white\/10 { color: rgba(255,255,255,0.18) !important; }
+
+/* Modal */
+.settings-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.64) !important; backdrop-filter: blur(10px); z-index: 100; display: none; align-items: center; justify-content: center; }
+.settings-modal.show { display: flex; animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.settings-modal > div { border-radius: 24px !important; box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
+.settings-modal .bg-\[\#2A3475\] { background: linear-gradient(135deg, var(--citl-navy-3), var(--citl-navy)) !important; }
+.room-checkbox:checked + div { background-color: var(--citl-navy) !important; border-color: var(--citl-navy) !important; color: white !important; }
+
+.fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.2,0.8,0.2,1) forwards; opacity: 0; transform: translateY(14px); }
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+.stagger-row { opacity: 0; animation: slideInRight 0.30s ease-out forwards; }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Portrait TV */
+@media (orientation: portrait) {
+    :root { --header-h: 112px; --footer-h: 88px; }
+    body.tv-display-page > header { padding: 15px 24px !important; gap: 12px !important; }
+    body.tv-display-page > header .flex.items-center.gap-6 { gap: 14px !important; }
+    body.tv-display-page > header .bg-white { width: 66px !important; height: 66px !important; border-radius: 18px !important; }
+    body.tv-display-page > header h1 { font-size: clamp(22px, 3.5vw, 35px) !important; }
+    body.tv-display-page > header p { font-size: clamp(10px, 1.45vw, 15px) !important; letter-spacing: 0.07em !important; }
+    #current-time { font-size: clamp(30px, 4.8vw, 48px) !important; }
+    #current-date { font-size: clamp(11px, 1.55vw, 16px) !important; }
+    body.tv-display-page > main { padding: 16px 18px calc(var(--footer-h) + 14px) !important; }
+    .room-card { border-radius: 24px !important; }
+    .room-hero { padding: 15px 18px 13px !important; gap: 12px; }
+    .room-title-wrap { gap: 11px; }
+    .room-icon { width: clamp(46px, 6.4vw, 62px); height: clamp(46px, 6.4vw, 62px); border-radius: 17px; }
+    .room-name { font-size: clamp(36px, 7vw, 66px); }
+    .room-subtitle { font-size: clamp(11px, 1.55vw, 15px); margin-top: 4px; }
+    .room-status-wrap { max-width: 38%; }
+    .room-status-wrap > div { font-size: clamp(9px, 1.25vw, 13px) !important; padding: 7px 10px !important; }
+    .schedule-panel { padding: 10px; }
+    .schedule-head {
+        display: grid;
+        grid-template-columns: minmax(122px, 0.72fr) minmax(0, 2.2fr) minmax(135px, 0.92fr) minmax(54px, 0.32fr);
+        gap: 7px;
+        padding: 0 8px 7px;
+        font-size: clamp(8px, 1.1vw, 10px);
+    }
+    .schedule-row {
+        grid-template-columns: minmax(122px, 0.72fr) minmax(0, 2.2fr) minmax(135px, 0.92fr) minmax(54px, 0.32fr);
+        gap: 7px;
+        padding: var(--row-pad-y, 6px) var(--row-pad-x, 8px);
+    }
+    .schedule-time { min-height: var(--time-box-h, 34px); }
+    .schedule-list.rows-1, .schedule-list.rows-2, .schedule-list.rows-3, .schedule-list.rows-4, .schedule-list.rows-5 {
+        --row-gap: 7px; --row-pad-y: 7px; --row-pad-x: 8px; --row-radius: 14px; --time-box-h: 36px;
+        --time-size: clamp(14px, 2.1vw, 22px); --course-size: clamp(14px, 2.0vw, 21px); --teacher-size: clamp(11px, 1.55vw, 16px);
+        --teacher-icon: 28px; --pill-size: 8px; --pill-pad: 4px 7px; --course-lines: 2;
+    }
+    .schedule-list.rows-6, .schedule-list.rows-7 {
+        --row-gap: 5px; --row-pad-y: 5px; --row-pad-x: 7px; --row-radius: 12px; --time-box-h: 30px;
+        --time-size: clamp(12px, 1.65vw, 17px); --course-size: clamp(12px, 1.55vw, 16px); --teacher-size: clamp(9px, 1.2vw, 13px);
+        --teacher-icon: 22px; --pill-size: 7px; --pill-pad: 3px 6px; --course-lines: 1;
+    }
+    .schedule-list.rows-8, .schedule-list.rows-9, .schedule-list.rows-10, .schedule-list.rows-many {
+        --row-gap: 4px; --row-pad-y: 4px; --row-pad-x: 6px; --row-radius: 10px; --time-box-h: 25px;
+        --time-size: clamp(10px, 1.35vw, 14px); --course-size: clamp(10px, 1.25vw, 13px); --teacher-size: clamp(8px, 1vw, 11px);
+        --teacher-icon: 18px; --pill-size: 6px; --pill-pad: 2px 5px; --course-lines: 1;
+    }
+    body.tv-display-page > footer .w-full.bg-white\/5 { height: 51px !important; }
+    body.tv-display-page > footer .bg-black\/20 { height: 32px !important; }
+    body.tv-display-page > footer .text-\[10px\] { font-size: 8px !important; }
+}
+
+/* Compact Landscape */
+@media (orientation: landscape) {
+    :root { --header-h: 100px; --footer-h: 82px; }
+    body.tv-display-page > main { padding-top: 16px !important; padding-bottom: calc(var(--footer-h) + 12px) !important; }
+    .room-hero { padding-top: 16px !important; padding-bottom: 13px !important; }
+    .schedule-panel { padding-top: 10px; }
+}
+
+/* Very short screens */
+@media (max-height: 760px) {
+    :root { --header-h: 88px; --footer-h: 76px; }
+    body.tv-display-page > header { padding-top: 10px !important; padding-bottom: 10px !important; }
+    body.tv-display-page > header .bg-white { width: 58px !important; height: 58px !important; }
+    .room-hero { padding: 11px 20px 9px !important; }
+    .room-icon { width: 46px; height: 46px; border-radius: 15px; }
+    .room-name { font-size: clamp(32px, 4vw, 52px); }
+    .room-subtitle { font-size: 12px; margin-top: 2px; }
+    .schedule-panel { padding: 8px; }
+    .schedule-head { padding-bottom: 5px; }
+    body.tv-display-page > footer .w-full.bg-white\/5 { height: 43px !important; }
+    body.tv-display-page > footer .bg-black\/20 { height: 29px !important; }
+}
+
+
+
+/* =====================================================
+   CITL TV DISPLAY - EXECUTIVE TOUCH V4
+   لمسات تنظيم واحتراف أعلى بدون سكرول
+===================================================== */
+body.tv-display-page {
+    background:
+        radial-gradient(circle at 6% 10%, rgba(243,166,40,0.13), transparent 24%),
+        radial-gradient(circle at 90% 86%, rgba(42,52,117,0.16), transparent 34%),
+        linear-gradient(135deg, #f7f9fd 0%, #eef2f8 50%, #ffffff 100%) !important;
+}
+body.tv-display-page::before {
+    background-size: 58px 58px;
+    opacity: 0.9;
+}
+body.tv-display-page > header {
+    border-bottom-width: 5px !important;
+}
+body.tv-display-page > header::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    pointer-events: none;
+}
+.room-card {
+    border-radius: 28px !important;
+    box-shadow:
+        0 22px 54px rgba(21,27,69,0.15),
+        0 0 0 1px rgba(42,52,117,0.06),
+        0 0 0 7px rgba(255,255,255,0.55) !important;
+}
+.room-card::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 0;
+    width: 38%;
+    height: 1px;
+    background: linear-gradient(to left, rgba(243,166,40,0.55), transparent);
+    z-index: 6;
+}
+.room-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 8% 20%, rgba(243,166,40,0.10), transparent 24%),
+        linear-gradient(135deg, #ffffff 0%, #fafcff 58%, #eef3ff 100%) !important;
+}
+.room-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-32deg, transparent, transparent 18px, rgba(42,52,117,0.025) 18px, rgba(42,52,117,0.025) 19px);
+    pointer-events: none;
+}
+.room-hero > * { position: relative; z-index: 1; }
+.room-title-stack { min-width: 0; }
+.room-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--citl-gold-2);
+    background: rgba(243,166,40,0.10);
+    border: 1px solid rgba(243,166,40,0.24);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: clamp(8px, 0.68vw, 11px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+.room-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.12);
+}
+.room-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 4px 8px;
+    background: #f3f6fb;
+    color: #526071;
+    border: 1px solid #e5eaf3;
+    font-size: clamp(9px, 0.75vw, 12px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+.meta-chip.live { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.meta-chip.idle { background: #ecfdf5; color: #059669; border-color: #bbf7d0; }
+.meta-chip.cancel { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.room-side-panel {
+    flex-shrink: 0;
+    max-width: 46%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+.room-side-panel .room-status-wrap {
+    max-width: 100%;
+}
+.slide-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(42,52,117,0.07);
+    border: 1px solid rgba(42,52,117,0.10);
+    color: var(--citl-navy);
+    padding: 5px 10px;
+    font-size: clamp(9px, 0.74vw, 12px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+.slide-counter strong {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.05em;
+}
+.schedule-head {
+    background: #f8fafc;
+    border: 1px solid #edf1f7;
+    border-radius: 13px;
+    padding: 8px 10px !important;
+    margin-bottom: 0;
+}
+.schedule-list {
+    padding-top: var(--row-gap, 8px) !important;
+}
+.schedule-row {
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.schedule-row::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    bottom: 9px;
+    right: 0;
+    width: 4px;
+    border-radius: 999px 0 0 999px;
+    background: #d9dfec;
+}
+.schedule-row.is-current::before { background: #dc2626; }
+.schedule-row.is-cancelled::before { background: #ef4444; }
+.schedule-row.is-upcoming::before { background: var(--citl-gold); }
+.schedule-row.is-finished::before { background: #94a3b8; }
+.schedule-row.is-current .schedule-time {
+    background: #fef2f2;
+    color: #dc2626;
+}
+.schedule-row.is-upcoming .schedule-time {
+    background: #fff7ed;
+    color: #c26a08;
+}
+.schedule-row.is-finished {
+    opacity: 0.76;
+}
+.schedule-row.is-finished .schedule-time {
+    background: #f1f5f9;
+    color: #64748b;
+}
+.schedule-time {
+    box-shadow: inset 0 0 0 1px rgba(42,52,117,0.04);
+}
+.schedule-course {
+    letter-spacing: -0.01em;
+}
+.schedule-code:empty { display: none; }
+.instructor-icon {
+    box-shadow: inset 0 0 0 1px rgba(42,52,117,0.06);
+}
+.status-upcoming { background: #fff7ed; color: #c26a08; border: 1px solid #fed7aa; }
+.status-done { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+.status-wait { background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0; }
+.empty-schedule {
+    background:
+        radial-gradient(circle at center, rgba(42,52,117,0.04), transparent 34%),
+        #fbfdff;
+}
+
+@media (orientation: portrait) {
+    .room-hero {
+        align-items: flex-start !important;
+    }
+    .room-side-panel {
+        max-width: 40%;
+        gap: 6px;
+    }
+    .room-meta {
+        gap: 5px;
+        margin-top: 6px;
+    }
+    .meta-chip {
+        padding: 3px 6px;
+    }
+    .room-kicker {
+        margin-bottom: 4px;
+        padding: 3px 7px;
+    }
+    .schedule-head {
+        border-radius: 10px;
+        padding: 6px 8px !important;
+    }
+}
+
+@media (max-height: 760px) {
+    .room-kicker,
+    .room-meta {
+        display: none;
+    }
+    .room-side-panel {
+        gap: 5px;
+    }
+}
+
+/* =====================================================
+   Instructor Focus Enhancement
+   إبراز محاضر المادة بشكل احترافي بدون تغيير منطق الجدول
+===================================================== */
+
+/* توزيع أعمدة أوضح: ندي المحاضر مساحة أكبر */
+.schedule-head,
+.schedule-row {
+    grid-template-columns:
+        minmax(132px, 0.72fr)
+        minmax(0, 1.95fr)
+        minmax(230px, 1.38fr)
+        minmax(82px, 0.45fr) !important;
+}
+
+/* بلوك المحاضر */
+.schedule-instructor {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    border: 1px solid #e3e8f4;
+    border-radius: calc(var(--row-radius, 16px) - 4px);
+    padding: 7px 10px;
+    min-height: var(--time-box-h, 42px);
+    box-shadow: inset 0 0 0 1px rgba(42,52,117,0.025);
+}
+
+/* أيقونة المحاضر أوضح */
+.instructor-icon {
+    background: linear-gradient(135deg, #2A3475, #11183d) !important;
+    color: #F3A628 !important;
+    box-shadow:
+        0 6px 14px rgba(42,52,117,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.14) !important;
+}
+
+/* محتوى المحاضر */
+.instructor-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* Label صغير فوق الاسم */
+.instructor-label {
+    color: #7b8496;
+    font-size: clamp(8px, 0.65vw, 10px);
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* اسم المحاضر نفسه */
+.instructor-name {
+    color: #1e255a !important;
+    font-size: var(--teacher-size, clamp(14px, 1.12vw, 19px)) !important;
+    font-weight: 900 !important;
+    line-height: 1.25;
+}
+
+/* في المحاضرة الحالية نخلي المحاضر واضح أكتر */
+.schedule-row.is-current .schedule-instructor {
+    background: linear-gradient(135deg, #fff7f7 0%, #fff1f2 100%);
+    border-color: rgba(220,38,38,0.22);
+}
+
+.schedule-row.is-current .instructor-icon {
+    background: linear-gradient(135deg, #dc2626, #991b1b) !important;
+    color: #ffffff !important;
+}
+
+.schedule-row.is-current .instructor-name {
+    color: #991b1b !important;
+}
+
+/* في المحاضرات القادمة */
+.schedule-row.is-upcoming .schedule-instructor {
+    background: linear-gradient(135deg, #fffdf7 0%, #fff7ed 100%);
+    border-color: rgba(243,166,40,0.24);
+}
+
+.schedule-row.is-upcoming .instructor-icon {
+    background: linear-gradient(135deg, #F3A628, #d48a1b) !important;
+    color: #2A3475 !important;
+}
+
+/* في الملغاة */
+.schedule-row.is-cancelled .schedule-instructor {
+    background: #fff1f2;
+    border-color: rgba(239,68,68,0.28);
+}
+
+/* لو عدد المحاضرات كبير نخلي label يختفي عشان مفيش تزاحم */
+.schedule-list.rows-8 .instructor-label,
+.schedule-list.rows-9 .instructor-label,
+.schedule-list.rows-10 .instructor-label,
+.schedule-list.rows-many .instructor-label {
+    display: none;
+}
+
+.schedule-list.rows-8 .schedule-instructor,
+.schedule-list.rows-9 .schedule-instructor,
+.schedule-list.rows-10 .schedule-instructor,
+.schedule-list.rows-many .schedule-instructor {
+    padding: 4px 7px;
+}
+
+/* Portrait */
+@media (orientation: portrait) {
+    .schedule-head,
+    .schedule-row {
+        grid-template-columns:
+            minmax(112px, 0.68fr)
+            minmax(0, 1.75fr)
+            minmax(150px, 1.08fr)
+            minmax(58px, 0.34fr) !important;
+    }
+
+    .schedule-instructor {
+        padding: 5px 7px;
+        gap: 6px;
+    }
+
+    .instructor-label {
+        display: none;
+    }
+
+    .instructor-name {
+        font-size: var(--teacher-size, clamp(9px, 1.2vw, 13px)) !important;
+    }
+}
+
+/* Low Power Display Optimizations */
+body.tv-display-page.low-power .animate-ping,
+body.tv-display-page.low-power .animate-pulse,
+body.tv-display-page.low-power .status-live {
+    animation: none !important;
+}
+
+body.tv-display-page.low-power .room-card,
+body.tv-display-page.low-power .glass-panel,
+body.tv-display-page.low-power > header,
+body.tv-display-page.low-power > footer {
+    box-shadow: none !important;
+}
+
+body.tv-display-page.low-power::before,
+body.tv-display-page > .absolute.inset-0 {
+    display: none !important;
+}
+
+/* =====================================================
+   Forced Portrait Mode for Samsung TV Browser
+   تدوير محتوى الصفحة 90 درجة لشاشة معلقة بالطول
+===================================================== */
+
+/* اتجاه يمين Clockwise */
+body.tv-display-page.tv-rotate-cw {
+    position: fixed !important;
+    top: 0 !important;
+    left: 100vw !important;
+
+    width: 100vh !important;
+    height: 100vw !important;
+
+    transform: rotate(90deg) !important;
+    transform-origin: top left !important;
+
+    overflow: hidden !important;
+}
+
+/* اتجاه شمال Counter Clockwise */
+body.tv-display-page.tv-rotate-ccw {
+    position: fixed !important;
+    top: 100vh !important;
+    left: 0 !important;
+
+    width: 100vh !important;
+    height: 100vw !important;
+
+    transform: rotate(-90deg) !important;
+    transform-origin: top left !important;
+
+    overflow: hidden !important;
+}
+
+/* لأن المتصفح لسه شايف نفسه Landscape، بنجبر الصفحة تتعامل كأنها Portrait */
+body.tv-display-page.tv-rotate-cw,
+body.tv-display-page.tv-rotate-ccw {
+    --header-h: 112px;
+    --footer-h: 88px;
+}
+
+/* مهم: نخلي ارتفاع المحتوى بعد الدوران محسوب على عرض الشاشة الأصلي */
+body.tv-display-page.tv-rotate-cw > main,
+body.tv-display-page.tv-rotate-ccw > main {
+    height: calc(100vw - var(--header-h)) !important;
+    padding: 16px 18px calc(var(--footer-h) + 14px) !important;
+}
+
+/* الفوتر يبقى داخل الصفحة المتدوّرة بدل fixed على viewport الأصلي */
+body.tv-display-page.tv-rotate-cw > footer,
+body.tv-display-page.tv-rotate-ccw > footer {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+}
+
+/* ضبط الهيدر في الوضع الطولي الإجباري */
+body.tv-display-page.tv-rotate-cw > header,
+body.tv-display-page.tv-rotate-ccw > header {
+    padding: 15px 24px !important;
+    min-height: var(--header-h) !important;
+}
+
+/* ضبط كارت القاعة */
+body.tv-display-page.tv-rotate-cw .room-card,
+body.tv-display-page.tv-rotate-ccw .room-card {
+    border-radius: 24px !important;
+}
+
+/* ضبط رأس القاعة */
+body.tv-display-page.tv-rotate-cw .room-hero,
+body.tv-display-page.tv-rotate-ccw .room-hero {
+    padding: 15px 18px 13px !important;
+    gap: 12px !important;
+}
+
+/* ضبط الجدول للوضع الطولي */
+body.tv-display-page.tv-rotate-cw .schedule-panel,
+body.tv-display-page.tv-rotate-ccw .schedule-panel {
+    padding: 10px !important;
+}
+
+/* أعمدة أهدأ في الشاشة الطولية */
+body.tv-display-page.tv-rotate-cw .schedule-head,
+body.tv-display-page.tv-rotate-cw .schedule-row,
+body.tv-display-page.tv-rotate-ccw .schedule-head,
+body.tv-display-page.tv-rotate-ccw .schedule-row {
+    grid-template-columns:
+        minmax(112px, 0.68fr)
+        minmax(0, 1.75fr)
+        minmax(150px, 1.08fr)
+        minmax(58px, 0.34fr) !important;
+    gap: 7px !important;
+}
+
+/* تقليل بسيط للخطوط في الوضع المتدوّر */
+body.tv-display-page.tv-rotate-cw .room-name,
+body.tv-display-page.tv-rotate-ccw .room-name {
+    font-size: clamp(36px, 7vw, 66px) !important;
+}
+
+body.tv-display-page.tv-rotate-cw .room-status-wrap,
+body.tv-display-page.tv-rotate-ccw .room-status-wrap {
+    max-width: 38% !important;
+}
+
+body.tv-display-page.tv-rotate-cw .room-status-wrap > div,
+body.tv-display-page.tv-rotate-ccw .room-status-wrap > div {
+    font-size: clamp(9px, 1.25vw, 13px) !important;
+    padding: 7px 10px !important;
+}
+/* =====================================================
+   FINAL TV ROTATE TUNE - CLEAN
+   مستطيل الحالة حسب الكلام + مسافة بين التوقيت والمقرر
+===================================================== */
+
+/* نخلي منطقة الحالة طبيعية مش ممدودة */
+body.tv-display-page.tv-rotate-cw .room-side-panel,
+body.tv-display-page.tv-rotate-ccw .room-side-panel {
+    max-width: 48% !important;
+    min-width: 0 !important;
+    width: auto !important;
+    align-items: flex-end !important;
+}
+
+/* الحاوية بتاعة مستطيل الحالة */
+body.tv-display-page.tv-rotate-cw .room-status-wrap,
+body.tv-display-page.tv-rotate-ccw .room-status-wrap {
+    width: auto !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* مستطيل القاعة متاحة / مشغولة حسب طول الكلام */
+body.tv-display-page.tv-rotate-cw .room-status-wrap > div,
+body.tv-display-page.tv-rotate-ccw .room-status-wrap > div {
+    width: fit-content !important;
+    min-width: 0 !important;
+    max-width: 360px !important;
+
+    min-height: 36px !important;
+    padding: 7px 13px !important;
+
+    display: inline-flex !important;
+    align-items: flex-start !important; /* 🔥 تعديل: محاذاة لأعلى عشان النقطة تفضل مع أول سطر */
+    justify-content: flex-start !important; /* 🔥 تعديل: يبدأ من اليمين بدل المنتصف */
+
+    font-size: clamp(10px, 1.45vh, 13px) !important;
+    line-height: 1.35 !important;
+    text-align: right !important; /* 🔥 تعديل: محاذاة النص لليمين */
+
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+/* عداد القاعة يفضل مستقل ومش يتمدد */
+body.tv-display-page.tv-rotate-cw .slide-counter,
+body.tv-display-page.tv-rotate-ccw .slide-counter {
+    width: fit-content !important;
+    align-self: flex-end !important;
+}
+
+/* مسافة بسيطة بين عمود التوقيت وعمود المقرر */
+body.tv-display-page.tv-rotate-cw .schedule-head,
+body.tv-display-page.tv-rotate-cw .schedule-row,
+body.tv-display-page.tv-rotate-ccw .schedule-head,
+body.tv-display-page.tv-rotate-ccw .schedule-row {
+    gap: 12px !important;
+}
+
+/* إبعاد نص المقرر درجتين عن التوقيت */
+body.tv-display-page.tv-rotate-cw .schedule-main,
+body.tv-display-page.tv-rotate-ccw .schedule-main {
+    padding-right: 14px !important;
+}
+
+/* إبعاد عنوان المقرر عن عنوان التوقيت */
+body.tv-display-page.tv-rotate-cw .schedule-head > div:nth-child(2),
+body.tv-display-page.tv-rotate-ccw .schedule-head > div:nth-child(2) {
+    padding-right: 14px !important;
+}
+/* =====================================================
+   News Ticker Slightly Bigger
+   تكبير شريط الأخبار درجة واحدة
+===================================================== */
+
+/* نزوّد مساحة الفوتر عشان الشريط ما يغطيش على المحتوى */
+:root {
+    --footer-h: 94px;
+}
+
+/* في وضع شاشة سامسونج المتدوّرة */
+body.tv-display-page.tv-rotate-cw,
+body.tv-display-page.tv-rotate-ccw {
+    --footer-h: 98px;
+}
+
+/* تكبير صف شريط الأخبار */
+body.tv-display-page > footer .w-full.bg-white\/5 {
+    height: 56px !important;
+}
+
+/* تكبير مربع "آخر التحديثات" */
+body.tv-display-page > footer .bg-\[\#F3A628\] {
+    font-size: 14px !important;
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+}
+
+/* تكبير نص الخبر المتحرك */
+#news-ticker-content {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+/* تكبير الفاصل بين الأخبار */
+.news-separator {
+    font-size: 1.08rem !important;
+    margin: 0 34px !important;
+}
+
+/* نخلي شريط الحقوق تحت مناسب بعد التكبير */
+body.tv-display-page > footer .bg-black\/20 {
+    height: 34px !important;
+}
+
+</style>
+</head>
+<body class="tv-display-page low-power tv-rotate-cw flex flex-col h-screen">
+
+    <div class="bg-animated"></div>
+    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 z-0"></div>
+
+<header class="relative z-10 px-8 py-5 flex justify-between items-center border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div class="flex items-center gap-6">
+            <div onclick="openSettings()" class="bg-white p-1 rounded-xl shadow-lg h-20 w-20 flex items-center justify-center transform hover:scale-105 hover:rotate-3 transition-all duration-300 cursor-pointer group relative overflow-hidden" title="اضغط لضبط القاعات">
+                <img src="/CITL.png" alt="Logo" class="h-full w-full object-contain transform scale-125">
+                <div class="absolute inset-0 bg-black/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                    <i class="fas fa-cog text-navy text-2xl animate-spin"></i>
+                </div>
+            </div>
+                        <div>
+                <h1 id="main-header-title" class="text-3xl font-black tracking-wide text-white drop-shadow-md transition-all duration-300">شاشة الجداول الدراسية اليومية</h1>
+                <p class="text-gold text-lg font-medium tracking-widest mt-1 font-english uppercase">COLLEGE OF INTERNATIONAL TRANSPORT & LOGISTICS</p>
+            </div>
+        </div>
+        <div class="text-left">
+            <div id="current-time" class="text-5xl font-black text-white font-english tracking-wider drop-shadow-lg">00:00</div>
+            <div id="current-date" dir="ltr" class="text-xl text-blue-200 font-bold mt-1 text-right opacity-90 font-english">...</div>
+        </div>
+    </header>
+
+    <main class="flex-1 relative flex overflow-hidden p-6 z-10">
+        <div id="content-container" class="w-full h-full flex flex-col justify-center">
+            <div class="flex flex-col items-center justify-center space-y-6 animate-pulse">
+                <div class="w-20 h-20 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-lg text-gray-300">جاري تحميل القاعات...</p>
+            </div>
+        </div>
+    </main>
+
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-black/90 backdrop-blur-xl border-t border-white/5 text-white overflow-hidden shadow-[0_-15px_40px_rgba(0,0,0,0.7)]">
+    <div class="progress-container top-0 absolute opacity-60">
+        <div id="slide-progress" class="progress-bar" style="height: 3px;"></div>
+    </div>
+
+    <div class="w-full bg-white/5 h-12 flex items-center overflow-hidden relative border-b border-white/5">
+        <div class="bg-[#F3A628] text-[#2A3475] h-full px-5 flex items-center justify-center text-sm font-black z-30 shrink-0 shadow-2xl relative">
+            <i class="fas fa-bullhorn ml-2 animate-pulse"></i> آخر التحديثات
+        </div>
+        
+        <div class="flex-1 h-full relative overflow-hidden flex items-center">
+            <div id="news-ticker-content" class="ticker-text text-white text-sm font-bold px-4 flex items-center">
+                جارٍ مزامنة شريط الأخبار...
+            </div>
+        </div>
+        
+        <div class="absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-black via-black/50 to-transparent z-20"></div>
+    </div>
+
+    <div class="px-8 py-2 flex justify-between items-center bg-black/20">
+        <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+            <span class="flex h-1.5 w-1.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+            </span>
+            <span>تحديث تلقائي مباشر</span>
+        </div>
+
+        <div class="text-[10px] font-medium text-gray-500 flex items-center gap-3">
+            <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
+            <span class="text-white/10">|</span>
+            <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+        </div>
+    </div>
+</footer>
+
+    <div id="settings-modal" class="settings-modal">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-fade-in-up">
+            <div class="bg-[#2A3475] p-5 flex justify-between items-center border-b-4 border-gold">
+                <h3 class="text-2xl font-bold text-white"><i class="fas fa-desktop ml-2"></i> اختيار القاعات للعرض</h3>
+                <button onclick="closeSettings()" class="text-white/70 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            
+            <div class="p-6 flex-1 overflow-y-auto bg-gray-50">
+                <p class="text-gray-600 mb-4 text-sm font-bold">حدد القاعات التي تريد أن تظهر في شاشة العرض الدوارة:</p>
+                
+                <div class="flex gap-3 mb-6">
+                    <button onclick="toggleAll(true)" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-200 transition-colors">تحديد الكل</button>
+                    <button onclick="toggleAll(false)" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-300 transition-colors">إلغاء التحديد</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="rooms-selection-grid"></div>
+            </div>
+
+            <div class="p-5 bg-white border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeSettings()" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-gray-50">إلغاء</button>
+                <button onclick="saveSettings()" class="px-8 py-2.5 bg-[#2A3475] text-white rounded-xl font-bold hover:bg-blue-900 shadow-lg transform active:scale-95 transition-all">حفظ وتشغيل</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // =======================================================
+        // 1. إعدادات الاتصال بـ Supabase (النسخة الموحدة للشاشات)
+        // =======================================================
+        const SUPABASE_URL = 'https://xgqukdbonzukxrpjovmb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
+
+        const supabaseFactory = window.supabase;
+
+        // تهيئة العميل (بدون تخزين جلسة لتخفيف الحمل على الشاشة)
+        const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: {
+                persistSession: false, 
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        });
+
+        // الربط العام (هذا يحل محل const supabase = ...)
+        window.supabase = sb;
+
+// =======================================================
+        // إعدادات العرض والمتغيرات العامة المستقرة (CITL NEW TUNE)
+        // =======================================================
+        const TV_DISPLAY_CONFIG_KEY = 'tv_display_config';
+        const REFRESH_INTERVAL = 2 * 60 * 1000; // تحديث احتياطي كل دقيقتين
+
+        const MASTER_ROOMS_LIST = [
+            "G004", "H 001 Hall", "H 002 Lab", "H 101 L", "H 104", 
+            "H 106 L", "H 107", "H 108", "H 109", "H 205", 
+            "H 207 L", "H 208", "H 209", "H 210", "H 211",
+            "IMO 001", "IMO 002", "IMO 003", "IMO 004", "IMO 005", "IMO 006",
+            "M 124", "M 128", "M 130", "M 132", "M 135", "M 136",
+            "PH 201", "PH 401", "PH 404", "PH 501"
+        ];
+
+        let activeRooms = [];
+        let displayRooms = [];
+        let roomsData = {};
+        let progressInterval;
+        const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        // ⏱️ ميكروسكوب التوقيتات المستقلة والمنفصلة تماماً
+        let roomDurationMs = 7000;          // 👈 وقت الجداول الدراسية الافتراضي (7 ثواني)
+        let posterDurationMs = 20000;       // 👈 وقت بوسترات الإعلانات الافتراضي (20 ثانية)
+        let currentSlideDurationMs = 7000;  // 👈 العداد الفعلي المشغل للمحرك حالياً
+
+// 🖼️ ميكروسكوب البوسترات والأنباء اللحظية
+        let tvPosters = [];                 // مصفوفة البوسترات الجاية من الـ View
+        // 🔥 متغيرات وضع الامتحانات (نظام اليوم بيومه)
+        let examPages = [];
+        const EXAMS_PER_PAGE = 7; 
+        let isExamMode = false;
+        let tvExamsEnabled = true; // القيمة الافتراضية
+        let currentMasterIndex = 0;         // العداد الشامل المشترك (جداول + بوسترات)
+        let postersEnabled = true;          // مفتاح تشغيل الإعلانات عامة
+
+        // 🔥 قاموس الذاكرة العميقة لمنع تسريب الرامات وانهيار الشاشة أوفلاين
+        const localBlobUrls = {};
+
+        // 🔔 نغمة التنبيه المحلية (المستقرة على الاستضافة)
+        const posterAlarm = new Audio('alarm.mp3');
+        posterAlarm.volume = 0.6;
+
+        // 🔥 مفك حظر الصوت التلقائي على الاستضافات الحية لشاشات سامسونج 🔥
+        // بمجرد ضغطة واحدة بالريموت أو الماوس في أي مكان على الشاشة بعد فتحها، سيتم فك الحظر تماماً للأبد
+        document.addEventListener('click', () => {
+            posterAlarm.play().then(() => {
+                posterAlarm.pause();
+                posterAlarm.currentTime = 0;
+                console.log("🔓 تم فك حظر قنوات الصوت برمجياً على الاستضافة الحية");
+            }).catch(e => console.log("Audio unlock pending interaction:", e));
+        }, { once: true });
+
+        function clampTvSeconds(value) {
+        const seconds = parseInt(value, 10);
+        if (Number.isNaN(seconds)) return 10;
+        return Math.min(120, Math.max(2, seconds));
+    }
+
+function getDefaultTvDisplayConfig() {
+    return {
+        slideDurationSeconds: 10,
+        activeRooms: [...MASTER_ROOMS_LIST],
+        updatedAt: Date.now()
+    };
+}
+
+function applyTvDisplayConfig(config) {
+    const safeConfig = config || getDefaultTvDisplayConfig();
+    const rooms = Array.isArray(safeConfig.activeRooms) ? safeConfig.activeRooms.filter(room => MASTER_ROOMS_LIST.includes(room)) : [...MASTER_ROOMS_LIST];
+    
+    activeRooms = rooms;
+    
+    const seconds = clampTvSeconds(safeConfig.slideDurationSeconds);
+    roomDurationMs = seconds * 1000;
+
+    if (safeConfig.examsEnabled !== undefined) {
+        tvExamsEnabled = safeConfig.examsEnabled;
+    }
+    window.tvTestExamDate = safeConfig.testExamDate || '';
+    
+    // 🔥 استقبال توقيت الامتحانات المستقل (15 ثانية افتراضياً لو مش موجود)
+    const examSeconds = clampTvSeconds(safeConfig.examSlideDurationSeconds || 15);
+    window.tvExamDurationMs = examSeconds * 1000;
+    
+    localStorage.setItem('tv_display_config', JSON.stringify({
+        slideDurationSeconds: seconds,
+        examSlideDurationSeconds: examSeconds,
+        activeRooms,
+        examsEnabled: tvExamsEnabled,
+        testExamDate: window.tvTestExamDate,
+        updatedAt: safeConfig.updatedAt || Date.now()
+    }));
+    
+    localStorage.setItem('tv_display_rooms', JSON.stringify(activeRooms));
+}
+
+function applyTvPosterConfig(config) {
+    if (!config) return;
+    postersEnabled = config.enabled ?? true;
+    const rotationSeconds = parseInt(config.rotationSeconds, 10) || 8;
+    posterDurationMs = rotationSeconds * 1000;
+    localStorage.setItem('news_poster_config_cache', JSON.stringify(config));
+}
+
+async function loadTvDisplayConfig() {
+    try {
+        const cachedDisplay = localStorage.getItem('tv_display_config');
+        if (cachedDisplay) applyTvDisplayConfig(JSON.parse(cachedDisplay));
+
+        // كاش البوسترات لو موجود محلياً
+        const cachedPoster = localStorage.getItem('news_poster_config_cache');
+        if (cachedPoster) {
+            const cp = JSON.parse(cachedPoster);
+            postersEnabled = cp.enabled ?? true;
+            posterDurationMs = (cp.rotationSeconds || 8) * 1000;
+        }
+
+        // سحب الإعدادين معاً بضربة واحدة من الداتابيز
+        const { data, error } = await supabase
+            .from('site_settings')
+            .select('*')
+            .in('setting_key', [TV_DISPLAY_CONFIG_KEY, 'tv_poster_config']);
+
+        if (!error && data) {
+            const displaySetting = data.find(r => r.setting_key === TV_DISPLAY_CONFIG_KEY);
+            if (displaySetting) applyTvDisplayConfig(displaySetting.setting_value);
+
+            const posterSetting = data.find(r => r.setting_key === 'tv_poster_config');
+            if (posterSetting && posterSetting.setting_value) {
+                const cp = posterSetting.setting_value;
+                postersEnabled = cp.enabled ?? true;
+                posterDurationMs = (cp.rotationSeconds || 8) * 1000;
+                localStorage.setItem('news_poster_config_cache', JSON.stringify(cp));
+            }
+        }
+    } catch (e) {
+        console.warn('TV config load error:', e);
+        activeRooms = [...MASTER_ROOMS_LIST];
+        roomDurationMs = 10000;
+    }
+    renderSettingsGrid();
+}
+
+        function tvFormatTimeDisplay(time) {
+    if (!time) return "00:00 - 00:00";
+    const t = time.trim();
+
+    if (t.startsWith("08:30") || t.startsWith("8:30")) return "08:30 - 10:20";
+    if (t.startsWith("10:30")) return "10:30 - 12:20";
+    if (t.startsWith("12:30")) return "12:30 - 02:20";
+    if (t.startsWith("02:30") || t.startsWith("14:30")) return "02:30 - 04:20";
+    if (t.startsWith("04:30") || t.startsWith("16:30")) return "04:30 - 06:20";
+
+    return t;
+}
+
+function tvTimeToMinutes(value) {
+    if (!value) return null;
+
+    const parts = value.trim().split(':');
+    if (parts.length < 2) return null;
+
+    let h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+
+    if (h < 7) h += 12;
+    if (h === 24) h = 12;
+
+    return h * 60 + m;
+}
+
+function tvIsLectureStillVisible(item) {
+    const displayTime = tvFormatTimeDisplay(item.time_slot);
+    const times = displayTime.split('-');
+
+    if (times.length !== 2) return true;
+
+    const endMins = tvTimeToMinutes(times[1]);
+    if (endMins === null) return true;
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return currentMinutes < endMins;
+}
+
+        // --- الساعة ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function loadSettings() {
+            const cached = localStorage.getItem('tv_display_config');
+
+            if (cached) {
+                const config = JSON.parse(cached); // فك التشفير ووضعه في متغير
+                applyTvDisplayConfig(config); // تشغيل الإعدادات العادية
+                
+                // 🔥 قراءة أمر تفعيل الامتحانات من لوحة التحكم
+                if (config.examsEnabled !== undefined) {
+                    tvExamsEnabled = config.examsEnabled;
+                }
+            } else {
+                const savedRooms = localStorage.getItem('tv_display_rooms');
+                activeRooms = savedRooms ? JSON.parse(savedRooms) : [...MASTER_ROOMS_LIST];
+            }
+
+            renderSettingsGrid();
+        }
+        function renderSettingsGrid() {
+            const grid = document.getElementById('rooms-selection-grid');
+            grid.innerHTML = '';
+            MASTER_ROOMS_LIST.forEach(room => {
+                const isChecked = activeRooms.includes(room);
+                
+                const cardClass = isChecked 
+                    ? "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-[#2A3475] text-white border-[#2A3475]" 
+                    : "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-white text-gray-700 border-gray-200 hover:border-navy/50";
+                
+                const iconHtml = isChecked ? '<i class="fas fa-check text-[10px]"></i>' : '';
+
+                grid.innerHTML += `
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="room-checkbox absolute opacity-0 w-0 h-0" value="${room}" ${isChecked ? 'checked' : ''} onchange="updateRoomCard(this)">
+                        <div class="${cardClass}">
+                            <span class="font-bold text-sm font-english">${room}</span>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center check-circle">
+                                ${iconHtml}
+                            </div>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+
+        window.updateRoomCard = function(checkbox) {
+            const card = checkbox.nextElementSibling;
+            const circle = card.querySelector('.check-circle');
+            
+            if (checkbox.checked) {
+                card.className = "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-[#2A3475] text-white border-[#2A3475]";
+                circle.innerHTML = '<i class="fas fa-check text-[10px]"></i>';
+            } else {
+                card.className = "border-2 rounded-xl p-3 flex items-center justify-between transition-all bg-white text-gray-700 border-gray-200 hover:border-navy/50";
+                circle.innerHTML = '';
+            }
+        }
+
+        function toggleAll(state) {
+            const checkboxes = document.querySelectorAll('.room-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = state;
+                updateRoomCard(cb);
+            });
+        }
+
+        function openSettings() {
+            loadSettings();
+            document.getElementById('settings-modal').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.remove('show');
+        }
+
+        async function saveSettings() {
+            const checked = document.querySelectorAll('.room-checkbox:checked');
+            activeRooms = Array.from(checked).map(cb => cb.value);
+            
+        const config = {
+            slideDurationSeconds: Math.round(roomDurationMs / 1000) || 10,
+            activeRooms,
+            updatedAt: Date.now()
+        };
+
+        localStorage.setItem('tv_display_config', JSON.stringify(config));
+        localStorage.setItem('tv_display_rooms', JSON.stringify(activeRooms));
+
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert({
+                    setting_key: TV_DISPLAY_CONFIG_KEY,
+                    setting_value: config
+                }, { onConflict: 'setting_key' });
+
+            if (error) throw error;
+        } catch (e) {
+            console.warn('TV config save error:', e);
+        }
+
+        closeSettings();
+
+        currentMasterIndex = 0;
+        fetchData();
+        }
+
+async function fetchData() {
+    if (!Array.isArray(activeRooms)) loadSettings();
+    const now = new Date();
+    const todayNameEn = daysMap[now.getDay()];
+    
+    // 1. حساب التاريخ الفعلي لليوم
+    let todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(now);
+    
+    // 2. 🔥 تفعيل وضع التجربة
+    if (window.tvTestExamDate && window.tvTestExamDate.trim() !== '') {
+        todayStr = window.tvTestExamDate;
+        console.log('🚨 وضع التجربة مفعل: يتم عرض امتحانات يوم', todayStr);
+    }
+    
+    // سحب الامتحانات
+    let examsQuery = null;
+    if (tvExamsEnabled) {
+        examsQuery = supabase.from('exam_schedule').select('*').eq('exam_date', todayStr).order('start_time');
+    }
+
+    const [scheduleRes, postersRes, examsRes] = await Promise.all([
+        supabase.from('academic_schedule').select('*').eq('day_of_week', todayNameEn),
+        supabase.from('tv_posters').select('*').eq('is_active', true).order('display_order', { ascending: true }),
+        examsQuery ? examsQuery : Promise.resolve({ data: [] })
+    ]);
+
+    // 🔥 تفعيل وضع الامتحانات (بنظام التقسيم الذكي)
+    if (examsRes.data && examsRes.data.length > 0) {
+        isExamMode = true;
+        examPages = [];
+        
+        // ترتيب الامتحانات بالوقت لضمان التسلسل المنطقي للفترات
+        const sortedExams = examsRes.data.sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+        const ITEMS_PER_SCREEN = 11; 
+        let currentPageItems = [];
+        let currentPeriodStr = '';
+        let currentPeriodInfo = null;
+
+        // 🔥 خوارزمية التقسيم الذكي للفترات
+        sortedExams.forEach(exam => {
+            const periodKey = `${exam.start_time}_${exam.end_time}`;
+            
+            // 1. هل التوقيت اتغير؟ (بندأ فترة جديدة)
+            if (periodKey !== currentPeriodStr) {
+                // لو الصفحة الحالية مليانة ومقفلنهاش، نقفلها ونفتح جديدة
+                if (currentPageItems.length >= ITEMS_PER_SCREEN) {
+                    examPages.push({ items: currentPageItems });
+                    currentPageItems = [];
+                }
+                
+                currentPeriodStr = periodKey;
+                currentPeriodInfo = { startTime: exam.start_time, endTime: exam.end_time };
+                
+                // نحط خط فاصل للفترة الجديدة
+                currentPageItems.push({ 
+                    isDivider: true, 
+                    startTime: exam.start_time, 
+                    endTime: exam.end_time,
+                    isContinuation: false // ده الأساسي
+                });
+            }
+
+            // 2. لو الصفحة اتملت وإحنا لسه مكملين في نفس الفترة!
+            if (currentPageItems.length >= ITEMS_PER_SCREEN) {
+                examPages.push({ items: currentPageItems });
+                currentPageItems = [];
+                
+                // التعديل السحري: نثبت عنوان الفترة في أول الصفحة الجديدة
+                currentPageItems.push({ 
+                    isDivider: true, 
+                    startTime: currentPeriodInfo.startTime, 
+                    endTime: currentPeriodInfo.endTime,
+                    isContinuation: true // دي تكملة
+                });
+            }
+
+            // 3. نحط لجنة الامتحان
+            currentPageItems.push({ isDivider: false, exam: exam });
+        });
+
+        // حفظ آخر صفحة متبقية
+        if (currentPageItems.length > 0) {
+            examPages.push({ items: currentPageItems });
+        }
+
+        // إضافة بيانات الترقيم والتاريخ
+        examPages.forEach((page, index) => {
+            page.currentPage = index + 1;
+            page.totalPages = examPages.length;
+            page.dateStr = examsRes.data[0].exam_date;
+        });
+        
+        if (currentMasterIndex >= examPages.length) currentMasterIndex = 0;
+        
+    } else {
+        isExamMode = false; // نرجع للجداول العادية
+        
+        roomsData = {};
+        activeRooms.forEach(room => roomsData[room] = []);
+        if (scheduleRes.data) {
+            scheduleRes.data.forEach(item => {
+                if (roomsData[item.room_name] !== undefined) roomsData[item.room_name].push(item);
+            });
+        }
+        for (let room in roomsData) {
+            roomsData[room].sort((a, b) => a.period_order - b.period_order);
+        }
+        displayRooms = activeRooms.filter(room => {
+            const schedule = roomsData[room] || [];
+            return schedule.some(item => tvIsLectureStillVisible(item));
+        });
+
+        tvPosters = (postersRes.data && postersEnabled) ? postersRes.data : [];
+
+        const totalSlides = displayRooms.length + tvPosters.length;
+        if (currentMasterIndex >= totalSlides) currentMasterIndex = 0;
+    }
+
+    if (!document.querySelector('.room-card')) {
+        renderMasterSlide(0);
+        startSlideshow();
+    } else {
+        renderMasterSlide(currentMasterIndex);
+    }
+}
+
+// دالة مساعدة لتحويل الوقت لشكل شيك (9:00 ص)
+function formatPeriodTime(timeStr) {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return `${hours}:${m} ${ampm}`;
+}
+
+// الدالة العقل: بتحدد السلايد الحالي قاعة ولا بوستر وتعدل الوقت بناء عليه
+function renderMasterSlide(index) {
+    // 🔥 عرض امتحانات اليوم فقط وتثبيت الشريحة للوقت المستقل من الداشبورد
+    if (isExamMode) {
+        if (examPages.length === 0) return;
+        // استخدام الوقت المستقل (أو 15 ثانية كاحتياطي)
+        currentSlideDurationMs = window.tvExamDurationMs || 15000; 
+        showExamPage(index % examPages.length);
+        return;
+    }
+
+    // --- النظام العادي ---
+    const roomsCount = displayRooms.length;
+    const totalSlides = roomsCount + tvPosters.length;
+
+    if (totalSlides === 0) {
+        showRoom(0); 
+        return;
+    }
+
+    if (index < roomsCount) {
+        currentSlideDurationMs = roomDurationMs;
+        showRoom(index);
+    } else {
+        const posterIndex = index - roomsCount;
+        const currentPoster = tvPosters[posterIndex];
+        currentSlideDurationMs = currentPoster.duration ? (currentPoster.duration * 1000) : posterDurationMs;
+        showPoster(currentPoster, posterIndex + 1, tvPosters.length);
+    }
+}
+
+function formatPeriodTime(timeStr) {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return `${hours}:${m} ${ampm}`;
+}
+
+function showExamPage(pageIndex) {
+    updateHeaderTitle('لوحة إعلانات لجان الامتحانات النهائية');
+    const container = document.getElementById('content-container');
+    
+    // سحب بيانات الصفحة الحالية
+    const pageData = examPages[pageIndex];
+    if (!pageData) return;
+    const items = pageData.items || [];
+    
+    const escapeHtml = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    
+    // سحب تاريخ اليوم وتجهيزه بشكل بارز جداً
+    const formattedDate = pageData.dateStr ? new Date(pageData.dateStr).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'اليوم';
+
+    const paginationHtml = pageData.totalPages > 1 
+        ? `<div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-5 py-2.5 rounded-xl font-black text-lg flex items-center shadow-inner">
+               <i class="fas fa-layer-group ml-2"></i>
+               صفحة ${pageData.currentPage} من ${pageData.totalPages}
+           </div>`
+        : '';
+
+    let rowsHTML = '';
+    items.forEach((item, i) => {
+        const delay = i * 50;
+        
+        // 🔥 الخط الفاصل
+        if (item.isDivider) {
+            const continuationText = item.isContinuation ? ' <span class="text-yellow-200 ml-1">(يتبع)</span>' : '';
+            const pTitle = `فترة ${formatPeriodTime(item.startTime)} إلى ${formatPeriodTime(item.endTime)}${continuationText}`;
+            rowsHTML += `
+                <div class="stagger-row w-full flex items-center justify-center shrink-0 py-1" style="animation-delay:${delay}ms">
+                    <div class="h-[2px] flex-1 bg-gradient-to-r from-transparent via-gray-300 to-gray-300 rounded-full"></div>
+                    <span class="bg-gradient-to-r from-[#2A3475] to-[#1e255a] text-white px-6 py-1.5 rounded-full text-sm font-black mx-4 shadow-md border border-white/20 flex items-center gap-2">
+                        <i class="fas fa-clock text-yellow-400"></i> ${pTitle}
+                    </span>
+                    <div class="h-[2px] flex-1 bg-gradient-to-l from-transparent via-gray-300 to-gray-300 rounded-full"></div>
+                </div>
+            `;
+        } 
+        // 🔥 لجنة الامتحان
+        else {
+            const exam = item.exam;
+            rowsHTML += `
+                <div class="stagger-row flex-1 w-full bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-2 flex items-center justify-between hover:border-[#2A3475]/30 transition-colors min-h-0" style="animation-delay:${delay}ms">
+                    <div class="w-[8%] text-center">
+                        <div class="text-[11px] text-gray-500 font-bold mb-0.5">الفرقة</div>
+                        <div class="text-xl font-black text-[#2A3475]">${escapeHtml(exam.academic_level)}</div>
+                    </div>
+                    
+                    <div class="w-[34%] px-3 border-r border-gray-100">
+                        <div class="text-[19px] font-black text-gray-900 leading-tight">${escapeHtml(exam.course_name)}</div>
+                        
+                        <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                            <span class="flex items-center gap-1 bg-gray-50 border border-gray-200 text-gray-600 px-2 py-0.5 rounded-md text-[11px] font-black font-english">
+                                <i class="fas fa-hashtag text-[10px] text-gray-400"></i> ${escapeHtml(exam.course_code)}
+                            </span>
+                            <span class="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-black border ${exam.course_language === 'E' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-orange-50 border-orange-200 text-orange-700'}">
+                                <i class="fas fa-language text-[11px]"></i> لغة: ${escapeHtml(exam.course_language)}
+                            </span>
+                            <span class="flex items-center gap-1 bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-md text-[11px] font-black">
+                                <i class="fas fa-users text-[10px]"></i> مجموعة: ${escapeHtml(exam.group_number)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="w-[18%] px-3 border-r border-gray-100 text-center">
+                        <div class="bg-gray-50 rounded-lg py-1.5 px-2 font-english text-[16px] font-black text-[#2A3475] inline-block border border-gray-200">
+                            ${exam.start_time.substring(0,5)} - ${exam.end_time.substring(0,5)}
+                        </div>
+                    </div>
+
+                    <div class="w-[22%] px-3 border-r border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-[#2A3475]/10 text-[#2A3475] flex items-center justify-center shrink-0"><i class="fas fa-user-tie text-sm"></i></div>
+                            <div class="text-sm font-bold text-gray-800 line-clamp-2">${escapeHtml(exam.instructor)}</div>
+                        </div>
+                    </div>
+
+                    <div class="w-[18%] border-r border-gray-100 flex items-center justify-center">
+                        <span class="bg-green-100 text-green-800 border border-green-300 px-4 py-2 rounded-xl font-black font-english text-2xl drop-shadow-sm">${escapeHtml(exam.room_name)}</span>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    const html = `
+        <div class="glass-panel room-card w-full max-w-[1400px] mx-auto fade-in-up flex flex-col h-full bg-[#f8fafc] !border-t-4 !border-t-[#F3A628]">
+            <div class="px-8 py-5 bg-white border-b border-gray-200 flex justify-between items-center shadow-sm z-10 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-[#2A3475] to-[#1e255a] rounded-2xl flex items-center justify-center text-[#F3A628] shadow-lg shadow-navy/20">
+                        <i class="fas fa-calendar-alt text-3xl animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-black text-[#1e255a] tracking-tight">جداول امتحانات اليوم الكاملة</h2>
+                        <div class="inline-flex items-center gap-2 mt-2 bg-blue-50 border border-blue-200 text-blue-800 px-3 py-1 rounded-lg text-[16px] font-black shadow-sm">
+                            <i class="fas fa-calendar-day"></i>
+                            يوم ${formattedDate}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    ${paginationHtml}
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col overflow-hidden p-5 relative">
+                <div class="shrink-0 flex items-center justify-between px-3 pb-3 mb-2 border-b border-gray-300 text-sm font-black text-gray-400 uppercase tracking-wider">
+                    <div class="w-[8%] text-center">الفرقة</div>
+                    <div class="w-[34%] text-right px-3">المقرر الدراسي</div>
+                    <div class="w-[18%] text-center px-3">توقيت الامتحان</div>
+                    <div class="w-[22%] text-right px-3">أستاذ المادة</div>
+                    <div class="w-[18%] text-center">لجنة الامتحان</div>
+                </div>
+                
+                <div class="flex-1 flex flex-col gap-2 min-h-0 pb-1">
+                    ${rowsHTML}
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function startSlideshow() {
+    const bar = document.getElementById('slide-progress');
+    let width = 0;
+    clearInterval(progressInterval);
+    
+    // تعريف دالة الخطوة باسمها لكي يمكن إعادة تدويرها بالوقت الجديد ديناميكياً
+    function step() {
+        width += 100 / (currentSlideDurationMs / 50);
+        if (bar) bar.style.transform = `scaleX(${width / 100})`;
+        
+        if (width >= 100) {
+            width = 0;
+            if (bar) bar.style.transform = 'scaleX(0)';
+            
+            const card = document.querySelector('.room-card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(-20px)';
+            }
+            
+            setTimeout(() => {
+                // 🔥 التعديل السحري هنا: تحديد عدد السلايدز الفعلي بناءً على نوع الوضع
+                const totalSlides = isExamMode ? examPages.length : (displayRooms.length + tvPosters.length);
+                
+                if (totalSlides === 0) {
+                    renderMasterSlide(0);
+                    return;
+                }
+                
+                // الانتقال للمؤشر الشامل المصحح
+                currentMasterIndex = (currentMasterIndex + 1) % totalSlides;
+                renderMasterSlide(currentMasterIndex);
+                
+                // هنا يتم الحذف وإعادة البناء بالوقت الجديد الخاص بالسلايد الحالي
+                clearInterval(progressInterval);
+                progressInterval = setInterval(step, 50);
+            }, 300);
+        }
+    }
+    progressInterval = setInterval(step, 50);
+}
+
+async function showPoster(poster, currentNumber, totalCount) {
+    // 1. تشغيل التنبيه الصوتي بناءً على إعدادات البوستر الفردية
+    if (poster.play_sound) {
+        posterAlarm.currentTime = 0;
+        posterAlarm.play().catch(e => console.log("ℹ️ تنبيه الصوت يحتاج ضغطة على الشاشة أول مرة:", e));
+    }
+
+// 🔥 التعديل بالمشرط: تغيير عنوان الهيدر ليتناسب مع الإعلانات
+    updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
+
+    const container = document.getElementById('content-container');
+    
+    const escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    const objectFitClass = poster.fit_mode === 'contain' ? 'object-contain' : 'object-cover';
+
+    // بناء الهيكل فوراً لحماية الشاشة من اللاج البصري
+    container.innerHTML = `
+        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden fade-in-up" style="background: #090d16 !important;">
+            <div class="room-hero flex justify-between items-center px-6 py-4" style="background: linear-gradient(135deg, #1e255a 0%, #11183d 100%) !important; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <div class="flex items-center gap-3">
+                    <div class="room-icon !bg-[#F3A628] !text-[#2A3475]"><i class="fas fa-bullhorn text-xl"></i></div>
+                    <div>
+                        <h2 class="text-2xl font-black text-white">${escapeHtml(poster.title || 'إعلان مهم')}</h2>
+                    </div>
+                </div>
+                <div class="slide-counter !bg-white/5 !border-white/10 !text-[#F3A628]">
+                    <i class="fas fa-images ml-1"></i>
+                    <span>إعلان</span>
+                    <strong class="font-english ml-1">${currentNumber} / ${totalCount}</strong>
+                </div>
+            </div>
+            
+            <div class="flex-1 bg-[#090d16] flex items-center justify-center p-1 relative overflow-hidden">
+                <img id="active-poster-img" 
+                     src="" 
+                     alt="${escapeHtml(poster.title)}" 
+                     class="w-full h-full ${objectFitClass} rounded-xl shadow-2xl"
+                     loading="eager" />
+            </div>
+        </div>
+    `;
+
+    const imgEl = document.getElementById('active-poster-img');
+    if (imgEl) {
+        let imageUrlToLoad = poster.image_url;
+
+        // 🔐 فتح الكاش الداخلي للتلفزيون لتخزين وحفظ الصورة للعمل أوفلاين 100%
+        try {
+            if (localBlobUrls[poster.image_url]) {
+                // الصورة متحولة وجاهزة في الرام -> استخدمها فوراً (هذا يمنع تسريب الذاكرة تماماً)
+                imageUrlToLoad = localBlobUrls[poster.image_url];
+            } else {
+                const cache = await caches.open('citl-posters-images');
+                const cachedResponse = await cache.match(poster.image_url);
+
+                if (cachedResponse) {
+                    // استخراج الصورة وتحويلها لمرة واحدة فقط ثم حفظها في القاموس
+                    const blob = await cachedResponse.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    localBlobUrls[poster.image_url] = blobUrl;
+                    imageUrlToLoad = blobUrl;
+                } else {
+                    // صورة جديدة والنت شغال -> اسحبها واحفظها للمرات القادمة
+                    fetch(poster.image_url).then(res => {
+                        if (res.ok) cache.put(poster.image_url, res);
+                    }).catch(err => console.log("ℹ️ الشاشة تعمل أوفلاين حالياً ويتم الاعتماد على الذاكرة العميقة"));
+                }
+            }
+        } catch (cacheErr) {
+            console.warn("Cache API Storage error:", cacheErr);
+        }
+
+        // تمرير الرابط المضمون (سواء سحابي أو لوكال بلوب) ونفخ التشفير في كرت الشاشة
+        imgEl.src = imageUrlToLoad;
+    }
+}
+
+// دالة لتغيير عنوان الهيدر بنعومة (Fade Animation)
+window.updateHeaderTitle = function(newTitle) {
+    const headerTitle = document.getElementById('main-header-title');
+    if (!headerTitle || headerTitle.textContent === newTitle) return;
+    
+    headerTitle.style.opacity = '0';
+    headerTitle.style.transform = 'translateY(-10px)';
+    
+    setTimeout(() => {
+        headerTitle.textContent = newTitle;
+        headerTitle.style.opacity = '1';
+        headerTitle.style.transform = 'translateY(0)';
+    }, 300);
+};
+
+        // --- عرض الغرفة ---
+// --- عرض الغرفة (معدلة لتوحيد التوقيتات مع الكروت) ---
+function showRoom(index) {
+    // إرجاع العنوان للجداول
+    updateHeaderTitle('شاشة الجداول الدراسية اليومية');
+    const container = document.getElementById('content-container');
+
+    const roomsToShow = Array.isArray(displayRooms) ? displayRooms : activeRooms;
+    
+    if (activeRooms.length === 0) {
+        container.innerHTML = '<div class="text-white text-2xl text-center">لم يتم اختيار قاعات للعرض</div>';
+        return;
+    }
+
+    if (roomsToShow.length === 0) {
+        container.innerHTML = `
+            <div class="glass-panel room-card w-full max-w-6xl mx-auto fade-in-up flex items-center justify-center">
+                <div class="empty-schedule">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>لا توجد محاضرات مجدولة اليوم في القاعات المختارة</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const roomName = roomsToShow[index] || roomsToShow[0];
+    const schedule = roomsData[roomName] || [];
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const todayStr = now.toLocaleDateString('en-CA');
+
+    const formatTimeDisplay = (time) => {
+        if (!time) return "00:00 - 00:00";
+        const t = time.trim();
+
+        if (t.startsWith("08:30") || t.startsWith("8:30")) return "08:30 - 10:20";
+        if (t.startsWith("10:30")) return "10:30 - 12:20";
+        if (t.startsWith("12:30")) return "12:30 - 02:20";
+        if (t.startsWith("02:30") || t.startsWith("14:30")) return "02:30 - 04:20";
+        if (t.startsWith("04:30") || t.startsWith("16:30")) return "04:30 - 06:20";
+
+        return t;
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    const timeToMinutes = (value) => {
+        if (!value) return null;
+
+        const parts = value.trim().split(':');
+        if (parts.length < 2) return null;
+
+        let h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+
+        if (Number.isNaN(h) || Number.isNaN(m)) return null;
+
+        // تحويل أوقات بعد الظهر المعروضة 02:30 / 04:30 إلى 24 ساعة
+        if (h < 7) h += 12;
+        if (h === 24) h = 12;
+
+        return h * 60 + m;
+    };
+
+    const getLectureState = (item) => {
+        const displayTime = formatTimeDisplay(item.time_slot);
+        const times = displayTime.split('-');
+
+        const isCancelled =
+            item.status === 'cancelled' ||
+            (item.cancelled_dates && item.cancelled_dates.includes(todayStr));
+
+        let startMins = null;
+        let endMins = null;
+        let isCurrent = false;
+        let isFinished = false;
+        let isUpcoming = false;
+
+        if (times.length === 2) {
+            startMins = timeToMinutes(times[0]);
+            endMins = timeToMinutes(times[1]);
+
+            if (startMins !== null && endMins !== null) {
+                if (currentMinutes >= endMins) {
+                    isFinished = true;
+                } else if (currentMinutes >= startMins && currentMinutes < endMins) {
+                    isCurrent = !isCancelled;
+                    isUpcoming = isCancelled;
+                } else if (currentMinutes < startMins) {
+                    isUpcoming = true;
+                }
+            }
+        } else {
+            isUpcoming = !isCancelled;
+        }
+
+        return {
+            displayTime,
+            isCancelled,
+            isCurrent,
+            isFinished,
+            isUpcoming
+        };
+    };
+
+    // المهم هنا:
+    // أي محاضرة انتهت لا تظهر في شاشة العرض
+    const visibleSchedule = schedule.filter(item => {
+        const state = getLectureState(item);
+        return !state.isFinished;
+    });
+
+    const rowCount = Math.max(visibleSchedule.length, 1);
+    const rowsClass = rowCount > 10 ? 'rows-many' : `rows-${rowCount}`;
+
+    let rowsHTML = '';
+    let liveCount = 0;
+    let cancelledCount = 0;
+    let upcomingCount = 0;
+
+let currentStatus = `
+        <div class="flex items-start justify-start gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-bold">
+            <span class="relative flex h-3 w-3 shrink-0 mt-1">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            <span class="leading-snug">القاعة متاحة الآن</span>
+        </div>
+    `;
+
+    if (visibleSchedule.length > 0) {
+        visibleSchedule.forEach((item, i) => {
+            const state = getLectureState(item);
+
+            const displayTime = state.displayTime;
+            const isCancelled = state.isCancelled;
+            const isCurrent = state.isCurrent;
+            const isUpcoming = state.isUpcoming;
+
+            if (isCurrent) {
+                            liveCount += 1;
+                            currentStatus = `
+                                <div class="flex items-start justify-start gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-xl font-bold status-live text-right">
+                                    <span class="relative flex h-3 w-3 shrink-0 mt-1">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                    <span class="leading-snug">مشغولة الآن: ${escapeHtml(item.course_name)}</span>
+                                </div>
+                            `;
+                        }
+
+            if (isCancelled) {
+                cancelledCount += 1;
+            } else if (isUpcoming) {
+                upcomingCount += 1;
+            }
+
+            const delay = i * 45;
+
+            const rowStateClass = isCancelled
+                ? 'is-cancelled'
+                : (isCurrent ? 'is-current' : 'is-upcoming');
+
+            let statusBadge = '';
+
+            if (isCancelled) {
+                statusBadge = '<span class="status-pill status-cancelled"><i class="fas fa-ban"></i> ملغاة</span>';
+            } else if (isCurrent) {
+                statusBadge = '<span class="status-pill status-now"><i class="fas fa-circle-play"></i> الآن</span>';
+            } else {
+                statusBadge = '<span class="status-pill status-upcoming"><i class="fas fa-clock"></i> قادمة</span>';
+            }
+
+            rowsHTML += `
+                <div class="schedule-row stagger-row ${rowStateClass}" style="animation-delay:${delay}ms">
+                    <div class="schedule-time">${escapeHtml(displayTime)}</div>
+
+                    <div class="schedule-main">
+                        <div class="schedule-course">${escapeHtml(item.course_name || 'محاضرة بدون اسم')}</div>
+                        <div class="schedule-code">${escapeHtml(item.course_code || '')}</div>
+                    </div>
+
+                <div class="schedule-instructor">
+                    <div class="instructor-icon"><i class="fas fa-user-tie"></i></div>
+                    <div class="instructor-name">${escapeHtml(item.instructor || 'غير محدد')}</div>
+                </div>
+
+                    <div class="schedule-status">${statusBadge}</div>
+                </div>
+            `;
+        });
+    } else {
+        rowsHTML = `
+            <div class="empty-schedule">
+                <i class="fas fa-calendar-check"></i>
+                <p>${schedule.length > 0 ? 'انتهت محاضرات هذه القاعة اليوم' : 'لا توجد محاضرات مجدولة في هذه القاعة اليوم'}</p>
+                <span class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 font-black text-sm">
+                    <i class="fas fa-check-circle"></i>
+                    القاعة متاحة الآن
+                </span>
+            </div>
+        `;
+    }
+
+    const roomsToShowCount = Array.isArray(displayRooms) ? displayRooms.length : activeRooms.length;
+    const roomPosition = roomsToShowCount ? `${index + 1} / ${roomsToShowCount}` : '0 / 0';
+
+    const operationClass = liveCount > 0 ? 'live' : 'idle';
+    const operationText = liveCount > 0 ? `${liveCount} جارية الآن` : 'متاحة الآن';
+
+    const cancelledChip = cancelledCount > 0
+        ? `<span class="meta-chip cancel"><i class="fas fa-ban"></i>${cancelledCount} ملغاة</span>`
+        : '';
+
+    const html = `
+        <div class="glass-panel room-card w-full max-w-6xl mx-auto fade-in-up" style="--row-count:${rowCount}">
+            <div class="room-hero">
+                <div class="room-title-wrap">
+                    <div class="room-icon"><i class="fas fa-door-open"></i></div>
+
+                    <div class="room-title-stack">
+                        <div class="room-kicker">
+                            <span class="room-kicker-dot"></span>
+                            LIVE ROOM SCHEDULE
+                        </div>
+
+                        <h2 class="room-name font-english">${escapeHtml(roomName)}</h2>
+
+                        <div class="room-subtitle">
+                            العرض التشغيلي للمحاضرات المتبقية
+                        </div>
+
+                        <div class="room-meta">
+                            <span class="meta-chip">
+                                <i class="fas fa-calendar-day"></i>
+                                ${visibleSchedule.length} متبقية
+                            </span>
+
+                            <span class="meta-chip ${operationClass}">
+                                <i class="fas fa-signal"></i>
+                                ${operationText}
+                            </span>
+
+                            <span class="meta-chip">
+                                <i class="fas fa-forward"></i>
+                                ${upcomingCount} قادمة
+                            </span>
+
+                            ${cancelledChip}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-side-panel">
+                    <div class="room-status-wrap">${currentStatus}</div>
+
+                    <div class="slide-counter">
+                        <i class="fas fa-layer-group"></i>
+                        <span>قاعة</span>
+                        <strong>${roomPosition}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-panel">
+                ${visibleSchedule.length > 0 ? `
+                    <div class="schedule-head">
+                        <div>التوقيت</div>
+                        <div>المقرر</div>
+                        <div>محاضر المادة</div>
+                        <div>الحالة</div>
+                    </div>
+
+                    <div class="schedule-list ${rowsClass}" style="--row-count:${rowCount}; grid-template-rows: repeat(${rowCount}, minmax(0, 1fr));">
+                        ${rowsHTML}
+                    </div>
+                ` : rowsHTML}
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+        // --- كود التحديث اللحظي السحري (Realtime) ---
+        // ده بيخلي الشاشة تحس بأي تغيير يحصل في الداتابيز وتحدث نفسها فوراً
+        const mySubscription = supabase
+            .channel('public:academic_schedule')
+            .on(
+                'postgres_changes', 
+                { event: '*', schema: 'public', table: 'academic_schedule' }, 
+                (payload) => {
+                    console.log('🔔 تغيير تم رصده:', payload);
+                    // إعادة تحميل البيانات فوراً لكي يظهر التعديل (إلغاء/تفعيل)
+                    fetchData(); 
+                }
+            )
+            .subscribe();
+        supabase
+            .channel('tv-display-config-realtime')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'site_settings',
+                    filter: `setting_key=eq.${TV_DISPLAY_CONFIG_KEY}`
+                },
+                (payload) => {
+                    if (!payload.new || !payload.new.setting_value) return;
+
+                    applyTvDisplayConfig(payload.new.setting_value);
+
+                    currentMasterIndex = 0;
+                    fetchData();
+                    startSlideshow();
+
+                    console.log('تم تحديث إعدادات شاشة العرض لحظيًا');
+                }
+            )
+            .subscribe();
+
+            // استماع لحظي لتغييرات جدول البوسترات (إضافة/حذف/تعديل)
+supabase
+    .channel('public:tv_posters_realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tv_posters' }, (payload) => {
+        console.log('🔔 تغيير تم رصده في البوسترات:', payload);
+        fetchData();
+    })
+    .subscribe();
+
+// استماع لحظي لتغيير إعدادات تشغيل أو سرعة البوسترات
+supabase
+    .channel('tv-poster-config-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings', filter: `setting_key=eq.tv_poster_config` }, (payload) => {
+        if (!payload.new || !payload.new.setting_value) return;
+        applyTvPosterConfig(payload.new.setting_value);
+        currentMasterIndex = 0;
+        fetchData();
+        startSlideshow();
+        console.log('تم تحديث إعدادات سرعة/تفعيل البوسترات لحظيًا');
+    })
+    .subscribe();
+
+        // التشغيل المبدئي والمؤقت الاحتياطي
+        (async function initTvDisplay() {
+            await loadTvDisplayConfig();
+            fetchData();
+        })();
+
+        setInterval(fetchData, REFRESH_INTERVAL);
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('السيستم جاهز للعمل أوفلاين'))
+        .catch(err => console.log('حدث خطأ في التسجيل: ', err));
+    });
+  }
+  
+  async function syncDashboardData() {
+    // ---------------------------------------------------------
+    // 1. التحديث الفوري للأرقام (من الذاكرة)
+    // ---------------------------------------------------------
+    const cachedHalls = localStorage.getItem('last_halls') || "0";
+    const cachedMeetings = localStorage.getItem('last_meetings') || "0";
+    const cachedLectures = localStorage.getItem('last_lectures') || "0";
+
+    if(document.getElementById('count-halls')) document.getElementById('count-halls').innerText = cachedHalls;
+    if(document.getElementById('count-meetings')) document.getElementById('count-meetings').innerText = cachedMeetings;
+    if(document.getElementById('count-live-lectures')) document.getElementById('count-live-lectures').innerText = cachedLectures;
+
+    // ---------------------------------------------------------
+    // 2. تحديث شريط الأخبار (نطاق سرعة واسع جداً: سلحفاة 🐢 -> صاروخ 🚀)
+    // ---------------------------------------------------------
+    const newsEl = document.getElementById('news-ticker-content');
+    if (newsEl) {
+        try {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('setting_value')
+                .eq('setting_key', 'news_config')
+                .maybeSingle();
+
+            if (data && data.setting_value) {
+                const newsData = data.setting_value;
+                const newText = newsData.text || "";
+                const currentText = newsEl.getAttribute('data-last-text');
+
+                // التحديث لو النص اتغير أو الشريط فاضي
+                if (currentText !== newText || newsEl.innerHTML.trim() === "") {
+                    
+                    const sentences = newText.split('\n').filter(s => s.trim() !== '');
+                    const singleSet = sentences.join(' <span class="news-separator">✦</span> ');
+                    
+                    // وضع النص (نسخة واحدة)
+                    newsEl.innerHTML = `<span>${singleSet}</span>`;
+                    
+                    newsEl.setAttribute('data-last-text', newText);
+
+                    // ============================================================
+                    // 🚀 المعادلة الجديدة (Wide Dynamic Range)
+                    // ============================================================
+                    
+                    // 1. حساب المسافة (النص + الشاشة)
+                    const textWidth = newsEl.scrollWidth; 
+                    const containerWidth = newsEl.parentElement.offsetWidth || window.innerWidth;
+                    const totalDistance = textWidth + containerWidth;
+
+                    // 2. حساب السرعة (المعدلة لتكون محسوسة جداً)
+                    const sliderVal = parseInt(newsData.sliderVal) || 50;
+                    
+                    // المعادلة القديمة كانت: 50 + (Val * 3) -> أقصى حاجة 350 (بطيء نسبياً)
+                    // المعادلة الجديدة: تبدأ من 10 (زحف) وتصل إلى 1200+ (صاروخ)
+                    const pixelsPerSecond = 35 + (sliderVal * 1.6);
+
+                    // 3. الزمن
+                    const duration = totalDistance / pixelsPerSecond;
+                    
+                    document.documentElement.style.setProperty('--ticker-speed', `${duration}s`);
+                    
+                    console.log(`🚀 سرعة: ${pixelsPerSecond}px/s | زمن الرحلة: ${duration.toFixed(1)}s`);
+                }
+            }
+        } catch (e) {
+            console.warn("⚠️ News Sync Error:", e);
+        }
+    }
+
+// ---------------------------------------------------------
+    // 3. تحديث الإحصائيات (قاعات، حجوزات، محاضرات) - نسخة مؤمنة بمشرط
+    // ---------------------------------------------------------
+    try {
+        // أ. عدد القاعات
+        const { data: halls } = await supabase.from('academic_schedule').select('room_name');
+        if (halls) {
+            const uniqueHalls = [...new Set(halls.map(h => h.room_name))].length;
+            if (uniqueHalls > 0 || halls.length === 0) {
+                const elHalls = document.getElementById('count-halls');
+                if (elHalls) elHalls.innerText = uniqueHalls;
+                localStorage.setItem('last_halls', uniqueHalls);
+            }
+        }
+
+        // ب. اجتماعات المجلس
+        const today = new Date().toISOString().split('T')[0];
+        const { count: mCount } = await supabase.from('smrm_reservations').select('*', { count: 'exact', head: true }).eq('date', today);
+        const elMeetings = document.getElementById('count-meetings');
+        if (elMeetings) elMeetings.innerText = mCount || 0;
+        localStorage.setItem('last_meetings', mCount || 0);
+
+        // ج. محاضرات جارية
+        const now = new Date();
+        const dayEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+
+        const { data: lectures } = await supabase.from('academic_schedule').select('time_slot').eq('day_of_week', dayEn);
+        if (lectures) {
+            const activeCount = lectures.filter(item => {
+                if (!item.time_slot) return false;
+                const parts = item.time_slot.split(' - ');
+                if (parts.length < 1) return false;
+                const [h, m] = parts[0].split(':').map(Number);
+                const startMins = h * 60 + (m || 0);
+                return currentMins >= startMins && currentMins <= (startMins + 110);
+            }).length;
+            
+            const elLive = document.getElementById('count-live-lectures');
+            if (elLive) elLive.innerText = activeCount;
+            localStorage.setItem('last_lectures', activeCount);
+        }
+    } catch (e) { 
+        console.error("Stats Sync Error:", e); 
+    }
+}
+
+// تشغيل الدالة
+document.addEventListener('DOMContentLoaded', syncDashboardData);
+setInterval(syncDashboardData, 60000);
+
+    // ==========================================
+    // 🚀 تحديث لحظي للسرعة (بنفس المعادلة القوية)
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        supabase.channel('realtime-news')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, (payload) => {
+                if (!payload.new || payload.new.setting_key !== 'news_config') return;
+
+                const newConfig = payload.new.setting_value;
+                if (!newConfig) return;
+
+            const newsEl = document.getElementById('news-ticker-content');
+            if (newsEl) {
+                // 1. تحديث النص
+                const currentText = newsEl.getAttribute('data-last-text');
+                const newText = newConfig.text || "";
+                
+                if (currentText !== newText) {
+                    const sentences = newText.split('\n').filter(s => s.trim() !== '');
+                    const singleSet = sentences.join(' <span class="news-separator">✦</span> ');
+                    newsEl.innerHTML = `<span>${singleSet}</span>`;
+                    newsEl.setAttribute('data-last-text', newText);
+                }
+
+                // 2. تحديث السرعة لحظياً (المعادلة الجديدة)
+                const sliderVal = parseInt(newConfig.sliderVal) || 50;
+                
+                // من 10 (سلحفاة) لـ 1200+ (صاروخ)
+                const pixelsPerSecond = 35 + (sliderVal * 1.6);
+                
+                const contentWidth = newsEl.scrollWidth;
+                const containerWidth = newsEl.parentElement.offsetWidth || window.innerWidth;
+                const totalDistance = contentWidth + containerWidth;
+                const duration = totalDistance / pixelsPerSecond;
+
+                document.documentElement.style.setProperty('--ticker-speed', `${duration}s`);
+                console.log(`🚀 تحديث لحظي: ${pixelsPerSecond} px/s`);
+            }
+        })
+        .subscribe();
+});
+// معادلة تحويل قيمة الشريط (0-100) إلى ثواني (60s - 5s)
+// كل ما الرقم يزيد (سرعة)، الوقت يقل (ثواني)
+function calculateDuration(sliderVal) {
+    // المعادلة: 65 - (قيمة الشريط * 0.6)
+    // لو 0 -> 65 ثانية (بطيء جداً)
+    // لو 50 -> 35 ثانية (متوسط)
+    // لو 100 -> 5 ثواني (صاروخ)
+    return Math.max(5, 65 - (sliderVal * 0.6)) + 's';
+}
+
+// دالة لتحديث النص فوق الشريط أثناء السحب
+function updateSpeedLabel(val) {
+    const label = document.getElementById('speed-display');
+    if(val < 20) { label.innerText = 'بطيء جداً'; label.className = 'text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md'; }
+    else if(val < 40) { label.innerText = 'بطيء'; label.className = 'text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md'; }
+    else if(val < 60) { label.innerText = 'سرعة متوسطة'; label.className = 'text-xs font-bold text-[#2A3475] bg-[#2A3475]/10 px-2 py-1 rounded-md'; }
+    else if(val < 80) { label.innerText = 'سريع'; label.className = 'text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md'; }
+    else { label.innerText = 'سريع جداً (صاروخ)'; label.className = 'text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-md'; }
+}
+
+// 1. دالة الحفظ (تكتب في الجدول الجديد)
+async function saveNewsConfig() {
+    const text = document.getElementById('news-input-multi').value;
+    const sliderVal = document.getElementById('news-speed-slider').value;
+    const calculatedSpeed = calculateDuration(sliderVal);
+
+    if (!text.trim()) {
+        alert('اكتب نص للخبر الأول!');
+        return;
+    }
+
+    const config = {
+        text: text,
+        speed: calculatedSpeed,
+        sliderVal: sliderVal,
+        updatedAt: Date.now()
+    };
+
+    // حفظ في الذاكرة المؤقتة (للسرعة)
+    localStorage.setItem('news_config', JSON.stringify(config));
+
+    // حفظ في قاعدة البيانات (Upsert)
+    const { error } = await supabase
+        .from('site_settings')
+        .upsert({ 
+            setting_key: 'news_config', 
+            setting_value: config 
+        }, { onConflict: 'setting_key' });
+
+    if (!error) {
+        showNotification('تم الحفظ وتحديث الشريط ✅');
+    } else {
+        console.error(error);
+        showNotification('تم الحفظ محلياً فقط (تأكد من النت)', 'warning');
+    }
+}
+
+// 2. دالة التحميل (تقرأ من الجدول الجديد عند فتح الصفحة)
+async function loadCurrentNews() {
+    const { data } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'news_config')
+        .maybeSingle();
+
+    if (data && data.setting_value) {
+        const config = data.setting_value;
+        
+        // تعبئة البيانات في الصفحة
+        if(document.getElementById('news-input-multi')) 
+            document.getElementById('news-input-multi').value = config.text || '';
+        
+        if(document.getElementById('news-speed-slider')) {
+            document.getElementById('news-speed-slider').value = config.sliderVal || 50;
+            if (typeof updateSpeedLabel === "function") updateSpeedLabel(config.sliderVal || 50);
+        }
+        
+        // تحديث الكاش
+        localStorage.setItem('news_config', JSON.stringify(config));
+    }
+}
+
+// تشغيل التحميل تلقائياً
+document.addEventListener('DOMContentLoaded', loadCurrentNews);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="same-origin">
+  <title>متابعة الحضور والانصراف | CITL</title>
+  <link rel="icon" href="/CITL_Logo-32.png">
+  <link rel="stylesheet" href="/management/style.css">
+</head>
+<body>
+  <header><a href="/schedules/" class="brand"><img src="/CITL.png" alt="CITL"><span>متابعة الحضور والانصراف</span></a><button id="logout" class="ghost">تسجيل الخروج</button></header>
+  <main>
+    <div id="status" role="status" aria-live="polite"></div>
+    <nav class="tabs" aria-label="أقسام الإدارة">
+      <button data-tab="term" class="active">الترم</button><button data-tab="visitors">المنتدبون</button>
+      <button data-tab="heads">رؤساء الأقسام</button><button data-tab="qr">QR القاعات</button><button data-tab="reports">الحضور والانصراف</button>
+    </nav>
+
+    <section id="tab-term" class="panel active">
+      <h1>تعريف الترم الدراسي</h1><p>لا يمكن أن يوجد أكثر من ترم نشط. بعد تحديث الجدول اضغط «مزامنة الجدول».</p>
+      <form id="term-form" class="grid">
+        <label>كود الترم<input name="code" required maxlength="40" placeholder="2026-FALL"></label>
+        <label>اسم الترم<input name="name" required maxlength="120" placeholder="الفصل الأول 2026/2027"></label>
+        <label>من<input name="starts_on" type="date" required></label><label>إلى<input name="ends_on" type="date" required></label>
+        <label class="check"><input name="is_active" type="checkbox" checked> ترم نشط</label><button class="primary">حفظ الترم</button>
+      </form><div id="terms-list" class="cards"></div>
+    </section>
+
+    <section id="tab-visitors" class="panel">
+      <h1>المنتدبون فقط</h1><p>اختر قيمة المحاضر المستخرجة تلقائيًا من جدول الترم كما كُتبت حرفيًا، ثم اربطها بالحساب. لا يستبعد النظام «غير محدد» ولا يقسم الأسماء المكتوبة معًا.</p>
+      <form id="visitor-form" class="grid">
+        <input name="id" type="hidden">
+        <label>الترم الدراسي<select name="term_id" id="visitor-term" required></select></label>
+        <label class="wide">الاسم كما في الجدول<select name="full_name" id="visitor-name" required><option value="">— اختر محاضرًا من الجدول —</option></select><small id="visitor-candidate-meta" class="field-help">تظهر القائمة بعد رفع جدول الترم إلى Supabase.</small></label>
+        <label>القسم<select name="department_key" class="department" required></select></label>
+        <label>ربط بحساب<select name="profile_id" id="visitor-profile"><option value="">— اختر الحساب —</option></select></label>
+        <label>أسماء بديلة مفصولة بفاصلة<input name="aliases" maxlength="500" placeholder="د. أحمد، Ahmed Ali"></label>
+        <label class="check"><input name="is_active" type="checkbox" checked> منتدب نشط</label>
+        <div class="form-actions"><button id="visitor-submit" class="primary">إضافة المنتدب</button><button id="visitor-reset" type="button" class="secondary hidden">إلغاء التعديل</button></div>
+      </form><div id="visitors-list" class="table-wrap"></div>
+    </section>
+
+    <section id="tab-heads" class="panel">
+      <h1>تحديد رئيس القسم</h1><p>يمكن تعديل الرئيس في أي وقت. اختيار المنتدب وإجراءات الاعتذار والإحلال وتحويل القاعة ترسل تنبيهًا للرئيس المحدد.</p>
+      <form id="head-form" class="grid"><label>القسم<select name="department_key" class="department" required></select></label>
+        <label>رئيس القسم<select name="profile_id" id="head-profile" required><option value="">— اختر الحساب —</option></select></label><button class="primary">حفظ التعيين</button></form>
+      <div id="heads-list" class="cards"></div>
+    </section>
+
+    <section id="tab-qr" class="panel">
+      <h1>مزامنة الجدول وQR القاعات</h1>
+      <div class="actions"><select id="qr-term"></select><button id="sync" class="primary">مزامنة الجدول</button><button id="generate" class="danger">توليد رموز جديدة</button></div>
+      <div id="qr-summary" class="summary-box" aria-live="polite"></div>
+      <div id="eligible-rooms" class="room-chips"></div>
+      <div class="warning">يُنشأ QR فقط للقاعات التي تحتوي على محاضرات لمنتدبين محددين. كل رمز ثابت طوال الترم، ولا يتغير إلا عند الضغط على «توليد رموز جديدة». إعادة التوليد تلغي الرموز السابقة؛ اطبع الرموز فورًا لأن الرمز الخام لا يُحفظ في قاعدة البيانات.</div>
+      <div id="qr-list" class="qr-grid"></div><button id="print" class="primary hidden">طباعة الرموز</button>
+    </section>
+
+    <section id="tab-reports" class="panel"><h1>سجل حضور وانصراف المنتدبين</h1><div class="actions"><label>الترم الدراسي<select id="reports-term"></select></label><button id="reports-refresh" class="secondary" type="button">تحديث السجل</button></div><p>يظهر كل مسح ناجح للـQR مرتبطًا بالمحاضرة والقاعة والوقت. التواجد الدوري منفصل ولا يُحتسب كحضور.</p><h2>مسح QR للمحاضرات</h2><div id="scans-list" class="table-wrap"></div><h2>جلسات الدخول والانصراف</h2><div id="presence-sessions-list" class="table-wrap"></div></section>
+  </main>
+  <script>{const embedded=new URLSearchParams(location.search).get('embedded')==='1';if(embedded)document.documentElement.classList.add('embedded');else location.replace('/schedules/?open=attendance');}</script>
+  <script src="/vendor/supabase-js-2.45.4.min.js"></script><script src="/vendor/qrcode-1.5.4.min.js"></script>
+  <script src="/management/management.js"></script>
+</body></html>

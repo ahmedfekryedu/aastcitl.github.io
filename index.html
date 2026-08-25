@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
+    <meta name="description" content="CITL Smart System">
+    <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات,الأكاديمية العربية">
+    <meta name="language" content="Arabic">
+    <meta name="theme-color" content="#2A3475">
+    <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
+    <meta property="og:description" content="CITL Smart System">
+    <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://aastcitl.me/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://aastcitl.me/CITL_Banner.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" type="image/png" href="CITL_Logo-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="CITL_Logo-192.png">
+    <link rel="apple-touch-icon" href="CITL_Logo-192.png">
+    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+    <script src="/vendor/supabase-js-2.45.4.min.js"></script>
+    <script src="/presence.js"></script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+        }
+        .bg-navy { background-color: #2A3475; }
+        .text-navy { color: #2A3475; }
+        .border-gold { border-color: #F3A628; }
+        .text-gold { color: #F3A628; }
+        .bg-gold { background-color: #F3A628; }
+        
+        /* تأثيرات حركية */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Dropdown Styles */
+        .custom-dropdown { position: relative; width: 100%; }
+
+        .custom-dropdown-display {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-width: 1px;
+            border-color: #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-dropdown-display:focus {
+            ring: 2px solid #2A3475;
+        }    
+
+        /* ========================================= */
+        /* 🔥 أنيميشن شاشة التحميل الجديدة 🔥 */
+        /* ========================================= */
+        @keyframes logo-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
+        .loader-ring { animation: spin-slow 4s linear infinite; }
+        
+        .loader-ring { animation: spin-slow 4s linear infinite; }
+
+        /* ========================================= */
+/* خلفية قسم الدخول بالصورة + الإيفكت */
+/* ========================================= */
+.login-campus-panel {
+    position: relative;
+    overflow: hidden;
+    background-color: #2A3475;
+}
+
+.login-campus-image-layer {
+    position: absolute;
+    inset: 0;
+    background-image: url('CITL-Camp1.jpg');
+    background-size: cover;
+    background-position: 50% center;
+    background-repeat: no-repeat;
+    opacity: 0.30; /* زوّدها أو قللها حسب الوضوح */
+    z-index: 1;
+    pointer-events: none;
+}
+
+.login-campus-pattern-layer {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            -30deg,
+            transparent,
+            transparent 14px,
+            rgba(255, 255, 255, 0.055) 14px,
+            rgba(255, 255, 255, 0.055) 15px
+        );
+    z-index: 2;
+    pointer-events: none;
+}
+
+.login-campus-soft-light {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(42, 52, 117, 0.72), rgba(31, 38, 88, 0.82)),
+        radial-gradient(circle at top right, rgba(243, 166, 40, 0.10), transparent 35%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.login-campus-content {
+    position: relative;
+    z-index: 5;
+}
+
+.login-campus-decor {
+    z-index: 4;
+}
+
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden opacity-0 transition-opacity duration-500">
+
+<div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[url('CITL-Camp2.jpg')] bg-cover bg-[position:40%_center] bg-no-repeat opacity-50"></div>
+    <div class="absolute inset-0 bg-[#2A3475]/90 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden relative z-10 fade-in mx-auto h-auto min-h-[600px]">
+
+<div class="flex w-full md:w-1/2 login-campus-panel flex-col justify-center items-center text-white p-6 md:p-8 relative shrink-0 order-first">
+
+    <div class="login-campus-image-layer"></div>
+    <div class="login-campus-pattern-layer"></div>
+    <div class="login-campus-soft-light"></div>
+
+    
+<div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16 login-campus-decor"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-gold opacity-10 rounded-full -ml-10 -mb-10 login-campus-decor"></div>
+
+<div class="login-campus-content w-full flex flex-col items-center">
+    <img src="CITL.png" alt="Logo" class="w-24 md:w-32 h-auto mb-4 md:mb-6 drop-shadow-lg bg-white p-0 rounded-lg">
+    
+<h2 class="font-bold mb-2 text-center whitespace-nowrap text-[clamp(18px,4vw,25px)]">
+    كلية النقل الدولي واللوجستيات
+</h2>
+
+<h3 class="text-[#F3A628] font-bold text-center whitespace-nowrap text-[clamp(12px,2.6vw,15px)] mb-3 tracking-[0.5px]">
+    College of International Transport & Logistics
+</h3>
+
+<div class="flex justify-center">
+    <div class="text-center">
+        <div class="flex items-center justify-center gap-3 mb-1">
+            <span class="w-8 h-px bg-[#F3A628]/80"></span>
+            <i class="fas fa-globe text-[#F3A628] text-xs"></i>
+            <span class="w-8 h-px bg-[#F3A628]/80"></span>
+        </div>
+        
+        <span class="text-white font-extrabold uppercase tracking-[2.4px] text-[clamp(16px,3.5vw,22px)]">
+            CITL Smart System
+        </span>
+    </div>
+</div>
+    
+    <div class="mt-4 md:mt-8 space-y-2 md:space-y-3 w-full max-w-xs">
+        
+        <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+            <i class="fas fa-chalkboard-teacher text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
+            
+            <div class="text-center md:text-right">
+                <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة الجداول الدراسية</span>
+                <span class="text-gray-300 hidden md:block">عرض، متابعة، وتحديث الجداول الدراسية بسهولة</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+            <i class="fas fa-door-open text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
+            
+            <div class="text-center md:text-right">
+                <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة القاعات الدراسية</span>
+                <span class="text-gray-300 hidden md:block">تنظيم حجوزات القاعة ومنع التعارض بين المواعيد</span>        
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="w-full md:w-1/2 p-4 md:p-12 flex flex-col justify-center bg-white relative overflow-y-auto custom-scrollbar">
+
+    <form id="loginForm" class="space-y-3 md:space-y-5 block transition-all duration-300">
+        
+        <div class="text-center md:text-right mb-4 md:mb-8">
+            <h1 class="text-xl md:text-2xl font-bold text-navy mb-1">تسجيل الدخول</h1>
+            <p class="text-gray-500 text-xs md:text-sm">يرجى إدخال بيانات حسابك للمتابعة</p>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">البريد الإلكتروني</label>
+            <div class="relative group">
+                <input type="email" id="email" required 
+                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 bg-gray-50 focus:bg-white text-sm" 
+                       placeholder="user@aastcitl.me">
+                <i class="fas fa-envelope absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">كلمة المرور</label>
+            <div class="relative group">
+                <input type="password" id="password" required 
+                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 pr-12 bg-gray-50 focus:bg-white text-sm" 
+                       placeholder="••••••••">
+                    
+                <i class="fas fa-lock absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
+                
+                <i class="fas fa-eye absolute right-3 top-2.5 md:top-3.5 text-gray-400 cursor-pointer hover:text-[#2A3475] transition-colors text-xs md:text-base" 
+                   onclick="togglePassword('password', this)"></i>
+            </div>
+        </div>
+
+        <div id="login-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg flex items-center">
+            <i class="fas fa-exclamation-circle ml-2"></i> <span>بيانات الدخول غير صحيحة</span>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-navy text-white font-bold py-2.5 md:py-3.5 rounded-lg hover:bg-[#1f2658] transition-all shadow-md transform active:scale-[0.98] flex justify-center items-center group text-sm md:text-base">
+            <span>دخول للنظام</span>
+            <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform text-xs md:text-sm"></i>
+        </button>
+        
+        <p class="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4">
+            ليس لديك حساب؟ <a href="#" onclick="toggleForms()" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
+        </p>
+    </form>
+
+    <form id="signupForm" class="space-y-4 hidden transition-all duration-300">
+        <div class="text-center md:text-right mb-4">
+            <h1 class="text-xl font-bold text-navy mb-1">إنشاء حساب جديد</h1>
+            <p class="text-gray-500 text-xs">انضم إلينا الآن</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل</label>
+                <input type="text" id="reg-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">رقم الموبايل</label>
+                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm text-left dir-ltr">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">القسم / الجهة</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
+                        <span class="text-sm text-gray-700">اختر...</span>
+                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                    </div>
+                    
+                    <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="">اختر...</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="dean">مكتب العميد</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="admin-followup">قسم المتابعة الإدارية</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="education-agency">وكالة شؤون التعليم</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="students-agency">وكالة شؤون الطلاب</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="assistants-office">مكتب المعيدين</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="computer-lab">معمل الحاسب</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
+                    </ul>
+
+                    <select id="reg-dept" class="hidden" required>
+                        <option value="">اختر...</option> 
+                        <option value="dean">مكتب العميد</option>
+                        <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
+                        <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
+                        <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
+                        <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
+                        <option value="admin-followup">قسم المتابعة الإدارية</option>
+                        <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
+                        <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
+                        <option value="education-agency">وكالة شؤون التعليم</option>
+                        <option value="students-agency">وكالة شؤون الطلاب</option>
+                        <option value="assistants-office">مكتب المعيدين</option>
+                        <option value="computer-lab">معمل الحاسب</option> 
+                        <option value="visitor">زائر خارجي</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">المسمى الوظيفي</label>
+                <input type="text" id="reg-position" required placeholder="مثال: معيد" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+            </div>
+            <div class="md:col-span-1">
+    <label class="block text-xs font-bold text-gray-700 mb-1">نوع الحساب</label>
+    <div class="relative custom-dropdown w-full">
+        <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
+            <span id="reg-account-type-label" class="text-sm text-gray-700">اختر...</span>
+            <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+        </div>
+
+        <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="">اختر...</li>
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="admin">إداري</li>
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
+        </ul>
+
+        <select id="reg-account-type" class="hidden" required>
+            <option value="">اختر...</option>
+            <option value="admin">إداري</option>
+            <option value="faculty">عضو هيئة تدريس</option>
+        </select>
+    </div>
+</div>
+
+<div id="faculty-link-block" class="md:col-span-1">
+    <label class="block text-xs font-bold text-gray-700 mb-1">ربط الحساب بعضو هيئة تدريس</label>
+
+    <div class="relative custom-dropdown w-full">
+        <div id="faculty-link-display" class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center justify-between cursor-not-allowed transition-all shadow-sm">
+            <span id="reg-linked-instructor-label" class="text-sm text-gray-500">خاص بالتعليم فقط</span>
+            <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
+        </div>
+
+        <ul id="faculty-name-options" class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+        </ul>
+
+        <select id="reg-linked-instructor" class="hidden">
+            <option value="">اختر اسمك الأكاديمي</option>
+        </select>
+    </div>
+</div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
+                <input type="email" id="reg-email" required 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
+                       placeholder="user@aastcitl.me"> 
+            </div>
+<div class="md:col-span-2 mb-3">
+    <label class="block text-xs font-bold text-gray-700 mb-1">كود التسجيل الخاص بالكلية</label>
+    <div class="relative group">
+        <input type="text" id="reg-access-code" required 
+               placeholder="ادخل كود التفعيل" 
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm bg-orange-50/50">
+        <i class="fas fa-shield-alt absolute left-3 top-2.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs"></i>
+    </div>
+</div>
+            <div class="md:col-span-2 mb-4">
+                <label class="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
+                <div class="relative">
+                    <input type="password" id="reg-password" required minlength="6" 
+                           class="w-full px-3 py-2 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
+                           placeholder="••••••••">
+                    <i class="fas fa-eye absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#2A3475] z-10" 
+                       onclick="togglePassword('reg-password', this)"></i>
+                </div>
+            </div>
+        </div> 
+        <div id="signup-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg"></div>
+
+        <button type="submit" class="w-full bg-[#F3A628] text-[#2A3475] font-bold py-3 rounded-lg hover:bg-yellow-400 transition-all shadow-md">تسجيل اشتراك</button>
+        
+        <p class="text-center text-xs text-gray-600 mt-2">
+            لديك حساب بالفعل؟ <a href="#" onclick="toggleForms()" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
+        </p>
+    </form>
+
+<div class="mt-2 md:mt-8 border-t border-gray-100 pt-2 md:pt-4 w-full">
+        <div class="flex flex-col items-center justify-center text-gray-500 font-medium text-[clamp(10px,3vw,12px)] gap-1">
+            <span class="whitespace-nowrap">جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
+            
+            <span class="whitespace-nowrap">تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+        </div>
+    </div>
+
+</div>
+<div id="installContainer" class="absolute top-0 left-0 w-32 h-32 overflow-hidden z-[100] cursor-pointer" role="button" tabindex="0" aria-label="تثبيت تطبيق CITL">
+    <div id="smartRibbon" class="absolute top-[25px] left-[-40px] w-[150px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1.5 shadow-md border-b-2 border-[#2A3475] tracking-wider transition-all duration-500 flex items-center justify-center gap-1 whitespace-nowrap">
+        نسخة تجريبية
+    </div>
+</div>
+<div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
+    
+    <div class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center border border-gray-100 transform scale-95 transition-transform duration-300 min-w-[80vw] md:min-w-[400px] gap-0">
+        
+        <div class="mb-0 -mt-6 md:-mt-10">
+            <img src="CITL.png" alt="Loading..." class="h-24 md:h-48 w-auto object-contain mix-blend-multiply brightness-110 contrast-110 saturate-110">
+        </div>
+
+        <div class="text-center -mt-2 md:-mt-6">
+            <h3 class="text-[#2A3475] font-black text-lg md:text-2xl tracking-wide leading-tight">جاري تهيئة النظام</h3>
+            <p id="loader-text" class="text-gray-400 text-xs md:text-sm font-bold mt-1 md:mt-2">يتم استدعاء البيانات، يرجى الانتظار...</p>
+        </div>
+
+    </div>
+</div>
+    <div id="success-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-[#2A3475]/80 backdrop-blur-sm transition-opacity"></div>
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start flex-col items-center">
+                        <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-green-100 mb-4 animate-bounce">
+                            <i class="fas fa-check text-2xl text-green-600"></i>
+                        </div>
+                        
+                        <div class="mt-3 text-center w-full">
+                            <h3 class="text-xl font-bold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">يمكنك الآن تسجيل الدخول للوصول إلى لوحة التحكم.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
+                    <button type="button" onclick="closeSuccessModal()" class="inline-flex w-full justify-center rounded-lg bg-[#2A3475] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1f2658] sm:w-auto transition-all">
+                        تسجيل الدخول الآن
+                        <i class="fas fa-arrow-left mr-2 mt-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+        // =======================================================
+        // 1. إعدادات الاتصال بـ Supabase (النسخة الموحدة)
+        // =======================================================
+        const SUPABASE_URL = 'https://xgqukdbonzukxrpjovmb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
+
+        const supabaseFactory = window.supabase;
+        
+        // 🔥 الإنشاء مع توحيد مفتاح التخزين (storageKey) 🔥
+        const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            
+            auth: {
+                storageKey: 'sb-main-auth', // يجب أن يطابق ملف schedules.html
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
+        window.sb = sb;
+        window.PRESENCE_SUPABASE_URL = SUPABASE_URL;
+        window.PRESENCE_SUPABASE_ANON_KEY = SUPABASE_KEY;
+
+// --- كود الدخول التلقائي الذكي (نسخة منع الوميض) ---
+async function autoRedirect() {
+    try {
+        const { data: { session } } = await sb.auth.getSession();
+        
+        if (session && localStorage.getItem('currentUser')) {
+            // لو مسجل: حوله فوراً والصفحة لسه مخفية
+            window.location.href = '/dashboard/'; 
+        } else {
+            // لو مش مسجل: أظهر الصفحة الآن بنعومة
+            document.body.classList.remove('opacity-0');
+        }
+    } catch (error) {
+        console.error("خطأ في التحقق التلقائي:", error);
+        // في حالة الخطأ أظهر الصفحة عشان السيستم ميعلقش
+        document.body.classList.remove('opacity-0');
+    }
+}
+
+// تشغيل الفحص
+autoRedirect();
+
+        // الربط العام
+        window.supabase = sb;
+
+        // =======================================================
+        // دوال التحكم في شاشة التحميل (كما هي)
+        // =======================================================
+        window.showLoader = function(text = "جاري المعالجة...") {
+            const loader = document.getElementById('global-loader');
+            const textEl = document.getElementById('loader-text');
+            
+            if(textEl) textEl.textContent = text;
+
+            if(loader) {
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+                
+                // تفعيل الأنيميشن
+                setTimeout(() => {
+                    loader.classList.remove('opacity-0');
+                    const inner = loader.querySelector('.relative');
+                    if(inner) {
+                        inner.classList.remove('scale-95');
+                        inner.classList.add('scale-100');
+                    }
+                }, 10);
+            }
+        }
+
+        window.hideLoader = function() {
+            const loader = document.getElementById('global-loader');
+            if(loader) {
+                loader.classList.add('opacity-0');
+                const inner = loader.querySelector('.relative');
+                if(inner) {
+                    inner.classList.remove('scale-100');
+                    inner.classList.add('scale-95');
+                }
+                
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                }, 300);
+            }
+        }
+
+        // التبديل بين الفورم
+        function toggleForms() {
+            document.getElementById('loginForm').classList.toggle('hidden');
+            document.getElementById('signupForm').classList.toggle('hidden');
+        }
+
+        // 1. تسجيل الدخول (محدث باللودر)
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('login-error');
+
+            // 🔥 تشغيل اللودر
+            showLoader("جاري التحقق من البيانات...");
+            
+            if(errorElement) errorElement.classList.add('hidden');
+
+            try {
+                const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                const { data: profile } = await supabase.from('profiles').select('*').eq('id', authData.user.id).single();
+
+                const meta = (authData.user && authData.user.user_metadata) ? authData.user.user_metadata : {};
+                const profileData = profile || {};
+
+                const mergedUser = {
+                    id: authData.user.id,
+                    email: authData.user.email,
+                    full_name: profileData.full_name || meta.full_name || '',
+                    mobile: meta.mobile || profileData.mobile || '',
+                    position: meta.position || profileData.position || '',
+                    department: meta.department || profileData.department || '',
+                    role: profileData.role || 'user',
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+
+                localStorage.removeItem('sessionToken');
+
+                if (window.presenceTracker) {
+                    try {
+                        await window.presenceTracker.startForPage('login');
+                    } catch (e) {
+                        console.error('Presence start failed:', e);
+                    }
+                }
+
+                // تحديث النص للنجاح
+                const textEl = document.getElementById('loader-text');
+                if(textEl) textEl.textContent = "تم الدخول بنجاح! جاري التوجيه...";
+
+                setTimeout(() => {
+                    const requested = new URLSearchParams(window.location.search).get('next') || '/dashboard/';
+                    const safeNext = /^\/[a-z0-9_/?=&.%+-]*$/i.test(requested) ? requested : '/dashboard/';
+                    window.location.href = safeNext;
+                }, 1000);
+
+            } catch (error) {
+                console.error(error);
+                
+                // 🔥 إخفاء اللودر عند الخطأ
+                hideLoader();
+
+                if(errorElement) {
+                    errorElement.innerHTML = `<i class="fas fa-exclamation-circle ml-2"></i> بيانات الدخول غير صحيحة`;
+                    errorElement.classList.remove('hidden');
+                } else {
+                    alert("بيانات الدخول غير صحيحة");
+                }
+                
+                document.querySelector('.bg-white').classList.add('animate-pulse');
+                setTimeout(() => document.querySelector('.bg-white').classList.remove('animate-pulse'), 200);
+            }
+        });
+
+// 2. إنشاء حساب جديد (محدث بمنطق كود التحقق واللودر)
+function normalizeFacultyName(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ');
+}
+
+let signupFacultyNames = [];
+let signupFacultyDirectoryByName = new Map();
+
+async function loadSignupFacultyDirectoryMap() {
+    try {
+        const { data, error } = await supabase
+            .from('faculty_directory_public')
+            .select('full_name, department_key, position, is_active')
+            .eq('is_active', true);
+
+        if (error) throw error;
+
+        signupFacultyDirectoryByName = new Map(
+            (data || [])
+                .map(item => ({
+                    full_name: normalizeFacultyName(item.full_name),
+                    department_key: String(item.department_key || '').trim(),
+                    position: String(item.position || '').trim()
+                }))
+                .filter(item => item.full_name)
+                .map(item => [item.full_name, item])
+        );
+    } catch (err) {
+        console.error('Failed to load faculty_directory map:', err);
+        signupFacultyDirectoryByName = new Map();
+    }
+}
+
+async function loadSignupFacultyNames() {
+    try {
+        const { data, error } = await supabase
+            .from('academic_schedule')
+            .select('instructor');
+
+        if (error) throw error;
+
+        signupFacultyNames = [...new Set(
+            (data || [])
+                .map(x => normalizeFacultyName(x.instructor))
+                .filter(Boolean)
+                .filter(name => name !== 'غير محدد')
+        )].sort((a, b) => a.localeCompare(b, 'ar'));
+
+        const optionsList = document.getElementById('faculty-name-options');
+        const hiddenSelect = document.getElementById('reg-linked-instructor');
+
+        if (optionsList) {
+            optionsList.innerHTML = signupFacultyNames
+                .map(name => `
+                    <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50"
+                        data-target="reg-linked-instructor"
+                        data-value="${name.replace(/"/g, '&quot;')}">
+                        ${name}
+                    </li>
+                `)
+                .join('');
+        }
+
+        if (hiddenSelect) {
+            hiddenSelect.innerHTML =
+                `<option value="">اختر اسمك الأكاديمي</option>` +
+                signupFacultyNames
+                    .map(name => `<option value="${name.replace(/"/g, '&quot;')}">${name}</option>`)
+                    .join('');
+        }
+    } catch (err) {
+        console.error('Failed to load academic_schedule names:', err);
+        signupFacultyNames = [];
+
+        const optionsList = document.getElementById('faculty-name-options');
+        const hiddenSelect = document.getElementById('reg-linked-instructor');
+
+        if (optionsList) optionsList.innerHTML = '';
+        if (hiddenSelect) {
+            hiddenSelect.innerHTML = `<option value="">اختر اسمك الأكاديمي</option>`;
+        }
+    }
+}
+
+function toggleFacultyLinkBlock() {
+    const accountType = document.getElementById('reg-account-type')?.value || '';
+    const block = document.getElementById('faculty-link-block');
+    const hiddenSelect = document.getElementById('reg-linked-instructor');
+    const display = document.getElementById('faculty-link-display');
+    const label = document.getElementById('reg-linked-instructor-label');
+    const options = document.getElementById('faculty-name-options');
+
+    if (!block || !hiddenSelect || !display || !label || !options) return;
+
+    block.classList.remove('hidden');
+
+    if (accountType === 'faculty') {
+        hiddenSelect.disabled = false;
+        hiddenSelect.required = true;
+
+        display.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        display.classList.add('bg-white', 'cursor-pointer');
+
+        label.textContent = hiddenSelect.value || 'اختر اسمك الأكاديمي';
+        label.classList.remove('text-gray-500');
+        label.classList.add('text-gray-700');
+    } else {
+        hiddenSelect.disabled = true;
+        hiddenSelect.required = false;
+        hiddenSelect.value = '';
+
+        display.classList.remove('bg-white', 'cursor-pointer');
+        display.classList.add('bg-gray-100', 'cursor-not-allowed');
+
+        label.textContent = 'خاص بالتعليم فقط';
+        label.classList.remove('text-[#2A3475]', 'font-bold', 'text-gray-700');
+        label.classList.add('text-gray-500');
+
+        options.classList.add('hidden');
+        const arrow = display.querySelector('.fa-chevron-down');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+function bindAccountTypeWatcher() {
+    const accountType = document.getElementById('reg-account-type');
+    if (!accountType) return;
+    accountType.addEventListener('change', toggleFacultyLinkBlock);
+}
+
+function isValidAcademicName(name) {
+    const clean = (name || '').trim();
+    return signupFacultyNames.includes(clean);
+}
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 1. جلب البيانات من الحقول
+            const inputCode = document.getElementById('reg-access-code').value; // كود التحقق الجديد
+            const name = document.getElementById('reg-name').value;
+            const mobile = document.getElementById('reg-mobile').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const department = document.getElementById('reg-dept').value;
+            const position = document.getElementById('reg-position').value;
+            const accountType = document.getElementById('reg-account-type').value;
+            const linkedInstructorInput = document.getElementById('reg-linked-instructor').value.trim();
+            const normalizedLinkedInstructor = normalizeFacultyName(linkedInstructorInput);
+            const selectedFacultyMeta =
+                accountType === 'faculty'
+                    ? signupFacultyDirectoryByName.get(normalizedLinkedInstructor)
+                    : null;
+            const errorDiv = document.getElementById('signup-error');
+
+            if (!department) {
+                alert("يرجى اختيار القسم / الجهة");
+                return;
+            }
+            if (!accountType) {
+                alert("يرجى اختيار نوع الحساب");
+                return;
+            }
+
+            if (accountType === 'faculty' && !isValidAcademicName(normalizedLinkedInstructor)) {
+                alert("يرجى اختيار الاسم الأكاديمي الصحيح من القائمة");
+                return;
+            }
+            // 🔥 تشغيل اللودر للبدء في التحقق
+            showLoader("جاري التحقق من كود التسجيل...");
+            errorDiv.classList.add('hidden');
+
+            try {
+                // الخطوة الأولى: التأكد من صحة كود التسجيل من قاعدة البيانات
+                const { data: codeData, error: codeError } = await supabase
+                    .from('access_codes')
+                    .select('code')
+                    .eq('code', inputCode)
+                    .single();
+
+                // إذا الكود غير موجود أو حدث خطأ في الاستعلام
+                if (codeError || !codeData) {
+                    throw new Error("كود التحقق المدخل غير مطابق لسجلات النظام. يرجى مراجعة المسؤول التقني (أ. أحمد فكري) لاعتماد حسابكم.");
+                }
+
+                // الخطوة الثانية: الكود صحيح، نحدث اللودر ونبدأ إنشاء الحساب
+                const textEl = document.getElementById('loader-text');
+                if(textEl) textEl.textContent = "كود صحيح.. جاري إنشاء الحساب...";
+                const finalDepartment =
+                    accountType === 'faculty'
+                        ? (selectedFacultyMeta?.department_key || department)
+                        : department;
+
+                const finalPosition =
+                    accountType === 'faculty'
+                        ? (selectedFacultyMeta?.position || position)
+                        : position;
+
+                const linkedInstructors =
+                    accountType === 'faculty'
+                        ? [normalizedLinkedInstructor]
+                        : null;
+
+                const scheduleLinkRequired = accountType === 'faculty';
+                const scheduleLinkStatus = accountType === 'faculty' ? 'linked' : 'not_required';
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            mobile: mobile,
+                            department: finalDepartment,
+                            position: finalPosition,
+                            account_type: accountType,
+                            linked_instructors: linkedInstructors
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                // الخطوة الثالثة: حفظ بيانات البروفايل في الجدول الإضافي
+            if (authData.user) {
+                const { error: profileError } = await supabase.from('profiles').upsert([{
+                    id: authData.user.id,
+                    email: email,
+                    full_name: name,
+                    mobile: mobile,
+                    role: 'user',
+                    department: finalDepartment,
+                    position: finalPosition,
+                    account_type: accountType,
+                    schedule_link_required: scheduleLinkRequired,
+                    schedule_link_status: scheduleLinkStatus,
+                    linked_instructors: linkedInstructors,
+                    updated_at: new Date()
+                }]);
+
+                if (profileError) {
+                    console.error("Profile Error:", profileError);
+                }
+
+                // ربط تلقائي بالهيكل الأكاديمي لو الحساب عضو هيئة تدريس
+                if (accountType === 'faculty' && normalizedLinkedInstructor) {
+                    const facultyPayload = {
+                        full_name: normalizedLinkedInstructor,
+                        department_key: finalDepartment,
+                        position: finalPosition,
+                        profile_id: authData.user.id,
+                        email: email,
+                        mobile: mobile,
+                        is_active: true,
+                        linked_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { data: updatedFacultyRows, error: facultyUpdateError } = await supabase
+                        .from('faculty_directory')
+                        .update({
+                            department_key: finalDepartment,
+                            position: finalPosition,
+                            profile_id: authData.user.id,
+                            email: email,
+                            mobile: mobile,
+                            is_active: true,
+                            linked_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('full_name', normalizedLinkedInstructor)
+                        .select('id');
+
+                    if (facultyUpdateError) {
+                        console.error("Faculty Directory Update Error:", facultyUpdateError);
+                        throw new Error("تعذر ربط الحساب بالهيكل الأكاديمي");
+                    }
+
+                    // لو الاسم غير موجود أصلًا في الهيكل الأكاديمي، أنشئه من بيانات التسجيل
+                    if (!updatedFacultyRows || updatedFacultyRows.length === 0) {
+                        const { error: facultyInsertError } = await supabase
+                            .from('faculty_directory')
+                            .insert([facultyPayload]);
+
+                        if (facultyInsertError) {
+                            console.error("Faculty Directory Insert Error:", facultyInsertError);
+                            throw new Error("تعذر إضافة العضو إلى الهيكل الأكاديمي");
+                        }
+                    }
+                }
+            }
+
+                // 🔥 نجاح العملية: إخفاء اللودر وإظهار مودال النجاح
+                hideLoader();
+                showSuccessModal();
+
+            } catch (error) {
+                // 🔥 في حالة حدوث أي خطأ (كود خطأ أو فشل تسجيل)
+                hideLoader();
+                errorDiv.textContent = 'تنبيه: ' + error.message;
+                errorDiv.classList.remove('hidden');
+                
+                // إضافة تأثير اهتزاز للفورم للتنبيه بالخطأ
+                document.getElementById('signupForm').classList.add('animate-shake');
+                setTimeout(() => document.getElementById('signupForm').classList.remove('animate-shake'), 500);
+            }
+        });
+
+function syncDepartmentDropdownLabel(value) {
+    const deptSelect = document.getElementById('reg-dept');
+    if (!deptSelect) return;
+
+    const dropdown = deptSelect.closest('.custom-dropdown');
+    const displaySpan = dropdown?.querySelector('.custom-dropdown-display span');
+    const selectedOption = deptSelect.querySelector(`option[value="${value}"]`);
+
+    if (displaySpan && selectedOption) {
+        displaySpan.textContent = selectedOption.textContent;
+        displaySpan.classList.add('text-[#2A3475]', 'font-bold');
+    }
+}
+
+function applyFacultyDirectorySelection(selectedName) {
+    const normalizedName = normalizeFacultyName(selectedName);
+    const row = signupFacultyDirectoryByName.get(normalizedName);
+
+    const deptInput = document.getElementById('reg-dept');
+    const positionInput = document.getElementById('reg-position');
+
+    // لو الاسم موجود في الهيكل الأكاديمي: عبّي البيانات تلقائيًا
+    if (row) {
+        if (deptInput && row.department_key) {
+            deptInput.value = row.department_key;
+            deptInput.dispatchEvent(new Event('change'));
+            syncDepartmentDropdownLabel(row.department_key);
+        }
+
+        if (positionInput) {
+            positionInput.value = row.position || '';
+        }
+    }
+}
+
+        // --- دالة تشغيل القوائم المنسدلة ---
+function setupCustomDropdowns() {
+    document.addEventListener('click', (e) => {
+        const display = e.target.closest('.custom-dropdown-display');
+        const option = e.target.closest('.custom-option');
+
+        if (option) {
+            const dropdown = option.closest('.custom-dropdown');
+            const hiddenSelect = dropdown.querySelector('select');
+            const displayText = dropdown.querySelector('.custom-dropdown-display span');
+            const value = option.dataset.value || '';
+            const text = option.innerText;
+            const target = option.dataset.target || '';
+
+            displayText.textContent = text;
+            displayText.classList.add('text-[#2A3475]', 'font-bold');
+
+            hiddenSelect.value = value;
+            hiddenSelect.dispatchEvent(new Event('change'));
+
+            if (target === 'reg-account-type') {
+                toggleFacultyLinkBlock();
+            }
+
+            if (target === 'reg-linked-instructor') {
+                applyFacultyDirectorySelection(value);
+            }
+            dropdown.querySelector('.custom-dropdown-options').classList.add('hidden');
+            const arrow = dropdown.querySelector('.fa-chevron-down');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+            return;
+        }
+
+        if (display) {
+            const dropdown = display.closest('.custom-dropdown');
+
+            if (
+                display.id === 'faculty-link-display' &&
+                document.getElementById('reg-linked-instructor')?.disabled
+            ) {
+                return;
+            }
+
+            const options = dropdown.querySelector('.custom-dropdown-options');
+            const arrow = display.querySelector('.fa-chevron-down');
+
+            document.querySelectorAll('.custom-dropdown-options').forEach(opt => {
+                if (opt !== options) opt.classList.add('hidden');
+            });
+
+            options.classList.toggle('hidden');
+            if (arrow) {
+                arrow.style.transform = options.classList.contains('hidden')
+                    ? 'rotate(0deg)'
+                    : 'rotate(180deg)';
+            }
+            return;
+        }
+
+        document.querySelectorAll('.custom-dropdown-options').forEach(opt => opt.classList.add('hidden'));
+        document.querySelectorAll('.fa-chevron-down').forEach(arrow => arrow.style.transform = 'rotate(0deg)');
+    });
+}
+
+        setupCustomDropdowns();
+        loadSignupFacultyDirectoryMap().then(() => loadSignupFacultyNames());
+        bindAccountTypeWatcher();
+        toggleFacultyLinkBlock();
+        function showSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.remove('hidden');
+            const content = modal.querySelector('.relative');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100', 'duration-300', 'ease-out');
+            }, 10);
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            toggleForms();
+        }
+
+        function togglePassword(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconElement.classList.remove('fa-eye');
+                iconElement.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                iconElement.classList.remove('fa-eye-slash');
+                iconElement.classList.add('fa-eye');
+            }
+        }
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('تم تفعيل خدمة التحديث والتشغيل الأساسي'))
+        .catch(err => console.log('حدث خطأ في التسجيل: ', err));
+    });
+  }
+  
+let deferredPrompt;
+const smartRibbon = document.getElementById('smartRibbon');
+const installContainer = document.getElementById('installContainer');
+
+// 1. الاستماع لحدث جاهزية التثبيت
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // تحويل الشريطة لزر تثبيت "ذكياً" مع تنظيف النص
+    if (smartRibbon) {
+        // استخدام gap في الـ HTML يغنينا عن ml-1 هنا
+        smartRibbon.innerHTML = '<i class="fas fa-download"></i> تثبيت التطبيق';
+        smartRibbon.classList.add('animate-pulse');
+        smartRibbon.style.background = "linear-gradient(to right, #F3A628, #ffb845)";
+    }
+});
+
+// 2. برمجة الضغط على الشريطة
+if (installContainer) {
+    installContainer.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (smartRibbon) {
+                smartRibbon.innerText = "نسخة تجريبية";
+                smartRibbon.classList.remove('animate-pulse');
+            }
+            deferredPrompt = null;
+        }
+    });
+    installContainer.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            installContainer.click();
+        }
+    });
+}
+
+// 3. عند نجاح التثبيت
+window.addEventListener('appinstalled', () => {
+    if (smartRibbon) {
+        smartRibbon.innerText = "نسخة تجريبية";
+        smartRibbon.classList.remove('animate-pulse');
+    }
+});
+    </script>
+<script src="/registration-secure.js"></script>
+</body>
+</html>

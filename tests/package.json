@@ -1,0 +1,14 @@
+{
+  "name": "citl-repair-tests",
+  "private": true,
+  "scripts": {
+    "runtime": "node runtime.cjs",
+    "database": "cd .. && node tests/database.mjs",
+    "browser": "cd .. && node tests/browser.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "jsqr": "^1.4.0",
+    "playwright": "1.62.1"
+  }
+}

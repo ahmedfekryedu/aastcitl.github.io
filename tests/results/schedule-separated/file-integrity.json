@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "html_ids_and_local_assets": "PASS",
+  "no_mobile_sharing_or_qr": "PASS",
+  "changed_original_files": [
+    "tests/browser.cjs",
+    "tests/package.json",
+    "today/index.html",
+    "tv_display/index.html"
+  ],
+  "other_original_files": "byte-for-byte unchanged",
+  "mobile_pages": {
+    "exams": "/today/",
+    "academic": "/study/"
+  },
+  "TV_QR": "Matches the displayed schedule; hidden during advertisements"
+}

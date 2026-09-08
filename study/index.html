@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الجداول الدراسية | كلية النقل الدولي واللوجستيات</title>
+<meta name="theme-color" content="#202b60"><meta name="description" content="مواعيد المحاضرات والقاعات. ابحث عن مقررك وتابع آخر تحديثات الجدول الدراسي.">
+<link rel="icon" href="/CITL_Logo-32.png"><link rel="stylesheet" href="/assets/schedule-portal.css">
+<script src="/vendor/supabase-js-2.45.4.min.js"></script><script src="/citl-runtime.js"></script><script src="/assets/schedule-common.js"></script>
+</head>
+<body data-schedule-type="academic">
+<header class="portal-header"><div class="header-inner"><div class="brand"><img src="/CITL.png" alt="شعار كلية النقل الدولي واللوجستيات"><div><strong>كلية النقل الدولي واللوجستيات</strong><small>الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</small></div></div><span class="header-tag" lang="en" dir="ltr">CITL · SMART CAMPUS</span></div></header>
+<main class="portal-main"><section class="intro"><div><span class="eyebrow">يومك الدراسي، بوضوح</span><h1 id="page-title">الجداول الدراسية</h1><p>تابع مواعيد المحاضرات والقاعات. احفظ الصفحة في مفضلة متصفحك للرجوع إليها.</p></div><div class="actions"><button id="refresh" type="button" class="button">↻ تحديث</button><button id="print-schedule" type="button" class="button">طباعة الجدول</button></div></section>
+<section class="workspace" aria-label="الجداول الدراسية">
+<div id="schedule-panel" aria-labelledby="page-title"><div class="filters"><label class="field search" for="search">البحث في الجدول<input id="search" type="search" maxlength="150" placeholder="المقرر، الكود، المحاضر أو القاعة…"></label><label class="field" for="schedule-date">التاريخ<span class="date-control"><input id="schedule-date" type="date" required><button type="button" class="button" id="go-today">اليوم</button></span></label><label class="field" for="room-filter">القاعة<select id="room-filter"><option value="">كل القاعات</option></select></label><label class="field status" for="status-filter">الحالة<select id="status-filter"><option value="">جميع الحالات</option><option value="now">جاري الآن</option><option value="upcoming">قادمة</option><option value="ended">انتهت</option><option value="cancelled">ملغاة</option></select></label></div>
+<div class="overview" aria-label="ملخص الجدول"><div class="stat"><span>إجمالي المواعيد</span><strong id="stat-total">—</strong></div><div class="stat live"><span>جاري الآن</span><strong id="stat-now">—</strong></div><div class="stat"><span>المواعيد القادمة</span><strong id="stat-next">—</strong></div></div>
+<div class="result-heading"><div><h2 id="result-title">جدول اليوم</h2><p id="result-summary" role="status" aria-live="polite"></p></div><span id="sync-status" class="sync">جارٍ تحميل الجداول…</span></div><p id="data-notice" class="notice" role="status" hidden></p><div id="results" class="results"></div></div></section></main>
+<footer class="portal-footer"><p>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</p><p>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</p></footer>
+<script>
+        const SUPABASE_URL = 'https://xgqukdbonzukxrpjovmb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {global:{fetch:CITLRuntime.timedFetch}});
+
+        async function logStudentVisit() {
+            // التحقق إذا كانت هذه الزيارة الأولى في هذه الجلسة لمنع التكرار الوهمي
+            if (!sessionStorage.getItem('has_visited')) {
+                try {
+                    const { error } = CITLRuntime.checked(await supabaseClient
+                        .from('page_visits')
+                        .insert([{ 
+                            device_info: navigator.userAgent // تسجيل نوع الهاتف والمتصفح
+                        }]));
+                    
+                    if (!error) {
+                        sessionStorage.setItem('has_visited', 'true'); // حفظ حالة الزيارة
+                        console.log('تم تسجيل الـ Scan بنجاح');
+                    }
+                } catch (err) {
+                    console.error('حدث خطأ أثناء تسجيل الزيارة');
+                }
+            }
+        }
+        // تشغيل الدالة بمجرد فتح الصفحة
+        logStudentVisit();
+</script><script src="/assets/schedule-portal.js"></script>
+</body></html>

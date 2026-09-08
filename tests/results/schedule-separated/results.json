@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "network": "All external requests blocked; local synthetic data only",
+  "checks": [
+    "/today/ is independent, reads/subscribes only to its data, with no tabs, sharing or QR tools",
+    "/study/ is independent, reads/subscribes only to its data, with no tabs, sharing or QR tools",
+    "Both independent pages fit 320px and 390px mobile widths",
+    "Bookmarks retain academic route and filters while following today",
+    "Refresh failures retain same-date data only with a visible warning",
+    "Schedule printing still works without QR or sharing",
+    "Empty exams page never switches itself to academic schedules",
+    "Exam slide QR independently decodes to the exams-only page",
+    "Disabling exams keeps academic slides plus posters and changes QR despite remaining exam records",
+    "Advertisement slide hides the schedule QR",
+    "Returning to academic slide restores the academic QR",
+    "Re-enabling exams restores the exam slide and exam QR",
+    "Asynchronous QR updates cannot leak onto advertisement slides",
+    "No uncaught JavaScript errors"
+  ]
+}

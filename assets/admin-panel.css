@@ -1,0 +1,67 @@
+.native-select-shell {
+    position: relative;
+    width: 100%;
+}
+
+.native-select-shell select {
+    width: 100%;
+    height: 46px;
+    padding-right: 14px;
+    padding-left: 38px;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #374151;
+    outline: none;
+    transition: all 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.native-select-shell select:focus {
+    border-color: #2A3475;
+    box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.08);
+}
+
+.native-select-shell select:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.native-select-shell .native-select-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.native-select-shell .native-select-text {
+    position: absolute;
+    right: 14px;
+    left: 38px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 700;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.native-select-shell select {
+    color: transparent;
+    text-shadow: 0 0 0 transparent;
+}
+
+.native-select-shell select option {
+    color: #374151;
+}

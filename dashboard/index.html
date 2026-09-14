@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+ <head>
+<meta name="citl-release" content="20260914-r6">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
+  <meta name="description" content="CITL Smart System">
+  <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات,الأكاديمية العربية">
+  <meta name="language" content="Arabic">
+  <meta name="theme-color" content="#2A3475">
+  <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
+  <meta property="og:description" content="CITL Smart System">
+  <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://aastcitl.me/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://aastcitl.me/CITL_Banner.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="shortcut icon" type="image/png" href="/CITL_Logo-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/CITL_Logo-192.png">
+<link rel="apple-touch-icon" href="/CITL_Logo-192.png">
+  <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20260914-r6">
+  <link rel="stylesheet" href="/assets/ui-fixes.css?v=20260914-r6">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  
+  
+  <script src="/vendor/supabase-js-2.45.4.min.js?v=20260914-r6"></script>
+    <script src="/assets/read-timeout.js?v=20260914-r6"></script>
+<script src="/assets/permissions.js?v=20260914-r6"></script>
+<script src="/assets/study-settings.js?v=20260914-r6"></script>
+<script src="/assets/auth-session.js?v=20260914-r6"></script>
+<script src="/assets/data-client.js?v=20260914-r6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="/presence.js?v=20260914-r6"></script>
+  <style>
+body {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif; /* هنا التغيير */
+            background-color: #f9fafb;
+        }
+
+        /* لضمان تطبيق الخط على العناوين أيضاً */
+        h1, h2, h3, h4, h5, h6, input, select, button, textarea {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+.calendar-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr); /* تصغير عمود الوقت قليلاً لإعطاء مساحة أكبر للمواعيد */
+            gap: 0; /* إزالة الفراغات السميكة */
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden; /* لقص الحواف الزائدة */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* إضافة ظل للجدول بالكامل */
+        }
+        
+.time-slot {
+            background: white;
+            padding: 4px; /* تقليل الحشو قليلاً */
+            min-height: 70px; /* زيادة الارتفاع قليلاً لراحة العين */
+            position: relative;
+        }
+        
+        .meeting-block {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .dean-priority { background: #dc2626; }
+        .vice-dean-priority { background: #2563eb; }
+        .department-priority { background: #16a34a; }
+        .assistant-priority { background: #ca8a04; }
+        
+/* ---------- Notification: في منتصف الشاشة ---------- */
+.notification-toast {
+    position: fixed;
+    top: -120px;
+    left: 50%;                  /* مركز الشاشة أفقياً */
+    transform: translateX(-50%); /* توسيط العنصر نفسه */
+    right: auto;                /* إلغاء المحاذاة لليمين */
+    
+    min-width: 320px;
+    max-width: 90%;             /* لضمان عدم الخروج من شاشات الموبايل */
+    padding: 14px 24px;
+    color: #fff;
+    border-radius: 50px;        /* حواف دائرية بالكامل لشكل عصري */
+    z-index: 10000;
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    pointer-events: none;
+    
+    /* تنسيق المحتوى الداخلي */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    direction: rtl;
+    font-family: 'Cairo', sans-serif;
+    backdrop-filter: blur(8px); /* تأثير ضبابي للخلفية */
+}
+
+/* حالة الظهور */
+.notification-toast.show {
+    top: 30px;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* الألوان */
+.notification-toast.bg-success { background: linear-gradient(135deg, #10b981, #059669) !important; }
+.notification-toast.bg-error   { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+.notification-toast.bg-info    { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+
+/* النص */
+.notification-text {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+        
+.ai-suggestion {
+            background: #2A3475; /* تم التغيير من التدرج البنفسجي للأزرق الكحلي */
+            border-right: 4px solid #F3A628; /* إضافة خط ذهبي جمالي */
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            color: white;
+        }
+        
+.stats-card {
+            background: #2A3475; /* تم التغيير من التدرج الوردي للأزرق الكحلي */
+            border-bottom: 4px solid #F3A628; /* إضافة خط ذهبي في الأسفل */
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        /* اللوحتان الكبيرتان نوافذ عائمة؛ لا ترثان الحشو الأبيض العام للمودالات. */
+        #dashboard-modal > .modal-content,
+        #admin-panel-modal > .modal-content {
+            padding: 0;
+            background: transparent;
+            border: 0;
+            outline: 0;
+        }
+
+        /* نافذة إضافة العضو مستقلة عن الحشو والخلفية البيضاء للمودال العام. */
+        #add-user-modal > .modal-content {
+            padding: 0;
+            background: transparent;
+            border: 0;
+            outline: 0;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); }
+            80%, 100% { opacity: 0; }
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1); }
+            100% { transform: scale(0.8); }
+        }
+        .live-indicator {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .live-indicator::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            background-color: currentColor;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        .live-indicator::after {
+            content: '';
+            position: relative;
+            width: 8px;
+            height: 8px;
+            background-color: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse-dot 1.25s cubic-bezier(0.455, 0.03, 0.515, 0.955) -0.4s infinite;
+        }
+
+        /* تصميم القائمة المنسدلة الاحترافية */
+        .custom-dropdown { position: relative; width: 100%; }
+        .custom-dropdown-display { 
+            width: 100%; 
+            padding: 10px 16px; 
+            background-color: white; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.5rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .custom-dropdown-display:hover { border-color: #2A3475; }
+        .custom-dropdown-options { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            width: 100%; 
+            background-color: white; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 0.5rem; 
+            margin-top: 4px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            z-index: 50; 
+            display: none; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+        }
+        .custom-dropdown-options.show { display: block; }
+        .custom-option { 
+            padding: 10px 16px; 
+            cursor: pointer; 
+            font-size: 0.875rem; 
+            color: #374151; 
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #f0fdf4; color: #2A3475; font-weight: bold; }
+        .custom-option.selected { background-color: #2A3475; color: white; }
+
+        /* توحيد فلتر المستخدمين مع قوائم الهوية البصرية في النظام. */
+        .users-department-filter .custom-dropdown-display {
+            height: 46px;
+            padding: 0 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            color: #374151;
+            font-weight: 700;
+            box-shadow: none;
+        }
+        .users-department-filter .custom-dropdown-display:hover {
+            border-color: #2A3475;
+            box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.08);
+        }
+        .users-department-filter .custom-dropdown-options {
+            padding: 6px;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+        }
+        .users-department-filter .custom-option {
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+        .users-department-filter .custom-option:hover {
+            background-color: #2A3475;
+            color: #fff;
+        }
+
+        /* كود تخصيص شريط التمرير (النسخة الموحدة) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #2A3475; border-radius: 4px; }
+
+        /* ========================================= */
+/* 🔥 أنيميشن شاشة التحميل (Unified Loader) 🔥 */
+/* ========================================= */
+@keyframes logo-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+@keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
+.loader-ring { animation: spin-slow 4s linear infinite; }
+/* -------------------------------------- */
+/* 🔥 أنماط الخلفية المتاحة (للتجربة: 15 نمطاً إضافياً) */
+/* -------------------------------------- */
+/* A. أنماط العمق الأساسية (لا تتغير) */
+.metallic-finish {
+    background: linear-gradient(to bottom, #2A3475, #1e255a);
+    box-shadow: inset 0px -2px 5px rgba(0, 0, 0, 0.4), 
+                inset 0px 1px 1px rgba(255, 255, 255, 0.15); 
+    position: relative;
+    overflow: hidden;
+}
+.metallic-finish-footer {
+    background: linear-gradient(to top, #2A3475, #1e255a);
+    box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.4), 
+                inset 0px -1px 1px rgba(255, 255, 255, 0.15); 
+    position: relative;
+    overflow: hidden;
+}
+/* ---------------------------------- */
+/* B. خيارات الأنماط الإضافية والبديلة (اختر كلاس واحد للتطبيق) */
+/* ---------------------------------- */
+
+/* 16. 🌫️ نمط الحبيبات/التشويش الناعم (Subtle Grain/Noise) - يعطي عمقاً كالخامة */
+.soft-grain-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08' fill='white'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    opacity: 1; 
+}
+
+/* 17. 🌑 نمط التعتيم المركزي (Vignette Effect) - يركز الضوء على المنتصف */
+.vignette-effect::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.2) 100%);
+    opacity: 1; 
+}
+
+/* 18. 🟡 نمط الدوائر الفاتحة العشوائية (Random Light Circles) - يوحي بالإضاءة المبعثرة */
+.random-light-circles::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.05) 5%, transparent 6%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08) 3%, transparent 4%),
+                radial-gradient(circle at 40% 50%, rgba(255, 255, 255, 0.06) 4%, transparent 5%);
+    background-size: 100% 100%;
+    opacity: 1; 
+}
+
+/* 19. 🧱 نمط الطوب الأفقي (Faint Brickwork) - يوحي بالبنية التحتية والمباني */
+.brickwork-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(90deg, #fff 1px, transparent 1px), linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, transparent 50%, #fff 50%), linear-gradient(#fff 1px, transparent 1px);
+    background-size: 40px 20px;
+    background-color: transparent;
+    opacity: 0.02; 
+}
+
+/* 20. ⚡️ نمط الخطوط المتعرجة (ZigZag Lines) */
+.zigzag-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08) 5px, transparent 5px, transparent 10px),
+                repeating-linear-gradient(-135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08) 5px, transparent 5px, transparent 10px);
+    background-size: 20px 20px;
+    opacity: 1; 
+}
+
+/* 21. 🟠 نمط الهلال المتكرر (Crescent Pattern) */
+.crescent-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at 0% 100%, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 12px, transparent 12px);
+    background-size: 50px 50px;
+    opacity: 1; 
+}
+
+/* 22. ➕ نمط الخطوط المركزية (Crosshair Grid) */
+.crosshair-grid-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 15px 15px;
+    opacity: 1; 
+}
+
+/* 23. 🔵 نمط الدوائر المزدوجة المتداخلة (Double Ring) */
+.double-ring-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at center, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 12px, transparent 12px, transparent 20px, rgba(255, 255, 255, 0.05) 20px, rgba(255, 255, 255, 0.05) 22px, transparent 22px);
+    background-size: 60px 60px;
+    opacity: 1; 
+}
+
+/* 24. 📦 نمط الحاويات العكسي (Inverse Cargo Stripes - رأسي) */
+.inverse-cargo-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(to right, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px, transparent 2px, transparent 20px);
+    background-size: 20px 100%;
+    opacity: 1; 
+}
+
+/* 25. 🧊 نمط البلاطات المائلة (Tilted Tiles) */
+.tilted-tiles-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 50%, transparent 50%), linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 50%, transparent 50%);
+    background-size: 40px 40px;
+    opacity: 1; 
+}
+
+/* 26. 🔴 تأثير الضوء العشوائي (Scattered Light Effect) */
+.scattered-light-effect::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.1), transparent 30%),
+                radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.05), transparent 25%);
+    opacity: 1; 
+}
+
+/* 27. 〰️ نمط الخطوط المتعرجة الرأسية (Vertical ZigZag) */
+.vertical-zigzag-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 5px, transparent 5px, transparent 10px),
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 5px, transparent 5px, transparent 10px);
+    background-size: 20px 20px;
+    opacity: 1; 
+}
+
+/* 28. 🌙 نمط التدرج نصف الدائري (Half-Circle Gradient) */
+.half-circle-gradient::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    background-size: 100% 100%;
+    opacity: 1; 
+}
+
+/* 29. 🔳 نمط المربعات المتداخلة (Interlaced Squares) */
+.interlaced-squares-pattern::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background-image: 
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 1; 
+}
+/* نمط الخطوط المائلة */
+        .random-slanted-lines {
+            position: relative;
+            overflow: hidden;
+        }
+/* 30. 🌠 نمط الخطوط المائلة العشوائية (Random Slanted Lines) */
+.random-slanted-lines::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+        -30deg, transparent, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 11px
+    );
+    opacity: 1; 
+}
+
+/* -------------------------------------- */
+/* 🔥 4. كلاس التعبئة المعدنية (بدون أنماط) - للتطبيق على المربعات والخلفيات */
+.metallic-blue-fill {
+    /* نفس تدرج الهيدر والفوتر */
+    background: linear-gradient(to bottom, #2A3475, #1e255a);
+    /* ظل داخلي خفيف لإعطاء العمق */
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.5),
+                inset 0px 1px 1px rgba(255, 255, 255, 0.15);
+}
+/* -------------------------------------- */
+
+/* تحسين شكل شريط التمرير للجدول */
+.scrollbar-thin::-webkit-scrollbar {
+    height: 4px; /* عرض رفيع جداً */
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #F3A628;
+    border-radius: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+/* الهوية البصرية للكروت (xl radius + shadow) */
+.premium-card {
+    background: white;
+    border-radius: 0.75rem; 
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+/* شريط الأخبار الموحد الارتفاع */
+.news-ticker-box {
+    background: #2A3475;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    height: 82px; /* نفس ارتفاع الكروت المجاورة بالظبط */
+    display: flex;
+    align-items: center;
+    border-right: 4px solid #F3A628;
+}
+
+.news-label {
+    background: #F3A628;
+    color: #2A3475;
+    padding: 0 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+    z-index: 10;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+/* === بداية التعديل الجذري للحركة === */
+.ticker-wrapper {
+    flex: 1;
+    overflow: hidden;
+    position: relative; /* ضروري جداً لضبط بداية الحركة */
+    height: 100%;
+}
+
+.ticker-text {
+    position: absolute; /* يسمح للنص بالخروج والدخول بحرية */
+    left: 0;            /* نقطة ارتكاز */
+    white-space: nowrap;
+    color: white;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    /* الأنيميشن الجديد: مرور كامل من اليسار لليمين */
+    animation: ticker-pass-through var(--ticker-speed, 45s) linear infinite;
+    will-change: transform; /* لتحسين الأداء ومنع التقطيع */
+}
+
+@keyframes ticker-pass-through {
+    0% {
+        /* يبدأ مختفي تماماً في اليسار (خارج حدود الشريط) */
+        transform: translateX(-100%);
+    }
+    100% {
+        /* يتحرك حتى يخرج تماماً من اليمين (عرض الشاشة بالكامل) */
+        transform: translateX(100vw);
+    }
+}
+/* === نهاية التعديل === */
+
+.news-separator {
+    color: #F3A628;
+    margin: 0 20px;
+}
+
+/* ===== تأثير زووم كروت الأنظمة الرئيسية ===== */
+.main-system-card {
+    min-height: 145px;
+    isolation: isolate;
+}
+
+.main-system-card-main,
+.main-system-card-footer {
+    transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+}
+
+.main-system-card-zoom-title {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    text-align: center;
+
+    color: #ffffff;
+    font-weight: 900;
+    font-size: clamp(18px, 2.2vw, 28px);
+    line-height: 1.45;
+
+    opacity: 0;
+    transform: scale(0.75);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+
+    pointer-events: none;
+    text-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.main-system-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+
+    background: radial-gradient(circle at center, rgba(255,255,255,0.12), rgba(0,0,0,0.20));
+    opacity: 0;
+    transition: opacity 0.35s ease;
+
+    pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .main-system-card:hover .main-system-card-main,
+    .main-system-card:hover .main-system-card-footer {
+        opacity: 0.16;
+        transform: scale(0.96);
+        filter: blur(1px);
+    }
+
+    .main-system-card:hover .main-system-card-zoom-title {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .main-system-card:hover::after {
+        opacity: 1;
+    }
+}
+    </style>
+ <link rel="stylesheet" href="/assets/admin-panel.css?v=20260914-r6">
+<link rel="stylesheet" href="/assets/dashboard-home.css?v=20260914-r6">
+<link rel="stylesheet" href="/assets/interface-controls.css?v=20260914-r6">
+<script src="/assets/loading-placeholders.js?v=20260914-r6"></script>
+<script defer src="/assets/interface-controls.js?v=20260914-r6"></script>
+<link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css?v=20260914-r6">
+<script src="/assets/news-ticker.js?v=20260914-r6"></script>
+<script defer src="/assets/site-updates.js?v=20260914-r6"></script>
+</head>
+ <body class="citl-dashboard-page bg-gray-50 min-h-screen flex flex-col overflow-x-hidden">
+  <div id="dashboard-shell" class="min-h-screen flex flex-col"><!-- Header -->
+<header class="metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
+        <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
+
+    <div class="absolute top-[15px] left-[-30px] w-[110px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1 shadow-md border-b-2 border-[#2A3475] tracking-wider">
+
+        نسخة تجريبية
+
+    </div>
+
+</div>
+    <div class="w-full max-w-[98%] mx-auto px-3 py-5 md:px-6 md:py-5">
+        
+        <div class="hidden lg:flex flex-row items-center justify-between gap-3">
+            <div class="flex items-center justify-start gap-4 text-right">
+                <div class="bg-white p-2 rounded-xl shadow-lg shrink-0 group hover:scale-105 transition-transform duration-300">
+                    <img src="/CITL.png" alt="Logo" class="h-16 w-auto object-contain transform scale-110">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-white font-black text-[24px] leading-tight tracking-wide drop-shadow-md">كلية النقل الدولي واللوجستيات</h1>
+                    <h2 class="text-[#F3A628] text-xs font-bold tracking-[2px] uppercase font-sans mt-0.5 opacity-90">College of International Transport & Logistics</h2>
+                    <p class="text-xs text-blue-100/90 font-bold mt-1">الصفحة الرئيسية - CITL Smart System</p>
+                </div>
+            </div>
+
+    <div class="mr-auto flex items-center gap-2">
+<button id="admin-panel-btn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px] flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#F3A628]/40"> 
+    <i class="fas fa-cogs text-base text-[#F3A628]"></i>
+    <span>حسابي</span>
+</button>
+<div class="w-px h-8 bg-white/20 mx-1"></div>
+        <div class="relative shrink-0" id="notif-btn-wrapper-pc">
+            <button type="button" onclick="toggleNotifications()" class="bg-white/10 hover:bg-white/20 text-white border border-white/10 p-2.5 rounded-xl backdrop-blur-sm transition-all shadow-sm flex items-center justify-center group relative">
+                <i class="fas fa-bell text-lg"></i>
+                <span id="notif-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-600 border-2 border-[#2A3475] rounded-full hidden flex items-center justify-center text-[10px] font-bold text-white">0</span>
+            </button>
+        </div>
+        <div class="flex items-center gap-3 bg-black/20 rounded-full pl-2 pr-5 py-1.5 border border-white/10 shrink-0 backdrop-blur-md self-center shadow-inner">
+            <div class="flex flex-col text-right">
+                <span id="profile-name" class="text-[13px] font-bold text-white leading-tight">جاري...</span>
+                <span id="profile-role" class="text-[11px] text-[#F3A628] leading-tight opacity-90">...</span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-[#2A3475] flex items-center justify-center text-white font-bold shadow-md border border-white/20 text-base relative">
+                <i class="fas fa-user"></i>
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#2A3475] rounded-full animate-pulse"></span>
+            </div>
+        </div>
+        <button onclick="window.logout()" class="bg-white/5 hover:bg-red-600 text-red-100 hover:text-white border border-white/10 p-2.5 rounded-xl transition-all shadow-sm ml-1">
+            <i class="fas fa-sign-out-alt text-lg"></i>
+        </button>
+    </div>
+</div>
+
+        <div class="lg:hidden flex flex-row items-center justify-between w-full gap-1">
+            
+            <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                <div class="relative shrink-0" id="notif-btn-wrapper">
+                    <div class="bg-white p-1 rounded-lg shadow-md relative h-11 w-11 flex items-center justify-center border border-white/20">
+                        <img src="/CITL.png" alt="Logo" class="h-8 w-auto object-contain cursor-pointer" onclick="toggleMobileMenu()">
+                        <div onclick="toggleMobileMenu()" class="absolute -bottom-1 -right-1 bg-[#2A3475] text-[#F3A628] w-5 h-5 rounded-full flex items-center justify-center text-[8px] border border-white shadow-sm cursor-pointer">
+                            <i class="fas fa-bars"></i>
+                        </div>
+                        <div onclick="event.stopPropagation(); toggleNotifications();" class="absolute -top-1.5 -left-1.5 bg-[#F3A628] text-[#2A3475] w-5 h-5 rounded-full flex items-center justify-center text-[10px] border border-white shadow-md cursor-pointer active:scale-110 transition-transform">
+                            <i class="fas fa-bell"></i>
+                            <span id="notif-badge-mob" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-black border border-white hidden">0</span>
+                        </div>
+                    </div>
+                </div>
+
+<div class="flex flex-col text-right leading-tight overflow-hidden flex-1 min-w-0">
+    <h1 class="text-white font-black text-[clamp(10.5px,3.5vw,13.5px)] whitespace-nowrap drop-shadow-sm">
+        كلية النقل الدولي واللوجستيات
+    </h1>
+<h2 class="text-[#F3A628] text-[clamp(7.25px,2.05vw,8.75px)] font-bold uppercase opacity-90 leading-none mt-0.5 whitespace-nowrap">
+    College of International Transport & Logistics
+</h2>
+    <p class="text-[clamp(8px,2.3vw,9.2px)] text-blue-100/70 font-bold leading-none mt-0.5 whitespace-nowrap">
+       CITL Smart System
+    </p>
+</div>
+
+<div id="mob-profile-capsule" onclick="toggleProfileInfoMenu()" class="flex flex-col justify-center text-left leading-tight bg-black/20 px-2.5 h-11 rounded-xl border border-white/10 backdrop-blur-md shadow-inner w-[clamp(82px,23.5vw,95px)] overflow-hidden shrink-0 cursor-pointer active:bg-black/40 transition-all ml-1">
+    <span id="profile-name-mob" class="text-[10.5px] font-bold text-white truncate block w-full">...</span>
+    <span id="profile-role-mob" class="text-[8.5px] text-[#F3A628] font-bold opacity-100 uppercase truncate block w-full">...</span>
+</div>
+
+	        </div>
+	    </div>
+	</div>
+</header><main id="dashboard-main" class="w-full max-w-[96%] mx-auto px-4 pt-3 pb-4 md:pt-4 md:pb-4 flex flex-col gap-3 md:gap-3 flex-grow" style="font-family: 'Cairo', sans-serif;">
+
+    <!-- شريط الأخبار -->
+    <section id="dashboard-news" aria-label="آخر التحديثات" class="w-full bg-[#2A3475] rounded-2xl shadow-md border-r-4 border-[#F3A628] overflow-hidden relative">
+        <div class="flex items-center h-10">
+            <div class="bg-[#F3A628] text-[#2A3475] h-full px-3 md:px-4 flex items-center justify-center text-[9px] md:text-[10px] font-black z-20 shrink-0 shadow-sm whitespace-nowrap">
+                <i class="fas fa-bullhorn ml-2 animate-pulse"></i> آخر التحديثات
+            </div>
+            <div class="flex-1 h-full relative overflow-hidden flex items-center bg-[#2A3475]">
+                <div id="news-ticker-content" class="ticker-text text-white text-[11px] md:text-xs font-bold px-3 flex items-center" style="height: 100%;">
+                    جارٍ تحميل شريط الأخبار...
+                </div>
+            </div>
+            <div class="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-[#2A3475] to-transparent z-10"></div>
+        </div>
+    </section>
+
+<section id="dashboard-home" aria-label="مساحة عملي">
+  <div class="dh-heading">
+    <div class="dh-heading-copy"><h2 id="dh-title">أهلًا بك</h2><p id="dh-subtitle">جاري تجهيز مساحة عملك…</p></div>
+    <div class="dh-tools"><span id="dh-updated" class="dh-update">جاري التحديث</span><button id="dh-refresh" class="dh-button" type="button" aria-label="تحديث بيانات الصفحة">تحديث</button></div>
+  </div>
+  <div id="dh-loading" role="status" aria-live="polite"><span class="citl-loading-label">جارٍ تحميل البيانات…</span><div class="citl-skeleton-grid" aria-hidden="true"><div class="citl-skeleton-card"><span class="citl-skeleton-line short"></span><span class="citl-skeleton-line tall"></span><span class="citl-skeleton-line"></span></div><div class="citl-skeleton-card"><span class="citl-skeleton-line short"></span><span class="citl-skeleton-line tall"></span><span class="citl-skeleton-line"></span></div><div class="citl-skeleton-card"><span class="citl-skeleton-line short"></span><span class="citl-skeleton-line tall"></span><span class="citl-skeleton-line"></span></div></div></div>
+  <div id="dh-content" hidden>
+    <div id="dh-role-tabs" class="dh-tabs" role="tablist" aria-label="مساحة العمل" hidden>
+      <button type="button" role="tab" data-dh-view="overview" aria-selected="false">متابعتي الإدارية</button>
+      <button type="button" role="tab" data-dh-view="faculty" aria-selected="true">جدولي الدراسي</button>
+    </div>
+    <div id="dh-errors" class="dh-error" role="status" aria-live="polite" hidden></div>
+    <div id="dh-metrics" class="dh-metrics" aria-label="مؤشرات اليوم"></div>
+    <div id="dh-workspace"></div>
+
+  </div>
+</section>
+<!-- النظامان الرئيسيان - نسخة مدمجة -->
+<section id="dashboard-modules-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+
+    <!-- إدارة القاعات -->
+    <a href="/smrm/" class="main-system-card group relative overflow-hidden rounded-[22px] border border-[#2A3475] bg-gradient-to-br from-[#1f2558] via-[#2A3475] to-[#10162f] text-white p-4 shadow-sm hover:shadow-md transition-all duration-300">
+        <div class="absolute inset-y-0 right-0 w-1 bg-[#F3A628]"></div>
+        
+        <div class="absolute -left-8 -bottom-10 text-[5rem] text-white/[0.04] group-hover:text-white/[0.07] transition-colors">
+            <i class="fas fa-door-closed"></i>
+        </div>
+
+        <div class="main-system-card-main relative z-10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                
+                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 text-[#F3A628] flex items-center justify-center shadow-sm shrink-0">
+                    <i class="fas fa-building text-base"></i>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[9px] font-black tracking-widest text-white bg-white/10 border border-white/10 rounded-full px-2 py-0.5">
+                            ROOM CONTROL
+                        </span>
+                    </div>
+
+                    <h2 class="text-base md:text-lg font-black leading-tight truncate">
+                        القاعات الدراسية
+                    </h2>
+
+                    <p class="text-[11px] md:text-xs text-blue-100/80 font-bold mt-1 truncate">
+                        تنظيم حجوزات القاعة ومنع التعارض بين المواعيد
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-[#F3A628] group-hover:text-[#2A3475] transition-all shrink-0">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </div>
+        </div>
+
+        <div class="main-system-card-footer relative z-10 mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+            <span class="text-[10px] font-black text-blue-100/60">
+                إدارة الحجوزات والتعارضات
+            </span>
+            <span class="inline-flex items-center gap-2 text-[11px] font-black text-[#F3A628]">
+                فتح إدارة القاعات
+                <i class="fas fa-arrow-left"></i>
+            </span>
+        </div>
+
+        <div class="main-system-card-zoom-title" aria-hidden="true">
+            القاعات الدراسية
+        </div>
+    </a>
+
+    <!-- إدارة الجداول -->
+    <a href="/schedules/" class="main-system-card group relative overflow-hidden rounded-[22px] border border-[#2A3475] bg-gradient-to-br from-[#1f2558] via-[#2A3475] to-[#10162f] text-white p-4 shadow-sm hover:shadow-md transition-all duration-300">
+        <div class="absolute inset-y-0 right-0 w-1 bg-[#F3A628]"></div>
+        
+        <div class="absolute -left-8 -bottom-10 text-[5rem] text-white/[0.04] group-hover:text-white/[0.07] transition-colors">
+            <i class="fas fa-table-list"></i>
+        </div>
+
+        <div class="main-system-card-main relative z-10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                
+                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 text-[#F3A628] flex items-center justify-center shadow-sm shrink-0">
+                    <i class="fas fa-calendar-days text-base"></i>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[9px] font-black tracking-widest text-white bg-white/10 border border-white/10 rounded-full px-2 py-0.5">
+                            SCHEDULE CONTROL
+                        </span>
+                    </div>
+
+                    <h2 class="text-base md:text-lg font-black leading-tight truncate">
+                        الجداول الدراسية
+                    </h2>
+
+                    <p class="text-[11px] md:text-xs text-blue-100/80 font-bold mt-1 truncate">
+                        عرض، متابعة، وتحديث الجداول الدراسية بسهولة
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-[#F3A628] group-hover:text-[#2A3475] transition-all shrink-0">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </div>
+        </div>
+
+        <div class="main-system-card-footer relative z-10 mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+            <span class="text-[10px] font-black text-blue-100/60">
+                متابعة الجداول والمحاضرات
+            </span>
+            <span class="inline-flex items-center gap-2 text-[11px] font-black text-[#F3A628]">
+                فتح الجداول الدراسية
+                <i class="fas fa-arrow-left"></i>
+            </span>
+        </div>
+
+        <div class="main-system-card-zoom-title" aria-hidden="true">
+            الجداول الدراسية
+        </div>
+    </a>
+
+</section>
+<!-- الخدمات السريعة - نسخة مدمجة -->
+<section class="bg-white rounded-[22px] border border-gray-200 shadow-sm px-4 py-3">
+    <div class="flex items-center justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <span class="w-1 h-5 bg-[#F3A628] rounded-full"></span>
+            <div>
+                <h3 class="text-[11px] md:text-xs font-black text-[#2A3475] uppercase tracking-[0.16em]">Quick Services</h3>
+                <p class="text-[10px] text-gray-400 font-bold">روابط مساندة سريعة</p>
+            </div>
+        </div>
+        <span class="hidden md:inline-flex text-[9px] font-black text-gray-400 uppercase tracking-widest">3 Links</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+
+        <button onclick="window.open('https://staffportal.aast.edu/', '_blank')" class="group bg-gray-50 hover:bg-white border border-gray-100 hover:border-blue-100 rounded-2xl px-3 py-3 text-right transition-all hover:shadow-sm active:scale-[0.98] flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+                    <i class="fas fa-id-card text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                    <h4 class="text-xs font-black text-[#2A3475] truncate">Staff Portal</h4>
+                    <p class="text-[10px] text-gray-500 font-bold truncate mt-0.5">البوابة الإدارية للعاملين</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-left text-gray-300 group-hover:text-blue-600 transition-colors text-xs shrink-0"></i>
+        </button>
+
+        <a href="https://outlook.office.com/mail/" target="_blank" class="group bg-gray-50 hover:bg-white border border-gray-100 hover:border-orange-100 rounded-2xl px-3 py-3 text-right transition-all hover:shadow-sm active:scale-[0.98] flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all shrink-0">
+                    <i class="fas fa-envelope text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                    <h4 class="text-xs font-black text-[#2A3475] truncate">Outlook Mail</h4>
+                    <p class="text-[10px] text-gray-500 font-bold truncate mt-0.5">البريد المؤسسي الرسمي</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-left text-gray-300 group-hover:text-orange-500 transition-colors text-xs shrink-0"></i>
+        </a>
+
+        <a href="https://www.microsoft.com/ar/microsoft-365/sharepoint/collaboration" target="_blank" class="group bg-gray-50 hover:bg-white border border-gray-100 hover:border-emerald-100 rounded-2xl px-3 py-3 text-right transition-all hover:shadow-sm active:scale-[0.98] flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+                    <i class="fas fa-share-nodes text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                    <h4 class="text-xs font-black text-[#2A3475] truncate">SharePoint</h4>
+                    <p class="text-[10px] text-gray-500 font-bold truncate mt-0.5">مشاركة الملفات والتعاون</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-left text-gray-300 group-hover:text-emerald-600 transition-colors text-xs shrink-0"></i>
+        </a>
+
+    </div>
+</section>
+</main>
+<footer id="dashboard-footer" class="metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50 mt-auto">
+    <div class="w-full max-w-[98%] mx-auto px-6 py-2 md:py-3">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+
+            <div class="hidden md:flex items-center gap-4">
+                <div class="bg-white p-1 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/20">
+                    <img src="/CITL.png" alt="CITL Logo" class="h-10 w-auto object-contain transform scale-110">
+                </div>
+                <div class="text-right leading-tight">
+                    <h3 class="font-black text-white text-xs md:text-sm tracking-wide">كلية النقل الدولي واللوجستيات</h3>
+                    <p class="text-[#F3A628] text-[9px] md:text-[10px] font-bold font-sans tracking-wider uppercase opacity-90">College of International Transport & Logistics</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-4 text-[11px] md:text-xs">
+                
+                <p class="text-blue-100/90 text-center md:text-right font-medium leading-relaxed">
+                    جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026
+                    <span class="hidden md:inline mx-1">|</span> <br class="md:hidden"> تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).
+                </p>
+
+                <div class="hidden md:block w-px h-5 bg-white/20"></div>
+
+                <div class="flex items-center gap-1.5 md:gap-3 bg-black/20 px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-white/10 shadow-inner">
+                    <a href="https://www.facebook.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.linkedin.com/in/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[10px] md:text-[13px]"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.youtube.com/@CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-youtube"></i></a>
+                    <div class="w-px h-3 bg-white/10 mx-0.5"></div>
+                    <a href="https://www.aast.edu/en/colleges/citl/alex" target="_blank" class="text-[#F3A628] hover:scale-125 transition-all text-[12px] md:text-sm"><i class="fas fa-globe"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<div id="add-meeting-modal" class="modal">
+    <div class="modal-content p-0 shadow-2xl rounded-xl flex flex-col h-auto max-h-[92vh] md:max-h-[85vh]" style="max-width: 650px; width: 95%; overflow: visible;">
+     
+     <div class="metallic-blue-fill random-slanted-lines px-4 py-3 md:px-6 md:py-4 flex items-center justify-between shadow-md relative overflow-hidden rounded-t-xl shrink-0">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="flex items-center space-x-3 space-x-reverse text-white relative z-10">
+            <div class="bg-white/10 p-2 md:p-2.5 rounded-lg backdrop-blur-sm border border-white/10 shadow-inner">
+                <i class="fas fa-calendar-plus text-[#F3A628] text-lg md:text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-sm md:text-lg font-bold tracking-wide">حجز اجتماع جديد</h3>
+                <p class="text-[10px] md:text-xs text-blue-200 font-light mt-0.5">يرجى ملء البيانات بدقة لضمان عدم التعارض</p>
+            </div>
+        </div>
+        <button id="close-modal" class="text-white/60 hover:text-white hover:bg-white/10 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-200 relative z-10"> 
+            <i class="fas fa-times text-sm"></i> 
+        </button>
+     </div>
+
+     <form id="meeting-form" class="p-4 md:p-6 bg-[#f8fafc] overflow-y-auto custom-scrollbar flex-1">
+      <input type="hidden" id="meeting-id">
+
+      <div class="space-y-4 md:space-y-5">
+          
+          <div class="group">
+              <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                  <i class="fas fa-heading ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> عنوان الاجتماع
+              </label> 
+              <input type="text" id="meeting-title" required placeholder="مثال: مجلس القسم الشهري" 
+                     class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] outline-none transition-all shadow-sm hover:border-gray-400 placeholder-gray-400 font-bold">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              <div class="group z-30">
+                  <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                      <i class="fas fa-building ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> الجهة الحاجزة
+                  </label> 
+                  <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                        <span class="text-gray-700 truncate">اختر الجهة...</span>
+                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                    </div>
+                    <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 md:max-h-60 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="">اختر الجهة...</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="dean">مكتب العميد</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة والبترول</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="admin-followup">قسم المتابعة الإدارية</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="education-agency">وكالة شؤون التعليم</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="students-agency">وكالة شؤون الطلاب</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="assistants-office">مكتب المعيدين</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50" data-value="computer-lab">معمل الحاسب</li>
+                        <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
+                    </ul>
+                    <select id="department" class="hidden">
+                        <option value="">اختر الجهة...</option> 
+                        <option value="dean">مكتب العميد</option>
+                    </select>
+                  </div>
+              </div>
+              
+              <div class="group z-20">
+                  <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                      <i class="far fa-calendar-alt ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> التاريخ
+                  </label> 
+                  <input type="date" id="meeting-date" required class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] outline-none transition-all shadow-sm cursor-pointer appearance-none font-bold text-gray-700">
+              </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+               <div class="group z-20">
+                  <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                      <i class="far fa-clock ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> وقت البدء
+                  </label> 
+                  <div class="relative custom-dropdown w-full" id="time-dropdown-container">
+                      <div class="custom-dropdown-display w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                          <span class="text-gray-700 font-bold">اختر الوقت</span>
+                          <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                      </div>
+                      <ul id="meeting-time-options" class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 md:max-h-60 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+                          <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="">اختر الوقت</li>
+                      </ul>
+                      <select id="meeting-time" class="hidden"></select>
+                  </div>
+               </div>
+               
+               <div class="group z-10">
+                  <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                      <i class="fas fa-hourglass-half ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> المدة المتوقعة
+                  </label> 
+                  <div class="relative custom-dropdown w-full">
+                      <div class="custom-dropdown-display w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] flex items-center justify-between cursor-pointer transition-all shadow-sm">
+                          <span class="text-gray-700 font-bold">ساعة واحدة</span>
+                          <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                      </div>
+                      <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 md:max-h-60 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+                          <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="1">ساعة واحدة</li>
+                          <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="2">ساعتان</li>
+                          <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="3">3 ساعات</li>
+                          <li class="custom-option px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="4">4 ساعات</li>
+                      </ul>
+                      <select id="duration" class="hidden">
+                          <option value="1">ساعة واحدة</option> 
+                          <option value="2">ساعتان</option> 
+                          <option value="3">3 ساعات</option> 
+                          <option value="4">4 ساعات</option> 
+                      </select>
+                  </div>
+               </div>
+          </div>
+
+          <div class="group">
+              <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                  <i class="fas fa-users ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> الحضور (اختياري)
+              </label> 
+              <input type="text" id="attendees" placeholder="أدخل أسماء الحضور أو الأقسام المدعوة..." 
+                     class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] outline-none transition-all shadow-sm placeholder-gray-400 font-bold">
+          </div>
+
+          <div class="group">
+              <label class="block text-[11px] md:text-xs font-bold text-[#2A3475] mb-1.5 md:mb-2 flex items-center transition-colors group-focus-within:text-[#F3A628]">
+                  <i class="fas fa-align-right ml-2 text-gray-400 group-focus-within:text-[#F3A628]"></i> ملاحظات إضافية
+              </label> 
+              <textarea id="description" rows="2" placeholder="أي تفاصيل إضافية عن الاجتماع..." 
+                        class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#2A3475]/20 focus:border-[#2A3475] outline-none transition-all shadow-sm resize-none placeholder-gray-400 font-bold md:rows-3"></textarea>
+          </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-end items-center gap-3 mt-6 pt-4 border-t border-gray-200 bg-gray-50 -mx-4 -mb-4 md:-mx-6 md:-mb-6 px-4 py-4 md:px-6 md:py-4 rounded-b-xl shrink-0">
+          <button type="button" id="cancel-meeting" class="w-full md:w-auto px-6 py-2.5 text-gray-600 font-bold hover:bg-gray-200 rounded-lg transition-colors text-xs md:text-sm border border-gray-200 bg-white shadow-sm order-2 md:order-1"> 
+              إلغاء 
+          </button> 
+          <button type="submit" id="save-meeting" class="w-full md:w-auto px-8 py-2.5 bg-[#2A3475] text-white font-bold rounded-lg hover:bg-[#1f2658] shadow-lg hover:shadow-[#2A3475]/40 transition-all text-xs md:text-sm flex items-center justify-center transform active:scale-95 order-1 md:order-2"> 
+              <span id="save-text">حفظ الحجز</span> 
+              <i id="save-loading" hidden aria-hidden="true" class="fas fa-spinner fa-spin hidden mr-2"></i> 
+          </button>
+      </div>
+     </form>
+    </div>
+</div>
+
+<div id="dashboard-modal" class="modal">
+<div class="modal-content p-0 overflow-hidden shadow-2xl rounded-xl" style="max-width: 900px; width: 95%;">
+     
+<div class="metallic-blue-fill random-slanted-lines px-6 py-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center space-x-3 space-x-reverse text-white">
+            <div class="bg-white/10 p-2.5 rounded-lg backdrop-blur-sm border border-white/10">
+                <i class="fas fa-chart-pie text-[#F3A628] text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold tracking-wide">لوحة القيادة والتحليلات</h3>
+                <p class="text-xs text-blue-200 font-light mt-0.5">تقرير الأداء وتحليل البيانات</p>
+            </div>
+        </div>
+        <button id="close-dashboard" class="text-white/60 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all"> 
+            <i class="fas fa-times"></i> 
+        </button>
+     </div>
+
+     <div class="p-3 md:p-6 bg-[#f8fafc] max-h-[85vh] md:max-h-[80vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 mb-6">
+          
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+              <div class="absolute right-0 top-0 w-24 h-24 bg-[#2A3475]/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+              <div class="relative z-10 flex justify-between items-start">
+                  <div>
+                      <p class="text-xs font-bold text-gray-500 mb-1">إجمالي الحجوزات</p>
+                      <h3 class="text-3xl font-bold text-[#2A3475]" id="total-meetings">0</h3>
+                  </div>
+                  <div class="bg-[#2A3475]/10 p-2 rounded-lg text-[#2A3475]">
+                      <i class="fas fa-calendar-check text-xl"></i>
+                  </div>
+              </div>
+              <div class="mt-3 flex items-center text-xs">
+                  <span class="text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-bold flex items-center ml-2">
+                      <i class="fas fa-arrow-up text-[10px] ml-1"></i> نشط
+                  </span>
+                  <span class="text-gray-400">مقارنة بالأسبوع الماضي</span>
+              </div>
+          </div>
+        
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+              <div class="absolute right-0 top-0 w-24 h-24 bg-[#F3A628]/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+              <div class="relative z-10 flex justify-between items-start">
+                  <div>
+                      <p class="text-xs font-bold text-gray-500 mb-1">معدل الإشغال</p>
+                      <h3 class="text-3xl font-bold text-[#2A3475]" id="usage-percentage">0%</h3>
+                  </div>
+                  <div class="bg-[#F3A628]/10 p-2 rounded-lg text-[#F3A628]">
+                      <i class="fas fa-chart-line text-xl"></i>
+                  </div>
+              </div>
+              <div class="mt-4 w-full bg-gray-100 rounded-full h-1.5">
+                  <div id="usage-bar" class="bg-[#F3A628] h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+              </div>
+          </div>
+        
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+              <div class="absolute right-0 top-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+              <div class="relative z-10 flex justify-between items-start">
+                  <div>
+                      <p class="text-xs font-bold text-gray-500 mb-1">الجهات النشطة</p>
+                      <h3 class="text-3xl font-bold text-[#2A3475]" id="active-departments">0</h3>
+                  </div>
+                  <div class="bg-green-50 p-2 rounded-lg text-green-600">
+                      <i class="fas fa-building text-xl"></i>
+                  </div>
+              </div>
+              <div class="mt-3 text-xs text-gray-400">
+                  <i class="fas fa-info-circle ml-1"></i> عدد الأقسام التي قامت بالحجز
+              </div>
+          </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+              <h4 class="text-sm font-bold text-[#2A3475] mb-4 flex items-center">
+                  <i class="fas fa-trophy text-[#F3A628] ml-2"></i> الجهات الأكثر استخداماً
+              </h4>
+              <div id="department-chart" class="space-y-3">
+                  </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+              <h4 class="text-sm font-bold text-[#2A3475] mb-4 flex items-center">
+                  <i class="fas fa-history text-gray-400 ml-2"></i> آخر النشاطات
+              </h4>
+              <div id="recent-meetings" class="space-y-0 relative">
+                  <div class="absolute top-2 bottom-2 right-[9px] w-0.5 bg-gray-100"></div>
+                  </div>
+          </div>
+
+      </div>
+
+      <div class="mt-6 mb-14 md:mb-0 bg-[#2A3475]/5 border border-[#2A3475]/10 rounded-xl p-5 flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-right w-full">
+          <div class="bg-white p-2 rounded-full shadow-sm shrink-0">
+              <i class="fas fa-robot text-[#2A3475] text-xl"></i>
+          </div>
+          <div>
+              <h5 class="font-bold text-[#2A3475] text-sm">رؤية تحليلية سريعة</h5>
+              <p id="dashboard-insight" class="text-xs text-gray-600 mt-1 leading-relaxed">
+                  جاري تحليل البيانات...
+              </p>
+          </div>
+      </div>
+
+     </div>
+    </div>
+   </div><!-- Meeting Details Modal -->
+<div id="meeting-details-modal" class="modal">
+    <div class="modal-content p-0 shadow-2xl rounded-xl flex flex-col h-auto max-h-[92vh] md:max-h-none overflow-hidden" style="max-width: 550px; width: 95%;">
+        
+        <div class="metallic-blue-fill random-slanted-lines px-4 py-3 md:px-6 md:py-4 flex items-center justify-between shadow-md shrink-0">
+            <div class="flex items-center space-x-3 space-x-reverse text-white">
+                <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm border border-white/10 shadow-inner">
+                    <i class="fas fa-info-circle text-[#F3A628] text-lg md:text-xl"></i>
+                </div>
+                <h3 class="text-sm md:text-lg font-bold tracking-wide">تفاصيل الاجتماع</h3>
+            </div>
+            <button id="close-details" class="text-white/60 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all"> 
+                <i class="fas fa-times text-sm"></i> 
+            </button>
+        </div>
+
+        <div id="meeting-details-content" class="p-4 md:p-6 bg-white overflow-y-auto custom-scrollbar flex-1 overscroll-contain pb-10 md:pb-6">
+            </div>
+    </div>
+</div>
+</div><div id="admin-panel-modal" class="modal"></div>
+<div id="notif-menu" class="hidden fixed w-80 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300 ease-in-out">
+    <div class="px-5 py-4 flex justify-between items-center border-b border-gray-50">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-[#F3A628] rounded-full animate-pulse"></span>
+            <h3 class="text-[#2A3475] font-bold text-sm">التنبيهات</h3>
+        </div>
+        <button onclick="toggleNotifications()" class="text-gray-400 hover:text-red-500 transition-colors">
+            <i class="fas fa-times text-xs"></i>
+        </button>
+    </div>
+    
+    <div id="notif-list" class="max-h-[350px] overflow-y-auto custom-scrollbar p-2">
+        </div>
+    
+    <div class="p-3 bg-gray-50/50 border-t border-gray-50 text-center">
+        <button onclick="markAllNotificationsRead()" class="text-[11px] font-medium text-gray-500 hover:text-[#2A3475] transition-colors">
+            تحديد الكل كمقروء
+        </button>
+    </div>
+</div>
+<div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
+    <div class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center border border-gray-100 transform scale-95 transition-transform duration-300 min-w-[80vw] md:min-w-[400px] gap-0">
+        
+        <div class="mb-0 -mt-6 md:-mt-10">
+            <img src="/CITL.png" alt="Loading..." class="h-24 md:h-48 w-auto object-contain mix-blend-multiply brightness-110 contrast-110 saturate-110">
+        </div>
+
+        <div class="text-center -mt-2 md:-mt-6">
+            <h3 class="text-[#2A3475] font-black text-lg md:text-2xl tracking-wide leading-tight">جاري تهيئة النظام</h3>
+            <p id="loader-text" class="text-gray-400 text-xs md:text-sm font-bold mt-1 md:mt-2">يتم استدعاء البيانات، يرجى الانتظار...</p>
+        </div>
+    </div>
+</div>
+
+<div id="mobile-menu" class="hidden fixed inset-0 z-[10002] lg:hidden">
+    <div class="absolute inset-0 bg-[#2A3475]/60 backdrop-blur-sm transition-opacity" onclick="toggleMobileMenu()"></div>
+    
+<div id="mobile-menu-content" class="absolute right-0 top-0 bottom-0 w-60 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+    
+    <div class="metallic-blue-fill p-5 relative overflow-hidden shrink-0 border-b-2 border-[#F3A628]">
+        <div class="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-10 -mt-10"></div>
+        <div class="flex flex-col items-center text-center gap-3 relative z-10">
+            <img src="/CITL.png" class="h-14 w-auto bg-white p-1 rounded-lg shadow-sm" alt="Logo">
+            <div class="flex flex-col gap-1">
+                <h1 class="text-white font-black text-[12px] leading-tight drop-shadow-md">كلية النقل الدولي واللوجستيات</h1>
+                <h2 class="text-[#F3A628] text-[8px] font-bold uppercase opacity-90">College of International Transport & Logistics</h2>
+                <p class="text-[9px] text-blue-100/90 font-bold leading-tight">CITL Smart System</p>
+            </div>
+        </div>
+    </div>
+
+<div class="flex-1 py-5 px-4 space-y-3 overflow-y-auto custom-scrollbar">
+    <button onclick="openAddMeetingModal(); toggleMobileMenu();" class="hidden w-full flex items-center justify-between p-4 rounded-xl bg-orange-50 text-[#d48a1b] font-bold text-sm border border-orange-100 transform active:scale-95 transition-all">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-plus-circle text-lg"></i>
+            <span>حجز اجتماع جديد</span>
+        </div>
+        <i class="fas fa-chevron-left text-[10px] opacity-50"></i>
+    </button>
+    
+    <a href="/schedules/" class="hidden w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-chalkboard text-lg text-[#2A3475]"></i>
+            <span>القاعات الدراسية</span>
+        </div>
+    </a>
+
+    <button onclick="openDashboard(); toggleMobileMenu();" class="hidden w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-chart-pie text-lg text-[#2A3475]"></i>
+            <span>إحصائيات النظام</span>
+        </div>
+    </button>
+
+<button data-dashboard-account onclick="openAdminPanel(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
+    <div class="flex items-center gap-3">
+        <i class="fas fa-cogs text-lg text-[#2A3475]"></i>
+        <span>لوحة التحكم</span>
+    </div>
+</button>
+
+    <div class="border-t border-gray-100 my-4"></div>
+    
+    <button onclick="logout();" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
+        <i class="fas fa-sign-out-alt text-lg"></i>
+        <span>تسجيل الخروج</span>
+    </button>
+</div>
+
+<div class="p-4 bg-gray-50 border-t border-gray-100"></div>
+    </div>
+</div>
+
+<div id="profile-info-menu" class="hidden fixed w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300">
+    <div class="metallic-blue-fill p-4 border-b border-[#F3A628] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full -ml-10 -mt-10"></div>
+        <div class="flex items-center gap-3 relative z-10">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/20 shadow-inner">
+                <i class="fas fa-user-circle text-xl"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-blue-200 font-bold">بيانات الحساب</p>
+                <h4 id="full-profile-name" class="text-white font-black text-sm leading-tight truncate w-40">...</h4>
+            </div>
+        </div>
+    </div>
+    <div class="p-4 bg-white">
+        <div class="flex items-start gap-3 mb-4">
+            <div class="bg-gray-50 p-2 rounded-lg text-[#2A3475]"><i class="fas fa-id-badge text-sm"></i></div>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">المسمى الوظيفي والجهة</p>
+                <p id="full-profile-role" class="text-xs text-gray-700 font-bold leading-relaxed break-words">...</p>
+            </div>
+        </div>
+        <button onclick="toggleProfileInfoMenu(); openAdminPanel();" class="w-full py-2.5 bg-[#2A3475]/5 text-[#2A3475] rounded-xl text-[11px] font-bold border border-[#2A3475]/10 hover:bg-[#2A3475] hover:text-white transition-all transform active:scale-95 flex items-center justify-center gap-2">
+            <i class="fas fa-user-edit"></i> تعديل بياناتي
+        </button>
+    </div>
+</div>
+
+  <script src="/assets/admin-panel-ui.js?v=20260914-r6"></script>
+<script src="/assets/tv-admin-ui.js?v=20260914-r6"></script>
+<script src="/assets/study-model.js?v=20260914-r6"></script>
+<script src="/assets/dashboard-home-model.js?v=20260914-r6"></script>
+<script src="/assets/pages/dashboard-1.js?v=20260914-r6"></script>
+<script src="/assets/admin-panel.js?v=20260914-r6"></script>
+<script src="/assets/tv-admin.js?v=20260914-r6"></script>
+<script src="/security-core.js?v=20260914-r6"></script>
+<script src="/assets/admin-permissions-ui.js?v=20260914-r6"></script>
+<script src="/assets/dashboard-home.js?v=20260914-r6"></script>
+</body>
+</html>

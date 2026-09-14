@@ -1,0 +1,5 @@
+{
+  "release": "20260914-r5",
+  "built_at": "2026-09-14T17:00:06.325561+03:00",
+  "description": "Automatic background service-worker update checks; versioned UI assets; database unchanged"
+}

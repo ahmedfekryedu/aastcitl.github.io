@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta name="citl-release" content="20260914-r5">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#2A3475"><meta name="description" content="الجداول الدراسية الأسبوعية لكلية النقل الدولي واللوجستيات">
+  <title>الجداول الدراسية | كلية النقل الدولي واللوجستيات</title>
+  <link rel="icon" href="/CITL_Logo-32.png"><link rel="stylesheet" href="/study/study.css?v=20260914-r5">
+  <script src="/vendor/supabase-js-2.45.4.min.js?v=20260914-r5" defer></script><script src="/assets/read-timeout.js?v=20260914-r5" defer></script>
+  <script src="/assets/study-model.js?v=20260914-r5" defer></script><script src="/study/study.js?v=20260914-r5" defer></script>
+<link rel="stylesheet" href="/assets/interface-controls.css?v=20260914-r5">
+<script src="/assets/loading-placeholders.js?v=20260914-r5"></script>
+<script defer src="/assets/interface-controls.js?v=20260914-r5"></script>
+<link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css?v=20260914-r5">
+<script defer src="/assets/site-updates.js?v=20260914-r5"></script>
+</head>
+<body>
+  <header class="portal-header"><div class="portal-brand"><p class="academy">الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</p><h1>الجداول الدراسية</h1><p>كلية النقل الدولي واللوجستيات <span>• CITL</span></p></div><div id="study-date" class="date-badge"></div></header>
+  <main>
+    <section class="filter-panel" aria-label="البحث في الجدول الأسبوعي">
+      <div class="section-heading"><div><span class="eyebrow">أسبوعك الدراسي</span><h2>اعرف محاضرتك ومكانها</h2></div><span class="week-tag">جدول أسبوعي</span></div>
+      <label for="study-search">ابحث باسم المادة أو المحاضر أو القاعة</label>
+      <div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="study-search" type="search" placeholder="مثال: لوجستيات، أحمد، H 104" autocomplete="off"></div>
+      <div class="filter-grid"><div><label for="study-room">القاعة</label><select id="study-room"><option value="">كل القاعات</option></select></div><div><label for="study-day">اليوم</label><select id="study-day"><option value="">الأسبوع كاملًا</option></select></div></div>
+      <div class="filter-actions"><button id="study-today" type="button">محاضرات اليوم</button><button id="study-reset" type="button">مسح الفلاتر</button></div>
+    </section>
+    <div class="results-heading"><h2 id="study-results-title">جدول الأسبوع</h2><span id="study-count" aria-live="polite"></span></div>
+    <div id="study-status" role="status" aria-live="polite">جاري تحميل الجداول الدراسية…</div>
+    <div class="refresh-line"><span id="study-updated"></span><button id="study-refresh" type="button">تحديث الجدول</button></div>
+    <div id="study-results" aria-busy="true"></div>
+    <p class="schedule-note">قد تُحدَّث مواعيد المحاضرات؛ راجع آخر تحديث قبل التوجّه للقاعة.</p>
+  </main>
+  <footer><p>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © <span id="study-year">2026</span></p><p class="credit">تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</p></footer>
+</body>
+</html>

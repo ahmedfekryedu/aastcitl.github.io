@@ -1166,6 +1166,26 @@ body.tv-display-page .schedule-instructor {
     background-clip: padding-box !important;
     outline: none !important;
 }
+/* =====================================================
+   SAMSUNG TV VIDEO FIX
+   منع طبقة الفيديو من الدخول في GPU mask/transform
+===================================================== */
+body.tv-display-page .poster-slide,
+body.tv-display-page .poster-slide #poster-media-host,
+body.tv-display-page .poster-slide #active-poster-video {
+    -webkit-transform: none !important;
+    transform: none !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}
+
+body.tv-display-page .poster-slide #active-poster-video {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #000 !important;
+}
 </style>
 <link rel="stylesheet" href="/assets/tv-study.css?v=20260920-r4">
 <script src="/assets/read-timeout.js?v=20260920-r4"></script><script src="/assets/study-model.js?v=20260920-r4"></script>

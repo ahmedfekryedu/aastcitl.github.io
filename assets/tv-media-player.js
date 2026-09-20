@@ -11,6 +11,11 @@
 
   const images = new Map();
 
+  const isSamsungTV =
+    /Tizen|SMART-TV|Samsung.*TV|Maple/i.test(
+      navigator.userAgent || ''
+    );
+
   const video = row =>
     row?.media_type === 'video' ||
     row?.mime_type === 'video/mp4' ||
@@ -24,11 +29,6 @@
     }
 
     soundUnlockCleanup = null;
-
-    const prompt = document.getElementById('tv-sound-unlock');
-    if (prompt) {
-      prompt.remove();
-    }
   }
 
   function cancel(discardPreload = false) {
@@ -67,9 +67,11 @@
 
     const task = (async () => {
       try {
-        const cache = await caches.open('citl-posters-images');
+        const cache =
+          await caches.open('citl-posters-images');
 
-        let response = await cache.match(url);
+        let response =
+          await cache.match(url);
 
         if (!response) {
           response = await fetch(url, {
@@ -80,20 +82,35 @@
             throw new Error('image unavailable');
           }
 
-          await cache.put(url, response.clone());
+          await cache.put(
+            url,
+            response.clone()
+          );
 
-          const keys = await cache.keys();
+          const keys =
+            await cache.keys();
 
           await Promise.all(
             keys
-              .slice(0, Math.max(0, keys.length - 30))
-              .map(key => cache.delete(key))
+              .slice(
+                0,
+                Math.max(
+                  0,
+                  keys.length - 30
+                )
+              )
+              .map(key =>
+                cache.delete(key)
+              )
           );
         }
 
-        return URL.createObjectURL(
-          await response.blob()
-        );
+        const source =
+          URL.createObjectURL(
+            await response.blob()
+          );
+
+        return source;
 
       } catch (_) {
         return url;
@@ -103,8 +120,11 @@
     images.set(url, task);
 
     while (images.size > 3) {
-      const key = images.keys().next().value;
-      const removed = images.get(key);
+      const key =
+        images.keys().next().value;
+
+      const removed =
+        images.get(key);
 
       images.delete(key);
 
@@ -126,49 +146,58 @@
 
     let unlocked = false;
 
-    const prompt = document.createElement('div');
-
-    prompt.id = 'tv-sound-unlock';
-    prompt.textContent = 'اضغط OK لتشغيل الصوت';
-
-    prompt.style.cssText = `
-      position: fixed;
-      z-index: 999999;
-      left: 50%;
-      bottom: 28px;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.75);
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 18px;
-      font-family: inherit;
-      pointer-events: none;
-      white-space: nowrap;
-    `;
-
-    if (document.body) {
-      document.body.appendChild(prompt);
-    }
-
     const cleanup = () => {
-      document.removeEventListener('click', unlock, true);
-      document.removeEventListener('pointerdown', unlock, true);
-      document.removeEventListener('touchstart', unlock, true);
-      document.removeEventListener('keydown', unlock, true);
+      document.removeEventListener(
+        'click',
+        unlock,
+        true
+      );
 
-      window.removeEventListener('keydown', unlock, true);
-      window.removeEventListener('keyup', unlock, true);
-      window.removeEventListener('click', unlock, true);
+      document.removeEventListener(
+        'pointerdown',
+        unlock,
+        true
+      );
 
-      const currentPrompt =
-        document.getElementById('tv-sound-unlock');
+      document.removeEventListener(
+        'touchstart',
+        unlock,
+        true
+      );
 
-      if (currentPrompt) {
-        currentPrompt.remove();
-      }
+      document.removeEventListener(
+        'keydown',
+        unlock,
+        true
+      );
 
-      if (soundUnlockCleanup === cleanup) {
+      document.removeEventListener(
+        'keyup',
+        unlock,
+        true
+      );
+
+      window.removeEventListener(
+        'keydown',
+        unlock,
+        true
+      );
+
+      window.removeEventListener(
+        'keyup',
+        unlock,
+        true
+      );
+
+      window.removeEventListener(
+        'click',
+        unlock,
+        true
+      );
+
+      if (
+        soundUnlockCleanup === cleanup
+      ) {
         soundUnlockCleanup = null;
       }
     };
@@ -184,8 +213,10 @@
 
       try {
         /*
-         * هنا فقط نفتح الصوت بعد تفاعل حقيقي
-         * من المستخدم أو الريموت.
+         * فتح الصوت فقط بعد تفاعل فعلي
+         * من الريموت / الماوس / اللمس.
+         *
+         * لا نوقف الفيديو ولا نعيد تحميله.
          */
         media.removeAttribute('muted');
 
@@ -193,7 +224,12 @@
         media.defaultMuted = false;
         media.volume = 1;
 
-        const result = media.play();
+        /*
+         * لو الفيديو شغال بالفعل،
+         * play() لا يعيده من البداية.
+         */
+        const result =
+          media.play();
 
         if (
           result &&
@@ -203,9 +239,11 @@
         }
 
         /*
-         * تأكيد مرة ثانية بعد play().
+         * تأكيد حالة الصوت مرة ثانية
+         * لبعض متصفحات Samsung.
          */
         media.removeAttribute('muted');
+
         media.muted = false;
         media.defaultMuted = false;
         media.volume = 1;
@@ -216,23 +254,18 @@
 
       } catch (_) {
         /*
-         * لو Samsung رفض فتح الصوت لأي سبب،
-         * نرجع فورًا للوضع الصامت حتى لا تسود الشاشة.
+         * مهم:
+         * لا نوقف الفيديو ولا نعمل load()
+         * في حالة فشل فتح الصوت.
+         *
+         * نخلي الفيديو مستمر كما هو
+         * وننتظر تفاعل آخر.
          */
-        try {
-          media.muted = true;
-          media.defaultMuted = true;
-          media.volume = 0;
-
-          media.setAttribute('muted', '');
-
-          await media.play();
-        } catch (_) {}
       }
     };
 
     /*
-     * Chrome / Mobile
+     * أي Click أو Touch على الكمبيوتر/الموبايل.
      */
     document.addEventListener(
       'click',
@@ -253,10 +286,18 @@
     );
 
     /*
-     * Samsung Remote / Keyboard
+     * Samsung Remote:
+     * لا نقيدها بـ Enter فقط.
+     * أي key event يعتبر user gesture.
      */
     document.addEventListener(
       'keydown',
+      unlock,
+      true
+    );
+
+    document.addEventListener(
+      'keyup',
       unlock,
       true
     );
@@ -297,24 +338,47 @@
     clearSoundUnlock();
 
     /*
-     * لا نستخدم detached VIDEO preload.
-     * ده كان مهم جدًا لتوافق Samsung.
+     * لا نستخدم detached video preload.
+     * ده جزء مهم من توافق Samsung.
      */
+    const warmed = null;
+
     if (preparedVideo) {
       try {
         preparedVideo.element.pause?.();
-        preparedVideo.element.removeAttribute('src');
+        preparedVideo.element.removeAttribute(
+          'src'
+        );
         preparedVideo.element.load();
       } catch (_) {}
 
       preparedVideo = null;
     }
 
-    const isVideo = video(row);
+    const isVideo =
+      video(row);
 
-    const media = document.createElement(
-      isVideo ? 'video' : 'img'
-    );
+    const media =
+      document.createElement(
+        isVideo
+          ? 'video'
+          : 'img'
+      );
+
+    /*
+     * مهم:
+     * رجعنا Samsung class
+     * كما كانت في النسخة التي عرضت الفيديو بنجاح.
+     */
+    if (
+      isVideo &&
+      isSamsungTV &&
+      document.body
+    ) {
+      document.body.classList.add(
+        'samsung-tv-video'
+      );
+    }
 
     media.className =
       'w-full h-full rounded-xl shadow-2xl';
@@ -331,48 +395,73 @@
 
     if (isVideo) {
       /*
-       * مهم جدًا:
+       * نفس إعدادات النسخة التي كانت تعمل.
        *
-       * Samsung يبدأ الفيديو MUTED.
-       * دي الطريقة اللي ثبت إنها بتظهر الفيديو
-       * بدون Black Screen.
+       * نجرب التشغيل بالصوت أولًا.
+       * لو المتصفح رفضه،
+       * هنرجع muted autoplay.
        */
-      media.muted = true;
-      media.defaultMuted = true;
-      media.volume = 0;
+      media.muted = false;
+      media.defaultMuted = false;
+      media.volume = 1;
 
       media.autoplay = true;
       media.loop = false;
       media.playsInline = true;
       media.preload = 'auto';
 
-      media.setAttribute('muted', '');
-      media.setAttribute('autoplay', '');
-      media.setAttribute('playsinline', '');
-      media.setAttribute('webkit-playsinline', '');
+      media.setAttribute(
+        'autoplay',
+        ''
+      );
+
+      media.setAttribute(
+        'playsinline',
+        ''
+      );
+
+      media.setAttribute(
+        'webkit-playsinline',
+        ''
+      );
 
     } else {
-      media.alt = row.title || 'إعلان';
-      media.decoding = 'async';
+      media.alt =
+        row.title || 'إعلان';
+
+      media.decoding =
+        'async';
     }
 
-    const source = isVideo
-      ? row.image_url
-      : await imageSource(row.image_url);
+    const source =
+      isVideo
+        ? row.image_url
+        : await imageSource(
+            row.image_url
+          );
 
-    if (ticket !== generation) {
+    if (
+      ticket !== generation
+    ) {
       return;
     }
 
     /*
-     * أهم Samsung Fix:
+     * مهم جدًا لـ Samsung:
      *
-     * عنصر VIDEO يدخل DOM أولًا،
-     * وبعدها فقط نضع src وننفذ load().
+     * ندخل VIDEO إلى DOM أولًا
+     * قبل تعيين src/load.
+     *
+     * ده هو السلوك الذي كان يعمل.
      */
     if (isVideo) {
-      host.replaceChildren(media);
-      container.replaceChildren(card);
+      host.replaceChildren(
+        media
+      );
+
+      container.replaceChildren(
+        card
+      );
 
       active = media;
     }
@@ -380,45 +469,58 @@
     let timer;
 
     try {
-      await new Promise((resolve, reject) => {
-        timer = setTimeout(
-          () => {
-            reject(
-              new Error('تعذر تحميل الإعلان')
-            );
-          },
-          25000
-        );
+      await new Promise(
+        (resolve, reject) => {
+          timer = setTimeout(
+            () =>
+              reject(
+                new Error(
+                  'تعذر تحميل الإعلان'
+                )
+              ),
+            25000
+          );
 
-        media.addEventListener(
-          isVideo ? 'loadeddata' : 'load',
-          resolve,
-          { once: true }
-        );
+          media.addEventListener(
+            isVideo
+              ? 'loadeddata'
+              : 'load',
+            resolve,
+            {
+              once: true
+            }
+          );
 
-        media.addEventListener(
-          'error',
-          () => {
-            reject(
-              new Error('ملف الإعلان غير متاح')
-            );
-          },
-          { once: true }
-        );
+          media.addEventListener(
+            'error',
+            () =>
+              reject(
+                new Error(
+                  'ملف الإعلان غير متاح'
+                )
+              ),
+            {
+              once: true
+            }
+          );
 
-        media.src = source;
+          media.src =
+            source;
 
-        if (isVideo) {
-          media.load();
+          if (isVideo) {
+            media.load();
+          }
         }
-      });
+      );
 
       clearTimeout(timer);
 
       if (
         isVideo &&
         (
-          !Number.isFinite(media.duration) ||
+          !Number.isFinite(
+            media.duration
+          ) ||
           media.duration <= 0
         )
       ) {
@@ -427,27 +529,45 @@
         );
       }
 
-      if (ticket !== generation) {
+      if (
+        ticket !== generation
+      ) {
         if (isVideo) {
           media.pause();
-          media.removeAttribute('src');
+
+          media.removeAttribute(
+            'src'
+          );
+
           media.load();
         }
 
         return;
       }
 
-      if (!isVideo && media.decode) {
-        await media.decode().catch(() => {});
+      if (
+        !isVideo &&
+        media.decode
+      ) {
+        await media
+          .decode()
+          .catch(() => {});
       }
 
-      if (ticket !== generation) {
+      if (
+        ticket !== generation
+      ) {
         return;
       }
 
       if (!isVideo) {
-        host.replaceChildren(media);
-        container.replaceChildren(card);
+        host.replaceChildren(
+          media
+        );
+
+        container.replaceChildren(
+          card
+        );
       }
 
       active = media;
@@ -458,7 +578,11 @@
 
         try {
           media.pause();
-          media.removeAttribute('src');
+
+          media.removeAttribute(
+            'src'
+          );
+
           media.load();
         } catch (_) {}
 
@@ -471,40 +595,73 @@
           ';color:#fff;font-size:20px;padding:24px';
 
         onFailure?.(
-          new Error('توقف تحميل الفيديو')
+          new Error(
+            'توقف تحميل الفيديو'
+          )
         );
       };
 
       if (isVideo) {
-        /*
-         * تشغيل مضمون للصورة أولًا.
-         */
-        media.muted = true;
-        media.defaultMuted = true;
-        media.volume = 0;
+        try {
+          /*
+           * المحاولة الأولى:
+           * تشغيل بالصوت.
+           *
+           * دي نفس طريقة النسخة
+           * التي كان الفيديو يظهر معها.
+           */
+          media.muted = false;
+          media.defaultMuted = false;
+          media.volume = 1;
 
-        media.setAttribute('muted', '');
+          await media.play();
 
-        await media.play();
+        } catch (playError) {
+          /*
+           * لو Samsung / Chrome
+           * رفض autoplay بالصوت:
+           *
+           * نرجع فورًا إلى التشغيل الصامت
+           * بدون تغيير DOM
+           * بدون reload
+           * بدون src جديد.
+           */
+          media.muted = true;
+          media.defaultMuted = true;
+          media.volume = 0;
 
-        /*
-         * بعد ما الفيديو اشتغل بالفعل،
-         * ننتظر OK / Click لفتح الصوت.
-         */
-        armSoundUnlock(media);
+          await media.play();
+
+          /*
+           * بعد نجاح تشغيل الصورة،
+           * نستمع لتفاعل الريموت
+           * لفتح الصوت.
+           */
+          armSoundUnlock(
+            media
+          );
+        }
       }
 
-      if (ticket !== generation) {
+      if (
+        ticket !== generation
+      ) {
         return;
       }
 
-      await new Promise(resolve =>
-        requestAnimationFrame(() =>
-          requestAnimationFrame(resolve)
-        )
+      await new Promise(
+        resolve =>
+          requestAnimationFrame(
+            () =>
+              requestAnimationFrame(
+                resolve
+              )
+          )
       );
 
-      if (ticket !== generation) {
+      if (
+        ticket !== generation
+      ) {
         return;
       }
 
@@ -519,7 +676,9 @@
     } catch (error) {
       clearTimeout(timer);
 
-      if (ticket !== generation) {
+      if (
+        ticket !== generation
+      ) {
         return;
       }
 
@@ -528,23 +687,32 @@
       if (isVideo) {
         try {
           media.pause();
-          media.removeAttribute('src');
+
+          media.removeAttribute(
+            'src'
+          );
+
           media.load();
         } catch (_) {}
       }
 
       ready = true;
 
-      host.textContent = isVideo
-        ? 'تعذر تشغيل الفيديو؛ تحقق من الاتصال واستخدم MP4 / H.264. ستتابع الشاشة تلقائيًا.'
-        : 'تعذر تحميل هذا الإعلان؛ ستتابع الشاشة تلقائيًا';
+      host.textContent =
+        isVideo
+          ? 'تعذر تشغيل الفيديو؛ تحقق من الاتصال واستخدم MP4 / H.264. ستتابع الشاشة تلقائيًا.'
+          : 'تعذر تحميل هذا الإعلان؛ ستتابع الشاشة تلقائيًا';
 
       host.style.cssText +=
         ';color:#fff;font-size:20px;padding:24px';
 
-      container.replaceChildren(card);
+      container.replaceChildren(
+        card
+      );
 
-      onFailure?.(error);
+      onFailure?.(
+        error
+      );
     }
   }
 
@@ -554,21 +722,24 @@
     }
 
     /*
-     * مهم:
-     * لا نعمل preload لفيديو داخل عنصر VIDEO منفصل.
+     * ممنوع video preload
+     * داخل عنصر منفصل.
      */
     if (video(row)) {
       return;
     }
 
-    imageSource(row.image_url)
-      .catch(() => {});
+    imageSource(
+      row.image_url
+    ).catch(() => {});
   }
 
   function videoProgress() {
     if (
       active?.tagName !== 'VIDEO' ||
-      !Number.isFinite(active.duration) ||
+      !Number.isFinite(
+        active.duration
+      ) ||
       !ready
     ) {
       return null;
@@ -579,7 +750,8 @@
       active.readyState < 3
     ) {
       if (!stalledAt) {
-        stalledAt = Date.now();
+        stalledAt =
+          Date.now();
       }
 
     } else {
@@ -590,7 +762,9 @@
       active.error ||
       (
         stalledAt &&
-        Date.now() - stalledAt > 30000
+        Date.now() -
+          stalledAt >
+          30000
       )
     ) {
       playbackFailure?.();
@@ -609,13 +783,14 @@
         );
   }
 
-  root.CITLTVMedia = Object.freeze({
-    cancel,
-    show,
-    preload,
-    video,
-    videoProgress,
-    waiting: () => !ready
-  });
+  root.CITLTVMedia =
+    Object.freeze({
+      cancel,
+      show,
+      preload,
+      video,
+      videoProgress,
+      waiting: () => !ready
+    });
 
 })(window);

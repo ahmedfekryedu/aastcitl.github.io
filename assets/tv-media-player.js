@@ -3,7 +3,8 @@
 
   let generation = 0, active, ready = true, preparedVideo, stalledAt = 0, playbackFailure;
   const images = new Map();
-
+  const isSamsungTV = /Tizen|SMART-TV|Samsung.*TV|Maple/i.test(navigator.userAgent || '');
+  
   const video = row =>
     row?.media_type === 'video' ||
     row?.mime_type === 'video/mp4' ||
@@ -94,7 +95,10 @@
 
     const isVideo = video(row);
     const media = document.createElement(isVideo ? 'video' : 'img');
-
+    if (isVideo && isSamsungTV && document.body) {
+    document.body.classList.add('samsung-tv-video');
+    }
+    
     media.className = 'w-full h-full rounded-xl shadow-2xl';
     media.style.objectFit = row.fit_mode === 'contain' ? 'contain' : 'cover';
     media.id = isVideo ? 'active-poster-video' : 'active-poster-img';

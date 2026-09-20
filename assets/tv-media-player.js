@@ -25,9 +25,9 @@
 
     soundUnlockCleanup = null;
 
-    const oldPrompt = document.getElementById('tv-sound-unlock');
-    if (oldPrompt) {
-      oldPrompt.remove();
+    const prompt = document.getElementById('tv-sound-unlock');
+    if (prompt) {
+      prompt.remove();
     }
   }
 
@@ -135,9 +135,9 @@
       position: fixed;
       z-index: 999999;
       left: 50%;
-      bottom: 30px;
+      bottom: 28px;
       transform: translateX(-50%);
-      background: rgba(0,0,0,.72);
+      background: rgba(0,0,0,.75);
       color: #fff;
       padding: 10px 18px;
       border-radius: 10px;
@@ -158,9 +158,11 @@
       document.removeEventListener('keydown', unlock, true);
 
       window.removeEventListener('keydown', unlock, true);
+      window.removeEventListener('keyup', unlock, true);
       window.removeEventListener('click', unlock, true);
 
-      const currentPrompt = document.getElementById('tv-sound-unlock');
+      const currentPrompt =
+        document.getElementById('tv-sound-unlock');
 
       if (currentPrompt) {
         currentPrompt.remove();
@@ -181,17 +183,27 @@
       }
 
       try {
+        /*
+         * هنا فقط نفتح الصوت بعد تفاعل حقيقي
+         * من المستخدم أو الريموت.
+         */
         media.removeAttribute('muted');
 
         media.muted = false;
         media.defaultMuted = false;
         media.volume = 1;
 
-        await media.play();
+        const result = media.play();
+
+        if (
+          result &&
+          typeof result.then === 'function'
+        ) {
+          await result;
+        }
 
         /*
-         * بعض متصفحات Samsung قد تعيد mute داخليًا،
-         * لذلك نؤكد حالة الصوت مرة أخرى بعد play().
+         * تأكيد مرة ثانية بعد play().
          */
         media.removeAttribute('muted');
         media.muted = false;
@@ -204,19 +216,68 @@
 
       } catch (_) {
         /*
-         * نترك الـ listeners موجودة
-         * حتى يجرب المستخدم زرًا آخر.
+         * لو Samsung رفض فتح الصوت لأي سبب،
+         * نرجع فورًا للوضع الصامت حتى لا تسود الشاشة.
          */
+        try {
+          media.muted = true;
+          media.defaultMuted = true;
+          media.volume = 0;
+
+          media.setAttribute('muted', '');
+
+          await media.play();
+        } catch (_) {}
       }
     };
 
-    document.addEventListener('click', unlock, true);
-    document.addEventListener('pointerdown', unlock, true);
-    document.addEventListener('touchstart', unlock, true);
-    document.addEventListener('keydown', unlock, true);
+    /*
+     * Chrome / Mobile
+     */
+    document.addEventListener(
+      'click',
+      unlock,
+      true
+    );
 
-    window.addEventListener('keydown', unlock, true);
-    window.addEventListener('click', unlock, true);
+    document.addEventListener(
+      'pointerdown',
+      unlock,
+      true
+    );
+
+    document.addEventListener(
+      'touchstart',
+      unlock,
+      true
+    );
+
+    /*
+     * Samsung Remote / Keyboard
+     */
+    document.addEventListener(
+      'keydown',
+      unlock,
+      true
+    );
+
+    window.addEventListener(
+      'keydown',
+      unlock,
+      true
+    );
+
+    window.addEventListener(
+      'keyup',
+      unlock,
+      true
+    );
+
+    window.addEventListener(
+      'click',
+      unlock,
+      true
+    );
 
     soundUnlockCleanup = cleanup;
   }
@@ -236,8 +297,8 @@
     clearSoundUnlock();
 
     /*
-     * فيديو Samsung:
-     * لا نستخدم detached video preload.
+     * لا نستخدم detached VIDEO preload.
+     * ده كان مهم جدًا لتوافق Samsung.
      */
     if (preparedVideo) {
       try {
@@ -270,19 +331,22 @@
 
     if (isVideo) {
       /*
-       * نحاول تشغيل الفيديو بالصوت أولًا.
+       * مهم جدًا:
+       *
+       * Samsung يبدأ الفيديو MUTED.
+       * دي الطريقة اللي ثبت إنها بتظهر الفيديو
+       * بدون Black Screen.
        */
-      media.removeAttribute('muted');
-
-      media.muted = false;
-      media.defaultMuted = false;
-      media.volume = 1;
+      media.muted = true;
+      media.defaultMuted = true;
+      media.volume = 0;
 
       media.autoplay = true;
       media.loop = false;
       media.playsInline = true;
       media.preload = 'auto';
 
+      media.setAttribute('muted', '');
       media.setAttribute('autoplay', '');
       media.setAttribute('playsinline', '');
       media.setAttribute('webkit-playsinline', '');
@@ -301,9 +365,10 @@
     }
 
     /*
-     * Samsung Fix:
-     * ندخل عنصر الفيديو داخل DOM
-     * قبل تعيين src وقبل load().
+     * أهم Samsung Fix:
+     *
+     * عنصر VIDEO يدخل DOM أولًا،
+     * وبعدها فقط نضع src وننفذ load().
      */
     if (isVideo) {
       host.replaceChildren(media);
@@ -411,44 +476,22 @@
       };
 
       if (isVideo) {
-        try {
-          /*
-           * المحاولة الأولى:
-           * تشغيل الفيديو مباشرة بالصوت.
-           */
-          media.removeAttribute('muted');
+        /*
+         * تشغيل مضمون للصورة أولًا.
+         */
+        media.muted = true;
+        media.defaultMuted = true;
+        media.volume = 0;
 
-          media.muted = false;
-          media.defaultMuted = false;
-          media.volume = 1;
+        media.setAttribute('muted', '');
 
-          await media.play();
+        await media.play();
 
-          /*
-           * نؤكد الصوت بعد التشغيل.
-           */
-          media.removeAttribute('muted');
-          media.muted = false;
-          media.defaultMuted = false;
-          media.volume = 1;
-
-        } catch (playError) {
-          /*
-           * Chrome أو Samsung منع autoplay بالصوت.
-           *
-           * نشغل الفيديو صامت بدل ما يفشل،
-           * ثم ننتظر أي تفاعل من المستخدم/الريموت.
-           */
-          media.muted = true;
-          media.defaultMuted = true;
-          media.volume = 0;
-
-          media.setAttribute('muted', '');
-
-          await media.play();
-
-          armSoundUnlock(media);
-        }
+        /*
+         * بعد ما الفيديو اشتغل بالفعل،
+         * ننتظر OK / Click لفتح الصوت.
+         */
+        armSoundUnlock(media);
       }
 
       if (ticket !== generation) {
@@ -511,8 +554,8 @@
     }
 
     /*
-     * لا نعمل preload لفيديو Samsung
-     * داخل عنصر VIDEO منفصل.
+     * مهم:
+     * لا نعمل preload لفيديو داخل عنصر VIDEO منفصل.
      */
     if (video(row)) {
       return;

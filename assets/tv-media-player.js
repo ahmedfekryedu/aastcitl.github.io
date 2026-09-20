@@ -24,6 +24,11 @@
     }
 
     soundUnlockCleanup = null;
+
+    const oldPrompt = document.getElementById('tv-sound-unlock');
+    if (oldPrompt) {
+      oldPrompt.remove();
+    }
   }
 
   function cancel(discardPreload = false) {
@@ -121,35 +126,58 @@
 
     let unlocked = false;
 
+    const prompt = document.createElement('div');
+
+    prompt.id = 'tv-sound-unlock';
+    prompt.textContent = 'اضغط OK لتشغيل الصوت';
+
+    prompt.style.cssText = `
+      position: fixed;
+      z-index: 999999;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.72);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-family: inherit;
+      pointer-events: none;
+      white-space: nowrap;
+    `;
+
+    if (document.body) {
+      document.body.appendChild(prompt);
+    }
+
     const cleanup = () => {
-      document.removeEventListener('click', unlock);
-      document.removeEventListener('touchstart', unlock);
-      document.removeEventListener('keydown', unlock);
+      document.removeEventListener('click', unlock, true);
+      document.removeEventListener('pointerdown', unlock, true);
+      document.removeEventListener('touchstart', unlock, true);
+      document.removeEventListener('keydown', unlock, true);
+
+      window.removeEventListener('keydown', unlock, true);
+      window.removeEventListener('click', unlock, true);
+
+      const currentPrompt = document.getElementById('tv-sound-unlock');
+
+      if (currentPrompt) {
+        currentPrompt.remove();
+      }
 
       if (soundUnlockCleanup === cleanup) {
         soundUnlockCleanup = null;
       }
     };
 
-    const unlock = async event => {
-      if (unlocked || active !== media) {
+    const unlock = async () => {
+      if (
+        unlocked ||
+        active !== media ||
+        media.tagName !== 'VIDEO'
+      ) {
         return;
-      }
-
-      if (event?.type === 'keydown') {
-        const key = event.key;
-        const code = event.keyCode;
-
-        const allowed =
-          key === 'Enter' ||
-          key === ' ' ||
-          key === 'Spacebar' ||
-          code === 13 ||
-          code === 32;
-
-        if (!allowed) {
-          return;
-        }
       }
 
       try {
@@ -161,17 +189,34 @@
 
         await media.play();
 
+        /*
+         * بعض متصفحات Samsung قد تعيد mute داخليًا،
+         * لذلك نؤكد حالة الصوت مرة أخرى بعد play().
+         */
+        media.removeAttribute('muted');
+        media.muted = false;
+        media.defaultMuted = false;
+        media.volume = 1;
+
         unlocked = true;
+
         cleanup();
 
       } catch (_) {
-        // نترك المستمع موجودًا لمحاولة أخرى
+        /*
+         * نترك الـ listeners موجودة
+         * حتى يجرب المستخدم زرًا آخر.
+         */
       }
     };
 
-    document.addEventListener('click', unlock);
-    document.addEventListener('touchstart', unlock);
-    document.addEventListener('keydown', unlock);
+    document.addEventListener('click', unlock, true);
+    document.addEventListener('pointerdown', unlock, true);
+    document.addEventListener('touchstart', unlock, true);
+    document.addEventListener('keydown', unlock, true);
+
+    window.addEventListener('keydown', unlock, true);
+    window.addEventListener('click', unlock, true);
 
     soundUnlockCleanup = cleanup;
   }
@@ -187,12 +232,13 @@
     const ticket = generation;
 
     ready = false;
+
     clearSoundUnlock();
 
-    // Samsung TV:
-    // لا نستخدم فيديو preload منفصل عن الـ DOM.
-    const warmed = null;
-
+    /*
+     * فيديو Samsung:
+     * لا نستخدم detached video preload.
+     */
     if (preparedVideo) {
       try {
         preparedVideo.element.pause?.();
@@ -225,8 +271,6 @@
     if (isVideo) {
       /*
        * نحاول تشغيل الفيديو بالصوت أولًا.
-       * لو سياسة المتصفح منعت Audible Autoplay،
-       * سنرجع تلقائيًا إلى Muted Autoplay.
        */
       media.removeAttribute('muted');
 
@@ -257,8 +301,9 @@
     }
 
     /*
-     * Samsung TV Fix:
-     * الفيديو يدخل الـ DOM قبل src/load.
+     * Samsung Fix:
+     * ندخل عنصر الفيديو داخل DOM
+     * قبل تعيين src وقبل load().
      */
     if (isVideo) {
       host.replaceChildren(media);
@@ -272,10 +317,11 @@
     try {
       await new Promise((resolve, reject) => {
         timer = setTimeout(
-          () =>
+          () => {
             reject(
               new Error('تعذر تحميل الإعلان')
-            ),
+            );
+          },
           25000
         );
 
@@ -287,10 +333,11 @@
 
         media.addEventListener(
           'error',
-          () =>
+          () => {
             reject(
               new Error('ملف الإعلان غير متاح')
-            ),
+            );
+          },
           { once: true }
         );
 
@@ -367,7 +414,7 @@
         try {
           /*
            * المحاولة الأولى:
-           * تشغيل بالصوت.
+           * تشغيل الفيديو مباشرة بالصوت.
            */
           media.removeAttribute('muted');
 
@@ -377,13 +424,20 @@
 
           await media.play();
 
+          /*
+           * نؤكد الصوت بعد التشغيل.
+           */
+          media.removeAttribute('muted');
+          media.muted = false;
+          media.defaultMuted = false;
+          media.volume = 1;
+
         } catch (playError) {
           /*
-           * Chrome / Samsung قد يمنعان
-           * autoplay بالصوت.
+           * Chrome أو Samsung منع autoplay بالصوت.
            *
-           * في الحالة دي نشغل الفيديو صامت
-           * بدل ما يفشل بالكامل.
+           * نشغل الفيديو صامت بدل ما يفشل،
+           * ثم ننتظر أي تفاعل من المستخدم/الريموت.
            */
           media.muted = true;
           media.defaultMuted = true;
@@ -393,10 +447,6 @@
 
           await media.play();
 
-          /*
-           * أول OK / Enter / Click / Touch
-           * يفتح الصوت.
-           */
           armSoundUnlock(media);
         }
       }
@@ -461,8 +511,8 @@
     }
 
     /*
-     * Samsung TV:
-     * ممنوع preload لفيديو داخل عنصر VIDEO منفصل.
+     * لا نعمل preload لفيديو Samsung
+     * داخل عنصر VIDEO منفصل.
      */
     if (video(row)) {
       return;
@@ -488,6 +538,7 @@
       if (!stalledAt) {
         stalledAt = Date.now();
       }
+
     } else {
       stalledAt = 0;
     }
@@ -500,6 +551,7 @@
       )
     ) {
       playbackFailure?.();
+
       return null;
     }
 

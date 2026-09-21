@@ -4,14 +4,17 @@
   let pendingVideo = null;
   const retired = new Set();
   let audioEnabled = false;
-  const manualAudio = new WeakSet();
+  // A playlist creates a new VIDEO node each cycle. Remember the user's choice
+  // by media record for this page session, not by the discarded DOM element.
+  const manualAudio = new Set();
+  const audioKey = row => String(row?.id ?? row?.image_url ?? '');
   function enableVideoAudio(media) {
     if(media!==active||media.paused||media.ended||media.currentTime<=0)return;
     media.volume=1;media.muted=false;
     // Unmute an already-playing decoder; never start audible playback or reload it.
     setTimeout(()=>{
       if(active===media&&media.paused&&!media.ended&&!media.muted){
-        audioEnabled=false;manualAudio.delete(media);media.muted=true;
+        audioEnabled=false;manualAudio.delete(audioKey(activeRow));media.muted=true;
         play(media,false).catch(()=>{});requestAudioUnlock();
       }
     },150);
@@ -31,7 +34,7 @@
     button.addEventListener('click', () => {
       // Unlock the current video's audio and the alarm in this same trusted gesture.
       audioEnabled=true;
-      if(active?.tagName==='VIDEO'){manualAudio.add(active);enableVideoAudio(active);}
+      if(active?.tagName==='VIDEO'){manualAudio.add(audioKey(activeRow));enableVideoAudio(active);}
       const attempt=root.CITLTVAudio?.test();
       Promise.resolve(attempt).then(()=>audioLabel(button,'اختبار الصوت مرة أخرى')).catch(()=>audioLabel(button,'تعذر الصوت — اضغط للمحاولة'));
     });
@@ -49,11 +52,11 @@
   }
   function updateSettings(row) {
     if (!row || !active) return;
-    if(activeRow?.play_sound!==row.play_sound&&!row.play_sound)manualAudio.delete(active);
+    if(activeRow?.play_sound!==row.play_sound&&!row.play_sound)manualAudio.delete(audioKey(activeRow));
     activeRow = {...row};
     active.style.objectFit = active.tagName==='VIDEO' ? (active.dataset.videoPlane==='native'?'fill':'cover') : row.fit_mode === 'contain' ? 'contain' : 'cover';
     if (active.tagName === 'VIDEO') {
-      if(!row.play_sound&&!manualAudio.has(active))active.muted=true;
+      if(!row.play_sound&&!manualAudio.has(audioKey(activeRow)))active.muted=true;
       else if(audioEnabled)enableVideoAudio(active);
       else requestAudioUnlock();
     }
@@ -140,7 +143,7 @@
         const afterPlaying=()=>{
           if(media!==active||media.currentTime<=0||media.paused)return;
           media.removeEventListener('timeupdate',afterPlaying);
-          if(audioEnabled&&(activeRow.play_sound||manualAudio.has(media)))enableVideoAudio(media);
+          if(audioEnabled&&(activeRow.play_sound||manualAudio.has(audioKey(activeRow))))enableVideoAudio(media);
         };
         media.addEventListener('timeupdate',afterPlaying);afterPlaying();
       }

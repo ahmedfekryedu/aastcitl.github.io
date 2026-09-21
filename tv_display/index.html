@@ -1170,7 +1170,7 @@ body.tv-display-page .schedule-instructor {
 <link rel="stylesheet" href="/assets/tv-study.css?v=20260921-r6.5">
 <script src="/assets/read-timeout.js?v=20260921-r6.5"></script><script src="/assets/study-model.js?v=20260921-r6.5"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20260921-r6.5"></script><script src="/assets/tv-audio.js?v=20260921-r6.5"></script>
-<script src="/assets/tv-room-catalog.js?v=20260921-r6.5"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-media-player.js?v=20260921-r6.5"></script><script src="/assets/tv-study.js?v=20260921-r6.5"></script>
+<script src="/assets/tv-room-catalog.js?v=20260921-r6.5.2"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-media-player.js?v=20260921-r6.5.2"></script><script src="/assets/tv-study.js?v=20260921-r6.5"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5">
 <script src="/assets/news-ticker.js?v=20260921-r6.5"></script>
@@ -1256,7 +1256,7 @@ body.tv-display-page .schedule-instructor {
                 <p class="text-gray-600 mb-4 text-sm font-bold">حدد القاعات التي تريد أن تظهر في شاشة العرض الدوارة:</p>
                 
                 <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-4"><input type="checkbox" id="tv-follow-admin" onchange="if(this.checked)renderSettingsGrid(CITLTVRooms.select(MASTER_ROOMS_LIST,configuredRoomSelection));"> اتباع اختيار القاعات من لوحة التحكم</label>
-                <p id="tv-room-status" class="text-xs text-gray-500 mb-4">اختيار القاعات هنا يخص هذه الشاشة. القاعات مأخوذة من الجداول الحالية وتتحدث عند استبدالها.</p>
+                <p id="tv-room-status" class="text-xs text-gray-500 mb-4">تعرض TV محاضرات اليوم التي لم تنتهِ للقاعات المحددة فقط؛ صفحة الجداول تعرض بقية أيام الأسبوع أيضًا. اختيار هذه الشاشة مستقل ما لم تفعّل اتباع لوحة التحكم.</p>
                 <div class="flex gap-3 mb-6">
                     <button onclick="toggleAll(true)" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-200 transition-colors">تحديد الكل</button>
                     <button onclick="toggleAll(false)" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-300 transition-colors">إلغاء التحديد</button>
@@ -1268,7 +1268,7 @@ body.tv-display-page .schedule-instructor {
 
             <div class="p-5 bg-white border-t border-gray-200 flex justify-end gap-3">
                 <button onclick="closeSettings()" class="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-gray-50">إلغاء</button>
-                <button onclick="saveSettings()" class="px-8 py-2.5 bg-[#2A3475] text-white rounded-xl font-bold hover:bg-blue-900 shadow-lg transform active:scale-95 transition-all">حفظ وتشغيل</button>
+                <button id="tv-rooms-save" onclick="saveSettings()" class="px-8 py-2.5 bg-[#2A3475] text-white rounded-xl font-bold hover:bg-blue-900 shadow-lg transform active:scale-95 transition-all">حفظ وتشغيل</button>
             </div>
         </div>
     </div>
@@ -1621,20 +1621,34 @@ function tvIsLectureStillVisible(item) {
             });
         }
 
+        let roomCatalogReady=false, roomSettingsRequest=0;
         async function openSettings() {
+            const request=++roomSettingsRequest;
+            roomCatalogReady=false;document.getElementById('tv-rooms-save').disabled=true;
             document.getElementById('settings-modal').classList.add('show');
             document.getElementById('tv-follow-admin').checked = !Array.isArray(localRoomSelection);
-            renderSettingsGrid();
-            document.getElementById('tv-room-status').textContent='اختيار القاعات هنا يخص هذه الشاشة. القاعات مأخوذة من الجداول الحالية وتتحدث عند استبدالها.';
-            try { acceptRoomCatalog(await window.CITLTVRooms.load(supabase)); }
-            catch(_) { document.getElementById('tv-room-status').textContent='تعذر تحديث القاعات الآن؛ آخر قائمة متاحة ما زالت معروضة.'; }
+            document.getElementById('rooms-selection-grid').innerHTML='<p class="text-sm text-gray-500 col-span-full">جاري تحميل القاعات من الجدول الحالي…</p>';
+            document.getElementById('tv-room-status').textContent='نعرض محاضرات اليوم التي لم تنتهِ للقاعات المحددة فقط.';
+            try {
+                const names=await window.CITLTVRooms.load(supabase);
+                if(request!==roomSettingsRequest)return;
+                acceptRoomCatalog(names);renderSettingsGrid();roomCatalogReady=true;
+                document.getElementById('tv-rooms-save').disabled=false;
+                document.getElementById('tv-room-status').textContent=`تمت المزامنة: ${names.length} قاعات في الجدول الحالي. اختيار هذه الشاشة مستقل ما لم تفعّل اتباع لوحة التحكم.`;
+            } catch(_) {
+                if(request!==roomSettingsRequest)return;
+                renderSettingsGrid();
+                document.getElementById('tv-room-status').textContent='تعذر تحديث القاعات؛ المعروض آخر قائمة محفوظة. أعد فتح القائمة عند عودة الاتصال قبل الحفظ.';
+            }
         }
 
         function closeSettings() {
+            roomSettingsRequest++;
             document.getElementById('settings-modal').classList.remove('show');
         }
 
         async function saveSettings() {
+            if(!roomCatalogReady)return;
             // This public TV client has no admin session. Keep per-screen choices local.
             if(document.getElementById('tv-follow-admin').checked){
                 localRoomSelection=undefined;localStorage.removeItem('citl-tv-local-rooms');

@@ -623,7 +623,15 @@ window.prepareExistingTvVideo = async function(id) {
         if (url.protocol !== 'https:' || !['media.aastcitl.me','xgqukdbonzukxrpjovmb.supabase.co'].includes(url.hostname))
             throw new Error('مصدر الفيديو غير مدعوم للتجهيز المباشر؛ اختر الملف من زر التعديل.');
         timeout = setTimeout(() => controller.abort(), 5 * 60 * 1000);
-        const response = await fetch(url.href, {signal:controller.signal, credentials:'omit'});
+        // A video playback response may be cached without CORS headers. Reading bytes
+        // for conversion needs a fresh CORS response; bucket GET permission is still required.
+        if (url.hostname === 'media.aastcitl.me') url.searchParams.set('citl_prepare', Date.now() + '-' + Math.random().toString(36).slice(2));
+        let response;
+        try { response = await fetch(url.href, {signal:controller.signal, credentials:'omit', cache:'no-store'}); }
+        catch (error) {
+            if (controller.signal.aborted) throw error;
+            throw new Error('تعذر قراءة الفيديو من التخزين. راجع سماح GET وHEAD في CORS الخاص بـsmrm-tv-media والاتصال؛ الفيديو السابق لم يتغير.');
+        }
         if (!response.ok) throw new Error('تعذر قراءة الفيديو الموجود؛ لم يتغير الإعلان.');
         const limit = 500 * 1024 * 1024;
         if (Number(response.headers.get('content-length')) > limit) throw new Error('الفيديو أكبر من 500 ميجابايت.');

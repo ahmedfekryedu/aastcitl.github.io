@@ -487,6 +487,7 @@ async function loadTvPosterAdminData() {
             const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
             const statusChecked = p.is_active ? 'checked' : '';
             const fitText = p.fit_mode === 'contain' ? 'احتواء كامل' : 'ملء الشاشة';
+            const isVideo = p.media_type === 'video' || /\.mp4(?:\?|$)/i.test(p.image_url || '');
             
             return `
                 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
@@ -512,6 +513,9 @@ async function loadTvPosterAdminData() {
                         </div>
                     </div>
                     
+                ${isVideo ? (p.video_layout === 'native-cw'
+                    ? '<p class="text-[10px] font-bold text-green-700 mt-2">اتجاه الفيديو مجهّز للشاشة</p>'
+                    : `<button type="button" onclick="prepareExistingTvVideo('${p.id}')" class="text-xs font-bold text-[#2A3475] bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg px-3 py-2 mt-2" data-prepare-tv-video="${p.id}"><i class="fas fa-rotate-right ml-1"></i> تجهيز اتجاه الفيديو لـSamsung</button>`) : ''}
                 <div class="flex items-center justify-between border-t border-gray-100 pt-2.5 mt-3">
                                         <label class="flex items-center gap-2 cursor-pointer">
                                             <input type="checkbox" onchange="togglePosterActiveState('${p.id}', this.checked)" ${statusChecked} class="w-3.5 h-3.5 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer">
@@ -585,6 +589,64 @@ window.editTvPoster = function(id) {
 // Shared R2 upload/replace flow used by both administration pages.
 const posterForm = document.getElementById('poster-upload-form');
 let mediaFormBusy = false;
+// Prepare an existing file through the same verified upload/replacement pipeline.
+// Never mark the database row as rotated without actually rotating its pixels.
+window.prepareExistingTvVideo = async function(id) {
+    if (mediaFormBusy) return;
+    const old = (window.adminLoadedPosters || []).find(p => String(p.id) === String(id));
+    if (!old || old.video_layout === 'native-cw') return;
+    if (!(old.media_type === 'video' || /\.mp4(?:\?|$)/i.test(old.image_url || ''))) return;
+    mediaFormBusy = true;
+    const submit = posterForm?.querySelector('button[type="submit"]');
+    if (submit) submit.disabled = true;
+    const heading = document.querySelector('#global-loader h3'), previousHeading = heading?.textContent;
+    if (heading) heading.textContent = 'جاري تجهيز فيديو Samsung';
+    const controller = new AbortController();
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.textContent = 'إلغاء التجهيز';
+    cancel.style.cssText = 'margin-top:14px;color:#2A3475;font-weight:700;font-size:13px';
+    cancel.onclick = () => { cancel.disabled = true; controller.abort(); };
+    const progress = document.createElement('progress'); progress.max = 100;
+    progress.setAttribute('aria-label', 'تقدم تجهيز الفيديو');
+    progress.style.cssText = 'display:block;width:100%;height:8px;accent-color:#F3A628;margin-top:16px';
+    const stage = (text, phase) => {
+        const label = document.getElementById('loader-text'); if (label) label.textContent = text;
+        cancel.hidden = phase !== 'prepare' && phase !== 'download';
+    };
+    const preventLeave = event => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', preventLeave);
+    let timeout;
+    showLoader('جاري قراءة ملف الفيديو الموجود…');
+    document.getElementById('loader-text')?.after(progress); progress.after(cancel);
+    try {
+        const url = new URL(old.image_url);
+        if (url.protocol !== 'https:' || !['media.aastcitl.me','xgqukdbonzukxrpjovmb.supabase.co'].includes(url.hostname))
+            throw new Error('مصدر الفيديو غير مدعوم للتجهيز المباشر؛ اختر الملف من زر التعديل.');
+        timeout = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+        const response = await fetch(url.href, {signal:controller.signal, credentials:'omit'});
+        if (!response.ok) throw new Error('تعذر قراءة الفيديو الموجود؛ لم يتغير الإعلان.');
+        const limit = 500 * 1024 * 1024;
+        if (Number(response.headers.get('content-length')) > limit) throw new Error('الفيديو أكبر من 500 ميجابايت.');
+        const blob = await response.blob(); clearTimeout(timeout);
+        if (!blob.size || blob.size > limit) throw new Error('حجم الفيديو غير مناسب؛ لم يتغير الإعلان.');
+        if (controller.signal.aborted) throw new Error('تم إلغاء تجهيز الفيديو.');
+        const file = new File([blob], old.original_filename || 'video.mp4', {type:'video/mp4'});
+        const result = await window.CITLMediaStorage.save(supabase, {
+            old, metadata:{}, file, signal:controller.signal, stage,
+            progress:percent => { progress.value = percent; stage(`جاري رفع الفيديو المجهز: ${percent}%`); }
+        });
+        notifyTvMediaUpdate();
+        showNotification(result.warning || 'تم تجهيز اتجاه الفيديو؛ ستستقبل الشاشة النسخة الجديدة تلقائيًا.', result.warning ? 'info' : 'success');
+    } catch (error) {
+        showNotification(controller.signal.aborted ? 'توقف التجهيز؛ الفيديو السابق محفوظ.' : (error.message || 'تعذر تجهيز الفيديو؛ الفيديو السابق محفوظ.'), 'error');
+    } finally {
+        clearTimeout(timeout); progress.remove(); cancel.remove(); hideLoader();
+        window.removeEventListener('beforeunload', preventLeave);
+        if (heading) heading.textContent = previousHeading;
+        mediaFormBusy = false; if (submit) submit.disabled = false;
+        await loadTvPosterAdminData();
+    }
+};
 if (posterForm) posterForm.addEventListener('submit', async e => {
     e.preventDefault();
     if (mediaFormBusy) return;

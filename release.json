@@ -1,5 +1,0 @@
-{
-  "release": "20260921-r6.1",
-  "built_at": "2026-09-21",
-  "description": "Schedule clear scoped to reviewed IDs; safe pause refresh; confirmed single-archive deletion."
-}

@@ -1282,18 +1282,12 @@ function amRoomLectureRows(roomName) {
 }
 
 function amPrintQrCards(cards) {
-    if (!cards?.length) return;
+    const images = (cards || []).map(card => card.querySelector('canvas')?.toDataURL('image/png')).filter(Boolean);
+    if (!images.length) return;
     const popup = window.open('', '_blank', 'width=900,height=900');
     if (!popup) return amSetStatus('اسمح بفتح نافذة الطباعة من المتصفح', 'error');
-    const escape = window.CITLSecure?.htmlEscape || (value => String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character])));
-    const sheets = cards.map(card => {
-        const roomName = card.dataset.qrRoom || card.querySelector('h5')?.textContent || 'القاعة';
-        const qrImage = card.querySelector('canvas')?.toDataURL('image/png') || '';
-        const lectures = amRoomLectureRows(roomName);
-        const lectureRows = lectures.length ? lectures.map(item => `<tr><td>${escape(item.day)}</td><td>${escape(item.time)}</td><td>${escape(item.course)}</td></tr>`).join('') : '<tr><td colspan="3">لا توجد مواعيد ظاهرة لهذه القاعة في الجدول الحالي</td></tr>';
-        return `<section class="sheet"><main class="print-card"><div class="room-heading"><span>رمز تسجيل الحضور</span><h1>${escape(roomName)}</h1></div><div class="qr-frame"><img class="qr" src="${qrImage}" alt="QR ${escape(roomName)}"></div><p class="scan-hint">امسح الرمز بالكاميرا لتسجيل الحضور</p><div class="faculty-note">خاص بأعضاء هيئة التدريس فقط</div><div class="schedule"><h2>مواعيد المحاضرات المسجلة في القاعة</h2><table><thead><tr><th>اليوم</th><th>الموعد</th><th>المادة</th></tr></thead><tbody>${lectureRows}</tbody></table></div></main></section>`;
-    }).join('');
-    popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>QR القاعات</title><style>@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;font-family:Cairo,Arial,sans-serif;color:#111}.sheet{width:100%;page-break-after:always;break-after:page}.sheet:last-child{page-break-after:auto;break-after:auto}.print-card{width:100%;max-width:175mm;margin:0 auto;border:2px solid #111;border-radius:4mm;padding:7mm 9mm;text-align:center;background:#fff}.room-heading span{display:block;font-size:10px;font-weight:900;letter-spacing:.3px}.room-heading h1{font-size:30px;line-height:1.3;margin:1mm 0 3mm;font-weight:900}.qr-frame{width:102mm;height:102mm;margin:0 auto 2mm;padding:2.5mm;border:1.2mm solid #111;border-radius:3mm;background:#fff}.qr{display:block;width:100%;height:100%;object-fit:contain;filter:grayscale(1)}.scan-hint{margin:0 0 2.5mm;font-size:10px;font-weight:700}.faculty-note{margin:0 auto 5mm;padding:2.5mm 5mm;border:1.5px solid #111;border-radius:2mm;font-size:11px;font-weight:900}.schedule{border:1.5px solid #111;border-radius:2.5mm;overflow:hidden;text-align:right}.schedule h2{margin:0;padding:2.3mm 4mm;border-bottom:1.5px solid #111;font-size:11px;text-align:center;font-weight:900}table{width:100%;border-collapse:collapse;font-size:8.5px}th,td{padding:1.7mm 2.5mm;border-bottom:1px solid #bbb;text-align:right}th{font-weight:900;border-bottom:1.5px solid #111}tbody tr:last-child td{border-bottom:0}@media screen{body{background:#eee}.sheet{padding:10mm 0}.print-card{box-shadow:0 5mm 14mm rgba(0,0,0,.12)}}@media print{.print-card{box-shadow:none}}</style><link rel="stylesheet" href="/assets/fonts.css"></head><body>${sheets}<script>onload=()=>setTimeout(()=>print(),700)<\/script></body></html>`);
+    const sheets = images.map(src => `<section class="sheet"><img class="qr" src="${src}" alt="QR"></section>`).join('');
+    popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title></title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff}.sheet{width:210mm;height:296mm;display:flex;align-items:center;justify-content:center;page-break-after:always;break-after:page}.sheet:last-child{page-break-after:auto;break-after:auto}.qr{display:block;width:140mm;height:140mm;max-width:100%;object-fit:contain;border:0;border-radius:0;box-shadow:none}</style></head><body>${sheets}<script>onload=()=>print()<\/script></body></html>`);
     popup.document.close();
 }
 
@@ -1304,11 +1298,11 @@ async function amRenderGeneratedQrCodes(generated, replaceRooms = false) {
         [...list.querySelectorAll('article')].filter(card => card.dataset.qrRoom === qr.room_name).forEach(card => card.remove());
         const card = document.createElement('article'); card.dataset.qrRoom = qr.room_name; card.className = 'rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm';
         const title = document.createElement('h5'); title.className = 'font-black text-[#2A3475] mb-2'; title.textContent = qr.room_name;
-        const canvas = document.createElement('canvas'); canvas.className = 'block mx-auto max-w-full h-auto';
-        const hint = document.createElement('p'); hint.className = 'text-[10px] text-gray-500 font-bold mt-2'; hint.textContent = 'يطبع الرمز منفردًا مع بيانات القاعة ومواعيد محاضراتها';
+        const canvas = document.createElement('canvas'); canvas.className = 'block mx-auto max-w-full h-auto'; canvas.style.width = '220px';
+        const hint = document.createElement('p'); hint.className = 'text-[10px] text-gray-500 font-bold mt-2'; hint.textContent = 'تطبع الورقة برمز QR فقط، بدون إطار أو بيانات إضافية';
         const printButton = document.createElement('button'); printButton.type = 'button'; printButton.className = 'mt-3 w-full px-3 py-2 rounded-lg bg-[#2A3475] text-white text-xs font-black'; printButton.innerHTML = '<i class="fas fa-print ml-1"></i>طباعة هذا الرمز A4'; printButton.addEventListener('click', () => amPrintQrCards([card]));
         card.append(title, canvas, hint, printButton); list.appendChild(card);
-        await window.QRCode.toCanvas(canvas, qr.url, { width: 220, margin: 2, errorCorrectionLevel: 'H' });
+        await window.QRCode.toCanvas(canvas, qr.url, { width: 1024, margin: 4, errorCorrectionLevel: 'H' });
     }
     const activeRooms = (attendanceManagement.state.rooms || []).filter(qr => qr.is_active && qr.term_id === (document.getElementById('am-qr-term')?.value || amDefaultTermId()));
     const missing = activeRooms.filter(qr => ![...list.querySelectorAll('article')].some(card => card.dataset.qrRoom === qr.room_name));

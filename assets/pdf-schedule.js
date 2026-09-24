@@ -9,7 +9,7 @@
   const payload=await Promise.all(files.map(async f=>({name:f.name,bytes:await f.arrayBuffer()})));
   if(signal?.aborted)throw new DOMException('تم الإلغاء','AbortError');
   return new Promise((resolve,reject)=>{
-   const worker=new Worker('/assets/pdf-schedule-worker.js?v=20260921-r6.5');
+   const worker=new Worker('/assets/pdf-schedule-worker.js?v=20260924-r6.6.1');
    const finish=(error,result)=>{clearTimeout(timer);signal?.removeEventListener('abort',cancel);worker.terminate();error?reject(error):resolve(result);};
    const cancel=()=>finish(new DOMException('تم إلغاء التحويل؛ لم يُرفع الجدول','AbortError'));
    const timer=setTimeout(()=>finish(Error('انتهت مهلة التحويل. جرّب البرنامج المكتبي لهذا الملف.')),10*60*1000);

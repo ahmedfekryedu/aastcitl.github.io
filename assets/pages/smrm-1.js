@@ -1127,6 +1127,13 @@ const meetingData = {
         hideLoader();
         Object.assign(meetingData, await window.CITLAcademicBooking.check(supabase,meetingData,currentUser));
         showLoader('جاري حفظ الحجز…');
+        const occurrences=meetingId?[meetingData]:window.CITLWeeklyBooking.expand(meetingData);
+        for(const occurrence of occurrences.slice(1)){
+            hideLoader();
+            Object.assign(occurrence,await window.CITLAcademicBooking.check(supabase,occurrence,currentUser,message=>showConfirmDialog('الحجز بتاريخ '+occurrence.date+' من '+occurrence.start_time+' إلى '+occurrence.end_time+'\n'+message)));
+            showLoader('جاري مراجعة المواعيد الأسبوعية…');
+            if(checkConflicts(occurrence,null))throw new Error('يوجد تعارض في موعد '+occurrence.date);
+        }
         const conflict = checkConflicts(meetingData, meetingId);
         if (conflict) throw new Error('Conflict');
 
@@ -1204,12 +1211,7 @@ const meetingData = {
         // === السيناريو 2: حجز جديد ===
         else {
             const status = window.CITLPermissions.can(currentUser, 'can_approve') ? 'confirmed' : 'pending';
-            const { error } = await supabase.from('meetings').insert([{
-                ...meetingData,
-                status: status
-            }]);
-
-            if (error) throw error;
+            await window.CITLWeeklyBooking.save(supabase,occurrences.map(row=>({...row,status})));
 
             if (status === 'pending') {
                 // جلب اسم الجهة المحجوز لها + اسم قسم مقدم الطلب
@@ -1222,7 +1224,7 @@ const meetingData = {
                 <strong>عنوان الاجتماع:</strong> ${titleVal}
                 <strong>الجهة الحاجزة:</strong> ${bookingDeptName}
                 <strong>مقدم الطلب:</strong> ${currentUser.full_name} (${userDeptName})
-                <strong>الموعد المطلوب:</strong> ${dateVal}
+                <strong>المواعيد المطلوبة:</strong> ${occurrences.map(row=>row.date+' ('+row.start_time+'–'+row.end_time+')').join('، ')}
                 <strong>التوقيت:</strong> من ${timeVal} إلى ${endTimeVal}
                 
                 <strong>يرجى التفضل بالدخول للنظام لاتخاذ الإجراء المناسب.</strong>`;
@@ -1230,7 +1232,7 @@ const meetingData = {
                 await notifyAllManagers("تنبيه: طلب حجز جديد", msgBody);
             }
 
-            showNotification('تم إرسال طلب الحجز بنجاح');
+            showNotification(occurrences.length>1?'تم حفظ '+occurrences.length+' مواعيد أسبوعية بنجاح':'تم إرسال طلب الحجز بنجاح');
         }
 
         await loadMeetings();

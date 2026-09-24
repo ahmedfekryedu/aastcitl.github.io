@@ -5,7 +5,7 @@
   let lastMarkup='',qrImage=null;
   const storage={get(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch(_){return null;}},set(key,v){try{localStorage.setItem(key,JSON.stringify(v));}catch(_){}}};
   const clamp=(v,lo,hi,fallback)=>Number.isFinite(Number(v))?Math.min(hi,Math.max(lo,Number(v))):fallback;
-  function configure(value){config={enabled:value?.studyEnhancedDisplayEnabled!==false,rows:clamp(value?.studyRowsPerPage,2,5,4),every:clamp(value?.studySlidesPerPoster,1,6,2),mode:value?.studyRotationMode==='grouped'?'grouped':'interleaved',adaptive:value?.studyAdaptiveDuration!==false};}
+  function configure(value){config={roomWindows:value?.studyRoomWindows||{},enabled:value?.studyEnhancedDisplayEnabled!==false,rows:clamp(value?.studyRowsPerPage,2,5,4),every:clamp(value?.studySlidesPerPoster,1,6,2),mode:value?.studyRotationMode==='grouped'?'grouped':'interleaved',adaptive:value?.studyAdaptiveDuration!==false};}
   function accept(result,date){
     if(!result.error&&Array.isArray(result.data)){lastGood={date,at:Date.now(),rows:result.data};stale=false;storage.set(cacheKey,lastGood);return result.data;}
     stale=true;const cached=lastGood?.date===date?lastGood:storage.get(cacheKey);
@@ -20,6 +20,8 @@
   function capacity(){const h=document.getElementById('content-container')?.clientHeight||1100;return Math.min(config.enabled?(config.rows||4):5,Math.max(2,Math.floor((h-330)/125)));}
   function build(rooms,data,posters){
     const now=M.cairo(),limit=capacity(),pages=[];
+    posters=posters.filter(p=>root.CITLDisplayDates.allows(p,now.date));
+    rooms=rooms.filter(room=>root.CITLDisplayDates.allows(config.roomWindows?.[room],now.date));
     for(const room of rooms){
       const rows=(data[room]||[]).filter(r=>M.day(r)===now.day&&M.runsOn(r,now.date)&&M.state(r,now)!=='ended').sort(M.compare);
       const box=document.getElementById('content-container');
@@ -33,7 +35,7 @@
       pages.push({kind:'study-end',key:'study-day-status',ended});
     }
     posterTotal=posters.length;
-    const ads=posters.map((poster,i)=>({kind:'poster',key:`poster:${poster.id??i}`,poster,index:i}));
+    const ads=posters.map((poster,i)=>({kind:'poster',key:`poster:${poster.id??i}`,poster,index:i,total:posters.length}));
     if(!pages.length){playlist=ads;}
     else if(!config.enabled||config.mode==='grouped'||!ads.length){playlist=[...pages,...ads];}
     else{

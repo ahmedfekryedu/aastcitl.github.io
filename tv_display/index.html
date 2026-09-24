@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta name="citl-release" content="20260921-r6.5">
+<meta name="citl-release" content="20260924-r6.6.1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
@@ -1170,7 +1170,7 @@ body.tv-display-page .schedule-instructor {
 <link rel="stylesheet" href="/assets/tv-study.css?v=20260921-r6.5">
 <script src="/assets/read-timeout.js?v=20260921-r6.5"></script><script src="/assets/study-model.js?v=20260921-r6.5"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20260921-r6.5"></script><script src="/assets/tv-audio.js?v=20260921-r6.5"></script>
-<script src="/assets/tv-room-catalog.js?v=20260921-r6.5.2"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-media-player.js?v=20260921-r6.5.2"></script><script src="/assets/tv-study.js?v=20260921-r6.5"></script>
+<script src="/assets/tv-display-dates.js?v=20260923-r6.6"></script><script src="/assets/tv-room-catalog.js?v=20260921-r6.5.2"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-media-player.js?v=20260921-r6.5.2"></script><script src="/assets/tv-study.js?v=20260923-r6.6"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5">
 <script src="/assets/news-ticker.js?v=20260921-r6.5"></script>
@@ -1397,6 +1397,7 @@ function applyTvDisplayConfig(config) {
         tvExamsEnabled = safeConfig.examsEnabled;
     }
     window.tvTestExamDate = safeConfig.testExamDate || '';
+    window.tvExamDisplayWindow=safeConfig.examDisplayWindow||{};
     
     // 🔥 استقبال توقيت الامتحانات المستقل (15 ثانية افتراضياً لو مش موجود)
     const examSeconds = clampTvSeconds(safeConfig.examSlideDurationSeconds || 15);
@@ -1683,7 +1684,7 @@ async function fetchData() {
     
     // سحب الامتحانات
     let examsQuery = null;
-    if (tvExamsEnabled) {
+    if (tvExamsEnabled && CITLDisplayDates.allows(window.tvExamDisplayWindow,studyDay.date)) {
         examsQuery = supabase.from('exam_schedule').select('*').eq('exam_date', todayStr).order('start_time');
     }
 
@@ -1892,7 +1893,7 @@ function renderMasterSlide(index, preserveMedia = false) {
         if (poster && renderedPosterSignature === posterSignature(poster)) {
             window.CITLTVMedia.updateSettings(poster);
             const title=document.querySelector('.poster-slide h2');if(title)title.textContent=poster.title||'إعلان مهم';
-            const counter=document.querySelector('.poster-slide .slide-counter strong');if(counter)counter.textContent=`${page.index+1} / ${tvPosters.length}`;
+            const counter=document.querySelector('.poster-slide .slide-counter strong');if(counter)counter.textContent=`${page.index+1} / ${page.total||tvPosters.length}`;
             if(!window.CITLTVMedia.video(poster))currentSlideDurationMs=(poster.duration||posterDurationMs/1000)*1000;
             if(!poster.play_sound){posterAlarm.pause();posterAlarm.currentTime=0;}
             else if(!displayedPoster?.play_sound&&!window.CITLTVMedia.video(poster))playPosterAlarm();

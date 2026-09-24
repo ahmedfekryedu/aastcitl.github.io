@@ -1,4 +1,4 @@
-const RELEASE = '20260921-r6.5';
+const RELEASE = '20260924-r6.6.1';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
@@ -25,6 +25,7 @@ const ASSETS_TO_CACHE = [
   '/tv_display/',
   '/assets/study-model.js',
   '/assets/tv-study.js',
+  '/assets/tv-display-dates.js',
   '/assets/tv-media-player.js',
   '/assets/video-layout.js',
   '/assets/tv-room-catalog.js',

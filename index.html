@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta name="citl-release" content="20260921-r6.5">
+<meta name="citl-release" content="20260924-r6.6.1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
-    <meta name="description" content="CITL Smart System">
+    <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
+    <meta name="description" content="CITL Smart System — التحكم وإدارة الجداول الدراسية والقاعات، تنظيم الحجوزات، متابعة الحضور والانصراف، وإدارة شاشات الإعلانات.">
+    <link rel="canonical" href="https://aastcitl.me/">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "CITL Smart System", "url": "https://aastcitl.me/", "inLanguage": "ar"}</script>
     <meta name="keywords" content="CITL, كلية النقل الدولي واللوجستيات, ادارة القاعات, جداول المحاضرات,الأكاديمية العربية">
     <meta name="language" content="Arabic">
     <meta name="theme-color" content="#2A3475">
-    <meta property="og:title" content="كلية النقل الدولي واللوجستيات">
-    <meta property="og:description" content="CITL Smart System">
+    <meta property="og:title" content="CITL Smart System | كلية النقل الدولي واللوجستيات">
+    <meta property="og:description" content="CITL Smart System — التحكم وإدارة الجداول الدراسية والقاعات، تنظيم الحجوزات، متابعة الحضور والانصراف، وإدارة شاشات الإعلانات.">
     <meta property="og:image" content="https://aastcitl.me/CITL_Banner.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -274,8 +276,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11"
-                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);"
+                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm text-left dir-ltr">
             </div>
 
@@ -325,7 +326,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">المسمى الوظيفي</label>
-                <input type="text" id="reg-position" required placeholder="مثال: معيد" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+                <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق تعليمي" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
             </div>
             <div class="md:col-span-1">
     <label class="block text-xs font-bold text-gray-700 mb-1">نوع الحساب</label>
@@ -633,6 +634,7 @@ function normalizeFacultyName(value) {
 }
 
 let signupFacultyNames = [];
+let signupFacultyRequest = 0;
 let signupFacultyDirectoryByName = new Map();
 
 async function loadSignupFacultyDirectoryMap() {
@@ -661,13 +663,17 @@ async function loadSignupFacultyDirectoryMap() {
 }
 
 async function loadSignupFacultyNames() {
+    const request=++signupFacultyRequest;
     try {
-        const { data, error } = await supabase
-            .from('academic_schedule')
-            .select('instructor');
-
-        if (error) throw error;
-
+        const data=[];
+        for(let offset=0;;offset+=500){
+            const result=await supabase.from('academic_schedule').select('id,instructor').order('id').range(offset,offset+499);
+            if(result.error)throw result.error;
+            data.push(...(result.data||[]));if(!result.data||result.data.length<500)break;
+        }
+        if(request!==signupFacultyRequest)return;
+        const selected=document.getElementById('reg-linked-instructor')?.value||'';
+        const escapeName=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         signupFacultyNames = [...new Set(
             (data || [])
                 .map(x => normalizeFacultyName(x.instructor))
@@ -683,8 +689,8 @@ async function loadSignupFacultyNames() {
                 .map(name => `
                     <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50"
                         data-target="reg-linked-instructor"
-                        data-value="${name.replace(/"/g, '&quot;')}">
-                        ${name}
+                        data-value="${escapeName(name)}">
+                        ${escapeName(name)}
                     </li>
                 `)
                 .join('');
@@ -694,10 +700,14 @@ async function loadSignupFacultyNames() {
             hiddenSelect.innerHTML =
                 `<option value="">اختر اسمك الأكاديمي</option>` +
                 signupFacultyNames
-                    .map(name => `<option value="${name.replace(/"/g, '&quot;')}">${name}</option>`)
+                    .map(name => `<option value="${escapeName(name)}">${escapeName(name)}</option>`)
                     .join('');
         }
+        if(hiddenSelect)hiddenSelect.value=signupFacultyNames.includes(selected)?selected:'';
+        toggleFacultyLinkBlock();
     } catch (err) {
+        if(request!==signupFacultyRequest)return;
+        document.getElementById('reg-linked-instructor-label').textContent='تعذر تحميل الأسماء — أعد فتح القائمة';
         console.error('Failed to load academic_schedule names:', err);
         signupFacultyNames = [];
 
@@ -754,9 +764,11 @@ function toggleFacultyLinkBlock() {
 function bindAccountTypeWatcher() {
     const accountType = document.getElementById('reg-account-type');
     if (!accountType) return;
-    accountType.addEventListener('change', toggleFacultyLinkBlock);
+    accountType.addEventListener('change',()=>{toggleFacultyLinkBlock();if(accountType.value==='faculty')loadSignupFacultyNames();});
 }
 
+document.getElementById('faculty-link-display')?.addEventListener('click',()=>{if(document.getElementById('reg-account-type').value==='faculty')loadSignupFacultyNames();});
+window.addEventListener('storage',e=>{if(e.key==='citl-schedule-update')loadSignupFacultyNames();});
 function isValidAcademicName(name) {
     const clean = (name || '').trim();
     return signupFacultyNames.includes(clean);
@@ -1122,6 +1134,6 @@ window.addEventListener('appinstalled', () => {
     }
 });
     </script>
-<script src="/registration-secure.js?v=20260921-r6.5"></script>
+<script src="/registration-secure.js?v=20260923-r6.6"></script>
 </body>
 </html>

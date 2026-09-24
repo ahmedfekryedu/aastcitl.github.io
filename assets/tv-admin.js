@@ -9,6 +9,7 @@ let TV_MASTER_ROOMS_LIST = [];
 
 let tvActiveRooms = [...TV_MASTER_ROOMS_LIST];
 let tvConfigReady = false;
+let tvRoomWindows={},tvExamWindow={};
 let tvPosterConfigReady = false, tvPosterSaving = false, tvPosterSavedEnabled = true;
 function publishTvSetting(key, value) {
     const update = {key, value};
@@ -49,7 +50,7 @@ function renderTvRoomsGrid() {
 
     grid.innerHTML = TV_MASTER_ROOMS_LIST.length ? '' : '<p class="text-sm text-gray-500 col-span-full">لا توجد قاعات في الجداول الحالية.</p>';
 
-    TV_MASTER_ROOMS_LIST.forEach(room => {
+    TV_MASTER_ROOMS_LIST.forEach((room,index) => {
         const isChecked = tvActiveRooms.includes(room);
 
         const cardClass = isChecked
@@ -59,7 +60,7 @@ function renderTvRoomsGrid() {
         const iconHtml = isChecked ? '<i class="fas fa-check text-[10px]"></i>' : '';
 
         grid.innerHTML += `
-            <label class="cursor-pointer group relative">
+            <div class="min-w-0"><label class="cursor-pointer group relative">
                 <input type="checkbox"
                     class="tv-room-checkbox absolute opacity-0 w-0 h-0"
                     value="${window.CITLTVRooms.escape(room)}"
@@ -74,8 +75,10 @@ function renderTvRoomsGrid() {
                     </div>
                 </div>
             </label>
+            <details class="mt-2 text-xs" data-room-window="${window.CITLTVRooms.escape(room)}"><summary class="cursor-pointer text-[#2A3475]">فترة عرض ${window.CITLTVRooms.escape(room)} — اختياري</summary>${CITLDisplayDates.fields('tv-room-date-'+index,'فترة عرض جدول '+window.CITLTVRooms.escape(room))}</details></div>
         `;
     });
+    TV_MASTER_ROOMS_LIST.forEach((room,index)=>CITLDisplayDates.fill('tv-room-date-'+index,tvRoomWindows[room]||{}));
 }
 
 function toggleTvRoomsSelection(state) {
@@ -102,6 +105,9 @@ async function loadTvDisplayConfig() {
         if (error) throw error;
         
         const config = data && data.setting_value ? data.setting_value : null;
+        tvRoomWindows=config?.studyRoomWindows||{};tvExamWindow=config?.examDisplayWindow||{};
+        if(!document.getElementById('tv-exam-date-from'))document.getElementById('tv-rooms-selection-grid')?.insertAdjacentHTML('afterend',CITLDisplayDates.fields('tv-exam-date','فترة عرض جداول الامتحانات'));
+        CITLDisplayDates.fill('tv-exam-date',tvExamWindow);
         window.CITLStudySettings.populate(config || {});
         if (config) {
             const secondsInput = document.getElementById('tv-slide-seconds');
@@ -141,6 +147,9 @@ async function loadTvDisplayConfig() {
 
 async function saveTvDisplayConfig() {
     if (!tvConfigReady) { showNotification('انتظر تحميل إعدادات الشاشة أو أعد فتح التبويب قبل الحفظ', 'error'); return; }
+    let dateWindows={},examWindow;
+    try {TV_MASTER_ROOMS_LIST.forEach((room,i)=>dateWindows[room]=CITLDisplayDates.read('tv-room-date-'+i));examWindow=CITLDisplayDates.read('tv-exam-date');}
+    catch(error){showNotification(error.message,'error');return;}
     const checked = document.querySelectorAll('.tv-room-checkbox:checked');
     const selectedRooms = Array.from(checked).map(cb => cb.value);
     
@@ -163,6 +172,7 @@ async function saveTvDisplayConfig() {
         ...window.CITLStudySettings.values(),
         updatedAt: Date.now(),
         activeRooms: selectedRooms,
+        studyRoomWindows:dateWindows,examDisplayWindow:examWindow,
         slideDurationSeconds: clampTvSeconds(seconds),
         studyEnabled: selectedRooms.length > 0, // Compatibility field; selected rooms are the only on/off control.
         examsEnabled: examsEnabled,
@@ -544,6 +554,7 @@ async function loadTvPosterAdminData() {
 // دالة تفريغ وإعادة الفورم لوضع الإضافة الجديد
 window.resetPosterForm = function() {
     document.getElementById('poster-upload-form').reset();
+    CITLDisplayDates.fill('poster-display',{});
     document.getElementById('poster-edit-id').value = '';
     updatePosterDurationControl();
     document.getElementById('poster-file-input').setAttribute('required', 'true');
@@ -562,6 +573,7 @@ window.editTvPoster = function(id) {
     const p = window.adminLoadedPosters.find(x => String(x.id) === String(id));
     if (!p) return;
 
+    CITLDisplayDates.fill('poster-display',p);
     // تعبئة البيانات
     document.getElementById('poster-edit-id').value = p.id;
     document.getElementById('poster-title-input').value = p.title || '';
@@ -588,6 +600,9 @@ window.editTvPoster = function(id) {
 
 // Shared R2 upload/replace flow used by both administration pages.
 const posterForm = document.getElementById('poster-upload-form');
+posterForm?.querySelector('button[type=submit]')?.insertAdjacentHTML('beforebegin',CITLDisplayDates.fields('poster-display','فترة عرض الإعلان'));
+// New videos default to sound enabled; existing explicit choices remain respected.
+document.getElementById('poster-sound-input').defaultChecked=true;
 let mediaFormBusy = false;
 // Prepare an existing file through the same verified upload/replacement pipeline.
 // Never mark the database row as rotated without actually rotating its pixels.
@@ -690,6 +705,7 @@ if (posterForm) posterForm.addEventListener('submit', async e => {
     window.addEventListener('beforeunload',preventLeave);
     try {
         const metadata = {
+            ...CITLDisplayDates.read('poster-display'),
             title:document.getElementById('poster-title-input').value.trim(),
             display_order:parseInt(document.getElementById('poster-order-input').value,10) || 1,
             fit_mode:document.getElementById('poster-fit-input').value,

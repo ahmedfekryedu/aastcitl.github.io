@@ -7,10 +7,10 @@ self.onmessage=async({data})=>{
   postMessage({stage:'جاري تحميل محرك قراءة PDF…'});
   const py=await loadPyodide({indexURL:base});
   await py.loadPackage(['cryptography','charset-normalizer','micropip']);
-  const manifest=await (await fetch(base+'manifest.json')).json();
+  const manifest=await (await fetch(base+'manifest.json?v=20260924-r6.6.1')).json();
   py.globals.set('wheel_urls',manifest.wheels.map(n=>location.origin+base+n));
   await py.runPythonAsync('import micropip\nawait micropip.install(wheel_urls.to_py(), deps=False)');
-  py.unpackArchive(await (await fetch(base+'extractor.zip')).arrayBuffer(),'zip',{extractDir:'/extractor'});
+  py.unpackArchive(await (await fetch(base+'extractor.zip?v=20260924-r6.6.1')).arrayBuffer(),'zip',{extractDir:'/extractor'});
   py.FS.mkdirTree('/input');py.FS.mkdirTree('/output');
   const names=new Set();
   for(const file of data.files){

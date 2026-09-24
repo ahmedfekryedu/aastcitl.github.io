@@ -114,19 +114,17 @@
   function escapeHtml(value){
     return String(value||'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
   }
-  function printQrCards(){
+function printQrCards() {
     const cards=[...document.querySelectorAll('#qr-list .qr-card')];
-    if(!cards.length){msg('لا توجد رموز جاهزة للطباعة',true);return}
-    const popup=window.open('','_blank','width=900,height=900');
-    if(!popup){msg('اسمح بفتح نافذة الطباعة من المتصفح',true);return}
-    const sheets=cards.map(card=>{
-      const roomName=card.querySelector('h2')?.textContent?.trim()||'القاعة';
-      const qrImage=card.querySelector('canvas')?.toDataURL('image/png')||'';
-      return `<section class="sheet"><main class="print-card"><div class="room-heading"><span>رمز تسجيل الحضور</span><h1>${escapeHtml(roomName)}</h1></div><div class="qr-frame"><img class="qr" src="${qrImage}" alt="QR ${escapeHtml(roomName)}"></div><p class="scan-hint">امسح الرمز بالكاميرا لتسجيل الحضور</p><div class="faculty-note">خاص بأعضاء هيئة التدريس فقط</div></main></section>`;
-    }).join('');
-    popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>QR القاعات</title><style>@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;font-family:Cairo,Arial,sans-serif;color:#111}.sheet{width:100%;page-break-after:always;break-after:page}.sheet:last-child{page-break-after:auto;break-after:auto}.print-card{width:100%;max-width:175mm;margin:0 auto;border:2px solid #111;border-radius:4mm;padding:9mm 10mm;text-align:center;background:#fff}.room-heading span{display:block;font-size:11px;font-weight:900}.room-heading h1{font-size:34px;line-height:1.3;margin:1.5mm 0 5mm;font-weight:900}.qr-frame{width:118mm;height:118mm;margin:0 auto 4mm;padding:3mm;border:1.2mm solid #111;border-radius:3mm;background:#fff}.qr{display:block;width:100%;height:100%;object-fit:contain;filter:grayscale(1)}.scan-hint{margin:0 0 3mm;font-size:11px;font-weight:700}.faculty-note{padding:3mm 5mm;border:1.5px solid #111;border-radius:2mm;font-size:12px;font-weight:900}@media screen{body{background:#eee}.sheet{padding:10mm 0}.print-card{box-shadow:0 5mm 14mm rgba(0,0,0,.12)}}@media print{.print-card{box-shadow:none}}</style><link rel="stylesheet" href="/assets/fonts.css"></head><body>${sheets}<script>onload=()=>setTimeout(()=>print(),700)<\/script></body></html>`);
+    const images = (cards || []).map(card => card.querySelector('canvas')?.toDataURL('image/png')).filter(Boolean);
+    if (!images.length) return;
+    const popup = window.open('', '_blank', 'width=900,height=900');
+    if (!popup) return msg('اسمح بفتح نافذة الطباعة من المتصفح', true);
+    const sheets = images.map(src => `<section class="sheet"><img class="qr" src="${src}" alt="QR"></section>`).join('');
+    popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title></title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff}.sheet{width:210mm;height:296mm;display:flex;align-items:center;justify-content:center;page-break-after:always;break-after:page}.sheet:last-child{page-break-after:auto;break-after:auto}.qr{display:block;width:140mm;height:140mm;max-width:100%;object-fit:contain;border:0;border-radius:0;box-shadow:none}</style></head><body>${sheets}<script>onload=()=>print()<\/script></body></html>`);
     popup.document.close();
-  }
+}
+
   function render(){
     fillSelects();
     const terms=document.getElementById('terms-list');terms.replaceChildren();(state.terms||[]).filter(t=>!t.schedule_deleted_at).forEach(t=>{const d=document.createElement('div');d.className='card';const a=document.createElement('strong');a.textContent=t.name;const b=document.createElement('span');b.className='muted';b.textContent=`${t.starts_on} ← ${t.ends_on||'النهاية لم تحدد'}${t.is_active?' • نشط':''}`;d.append(a,b);terms.append(d)});
@@ -143,7 +141,7 @@
     const termId=document.getElementById('qr-term').value,box=document.getElementById('qr-list');box.replaceChildren();document.getElementById('print').classList.add('hidden');if(!termId)return;
     try{const r=await qrRequest('citl_room_qr_restore',{p_term_id:termId,p_codes:[]});if(document.getElementById('qr-term').value!==termId)return;
       if(!Array.isArray(r?.generated))throw new Error('تعذر قراءة الرموز المحفوظة');
-      for(const q of r.generated){const card=document.createElement('article');card.className='qr-card';const h=document.createElement('h2');h.textContent=q.room_name;const canvas=document.createElement('canvas');canvas.style.display='block';canvas.style.margin='0 auto';canvas.style.maxWidth='100%';const p=document.createElement('p');p.textContent='QR ثابت لهذه القاعة طوال الترم — خاص بأعضاء هيئة التدريس فقط';card.append(h,canvas,p);box.append(card);await window.QRCode.toCanvas(canvas,q.url,{width:260,margin:2,errorCorrectionLevel:'H'})}
+      for(const q of r.generated){const card=document.createElement('article');card.className='qr-card';const h=document.createElement('h2');h.textContent=q.room_name;const canvas=document.createElement('canvas');canvas.style.display='block';canvas.style.margin='0 auto';canvas.style.maxWidth='100%';canvas.style.width='260px';canvas.style.height='auto';const p=document.createElement('p');p.textContent='QR ثابت لهذه القاعة طوال الترم — خاص بأعضاء هيئة التدريس فقط';card.append(h,canvas,p);box.append(card);await window.QRCode.toCanvas(canvas,q.url,{width:1024,margin:4,errorCorrectionLevel:'H'})}
       document.getElementById('print').classList.toggle('hidden',!r.generated.length);
       if(!r.generated.length&&(state.rooms||[]).some(q=>q.term_id===termId&&q.is_active)){const note=document.createElement('p');note.textContent='الرموز نشطة، لكن نسخة العرض القديمة غير محفوظة. يمكنك استعادتها من متابعة الحضور والانصراف داخل الجداول باستخدام رابط الرمز المطبوع.';box.append(note)}
     }catch(error){msg(error.message,true)}
@@ -180,7 +178,7 @@
     const button=e.currentTarget;button.disabled=true;
     try{
       const r=await qrRequest('citl_generate_saved_room_qr',{p_term_id:termId,p_room_name:null});await load();const box=document.getElementById('qr-list');box.replaceChildren();
-      for(const q of r.generated){const card=document.createElement('article');card.className='qr-card';const h=document.createElement('h2');h.textContent=q.room_name;const canvas=document.createElement('canvas');canvas.style.display='block';canvas.style.margin='0 auto';canvas.style.maxWidth='100%';const p=document.createElement('p');p.textContent='QR ثابت لهذه القاعة طوال الترم — خاص بأعضاء هيئة التدريس فقط';card.append(h,canvas,p);box.append(card);await window.QRCode.toCanvas(canvas,q.url,{width:260,margin:2,errorCorrectionLevel:'H'})}
+      for(const q of r.generated){const card=document.createElement('article');card.className='qr-card';const h=document.createElement('h2');h.textContent=q.room_name;const canvas=document.createElement('canvas');canvas.style.display='block';canvas.style.margin='0 auto';canvas.style.maxWidth='100%';canvas.style.width='260px';canvas.style.height='auto';const p=document.createElement('p');p.textContent='QR ثابت لهذه القاعة طوال الترم — خاص بأعضاء هيئة التدريس فقط';card.append(h,canvas,p);box.append(card);await window.QRCode.toCanvas(canvas,q.url,{width:1024,margin:4,errorCorrectionLevel:'H'})}
       document.getElementById('print').classList.toggle('hidden',!r.generated.length);msg(`تم توليد ${r.generated.length} رمز للقاعات التي بها منتدبون فقط`);
     }catch(x){msg(x.message,true)}finally{button.disabled=false}
   });

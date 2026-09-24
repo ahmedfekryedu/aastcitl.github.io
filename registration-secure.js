@@ -3,6 +3,8 @@
   const form = document.getElementById('signupForm');
   if (!form) return;
 
+  const mobile=document.getElementById('reg-mobile');
+  mobile?.addEventListener('input',()=>{mobile.value=mobile.value.replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c));mobile.setCustomValidity(/^[0-9]{11}$/.test(mobile.value)?'':'أدخل رقم موبايل مكوّنًا من 11 رقمًا');});
   form.addEventListener('submit', async function (event) {
     event.preventDefault();
     event.stopImmediatePropagation();
@@ -19,6 +21,8 @@
         account_type: document.getElementById('reg-account-type')?.value,
         linked_instructor: document.getElementById('reg-linked-instructor')?.value,
       };
+      if(!/^[0-9]{11}$/.test(details.mobile||''))throw new Error('رقم الموبايل يجب أن يتكون من 11 رقمًا');
+      if(details.account_type==='faculty'){await loadSignupFacultyNames();if(!isValidAcademicName(details.linked_instructor))throw new Error('اختر اسمًا موجودًا في الجدول الحالي');}
       const accessCode = document.getElementById('reg-access-code')?.value;
       const password = document.getElementById('reg-password')?.value;
       const { data: prepared, error: prepareError } = await window.sb.rpc('citl_prepare_registration', {

@@ -77,3 +77,41 @@ body #profile-info-menu,body #notif-menu,body .dh-room-details>div{border:0!impo
    rule must not override Tailwind p-0 and add a second 24px white surround. */
 .modal > .modal-content.p-0{padding:0!important;border:0!important;outline:0!important}
 #add-meeting-modal #meeting-form{min-height:0;border-radius:0 0 12px 12px}
+
+/* R6.8: keep the administrative sections present while their data loads. */
+#dashboard-home .dh-heading{background:#fff}
+.citl-identity-admin{display:grid;gap:16px;margin-top:24px;font-family:Cairo,sans-serif}
+.citl-admin-section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;min-width:0}
+.citl-admin-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f1f4}
+.citl-admin-section h3{font-size:14px;font-weight:800;color:#2a3475;margin:0}
+.citl-admin-section h3 i{color:#b78322;margin-inline-end:5px}
+.citl-admin-section-head p{font-size:11px;color:#6b7280;margin:4px 0 0}
+.citl-claims-list{padding:12px 16px;min-height:128px;display:grid;gap:8px}
+.citl-admin-empty{display:flex;align-items:center;justify-content:center;gap:9px;min-height:100px;font-size:12px;font-weight:700;color:#7b8495;background:#f9fafb;border-radius:8px}
+.citl-admin-empty i{color:#8393b3;font-size:18px}
+.citl-admin-placeholder{display:grid;align-content:center;gap:12px;min-height:100px}
+.citl-admin-placeholder .citl-skeleton-line{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,#eef1f5 25%,#f9fafc 50%,#eef1f5 75%);background-size:200% 100%;animation:citl-admin-shimmer 1.6s linear infinite}
+.citl-admin-placeholder .short{width:55%}
+.citl-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px}
+.citl-qr-card{min-width:0;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:12px}
+.citl-qr-space{height:220px;display:flex;align-items:center;justify-content:center;margin:8px auto;max-width:220px;width:100%}
+.citl-qr-space canvas{display:block;max-width:220px!important;width:100%!important;height:auto!important;aspect-ratio:1}
+.citl-qr-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px}
+.citl-qr-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.citl-qr-tools button{font:700 11px Cairo,sans-serif;padding:6px 9px;border-radius:7px;background:#f2f4f8;color:#2a3475;border:1px solid #e5e7eb}
+.citl-qr-tools button[data-danger]{color:#b53a3a;background:#fff6f6}
+.citl-qr-tools button:disabled{opacity:.5;cursor:wait}
+.citl-head-dialog{width:min(480px,94vw);border:0;border-radius:12px;padding:0;color:#2a3475;font-family:Cairo,sans-serif;overflow:visible}
+.citl-head-dialog header{border-radius:12px 12px 0 0}
+.citl-code-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.citl-code-form h4,.citl-code-form p,.citl-code-form label:first-of-type,.citl-code-form>button{grid-column:1/-1}
+.citl-code-form>button{justify-self:start}
+.citl-code-form [name]{margin-top:5px}
+.citl-identity-admin [data-code-host]{min-height:295px}
+@media(max-width:480px){.citl-code-form{grid-template-columns:1fr}}
+.citl-head-dialog::backdrop{background:#101a3b88}
+.citl-head-dialog header{display:flex;align-items:center;justify-content:space-between;padding:16px;background:#2a3475;color:white}
+.citl-head-dialog form{padding:16px;display:grid;gap:12px}.citl-head-dialog label{font-size:12px;font-weight:700}
+.citl-head-dialog select{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font:inherit;background:white;margin-top:6px}
+@keyframes citl-admin-shimmer{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.citl-admin-placeholder .citl-skeleton-line{animation:none}}

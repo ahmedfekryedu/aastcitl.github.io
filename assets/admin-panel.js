@@ -331,6 +331,7 @@ activeUsersList.appendChild(tr);
             }
         }
 
+        window.CITLDepartmentHeads?.decorate(users);
         if (deptStats) {
             deptStats.innerHTML = '';
             const deptCounts = {};

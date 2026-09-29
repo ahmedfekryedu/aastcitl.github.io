@@ -1113,8 +1113,9 @@ function amCell(value, className = 'px-3 py-2.5 whitespace-nowrap font-bold text
 }
 
 function amSwitchTab(tab) {
+    if (attendanceManagement.departmentOnly) tab='reports';
     attendanceManagement.activeTab = tab;
-    if(tab==='qr')window.CITLRoomQr?.load();
+    if(tab==='qr'){document.getElementById('am-content')?.classList.remove('hidden');document.getElementById('am-loading')?.classList.add('hidden');window.CITLRoomQr?.load();}
     document.querySelectorAll('[data-am-panel]').forEach(panel => panel.classList.toggle('hidden', panel.id !== `am-panel-${tab}`));
     document.querySelectorAll('[data-am-tab]').forEach(button => {
         const active = button.dataset.amTab === tab;
@@ -1131,6 +1132,7 @@ function amResetVisitorForm() {
     form.reset(); form.elements.id.value = ''; form.elements.is_active.checked = true;
     amSetDropdownValue('am-visitor-term', termId); amSetDropdownValue('am-visitor-name', '');
     amSetDropdownValue('am-visitor-department', ''); amSetDropdownValue('am-visitor-profile', '');
+    amFillVisitorAccounts();
     document.getElementById('am-visitor-submit').innerHTML = '<i class="fas fa-user-plus ml-2"></i>حفظ المنتدب';
     document.getElementById('am-visitor-reset').classList.add('hidden');
     document.getElementById('am-visitor-meta').textContent = 'اختر اسمًا لعرض عدد المحاضرات والقاعات.';
@@ -1159,6 +1161,7 @@ function amEditVisitor(visitor) {
         const item = document.createElement('li'); item.className = 'custom-option'; item.dataset.value = visitor.full_name; item.textContent = option.textContent; document.getElementById('am-visitor-name-options').appendChild(item);
     }
     amSetDropdownValue('am-visitor-name', visitor.full_name);
+    amFillVisitorAccounts(visitor.profile_id || '');
     amSetDropdownValue('am-visitor-department', visitor.department_key || '');
     amSetDropdownValue('am-visitor-profile', visitor.profile_id || '');
     form.elements.aliases.value = Array.isArray(visitor.aliases) ? visitor.aliases.filter(Boolean).join('، ') : (visitor.aliases || '');
@@ -1179,6 +1182,7 @@ function amSelectVisitorCandidate() {
     const form = document.getElementById('am-visitor-form');
     form.elements.id.value = identity?.id || '';
     amSetDropdownValue('am-visitor-department', identity?.department_key || '');
+    amFillVisitorAccounts(identity?.profile_id || '');
     amSetDropdownValue('am-visitor-profile', identity?.profile_id || '');
     form.elements.aliases.value = Array.isArray(identity?.aliases) ? identity.aliases.filter(Boolean).join('، ') : (identity?.aliases || '');
     form.elements.is_active.checked = true; amUpdateVisitorMeta();
@@ -1356,6 +1360,10 @@ async function amLoadVisitorAttendance() {
     if (!visitor.profile_id) { amRenderReports(); return amSetStatus('هذا المنتدب غير مربوط بحساب نظام، لذلك لا يمكن أن يكون له تسجيل حضور', 'error'); }
     attendanceManagement.reportLoading = true; amRenderReports();
     try {
+        if(attendanceManagement.departmentOnly){
+            const result=await amRpc('citl_department_attendance',{p_action:'report',p_payload:{term_id:termId,visitor_id:visitor.id}});
+            attendanceManagement.reportScans=result.scans;return;
+        }
         const pageSize = 1000; const allScans = [];
         for (let from = 0; ; from += pageSize) {
             const { data, error } = await window.supabase
@@ -1406,6 +1414,14 @@ function amRenderReports() {
     });
 }
 
+function amFillVisitorAccounts(preferred) {
+    const name=document.getElementById('am-visitor-name')?.value||'';
+    const key=window.CITLFaculty.key;
+    const profiles=(attendanceManagement.state.profiles||[]).filter(p=>p.faculty_verification_status==='approved'&&(p.linked_instructors||[]).some(n=>key(n)===key(name)));
+    amFillDropdown('am-visitor-profile','am-visitor-profile-options','اختر الحساب المعتمد',profiles.map(p=>({value:p.id,label:`${p.full_name||p.email} — ${p.email||''}`})),preferred);
+    const notice=document.getElementById('am-visitor-account-help');if(notice)notice.textContent=!name?'اختر الاسم من الجدول أولًا.':profiles.length?'ربط الحساب إلزامي لتسجيل حضور المنتدب.':'لا يوجد حساب معتمد لهذا الاسم؛ اعتمد طلب ربطه من إدارة المستخدمين أولًا.';
+}
+
 function amPopulateDropdowns() {
     const state = attendanceManagement.state;
     amFillActiveTermSelect('am-visitor-term'); amFillActiveTermSelect('am-qr-term'); amFillActiveTermSelect('am-reports-term');
@@ -1414,7 +1430,7 @@ function amPopulateDropdowns() {
     amFillDropdown('am-visitor-department', 'am-visitor-department-options', 'اختر القسم', depts);
     amFillDropdown('am-head-department', 'am-head-department-options', 'اختر القسم', depts);
     const profiles = (state.profiles || []).map(profile => ({ value: profile.id, label: `${profile.full_name || profile.email} — ${amDepartmentName(profile.department)}` }));
-    amFillDropdown('am-visitor-profile', 'am-visitor-profile-options', 'اختر الحساب', profiles);
+    amFillVisitorAccounts();
     amFillDropdown('am-head-profile', 'am-head-profile-options', 'اختر الحساب', profiles);
     const reportTermId = amDefaultTermId();
     const reportVisitors = (state.term_visitors || []).filter(visitor => visitor.term_id === reportTermId && visitor.is_active).map(visitor => ({ value: visitor.id, label: visitor.full_name }));
@@ -1423,6 +1439,7 @@ function amPopulateDropdowns() {
 }
 
 function amRenderAll() {
+    if(attendanceManagement.departmentOnly){amPopulateDropdowns();amRenderReports();amSwitchTab('reports');return;}
     amPopulateDropdowns(); amEvaluateScheduleRenewal(); amRenderVisitors(); amRenderHeads(); amRenderQrEligibility(); amRenderActiveQrTokens(); amRenderReports(); amSwitchTab(attendanceManagement.activeTab);
 }
 
@@ -1440,8 +1457,14 @@ async function amLoadAllScheduleRows() {
 }
 
 async function amLoadData() {
-    document.getElementById('am-loading')?.classList.remove('hidden'); document.getElementById('am-content')?.classList.add('hidden'); amSetStatus('');
+    const content=document.getElementById('am-content');content?.setAttribute('aria-busy','true');
+    if(!attendanceManagement.loaded)document.getElementById('am-loading')?.classList.remove('hidden');
+    amSetStatus('');
     try {
+        if(attendanceManagement.departmentOnly){
+            attendanceManagement.state=await amRpc('citl_department_attendance',{p_action:'snapshot',p_payload:{}});
+            attendanceManagement.loaded=true;amRenderAll();document.getElementById('am-loading')?.classList.add('hidden');content?.classList.remove('hidden');return;
+        }
         attendanceManagement.reportScans = [];
         const [snapshot, scheduleResult] = await Promise.all([
             amApi('management.snapshot'),
@@ -1466,9 +1489,9 @@ async function amLoadData() {
         if (syncFailed) amSetStatus('ظهرت البيانات المحفوظة، لكن مزامنة المحاضرات لم تكتمل؛ أعد المحاولة من مزامنة المواعيد.', 'error');
         if (syncResult.skipped?.length) amSetStatus(`تعذر تجهيز ${syncResult.skipped.length} محاضرة للحضور؛ راجع صيغة الوقت والقاعة في الجداول ثم أعد المزامنة`, 'error');
     } catch (error) {
-        attendanceManagement.loaded = false; document.getElementById('am-loading')?.classList.add('hidden'); document.getElementById('am-content')?.classList.add('hidden');
+        document.getElementById('am-loading')?.classList.add('hidden');
         amSetStatus(`${error.message} — اضغط هنا لإعادة المحاولة`, 'error'); document.getElementById('am-status')?.addEventListener('click', amLoadData, { once: true });
-    }
+    } finally { content?.setAttribute('aria-busy','false'); }
 }
 
 function amRenewScheduleVisitors() {
@@ -1494,8 +1517,8 @@ function amBindEvents() {
     document.getElementById('am-report-visitor').addEventListener('change', amLoadVisitorAttendance);
     document.getElementById('am-visitor-reset').addEventListener('click', amResetVisitorForm);
     document.getElementById('am-renew-schedule-visitors').addEventListener('click', amRenewScheduleVisitors);
-    document.getElementById('am-visitor-form').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget; const data = new FormData(form); if (!data.get('full_name') || !data.get('department_key')) return amSetStatus('اختر اسم المنتدب والقسم أولًا', 'error'); const button = document.getElementById('am-visitor-submit'); button.disabled = true; try { await amApi('visitor.save', { data: { id: data.get('id') || null, term_id: data.get('term_id') || amDefaultTermId(), full_name: data.get('full_name'), department_key: data.get('department_key'), profile_id: data.get('profile_id') || null, aliases: String(data.get('aliases') || '').replace(/،/g, ','), is_active: data.get('is_active') === 'on' } }); await amLoadData(); amSetStatus('تم حفظ المنتدب وإرسال التنبيه إلى رئيس القسم', 'success'); amSwitchTab('visitors'); } catch (error) { amSetStatus(error.message, 'error'); } finally { button.disabled = false; } });
-    document.getElementById('am-head-form').addEventListener('submit', async event => { event.preventDefault(); const data = new FormData(event.currentTarget); if (!data.get('department_key') || !data.get('profile_id')) return amSetStatus('اختر القسم ورئيس القسم أولًا', 'error'); const button = event.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; try { await amApi('head.save', { data: { department_key: data.get('department_key'), profile_id: data.get('profile_id') } }); await amLoadData(); amSetStatus('تم حفظ رئيس القسم وتفعيل استقبال التنبيهات', 'success'); amSwitchTab('heads'); } catch (error) { amSetStatus(error.message, 'error'); } finally { button.disabled = false; } });
+    document.getElementById('am-visitor-form').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget; const data = new FormData(form); if (!data.get('full_name') || !data.get('department_key') || !data.get('profile_id')) return amSetStatus('اختر اسم المنتدب والقسم والحساب المعتمد المرتبط بالاسم أولًا', 'error'); const button = document.getElementById('am-visitor-submit'); button.disabled = true; try { await amApi('visitor.save', { data: { id: data.get('id') || null, term_id: data.get('term_id') || amDefaultTermId(), full_name: data.get('full_name'), department_key: data.get('department_key'), profile_id: data.get('profile_id'), aliases: String(data.get('aliases') || '').replace(/،/g, ','), is_active: data.get('is_active') === 'on' } }); await amLoadData(); amSetStatus('تم حفظ المنتدب وربط حسابه بالجدول', 'success'); amSwitchTab('visitors'); } catch (error) { amSetStatus(error.message, 'error'); } finally { button.disabled = false; } });
+    document.getElementById('am-head-form').addEventListener('submit', async event => { event.preventDefault(); const data = new FormData(event.currentTarget); if (!data.get('department_key') || !data.get('profile_id')) return amSetStatus('اختر القسم ورئيس القسم أولًا', 'error'); const button = event.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; try { const result=await window.CITLDepartmentHeads.save(data.get('department_key'),data.get('profile_id')); await amLoadData(); amSetStatus('تم حفظ رئيس القسم', 'success'); window.CITLDepartmentHeads.feedback(result,document.getElementById('am-status')); amSwitchTab('heads'); } catch (error) { amSetStatus(error.message, 'error'); } finally { button.disabled = false; } });
     document.getElementById('am-refresh-reports').addEventListener('click', amLoadVisitorAttendance);
     document.getElementById('am-print-reports').addEventListener('click', amPrintAttendanceReports);
     document.getElementById('am-sync').addEventListener('click', async event => { const button = event.currentTarget; button.disabled = true; try { const result = await amApi('sessions.sync', { term_id: document.getElementById('am-qr-term').value }); await amLoadData(); amSetStatus(`تمت مزامنة ${result.count || 0} محاضرة للمنتدبين` + (result.skipped?.length ? ` — تعذر تجهيز ${result.skipped.length} محاضرة؛ راجع صيغة الوقت والقاعة في الجداول ثم أعد المزامنة` : ''), result.skipped?.length ? 'error' : 'success'); amSwitchTab('qr'); } catch (error) { amSetStatus(error.message, 'error'); } finally { button.disabled = false; } });
@@ -1519,7 +1542,13 @@ function amBindEvents() {
 
 async function openSchedulePresenceModal() {
     const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if (!isManagerUser(user)) return showNotification('متابعة الحضور والانصراف متاحة للمديرين فقط', 'error');
+    attendanceManagement.departmentOnly=!isManagerUser(user);
+    if(attendanceManagement.departmentOnly){
+        try{await amRpc('citl_department_attendance',{p_action:'snapshot',p_payload:{}});}catch(error){return showNotification(error.message,'error');}
+    }
+    document.querySelectorAll('[data-am-tab]').forEach(b=>b.classList.toggle('hidden',attendanceManagement.departmentOnly&&b.dataset.amTab!=='reports'));
+    document.querySelector('#schedule-presence-modal a[href*="term-schedules"]')?.classList.toggle('hidden',attendanceManagement.departmentOnly);
+    document.getElementById('am-sync')?.classList.toggle('hidden',attendanceManagement.departmentOnly);
     const modal = document.getElementById('schedule-presence-modal'); if (!modal) return;
     modal.classList.remove('hidden'); modal.classList.add('flex'); amBindEvents();
     await amLoadData();

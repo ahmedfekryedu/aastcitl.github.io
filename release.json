@@ -1,5 +1,5 @@
 {
-  "release": "20260928-r6.7",
-  "built_at": "2026-09-29",
-  "description": "Administrator-approved faculty identity, registration-code rotation, permanent room QR and account deletion repair."
+  "release": "20260929-r6.8",
+  "built_at": "2026-09-29T18:00:00Z",
+  "description": "Account-bound visiting lecturers, department-head assignments and room QR lifecycle controls."
 }

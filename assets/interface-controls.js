@@ -34,7 +34,9 @@
     function highlight(){if(active?.select!==select)return;[...active.list.children].forEach((el,i)=>el.classList.toggle('is-active',i===active.index));const el=active.list.children[active.index];if(el){button.setAttribute('aria-activedescendant',el.id);el.scrollIntoView({block:'nearest'});}}
     function open(){if(button.disabled)return;if(active?.select===select){close();return;}close();document.querySelectorAll('.custom-dropdown-options.show').forEach(el=>el.classList.remove('show'));
       const list=document.createElement('div');list.className='citl-select-list';list.id=id;list.dir=getComputedStyle(select).direction;list.setAttribute('role','listbox');list.setAttribute('aria-label',button.getAttribute('aria-label'));
-      document.body.append(list);active={select,button,list,index:0};button.setAttribute('aria-expanded','true');draw();
+      // Keep focus on the combobox until an option is selected (including dialogs).
+      list.addEventListener('mousedown',event=>event.preventDefault());
+      (select.closest('dialog[open]')||document.body).append(list);active={select,button,list,index:0};button.setAttribute('aria-expanded','true');draw();
     }
     button.addEventListener('click',open);
     let search='',searchAt=0;

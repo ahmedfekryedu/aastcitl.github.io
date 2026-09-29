@@ -31,6 +31,7 @@
       clearTimeout(recoveryTimer); recoveryAttempts = 0;
       // Storage is a convenience; a full/disabled browser store must not break login.
       try { localStorage.setItem('currentUser', JSON.stringify(profile)); localStorage.removeItem('sessionToken'); } catch (_) {}
+      root.dispatchEvent(new CustomEvent('citl-profile-loaded',{detail:profile}));
       return profile;
     })().finally(() => { pending = null; });
     return pending;

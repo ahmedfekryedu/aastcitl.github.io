@@ -167,6 +167,7 @@ function filterAdminMeetings(type) {
         }
 
 async function updateAdminUsersList() {
+    window.CITLFacultyAdmin?.load();
     if (typeof updateSidebarProfile === 'function') updateSidebarProfile();
 
     const activeUsersList = document.getElementById('active-users-list');

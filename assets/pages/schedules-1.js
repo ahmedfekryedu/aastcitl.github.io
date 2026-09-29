@@ -1114,6 +1114,7 @@ function amCell(value, className = 'px-3 py-2.5 whitespace-nowrap font-bold text
 
 function amSwitchTab(tab) {
     attendanceManagement.activeTab = tab;
+    if(tab==='qr')window.CITLRoomQr?.load();
     document.querySelectorAll('[data-am-panel]').forEach(panel => panel.classList.toggle('hidden', panel.id !== `am-panel-${tab}`));
     document.querySelectorAll('[data-am-tab]').forEach(button => {
         const active = button.dataset.amTab === tab;
@@ -1459,7 +1460,7 @@ async function amLoadData() {
         } catch (_) { syncFailed = true; }
         attendanceManagement.loaded = true;
         amRenderAll();
-        await amRenderGeneratedQrCodes(await amRestoreQrCodes());
+        // Permanent room QR is loaded independently of the selected term.
         if (document.getElementById('am-report-visitor')?.value) await amLoadVisitorAttendance();
         document.getElementById('am-loading')?.classList.add('hidden'); document.getElementById('am-content')?.classList.remove('hidden');
         if (syncFailed) amSetStatus('ظهرت البيانات المحفوظة، لكن مزامنة المحاضرات لم تكتمل؛ أعد المحاولة من مزامنة المواعيد.', 'error');
@@ -2273,6 +2274,11 @@ function normalizeInstructorName(value) {
 }
 
     // 1. فتح المودال وتوجيه المستخدم
+async function getCurrentScheduleInstructorValues() {
+    const rows=[];
+    for(let offset=0;;offset+=500){const {data,error}=await supabase.from('academic_schedule').select('id,instructor').order('id').range(offset,offset+499);if(error)throw error;rows.push(...(data||[]));if(!data||data.length<500)break;}
+    return rows.map(row=>row.instructor).filter(Boolean);
+}
 async function getCurrentAcademicInstructorNames() {
     const { data, error } = await supabase
         .from('academic_schedule')
@@ -2330,59 +2336,19 @@ async function openMyScheduleModal() {
     // بعد كده حمّل البيانات
     const { data: profile } = await supabase
         .from('profiles')
-        .select('linked_instructors, schedule_link_required, schedule_link_status, account_type')
+        .select('linked_instructors, schedule_link_required, schedule_link_status, account_type, faculty_verification_status')
         .eq('id', user.id)
         .single();
 
-    const currentAcademicNames = await getCurrentAcademicInstructorNames();
-
-    if (!currentAcademicNames || currentAcademicNames.length === 0) {
-        showNotification('الجداول قيد التحديث الآن، حاول بعد دقائق', 'error');
+    if (!profile) { showNotification('تعذر التحقق من ربط الحساب؛ أعد المحاولة', 'error'); closeMyScheduleModal(); return; }
+    if (!isManagerUser && profile.account_type==='faculty' && profile.faculty_verification_status!=='approved') {
+        window.CITLFaculty.showStatus({...user,...profile});
+        closeMyScheduleModal();
+        const status=document.getElementById('faculty-identity-status');
+        if(status){status.scrollIntoView({block:'center'});await window.CITLFaculty.renderClaimEditor(status);}
         return;
     }
-
-    const linkedNames = Array.isArray(profile?.linked_instructors)
-        ? profile.linked_instructors.map(name => normalizeInstructorName(name))
-        : [];
-
-    const hasMissingLinkedName =
-        linkedNames.length > 0 &&
-        linkedNames.some(name => !currentAcademicNames.includes(name));
-
-    if (
-        !isManagerUser &&
-        profile?.account_type === 'faculty' &&
-        profile?.schedule_link_required === true &&
-        hasMissingLinkedName
-    ) {
-        await supabase
-            .from('profiles')
-            .update({
-                schedule_link_status: 'needs_relink',
-                last_link_prompt_at: new Date().toISOString()
-            })
-            .eq('id', user.id);
-
-        profile.schedule_link_status = 'needs_relink';
-    }
-
-    const needsScheduleLink =
-        !isManagerUser &&
-        profile &&
-        profile.account_type === 'faculty' &&
-        profile.schedule_link_required === true &&
-        (
-            profile.schedule_link_status === 'needs_relink' ||
-            !Array.isArray(profile.linked_instructors) ||
-            profile.linked_instructors.length === 0
-        );
-
-    if (needsScheduleLink) {
-        showNotification('يجب اختيار اسمك الأكاديمي الحالي قبل متابعة استخدام الجداول', 'error');
-        showSetupView();
-        return;
-    }
-
+    // Keep approved identity through timetable replacement, even when no rows exist yet.
 if (profile && profile.linked_instructors && profile.linked_instructors.length > 0) {
     user.linked_instructors = profile.linked_instructors;
     user.account_type = profile.account_type || 'admin';
@@ -2585,6 +2551,12 @@ async function saveInstructorSelection() {
     }
 
     try {
+        if(!window.CITLPermissions.full(user)) {
+            if(selectedArray.length!==1)throw new Error('اختر اسمًا واحدًا لإرسال طلب اعتماده');
+            await window.CITLFaculty.requestName(selectedArray[0]);
+            showNotification('تم إرسال طلب ربط الاسم إلى الإدارة؛ ارتباطك المعتمد الحالي محفوظ.', 'success');
+            closeMyScheduleModal();return;
+        }
         // تحديث قاعدة البيانات (نقبل المصفوفة الفارغة [])
         const { error } = await supabase
             .from('profiles')
@@ -2673,13 +2645,10 @@ async function clearMyScheduleLink() {
         // أهم حاجة إنها بتنادي على mobileContainer و desktopBody
         
         // --- سأعيد كتابة الجزء المهم للتأكيد ---
-        let targetNames = names;
-        if (!targetNames || !Array.isArray(targetNames) || targetNames.length === 0) {
-            const saved = localStorage.getItem('my_linked_instructors');
-            targetNames = saved ? JSON.parse(saved) : [];
-        }
-    if (targetNames.length > 0) localStorage.setItem('my_linked_instructors', JSON.stringify(targetNames));
-
+        const verifiedProfile=await window.CITLAuth.loadProfile();
+        let targetNames=window.CITLPermissions.full(verifiedProfile)?(Array.isArray(names)?names:[]):(verifiedProfile.faculty_verification_status==='approved'?(verifiedProfile.linked_instructors||[]):[]);
+        // Never restore another account's names from the old unscoped localStorage cache.
+        localStorage.removeItem('my_linked_instructors');
     // 2. التبديل بين الشاشات
     document.getElementById('my-schedule-setup').classList.replace('flex', 'hidden');
     document.getElementById('my-schedule-content').classList.replace('hidden', 'flex');
@@ -2722,7 +2691,7 @@ async function clearMyScheduleLink() {
         const { data, error } = await supabase
             .from('academic_schedule')
             .select('*')
-            .in('instructor', targetNames)
+            .in('instructor', [...new Set((await getCurrentScheduleInstructorValues()).filter(n=>targetNames.some(t=>normalizeInstructorName(t)===normalizeInstructorName(n))))])
             .order('day_of_week', { ascending: true });
 
         if (error) throw error;

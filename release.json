@@ -1,5 +1,5 @@
 {
-  "release": "20260924-r6.6.1",
-  "built_at": "2026-09-24",
-  "description": "Includes R6.6 updates; exact RoomFix v2 PDF extractor and QR-only attendance printing."
+  "release": "20260928-r6.7",
+  "built_at": "2026-09-29",
+  "description": "Administrator-approved faculty identity, registration-code rotation, permanent room QR and account deletion repair."
 }

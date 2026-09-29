@@ -151,7 +151,7 @@ function printQrCards() {
     catch(e){msg(e.message,true);if(e.message==='يلزم تسجيل الدخول')setTimeout(()=>location.replace('/'),1200)}
   }
 
-  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab],.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(`tab-${b.dataset.tab}`).classList.add('active')}));
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab==='qr'){location.assign('/schedules/?open=attendance&tab=qr');return;}document.querySelectorAll('[data-tab],.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(`tab-${b.dataset.tab}`).classList.add('active')}));
   if(location.hash){document.querySelector(`[data-tab="${location.hash.slice(1)}"]`)?.click()}
   document.getElementById('term-form').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target);try{await api('term.save',{data:{code:f.get('code'),name:f.get('name'),starts_on:f.get('starts_on'),ends_on:f.get('ends_on'),is_active:f.get('is_active')==='on'}});e.target.reset();await load();msg('تم حفظ الترم')}catch(x){msg(x.message,true)}});
   document.getElementById('visitor-term').addEventListener('change',()=>{resetVisitorForm();fillSelects();renderVisitorRows()});

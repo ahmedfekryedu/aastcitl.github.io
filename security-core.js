@@ -176,7 +176,8 @@
   addEventListener('load', async () => {
     if (!await protectedPageReady) return;
     if (location.pathname.startsWith('/schedules/') && new URLSearchParams(location.search).get('open') === 'attendance') {
-      window.openSchedulePresenceModal?.();
+      await window.openSchedulePresenceModal?.();
+      if(new URLSearchParams(location.search).get('tab')==='qr')window.amSwitchTab?.('qr');
     }
     const addUserForm = document.getElementById('add-user-form');
     if (addUserForm && !addUserForm.dataset.secureBound) {

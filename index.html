@@ -262,7 +262,7 @@
         </p>
     </form>
 
-    <form id="signupForm" class="space-y-4 hidden transition-all duration-300">
+    <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
         <div class="text-center md:text-right mb-4">
             <h1 class="text-xl font-bold text-navy mb-1">إنشاء حساب جديد</h1>
             <p class="text-gray-500 text-xs">انضم إلينا الآن</p>
@@ -445,7 +445,7 @@
                         <div class="mt-3 text-center w-full">
                             <h3 class="text-xl font-bold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">يمكنك الآن تسجيل الدخول للوصول إلى لوحة التحكم.</p>
+                                <p id="registration-success-message" class="text-sm text-gray-500">يمكنك الآن تسجيل الدخول للوصول إلى لوحة التحكم.</p>
                             </div>
                         </div>
                     </div>
@@ -773,177 +773,7 @@ function isValidAcademicName(name) {
     const clean = (name || '').trim();
     return signupFacultyNames.includes(clean);
 }
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // 1. جلب البيانات من الحقول
-            const inputCode = document.getElementById('reg-access-code').value; // كود التحقق الجديد
-            const name = document.getElementById('reg-name').value;
-            const mobile = document.getElementById('reg-mobile').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-            const department = document.getElementById('reg-dept').value;
-            const position = document.getElementById('reg-position').value;
-            const accountType = document.getElementById('reg-account-type').value;
-            const linkedInstructorInput = document.getElementById('reg-linked-instructor').value.trim();
-            const normalizedLinkedInstructor = normalizeFacultyName(linkedInstructorInput);
-            const selectedFacultyMeta =
-                accountType === 'faculty'
-                    ? signupFacultyDirectoryByName.get(normalizedLinkedInstructor)
-                    : null;
-            const errorDiv = document.getElementById('signup-error');
-
-            if (!department) {
-                alert("يرجى اختيار القسم / الجهة");
-                return;
-            }
-            if (!accountType) {
-                alert("يرجى اختيار نوع الحساب");
-                return;
-            }
-
-            if (accountType === 'faculty' && !isValidAcademicName(normalizedLinkedInstructor)) {
-                alert("يرجى اختيار الاسم الأكاديمي الصحيح من القائمة");
-                return;
-            }
-            // 🔥 تشغيل اللودر للبدء في التحقق
-            showLoader("جاري التحقق من كود التسجيل...");
-            errorDiv.classList.add('hidden');
-
-            try {
-                // الخطوة الأولى: التأكد من صحة كود التسجيل من قاعدة البيانات
-                const { data: codeData, error: codeError } = await supabase
-                    .from('access_codes')
-                    .select('code')
-                    .eq('code', inputCode)
-                    .single();
-
-                // إذا الكود غير موجود أو حدث خطأ في الاستعلام
-                if (codeError || !codeData) {
-                    throw new Error("كود التحقق المدخل غير مطابق لسجلات النظام. يرجى مراجعة المسؤول التقني (أ. أحمد فكري) لاعتماد حسابكم.");
-                }
-
-                // الخطوة الثانية: الكود صحيح، نحدث اللودر ونبدأ إنشاء الحساب
-                const textEl = document.getElementById('loader-text');
-                if(textEl) textEl.textContent = "كود صحيح.. جاري إنشاء الحساب...";
-                const finalDepartment =
-                    accountType === 'faculty'
-                        ? (selectedFacultyMeta?.department_key || department)
-                        : department;
-
-                const finalPosition =
-                    accountType === 'faculty'
-                        ? (selectedFacultyMeta?.position || position)
-                        : position;
-
-                const linkedInstructors =
-                    accountType === 'faculty'
-                        ? [normalizedLinkedInstructor]
-                        : null;
-
-                const scheduleLinkRequired = accountType === 'faculty';
-                const scheduleLinkStatus = accountType === 'faculty' ? 'linked' : 'not_required';
-                const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: name,
-                            mobile: mobile,
-                            department: finalDepartment,
-                            position: finalPosition,
-                            account_type: accountType,
-                            linked_instructors: linkedInstructors
-                        }
-                    }
-                });
-
-                if (authError) throw authError;
-
-                // الخطوة الثالثة: حفظ بيانات البروفايل في الجدول الإضافي
-            if (authData.user) {
-                const { error: profileError } = await supabase.from('profiles').upsert([{
-                    id: authData.user.id,
-                    email: email,
-                    full_name: name,
-                    mobile: mobile,
-                    role: 'user',
-                    department: finalDepartment,
-                    position: finalPosition,
-                    account_type: accountType,
-                    schedule_link_required: scheduleLinkRequired,
-                    schedule_link_status: scheduleLinkStatus,
-                    linked_instructors: linkedInstructors,
-                    updated_at: new Date()
-                }]);
-
-                if (profileError) {
-                    console.error("Profile Error:", profileError);
-                }
-
-                // ربط تلقائي بالهيكل الأكاديمي لو الحساب عضو هيئة تدريس
-                if (accountType === 'faculty' && normalizedLinkedInstructor) {
-                    const facultyPayload = {
-                        full_name: normalizedLinkedInstructor,
-                        department_key: finalDepartment,
-                        position: finalPosition,
-                        profile_id: authData.user.id,
-                        email: email,
-                        mobile: mobile,
-                        is_active: true,
-                        linked_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    };
-
-                    const { data: updatedFacultyRows, error: facultyUpdateError } = await supabase
-                        .from('faculty_directory')
-                        .update({
-                            department_key: finalDepartment,
-                            position: finalPosition,
-                            profile_id: authData.user.id,
-                            email: email,
-                            mobile: mobile,
-                            is_active: true,
-                            linked_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('full_name', normalizedLinkedInstructor)
-                        .select('id');
-
-                    if (facultyUpdateError) {
-                        console.error("Faculty Directory Update Error:", facultyUpdateError);
-                        throw new Error("تعذر ربط الحساب بالهيكل الأكاديمي");
-                    }
-
-                    // لو الاسم غير موجود أصلًا في الهيكل الأكاديمي، أنشئه من بيانات التسجيل
-                    if (!updatedFacultyRows || updatedFacultyRows.length === 0) {
-                        const { error: facultyInsertError } = await supabase
-                            .from('faculty_directory')
-                            .insert([facultyPayload]);
-
-                        if (facultyInsertError) {
-                            console.error("Faculty Directory Insert Error:", facultyInsertError);
-                            throw new Error("تعذر إضافة العضو إلى الهيكل الأكاديمي");
-                        }
-                    }
-                }
-            }
-
-                // 🔥 نجاح العملية: إخفاء اللودر وإظهار مودال النجاح
-                hideLoader();
-                showSuccessModal();
-
-            } catch (error) {
-                // 🔥 في حالة حدوث أي خطأ (كود خطأ أو فشل تسجيل)
-                hideLoader();
-                errorDiv.textContent = 'تنبيه: ' + error.message;
-                errorDiv.classList.remove('hidden');
-                
-                // إضافة تأثير اهتزاز للفورم للتنبيه بالخطأ
-                document.getElementById('signupForm').classList.add('animate-shake');
-                setTimeout(() => document.getElementById('signupForm').classList.remove('animate-shake'), 500);
-            }
-        });
+        // Registration is handled only by registration-secure.js.
 
 function syncDepartmentDropdownLabel(value) {
     const deptSelect = document.getElementById('reg-dept');
@@ -1134,6 +964,6 @@ window.addEventListener('appinstalled', () => {
     }
 });
     </script>
-<script src="/registration-secure.js?v=20260923-r6.6"></script>
+<script src="/registration-secure.js?v=20260928-r6.7"></script>
 </body>
 </html>

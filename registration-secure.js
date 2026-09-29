@@ -3,11 +3,14 @@
   const form = document.getElementById('signupForm');
   if (!form) return;
 
+  let submitting=false;
   const mobile=document.getElementById('reg-mobile');
   mobile?.addEventListener('input',()=>{mobile.value=mobile.value.replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c));mobile.setCustomValidity(/^[0-9]{11}$/.test(mobile.value)?'':'أدخل رقم موبايل مكوّنًا من 11 رقمًا');});
   form.addEventListener('submit', async function (event) {
     event.preventDefault();
     event.stopImmediatePropagation();
+    if(submitting)return;submitting=true;
+    const button=form.querySelector('button[type=submit]');if(button)button.disabled=true;
     const errorBox = document.getElementById('signup-error');
     window.showLoader?.('جاري التحقق من الكود وإنشاء الحساب…');
     errorBox?.classList.add('hidden');
@@ -41,6 +44,8 @@
         throw new Error(signupError?.message || 'البريد مستخدم بالفعل أو تعذر إنشاء الحساب');
       }
       window.hideLoader?.();
+      const message=document.getElementById('registration-success-message');
+      if(message)message.textContent=details.account_type==='faculty'?'تم إنشاء الحساب، ويجري انتظار اعتماد ربط حسابك بعضو هيئة التدريس من الإدارة.':'تم إنشاء الحساب. يمكنك تسجيل الدخول بعد تأكيد البريد إذا كان مطلوبًا.';
       window.showSuccessModal?.();
     } catch (error) {
       window.hideLoader?.();
@@ -48,6 +53,6 @@
         errorBox.textContent = `تنبيه: ${error.message}`;
         errorBox.classList.remove('hidden');
       }
-    }
+    } finally {submitting=false;if(button)button.disabled=false;}
   }, true);
 })();

@@ -37,6 +37,12 @@
     return `<ul class="dh-list">${rows.map(x=>`<li><div class="dh-time">${E(String(x.start_time||'').slice(0,5))}</div><div class="dh-item-copy"><strong>${E(x.title||'حجز')}</strong><p>${E(dateLabel(x.date))} · ${E(root.getDashboardDepartmentLabel?.(x.department)||'')}</p></div>${requests?'<button class="dh-button" data-dh-admin="meetings">مراجعة</button>':'<span class="dh-badge">مؤكد</span>'}</li>`).join('')}</ul>`;
   }
   function renderFaculty(items,stats,now){
+    if(state.user.faculty_verification_status!=='approved'){
+      $('dh-metrics').innerHTML='';
+      $('dh-workspace').innerHTML=empty(state.user.faculty_verification_status==='pending'?'ربط الهوية بانتظار اعتماد الإدارة':'الهوية الأكاديمية غير مرتبطة','يمكنك استخدام حسابك، ويظهر جدولك الشخصي بعد اعتماد ربط الاسم.');
+      return;
+    }
+
     $('dh-title').textContent='جدولي الدراسي';
     $('dh-subtitle').textContent=M.names(state.user).length?`الأسبوع الحالي · ${dateLabel(M.week(now).start)} — ${dateLabel(M.week(now).end)}`:'اربط اسمك الأكاديمي بحسابك ليظهر جدولك هنا';
     const failed=state.errors.some(x=>['schedule','actions'].includes(x));

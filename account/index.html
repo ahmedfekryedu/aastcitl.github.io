@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="robots" content="noindex,nofollow"><meta name="citl-release" content="20261007-r6.8.2">
+ <title>متابعة اعتماد الحساب | CITL Smart System</title>
+ <link rel="icon" href="/CITL_Logo-32.png"><link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5">
+ <link rel="stylesheet" href="/account/account.css?v=20261007-r6.8.2">
+ <script src="/vendor/supabase-js-2.45.4.min.js?v=20260921-r6.5"></script>
+ <script src="/assets/read-timeout.js?v=20260921-r6.5"></script><script src="/assets/data-client.js?v=20260921-r6.5"></script>
+ <script src="/assets/auth-session.js?v=20261007-r6.8.2"></script>
+</head>
+<body>
+ <header class="account-brand"><img src="/CITL.png" alt="CITL"><div><strong>كلية النقل الدولي واللوجستيات</strong><span dir="ltr">CITL Smart System</span></div></header>
+ <main>
+  <section class="account-card" aria-labelledby="account-title" aria-busy="true">
+   <div class="account-heading"><span class="account-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span id="account-state" class="account-badge">التحقق من حالة الحساب</span></div>
+   <h1 id="account-title">جاري مراجعة حالة طلبك</h1>
+   <p id="account-description">لحظات لعرض أحدث حالة لطلب ربط حسابك بالهوية الأكاديمية.</p>
+   <dl class="account-details" id="account-details"><div><dt>الحساب</dt><dd id="account-name" class="account-skeleton">&nbsp;</dd><dd id="account-email" dir="ltr"></dd></div><div><dt>الاسم الأكاديمي المطلوب</dt><dd id="account-instructor" class="account-skeleton" dir="auto">&nbsp;</dd></div></dl>
+   <p class="account-note">تتاح خدمات النظام بعد اعتماد الإدارة. لا تحتاج إلى إنشاء حساب جديد.</p>
+   <div id="account-editor"></div>
+   <div class="account-actions"><button id="account-refresh" type="button" disabled>تحديث حالة الطلب</button><button id="account-edit" class="secondary" type="button" hidden>اختيار الاسم وإعادة الطلب</button><button id="account-logout" class="secondary" type="button">تسجيل الخروج</button></div>
+   <p id="account-feedback" role="status" aria-live="polite"></p>
+  </section>
+ </main>
+ <footer>كلية النقل الدولي واللوجستيات · متابعة اعتماد الهوية الأكاديمية</footer>
+ <script src="/assets/faculty-identity.js?v=20261007-r6.8.2"></script>
+ <script src="/account/account.js?v=20261007-r6.8.2"></script>
+</body>
+</html>

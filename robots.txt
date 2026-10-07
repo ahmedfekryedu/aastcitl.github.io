@@ -1,0 +1,11 @@
+User-agent: *
+
+Disallow: /tv_display/
+Disallow: /dashboard/
+Disallow: /schedules/
+Disallow: /smrm/
+Disallow: /management/
+Disallow: /attendance/
+Allow: /
+Allow: /today/
+Sitemap: https://aastcitl.me/sitemap.xml

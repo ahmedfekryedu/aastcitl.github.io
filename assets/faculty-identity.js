@@ -90,8 +90,13 @@
     const card=document.createElement('article');card.className='p-3 border border-gray-100 rounded-lg';
     card.innerHTML=`<strong>${e(item.account_name)}</strong><span class="block text-xs" dir="ltr">${e(item.account_email)}</span><p class="text-sm my-1">الاسم الأكاديمي: <b>${e(item.instructor_name)}</b></p><p class="text-xs text-gray-500">القسم: ${e(departmentLabel(item.department_key))} · ${e(new Date(item.created_at).toLocaleString('ar-EG'))}</p><div class="flex gap-2 mt-2"><button type="button" data-review="approve" class="${buttonClass}">اعتماد الربط</button><button type="button" data-review="reject" class="px-3 py-2 rounded-lg text-xs font-bold bg-red-50 text-red-700">رفض الطلب</button></div>`;
     card.querySelectorAll('[data-review]').forEach(button=>button.onclick=async()=>{
-     const confirmFn=root.showConfirmDialog||root.showCustomConfirm|| (async message=>confirm(message));
-     if(!await confirmFn(button.dataset.review==='approve'?`اعتماد ربط حساب «${item.account_name}» بالاسم «${item.instructor_name}»؟`:'رفض طلب الربط مع الاحتفاظ بحساب المستخدم؟'))return;
+     const approving=button.dataset.review==='approve';
+     const message=approving?`اعتماد ربط حساب «${item.account_name}» بالاسم «${item.instructor_name}»؟`:'رفض طلب الربط مع الاحتفاظ بحساب المستخدم؟';
+     const options={title:approving?'اعتماد ربط الهوية الأكاديمية':'رفض طلب ربط الهوية',confirmText:approving?'اعتماد الربط':'رفض الطلب',
+      color:approving?'bg-[#2A3475] hover:bg-[#1f2658]':'bg-red-600 hover:bg-red-700',
+      icon:approving?'fa-user-check':'fa-user-times',iconColor:approving?'text-[#2A3475]':'text-red-600',iconBg:approving?'bg-blue-50':'bg-red-100'};
+     const confirmed=root.showConfirmDialog?await root.showConfirmDialog(e(message),options):root.showCustomConfirm?await root.showCustomConfirm(e(message),options):confirm(message);
+     if(!confirmed)return;
      card.querySelectorAll('button').forEach(b=>b.disabled=true);
      try{await rpc('citl_faculty_links',button.dataset.review,{id:item.id});await loadAdmin();}
      catch(error){host.querySelector('[data-status]').textContent=error.message;card.querySelectorAll('button').forEach(b=>b.disabled=false);}

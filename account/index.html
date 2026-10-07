@@ -2,16 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
- <meta name="robots" content="noindex,nofollow"><meta name="citl-release" content="20261007-r6.8.2">
+ <meta name="robots" content="noindex,nofollow"><meta name="citl-release" content="20261007-r6.8.3">
  <title>متابعة اعتماد الحساب | CITL Smart System</title>
  <link rel="icon" href="/CITL_Logo-32.png"><link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5">
- <link rel="stylesheet" href="/account/account.css?v=20261007-r6.8.2">
+ <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20260921-r6.5">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ <link rel="stylesheet" href="/account/account.css?v=20261007-r6.8.3">
  <script src="/vendor/supabase-js-2.45.4.min.js?v=20260921-r6.5"></script>
  <script src="/assets/read-timeout.js?v=20260921-r6.5"></script><script src="/assets/data-client.js?v=20260921-r6.5"></script>
  <script src="/assets/auth-session.js?v=20261007-r6.8.2"></script>
 </head>
 <body>
- <header class="account-brand"><img src="/CITL.png" alt="CITL"><div><strong>كلية النقل الدولي واللوجستيات</strong><span dir="ltr">CITL Smart System</span></div></header>
+ <header class="account-brand metallic-blue-fill random-slanted-lines">
+  <div class="account-ribbon" aria-label="نسخة تجريبية"><span>نسخة تجريبية</span></div>
+  <div class="account-brand-inner">
+   <div class="account-brand-logo"><img src="/CITL.png" alt="شعار كلية النقل الدولي واللوجستيات"></div>
+   <div class="account-brand-copy"><strong>كلية النقل الدولي واللوجستيات</strong><span class="account-brand-english" lang="en" dir="ltr">College of International Transport &amp; Logistics</span><p>متابعة اعتماد الحساب - CITL Smart System</p></div>
+  </div>
+ </header>
  <main>
   <section class="account-card" aria-labelledby="account-title" aria-busy="true">
    <div class="account-heading"><span class="account-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span id="account-state" class="account-badge">التحقق من حالة الحساب</span></div>
@@ -24,7 +32,42 @@
    <p id="account-feedback" role="status" aria-live="polite"></p>
   </section>
  </main>
- <footer>كلية النقل الدولي واللوجستيات · متابعة اعتماد الهوية الأكاديمية</footer>
+ <footer id="account-footer" class="metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50 mt-auto">
+    <div class="w-full max-w-[98%] mx-auto px-6 py-2 md:py-3">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+
+            <div class="hidden md:flex items-center gap-4">
+                <div class="bg-white p-1 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/20">
+                    <img src="/CITL.png" alt="CITL Logo" class="h-10 w-auto object-contain transform scale-110">
+                </div>
+                <div class="text-right leading-tight">
+                    <h3 class="font-black text-white text-xs md:text-sm tracking-wide">كلية النقل الدولي واللوجستيات</h3>
+                    <p class="text-[#F3A628] text-[9px] md:text-[10px] font-bold font-sans tracking-wider uppercase opacity-90">College of International Transport & Logistics</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-4 text-[11px] md:text-xs">
+                
+                <p class="text-blue-100/90 text-center md:text-right font-medium leading-relaxed">
+                    جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026
+                    <span class="hidden md:inline mx-1">|</span> <br class="md:hidden"> تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).
+                </p>
+
+                <div class="hidden md:block w-px h-5 bg-white/20"></div>
+
+                <div class="flex items-center gap-1.5 md:gap-3 bg-black/20 px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-white/10 shadow-inner">
+                    <a href="https://www.facebook.com/CITLAlexandria" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.linkedin.com/in/CITLAlexandria" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/CITLAlexandria" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/CITLAlexandria" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#F3A628] transition-all text-[10px] md:text-[13px]" aria-label="X"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.youtube.com/@CITLAlexandria" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <div class="w-px h-3 bg-white/10 mx-0.5"></div>
+                    <a href="https://www.aast.edu/en/colleges/citl/alex" target="_blank" rel="noopener noreferrer" class="text-[#F3A628] hover:scale-125 transition-all text-[12px] md:text-sm" aria-label="الموقع الرسمي للكلية"><i class="fas fa-globe"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
  <script src="/assets/faculty-identity.js?v=20261007-r6.8.2"></script>
  <script src="/account/account.js?v=20261007-r6.8.2"></script>
 </body>

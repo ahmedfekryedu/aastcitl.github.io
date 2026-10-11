@@ -678,17 +678,30 @@ function setupCustomDropdowns() {
     return !!(userObj && window.CITLPermissions.full(userObj));
 }
 
-function openScheduleHub() {
-    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-
-    if (isManagerUser(user)) {
-        openScheduleEntryModal();
-    } else {
-        openMyScheduleModal();
-    }
+function hasApprovedTeachingIdentity(user) {
+    return ['faculty', 'visiting_lecturer'].includes(user?.account_type)
+        && user.faculty_verification_status === 'approved'
+        && Array.isArray(user.linked_instructors)
+        && user.linked_instructors.some(name => typeof name === 'string' && name.trim());
 }
-
+function syncScheduleEntryAccess(user) {
+    const faculty = hasApprovedTeachingIdentity(user), manager = isManagerUser(user);
+    document.querySelectorAll('[data-schedule-hub]').forEach(el => el.classList.toggle('hidden', !faculty && !manager));
+    document.querySelectorAll('[data-personal-schedule-entry]').forEach(el => el.classList.toggle('hidden', !faculty));
+    const grid = document.getElementById('schedule-entry-tools');
+    if (grid) grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))';
+    const count = document.getElementById('schedule-entry-count');
+    if (count) count.textContent = faculty ? '3 أدوات رئيسية' : 'أداتان رئيسيتان';
+}
+window.addEventListener('citl-profile-loaded', event => syncScheduleEntryAccess(event.detail));
+function openScheduleHub() {
+    const user = window.currentUser;
+    if (isManagerUser(user)) openScheduleEntryModal();
+    else if (hasApprovedTeachingIdentity(user)) openMyScheduleModal();
+}
 function openScheduleEntryModal() {
+    if (!isManagerUser(window.currentUser)) return;
+    syncScheduleEntryAccess(window.currentUser);
     const modal = document.getElementById('schedule-entry-modal');
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -2324,13 +2337,13 @@ async function getCurrentAcademicInstructorNames() {
 }
 
 async function openMyScheduleModal() {
-    const userStr = localStorage.getItem('currentUser');
-    if (!userStr) {
-        alert('يرجى تسجيل الدخول أولاً');
+    let user;
+    try { user = await window.CITLAuth.loadProfile(); }
+    catch (error) { window.CITLAuth.showFailure(error); return; }
+    if (!hasApprovedTeachingIdentity(user)) {
+        showNotification('الجدول الشخصي متاح لعضو هيئة التدريس بعد اعتماد ربط حسابه.', 'info');
         return;
     }
-
-    const user = JSON.parse(userStr);
     const isManagerUser = user && window.CITLPermissions.full(user);
     const modal = document.getElementById('my-schedule-modal');
     modal.classList.remove('hidden');

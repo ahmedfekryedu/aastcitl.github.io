@@ -517,7 +517,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
                 <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="bg-white/10 hover:bg-white/20 text-white border border-white/10 px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px] hidden"> 
                     <i class="fas fa-cogs text-base text-[#F3A628] ml-2"></i> وضع التعديل 
                 </button>
-                <button onclick="openScheduleHub()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px] focus:outline-none focus:ring-2 focus:ring-[#F3A628]/40"> 
+                <button data-schedule-hub onclick="openScheduleHub()" class="hidden bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg font-bold backdrop-blur-sm transition-all text-[13px] focus:outline-none focus:ring-2 focus:ring-[#F3A628]/40"> 
                     <i class="fas fa-chalkboard-user text-base text-[#F3A628] ml-2"></i> لوحة التحكم
                 </button>
                 
@@ -623,7 +623,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
                 <i class="fas fa-chevron-left text-[10px] opacity-50"></i>
             </a>
             
-<button onclick="openScheduleHub(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right">                <div class="flex items-center gap-3">
+<button data-schedule-hub onclick="openScheduleHub(); toggleMobileMenu();" class="hidden w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right">                <div class="flex items-center gap-3">
                     <i class="fas fa-chalkboard-user text-lg text-[#2A3475]"></i>
                     <span>الجداول الدراسية</span>
                 </div>
@@ -917,13 +917,13 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
         </div>
         <div class="hidden md:flex items-center gap-2 text-[#2A3475] bg-[#2A3475]/5 px-3 py-2 rounded-xl border border-[#2A3475]/10 text-xs font-black">
             <i class="fas fa-grid-2"></i>
-            <span>3 أدوات رئيسية</span>
+            <span id="schedule-entry-count">أدوات الجداول</span>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+    <div id="schedule-entry-tools" class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
         
-        <button onclick="closeScheduleEntryModal(); openMyScheduleModal();" class="group h-full min-h-[230px] bg-white border border-gray-200 rounded-[26px] p-6 text-right shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#2A3475]/30 transition-all duration-300 flex flex-col relative overflow-hidden">
+        <button data-personal-schedule-entry onclick="closeScheduleEntryModal(); openMyScheduleModal();" class="hidden group h-full min-h-[230px] bg-white border border-gray-200 rounded-[26px] p-6 text-right shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#2A3475]/30 transition-all duration-300 flex flex-col relative overflow-hidden">
             <div class="absolute top-0 left-0 w-24 h-24 bg-[#2A3475]/5 rounded-full -ml-8 -mt-8 group-hover:scale-125 transition-transform duration-500"></div>
             
             <div class="relative z-10 flex items-start justify-between gap-3 mb-5">
@@ -1550,7 +1550,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20260921-r6.5"></script>
-<script src="/assets/pages/schedules-1.js?v=20261011-r6.8.6"></script>
+<script src="/assets/pages/schedules-1.js?v=20261011-r6.8.7.1"></script>
 <script src="/security-core.js?v=20260928-r6.7"></script>
 <script src="/assets/department-heads.js?v=20260929-r6.8"></script>
 <script src="/assets/faculty-identity.js?v=20261011-r6.8.6"></script>

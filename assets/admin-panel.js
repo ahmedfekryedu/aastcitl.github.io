@@ -19,7 +19,7 @@ function openAdminPanel() {
     const allTabs = document.querySelectorAll('.admin-tab');
 
     if (window.CITLPermissions.full(currentUser)) {
-        allTabs.forEach(tab => tab.style.display = 'flex');
+        allTabs.forEach(tab => tab.style.display = tab.dataset.tab === 'my-bookings' ? 'none' : 'flex');
 
         if (typeof updateAdminMeetingsList === 'function') {
             try { updateAdminMeetingsList(); } catch (e) { console.error(e); }
@@ -38,7 +38,7 @@ function openAdminPanel() {
 
     } else {
         allTabs.forEach(tab => {
-            if (tab.dataset.tab === 'profile') {
+            if (tab.dataset.tab === 'profile' || (tab.dataset.tab === 'my-bookings' && currentUser?.role !== 'manager')) {
                 tab.style.display = 'flex';
             } else {
                 tab.style.display = 'none';
@@ -52,6 +52,7 @@ function openAdminPanel() {
 }
 
 function switchAdminTab(tabName) {
+    if (tabName === 'my-bookings') window.CITLMemberBookings?.load();
     document.querySelectorAll('.admin-tab').forEach(btn => {
         btn.classList.remove('active', 'bg-gray-100');
 

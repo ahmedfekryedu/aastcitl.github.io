@@ -635,33 +635,6 @@ function normalizeFacultyName(value) {
 
 let signupFacultyNames = [];
 let signupFacultyRequest = 0;
-let signupFacultyDirectoryByName = new Map();
-
-async function loadSignupFacultyDirectoryMap() {
-    try {
-        const { data, error } = await supabase
-            .from('faculty_directory_public')
-            .select('full_name, department_key, position, is_active')
-            .eq('is_active', true);
-
-        if (error) throw error;
-
-        signupFacultyDirectoryByName = new Map(
-            (data || [])
-                .map(item => ({
-                    full_name: normalizeFacultyName(item.full_name),
-                    department_key: String(item.department_key || '').trim(),
-                    position: String(item.position || '').trim()
-                }))
-                .filter(item => item.full_name)
-                .map(item => [item.full_name, item])
-        );
-    } catch (err) {
-        console.error('Failed to load faculty_directory map:', err);
-        signupFacultyDirectoryByName = new Map();
-    }
-}
-
 async function loadSignupFacultyNames() {
     const request=++signupFacultyRequest;
     try {
@@ -789,27 +762,6 @@ function syncDepartmentDropdownLabel(value) {
     }
 }
 
-function applyFacultyDirectorySelection(selectedName) {
-    const normalizedName = normalizeFacultyName(selectedName);
-    const row = signupFacultyDirectoryByName.get(normalizedName);
-
-    const deptInput = document.getElementById('reg-dept');
-    const positionInput = document.getElementById('reg-position');
-
-    // لو الاسم موجود في الهيكل الأكاديمي: عبّي البيانات تلقائيًا
-    if (row) {
-        if (deptInput && row.department_key) {
-            deptInput.value = row.department_key;
-            deptInput.dispatchEvent(new Event('change'));
-            syncDepartmentDropdownLabel(row.department_key);
-        }
-
-        if (positionInput) {
-            positionInput.value = row.position || '';
-        }
-    }
-}
-
         // --- دالة تشغيل القوائم المنسدلة ---
 function setupCustomDropdowns() {
     document.addEventListener('click', (e) => {
@@ -834,9 +786,6 @@ function setupCustomDropdowns() {
                 toggleFacultyLinkBlock();
             }
 
-            if (target === 'reg-linked-instructor') {
-                applyFacultyDirectorySelection(value);
-            }
             dropdown.querySelector('.custom-dropdown-options').classList.add('hidden');
             const arrow = dropdown.querySelector('.fa-chevron-down');
             if (arrow) arrow.style.transform = 'rotate(0deg)';
@@ -875,7 +824,7 @@ function setupCustomDropdowns() {
 }
 
         setupCustomDropdowns();
-        loadSignupFacultyDirectoryMap().then(() => loadSignupFacultyNames());
+        loadSignupFacultyNames();
         bindAccountTypeWatcher();
         toggleFacultyLinkBlock();
         function showSuccessModal() {
@@ -964,6 +913,6 @@ window.addEventListener('appinstalled', () => {
     }
 });
     </script>
-<script src="/registration-secure.js?v=20260928-r6.7"></script>
+<script src="/registration-secure.js?v=20261011-r6.8.7"></script>
 </body>
 </html>

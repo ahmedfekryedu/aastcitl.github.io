@@ -4,6 +4,7 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'my-bookings') return !!current() && current().role !== 'manager' && !root.CITLAuth.facultyPending(current());
     if (permissions.full(current()) || tab === 'profile') return true;
     if (tab === 'users') return can('can_manage_users');
     if (tab === 'meetings') return can('can_approve') || can('can_delete');

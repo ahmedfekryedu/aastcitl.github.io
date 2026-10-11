@@ -1,1 +1,1 @@
-{"release":"20261011-r6.8.6","built_at":"2026-10-11","description":"Require secure registration tickets and safely render administrative data without changing ownership or schedules."}
+{"release": "20261011-r6.8.7", "built_at": "2026-10-11", "description": "Account header alignment, registration job title repair, deleted-account session checks and member-only booking history; includes R6.8.6 security fixes."}

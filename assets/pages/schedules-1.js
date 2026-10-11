@@ -4646,7 +4646,7 @@ function showCustomConfirm(message) {
                     </div>
                     
                     <h3 class="text-xl font-bold text-gray-800 mb-2">تأكيد الإجراء</h3>
-                    <p class="text-sm text-gray-600 leading-relaxed mb-6 font-semibold whitespace-pre-line">${message}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6 font-semibold whitespace-pre-line">${window.CITLSecure.htmlEscape(message)}</p>
                     
                     <div class="flex gap-3">
                         <button id="btn-confirm-yes" class="flex-1 bg-[#2A3475] text-white py-3 rounded-xl font-bold hover:bg-[#1f2658] shadow-lg transition-all transform active:scale-95">

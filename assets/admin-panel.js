@@ -1,3 +1,11 @@
+// Dispatch only the established actions; database values never become script source.
+window.CITLBindMeetingActions = function(row, id) {
+    const allowed = ['approveModification','rejectModification','confirmDeleteRequest','rejectDeleteRequest','approveMeeting','rejectMeeting','deleteMeetingFromAdmin','editMeetingFromAdmin'];
+    row.querySelectorAll('[data-meeting-action]').forEach(button => {
+        const action = button.dataset.meetingAction;
+        if (allowed.includes(action)) button.addEventListener('click', () => window[action](id));
+    });
+};
 // Shared admin operations; host calendar/dashboard entrypoints stay separate.
 let activeFacultyDirectoryDepartment = '';
 
@@ -219,8 +227,8 @@ async function updateAdminUsersList() {
                     const position = user.position || '---';
 
                     const mobileDisplay = user.mobile
-                        ? `<div class="text-[10px] text-[#2A3475] font-bold font-sans mt-0.5 flex items-center gap-1" title="${user.mobile}">
-                                <i class="fas fa-phone-alt text-gray-400 text-[9px]"></i> ${user.mobile}
+                        ? `<div class="text-[10px] text-[#2A3475] font-bold font-sans mt-0.5 flex items-center gap-1" title="${escapeDirectoryText(user.mobile)}">
+                                <i class="fas fa-phone-alt text-gray-400 text-[9px]"></i> ${escapeDirectoryText(user.mobile)}
                            </div>`
                         : '';
 
@@ -241,7 +249,7 @@ async function updateAdminUsersList() {
                             if (isMe) {
                                 return `
                                     <div class="flex justify-center gap-1">
-                                        <button onclick="openEditUserInfo('${user.id}', '${user.full_name || ''}', '${user.department || ''}', '${user.position || ''}', '${user.mobile || ''}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 transition-colors" title="تعديل بياناتي">
+                                        <button data-user-action="edit" class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 transition-colors" title="تعديل بياناتي">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
                                         <span class="text-[10px] text-gray-400 mx-1 bg-yellow-100 text-yellow-700 px-2 py-1 rounded border border-yellow-200 font-bold">أنت</span>
@@ -259,12 +267,12 @@ async function updateAdminUsersList() {
                         }
 
                         let html = `<div class="flex justify-center gap-1">`;
-                        html += `<button onclick="openEditUserInfo('${user.id}', '${user.full_name || ''}', '${user.department || ''}', '${user.position || ''}', '${user.mobile || ''}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="تعديل"><i class="fas fa-pen text-xs"></i></button>`;
+                        html += `<button data-user-action="edit" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="تعديل"><i class="fas fa-pen text-xs"></i></button>`;
 
                         if (!isMe) {
-                            const permString = encodeURIComponent(JSON.stringify(user.permissions || {}));
-                            html += `<button onclick="openPermissionsModal('${user.id}', '${user.full_name}', '${permString}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="الصلاحيات"><i class="fas fa-user-cog text-xs"></i></button>`;
-                            html += `<button onclick="deleteUser('${user.id}', '${user.full_name}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف"><i class="fas fa-trash-alt text-xs"></i></button>`;
+
+                            html += `<button data-user-action="permissions" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="الصلاحيات"><i class="fas fa-user-cog text-xs"></i></button>`;
+                            html += `<button data-user-action="delete" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف"><i class="fas fa-trash-alt text-xs"></i></button>`;
                         } else {
                             html += `<span class="text-[10px] text-gray-400 mx-1 bg-gray-100 px-2 py-1 rounded">أنت</span>`;
                         }
@@ -296,22 +304,22 @@ async function updateAdminUsersList() {
                     tr.innerHTML = `
 <td class="px-4 py-3">
     <div class="min-w-0">
-        <div class="font-bold text-gray-800 text-sm truncate max-w-[220px] flex items-center gap-2" title="${user.full_name || ''}">
+        <div class="font-bold text-gray-800 text-sm truncate max-w-[220px] flex items-center gap-2" title="${escapeDirectoryText(user.full_name || '')}">
             <span data-name-dot class="inline-flex w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-300'}"></span>
-            <span>${user.full_name || 'مستخدم'}</span>
+            <span>${escapeDirectoryText(user.full_name || 'مستخدم')}</span>
             ${isFounderRow ? '<i class="fas fa-crown text-[#F3A628] text-[10px]" title="المؤسس"></i>' : ''}
         </div>
-        <div class="text-[10px] text-gray-400 truncate max-w-[220px] font-sans">${user.email || ''}</div>
+        <div class="text-[10px] text-gray-400 truncate max-w-[220px] font-sans">${escapeDirectoryText(user.email || '')}</div>
         ${mobileDisplay}
     </div>
 </td>
 
-<td class="px-4 py-3 text-sm text-gray-700 font-medium max-w-[140px] truncate" title="${position}">
-    ${position}
+<td class="px-4 py-3 text-sm text-gray-700 font-medium max-w-[140px] truncate" title="${escapeDirectoryText(position)}">
+    ${escapeDirectoryText(position)}
 </td>
 
 <td class="px-4 py-3 text-sm text-gray-600 max-w-[150px]">
-    <div class="truncate" title="${deptName || ''}">${deptName || '—'}</div>
+    <div class="truncate" title="${escapeDirectoryText(deptName || '')}">${escapeDirectoryText(deptName || '—')}</div>
 </td>
 
 <td class="px-4 py-3 text-center align-middle">
@@ -327,6 +335,13 @@ async function updateAdminUsersList() {
 </td>
 `;
 
+tr.querySelectorAll('[data-user-action]').forEach(button => {
+    button.addEventListener('click', () => {
+        if (button.dataset.userAction === 'edit') return openEditUserInfo(user.id, user.full_name || '', user.department || '', user.position || '', user.mobile || '');
+        if (button.dataset.userAction === 'permissions') return openPermissionsModal(user.id, user.full_name || '', encodeURIComponent(JSON.stringify(user.permissions || {})));
+        return window.deleteUser(user.id, user.full_name || '');
+    });
+});
 activeUsersList.appendChild(tr);
                 });
             }
@@ -352,7 +367,7 @@ activeUsersList.appendChild(tr);
                     .forEach(([dName, count]) => {
                         deptStats.innerHTML += `
                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <span class="text-gray-700 font-bold text-xs truncate ml-2">${dName}</span>
+                                <span class="text-gray-700 font-bold text-xs truncate ml-2">${escapeDirectoryText(dName)}</span>
                                 <span class="bg-[#2A3475] text-white px-2 py-0.5 rounded text-xs font-bold">${count}</span>
                             </div>
                         `;
@@ -630,9 +645,9 @@ async function renderTodayAgenda() {
 
         body.innerHTML = meetings.map(m => `
             <tr class="hover:bg-blue-50/30 transition-colors">
-                <td class="px-6 py-5 font-black text-[#2A3475]">${m.start_time}</td>
+                <td class="px-6 py-5 font-black text-[#2A3475]">${escapeDirectoryText(m.start_time)}</td>
                 <td class="px-6 py-5">
-                    <div class="font-bold text-slate-800">${m.title || 'اجتماع مجلس'}</div>
+                    <div class="font-bold text-slate-800">${escapeDirectoryText(m.title || 'اجتماع مجلس')}</div>
                     <div class="text-[9px] text-gray-400 uppercase">Council Chamber</div>
                 </td>
                 <td class="px-6 py-5 text-center">
@@ -669,7 +684,7 @@ function updateRoomHeaderUI() {
 
     if (nameEl) nameEl.textContent = currentRoom.name ?? '—';
     if (capEl) capEl.innerHTML  = `<i class="fas fa-chair ml-1.5 text-[#F3A628]"></i> السعة: ${currentRoom.capacity ?? '—'} أشخاص`;
-    if (featEl) featEl.innerHTML = `<i class="fas fa-wifi ml-1.5 text-[#F3A628]"></i> ${currentRoom.features ?? '—'}`;
+    if (featEl) featEl.innerHTML = `<i class="fas fa-wifi ml-1.5 text-[#F3A628]"></i> ${escapeDirectoryText(currentRoom.features ?? '—')}`;
 }
 
 function ensureRoomPickerUI() {
@@ -716,18 +731,19 @@ async function openRoomPicker() {
         <button
             type="button"
             class="text-right bg-gray-50 hover:bg-white border border-gray-200 hover:border-[#2A3475]/40 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all"
-            onclick="selectRoom('${r.id}')"
+            data-room-id="${escapeDirectoryText(r.id)}"
         >
-            <div class="text-[#2A3475] font-black text-base mb-2">${r.name}</div>
+            <div class="text-[#2A3475] font-black text-base mb-2">${escapeDirectoryText(r.name)}</div>
             <div class="text-gray-600 text-sm font-bold">
                 السعة: ${r.capacity ?? '—'} أشخاص
                 <span class="text-gray-300 mx-2">|</span>
-                ${r.features ?? '—'}
+                ${escapeDirectoryText(r.features ?? '—')}
             </div>
             ${String(r.id) === String(currentRoomId) ? `<div class="text-[10px] font-black text-green-700 mt-2">القــاعة الحالية</div>` : ``}
         </button>
     `).join('');
 
+    grid.querySelectorAll('[data-room-id]').forEach(button => button.addEventListener('click', () => selectRoom(button.dataset.roomId)));
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }
@@ -859,15 +875,16 @@ function renderRoomsAdminList() {
     el.innerHTML = (rooms || []).map(r => `
         <button type="button"
             class="w-full text-right p-3 rounded-xl border hover:bg-gray-50 transition-all"
-            onclick="pickRoomForEdit('${r.id}')"
+            data-edit-room-id="${escapeDirectoryText(r.id)}"
         >
-            <div class="font-black text-[#2A3475]">${r.name}</div>
+            <div class="font-black text-[#2A3475]">${escapeDirectoryText(r.name)}</div>
             <div class="text-xs font-bold text-gray-600">
-                السعة: ${r.capacity ?? '—'} | ${r.features ?? '—'}
+                السعة: ${r.capacity ?? '—'} | ${escapeDirectoryText(r.features ?? '—')}
             </div>
             ${String(r.id) === String(currentRoomId) ? `<div class="text-[10px] font-black text-green-700 mt-1">القــاعة الحالية</div>` : ``}
         </button>
     `).join('');
+    el.querySelectorAll('[data-edit-room-id]').forEach(button => button.addEventListener('click', () => pickRoomForEdit(button.dataset.editRoomId)));
 }
 
 function pickRoomForEdit(id) {
@@ -966,7 +983,7 @@ async function deleteRoom() {
     // تحديث القائمة المنسدلة في الواجهة الرئيسية إذا لزم الأمر
     const selector = document.getElementById('room-selector');
     if (selector && typeof rooms !== 'undefined') {
-        selector.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        selector.innerHTML = rooms.map(r => `<option value="${escapeDirectoryText(r.id)}">${escapeDirectoryText(r.name)}</option>`).join('');
     }
 
     if (typeof hideLoader === 'function') hideLoader();
@@ -1045,7 +1062,8 @@ function escapeDirectoryText(value) {
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/'/g, '&#39;');
 }
 
 function setDirectoryOtherInput(inputId, show, value) {
@@ -1264,11 +1282,11 @@ function renderFacultyDirectoryTable() {
                 <td class="px-4 py-3">
                     <div class="flex items-start gap-3">
                         <div class="w-8 h-8 rounded-full ${avatarColor} text-white flex items-center justify-center text-xs font-bold shrink-0 border border-gray-200 mt-1">
-                            ${avatarText}
+                            ${escapeDirectoryText(avatarText)}
                         </div>
                         <div class="min-w-0">
-                            <div class="font-bold text-gray-800 text-sm truncate max-w-[180px]" title="${item.full_name || ''}">
-                                ${item.full_name || '—'}
+                            <div class="font-bold text-gray-800 text-sm truncate max-w-[180px]" title="${escapeDirectoryText(item.full_name || '')}">
+                                ${escapeDirectoryText(item.full_name || '—')}
                             </div>
                             <div class="text-[11px] text-gray-400 mt-1">
                                 عضو داخل الهيكل الأكاديمي
@@ -1279,23 +1297,23 @@ function renderFacultyDirectoryTable() {
 
                 <td class="px-4 py-3">
                     <span class="text-gray-700 font-bold text-sm">
-                        ${getDepartmentDisplayName(item.department_key)}
+                        ${escapeDirectoryText(getDepartmentDisplayName(item.department_key))}
                     </span>
                 </td>
 
                 <td class="px-4 py-3">
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-[#2A3475]/5 text-[#2A3475] text-[11px] font-bold border border-[#2A3475]/10">
-                        ${item.position || '—'}
+                        ${escapeDirectoryText(item.position || '—')}
                     </span>
                 </td>
 
                 <td class="px-4 py-3 text-center">
                     <div class="flex justify-center gap-1">
-                        <button onclick="editFacultyDirectoryEntry('${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="تعديل">
+                        <button data-directory-edit="${escapeDirectoryText(item.id)}" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="تعديل">
                             <i class="fas fa-pen text-xs"></i>
                         </button>
 
-                        <button onclick="deleteFacultyDirectoryEntry('${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف">
+                        <button data-directory-delete="${escapeDirectoryText(item.id)}" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف">
                             <i class="fas fa-trash-alt text-xs"></i>
                         </button>
                     </div>
@@ -1303,6 +1321,8 @@ function renderFacultyDirectoryTable() {
             </tr>
         `;
     }).join('');
+    tbody.querySelectorAll('[data-directory-edit]').forEach(button => button.addEventListener('click', () => editFacultyDirectoryEntry(button.dataset.directoryEdit)));
+    tbody.querySelectorAll('[data-directory-delete]').forEach(button => button.addEventListener('click', () => deleteFacultyDirectoryEntry(button.dataset.directoryDelete)));
 }
 
 async function handleFacultyDirectoryDepartmentChange() {
@@ -1525,7 +1545,7 @@ function showCustomConfirm(message) {
                     </div>
                     
                     <h3 class="text-xl font-bold text-gray-800 mb-2">تأكيد الإجراء</h3>
-                    <p class="text-sm text-gray-600 leading-relaxed mb-6 font-semibold whitespace-pre-line">${message}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6 font-semibold whitespace-pre-line">${window.CITLSecure.htmlEscape(message)}</p>
                     
                     <div class="flex gap-3">
                         <button id="btn-confirm-yes" class="flex-1 bg-[#2A3475] text-white py-3 rounded-xl font-bold hover:bg-[#1f2658] shadow-lg transition-all">
@@ -1636,7 +1656,7 @@ window.bulkDeleteMeetings = async function() {
             const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
 
             // ✅ استخدام النافذة الاحترافية مع عرض العدد
-            const isConfirmed = await showConfirmDialog(`هل أنت متأكد من حذف <span class="text-red-600 font-bold text-lg">${idsToDelete.length}</span> حجز دفعة واحدة؟`);
+            const isConfirmed = await showConfirmDialog(`هل أنت متأكد من حذف ${idsToDelete.length} حجز دفعة واحدة؟`);
             
             if(!isConfirmed) return;
 

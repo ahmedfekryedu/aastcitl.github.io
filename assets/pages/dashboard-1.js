@@ -783,7 +783,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                     <div class="p-1 md:p-1.5 h-full flex flex-col justify-between overflow-hidden text-white">
                         <div class="flex flex-col gap-0.5">
                             <p class="text-[9px] md:text-[11px] font-black leading-tight truncate text-right">
-                                ${meeting.title}
+                                ${window.CITLSecure.htmlEscape(meeting.title)}
                             </p>
                             <p class="text-[7px] md:text-[9px] font-bold opacity-90 truncate text-right flex items-center justify-start gap-1">
                                 <i class="fas fa-building text-[6px] md:text-[8px] opacity-70"></i>
@@ -793,7 +793,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                         
                         <div class="flex items-center justify-between mt-0.5 border-t border-white/20 pt-0.5">
                             <span class="text-[8px] md:text-[10px] font-bold opacity-90 whitespace-nowrap">
-                                ${toArabicNum(meeting.startTime)}
+                                ${window.CITLSecure.htmlEscape(toArabicNum(meeting.startTime))}
                             </span>
                             <i class="fas fa-bookmark text-[7px] md:text-[9px] opacity-60"></i>
                         </div>
@@ -1451,10 +1451,10 @@ function showMeetingDetails(meeting) {
         <div class="pb-4 mb-4 border-b border-gray-100">
             <div class="flex flex-col md:flex-row justify-between items-start gap-3">
                 <div class="min-w-0 flex-1">
-                    <h4 class="text-lg md:text-2xl font-bold text-[#2A3475] mb-1 break-words leading-tight">${meeting.title}</h4>
+                    <h4 class="text-lg md:text-2xl font-bold text-[#2A3475] mb-1 break-words leading-tight">${window.CITLSecure.htmlEscape(meeting.title)}</h4>
                     <div class="flex items-center text-xs md:text-sm text-gray-500 font-bold">
                         <i class="fas fa-building text-[#F3A628] ml-2"></i>
-                        <span>${departments[meeting.department] ? departments[meeting.department].name : meeting.department}</span>
+                        <span>${window.CITLSecure.htmlEscape(departments[meeting.department] ? departments[meeting.department].name : meeting.department)}</span>
                     </div>
                 </div>
                 <span class="px-3 py-1 bg-green-50 text-green-700 border border-green-100 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap self-start flex items-center">
@@ -1477,7 +1477,7 @@ function showMeetingDetails(meeting) {
                 <div class="text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">التوقيت والمدة</div>
                 <div class="text-xs md:text-sm font-bold text-gray-800 flex items-center">
                     <i class="far fa-clock text-[#2A3475] ml-2"></i>
-                    ${toArabicNum(meeting.startTime)} - ${toArabicNum(meeting.endTime)} 
+                    ${window.CITLSecure.htmlEscape(toArabicNum(meeting.startTime))} - ${window.CITLSecure.htmlEscape(toArabicNum(meeting.endTime))} 
                     <span class="text-[10px] text-gray-400 mr-2">(${durationHrs} ساعة)</span>
                 </div>
             </div>
@@ -1487,18 +1487,18 @@ function showMeetingDetails(meeting) {
             ${meeting.attendees ? `
             <div>
                 <h5 class="text-xs md:text-sm font-bold text-[#2A3475] mb-2 flex items-center"><i class="fas fa-users ml-2 text-gray-400"></i> الحضور</h5>
-                <div class="bg-white border border-gray-100 rounded-lg p-2.5 text-xs md:text-sm text-gray-600 font-bold leading-relaxed">${meeting.attendees}</div>
+                <div class="bg-white border border-gray-100 rounded-lg p-2.5 text-xs md:text-sm text-gray-600 font-bold leading-relaxed">${window.CITLSecure.htmlEscape(meeting.attendees)}</div>
             </div>` : ''}
             
             ${meeting.description ? `
             <div>
                 <h5 class="text-xs md:text-sm font-bold text-[#2A3475] mb-2 flex items-center"><i class="fas fa-align-right ml-2 text-gray-400"></i> ملاحظات</h5>
-                <div class="bg-blue-50/30 rounded-lg p-3 text-xs md:text-sm text-gray-600 leading-relaxed border border-blue-50">${meeting.description}</div>
+                <div class="bg-blue-50/30 rounded-lg p-3 text-xs md:text-sm text-gray-600 leading-relaxed border border-blue-50">${window.CITLSecure.htmlEscape(meeting.description)}</div>
             </div>` : ''}
         </div>
 
         <div class="mt-6 pt-4 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[9px] md:text-[10px] text-gray-400">
-            <div class="flex items-center"><i class="fas fa-user-edit ml-1"></i> محجوز بواسطة: <span class="font-bold text-gray-500 mr-1">${creatorName}</span></div>
+            <div class="flex items-center"><i class="fas fa-user-edit ml-1"></i> محجوز بواسطة: <span class="font-bold text-gray-500 mr-1">${window.CITLSecure.htmlEscape(creatorName)}</span></div>
             <div class="flex items-center"><i class="fas fa-history ml-1"></i> تاريخ الطلب: ${createdDateDisplay}</div>
         </div>
         
@@ -1714,7 +1714,7 @@ function editMeeting() {
                         <div class="absolute right-0 top-1.5 w-5 h-5 bg-white border-2 border-[#F3A628] rounded-full z-10"></div>
                         
                         <div class="flex-1">
-                            <div class="font-bold text-xs text-[#2A3475]">${meeting.title}</div>
+                            <div class="font-bold text-xs text-[#2A3475]">${window.CITLSecure.htmlEscape(meeting.title)}</div>
                             <div class="text-[10px] text-gray-500 mt-0.5 flex items-center">
                                 <i class="far fa-clock ml-1"></i> ${new Date(meeting.date).toLocaleDateString('ar-EG', {month:'numeric', day:'numeric'})} | ${meeting.startTime}
                             </div>
@@ -1784,7 +1784,7 @@ function editMeeting() {
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="text-red-800 font-bold text-sm mb-1"><i class="fas fa-circle text-[10px] animate-pulse ml-2"></i> القاعة مشغولة حالياً</h4>
-                                <p class="text-gray-700 font-bold text-base">${currentMeeting.title}</p>
+                                <p class="text-gray-700 font-bold text-base">${window.CITLSecure.htmlEscape(currentMeeting.title)}</p>
                                 <p class="text-xs text-gray-500 mt-1">بواسطة: ${departments[currentMeeting.department].name}</p>
                             </div>
                             <div class="text-left">
@@ -2317,30 +2317,30 @@ window.renderAdminMeetingsTable = function(list) {
                 const changes = m.pending_changes || {};
                 detailsHTML = `
                     <div class="text-[10px] text-gray-500 mt-1 bg-blue-50 p-1 rounded border border-blue-100">
-                        <div class="flex justify-between"><span>من:</span> <b>${new Date(m.date).toLocaleDateString('ar-EG')} (${toArabicNum(m.startTime)})</b></div>
-                        <div class="flex justify-between text-blue-700"><span>إلى:</span> <b>${new Date(changes.date).toLocaleDateString('ar-EG')} (${toArabicNum(changes.start_time)})</b></div>
+                        <div class="flex justify-between"><span>من:</span> <b>${new Date(m.date).toLocaleDateString('ar-EG')} (${window.CITLSecure.htmlEscape(toArabicNum(m.startTime))})</b></div>
+                        <div class="flex justify-between text-blue-700"><span>إلى:</span> <b>${new Date(changes.date).toLocaleDateString('ar-EG')} (${window.CITLSecure.htmlEscape(toArabicNum(changes.start_time))})</b></div>
                     </div>
                 `;
 
                 actionButtons = `
-                    <button onclick="window.approveModification('${m.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm ml-2">قبول التعديل</button>
-                    <button onclick="window.rejectModification('${m.id}')" class="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-600 shadow-sm">إبقاء القديم</button>
+                    <button data-meeting-action="approveModification" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm ml-2">قبول التعديل</button>
+                    <button data-meeting-action="rejectModification" class="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-600 shadow-sm">إبقاء القديم</button>
                 `;
             } 
             // --- ب. طلب إلغاء ---
             else if (m.status === 'cancellation_requested') {
                 statusBadge = '<span class="text-red-600 font-bold text-xs"><i class="fas fa-trash-alt ml-1"></i> طلب إلغاء</span>';
                 actionButtons = `
-                    <button onclick="window.confirmDeleteRequest('${m.id}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm ml-2">تأكيد الحذف</button>
-                    <button onclick="window.rejectDeleteRequest('${m.id}')" class="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-600 shadow-sm">رفض</button>
+                    <button data-meeting-action="confirmDeleteRequest" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm ml-2">تأكيد الحذف</button>
+                    <button data-meeting-action="rejectDeleteRequest" class="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-600 shadow-sm">رفض</button>
                 `;
             }
             // --- ج. حجز جديد ---
             else {
                 statusBadge = '<span class="text-green-600 font-bold text-xs"><i class="fas fa-plus-circle ml-1"></i> حجز جديد</span>';
                 actionButtons = `
-                    <button onclick="window.approveMeeting('${m.id}')" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm ml-2">موافقة</button>
-                    <button onclick="window.rejectMeeting('${m.id}')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm">رفض</button>
+                    <button data-meeting-action="approveMeeting" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm ml-2">موافقة</button>
+                    <button data-meeting-action="rejectMeeting" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm">رفض</button>
                 `;
             }
 
@@ -2350,16 +2350,16 @@ window.renderAdminMeetingsTable = function(list) {
 
             tr.innerHTML = `
                 <td class="px-6 py-4 font-bold text-gray-800">
-                    ${m.title}
+                    ${window.CITLSecure.htmlEscape(m.title)}
                     <div class="mt-1">${statusBadge}</div>
                 </td>
                 <td class="px-6 py-4 text-xs text-gray-600">
-                    <div class="font-bold">${deptInfo.name}</div>
-                    <div class="text-[10px] text-gray-500">${m.createdBy || '---'}</div>
+                    <div class="font-bold">${window.CITLSecure.htmlEscape(deptInfo.name)}</div>
+                    <div class="text-[10px] text-gray-500">${window.CITLSecure.htmlEscape(m.createdBy || '---')}</div>
                 </td>
                 <td class="px-6 py-4 text-xs font-sans">
                     <span class="block font-bold text-[#2A3475]">${new Date(m.date).toLocaleDateString('ar-EG')}</span>
-                    <span class="block text-gray-600 font-bold mt-1" dir="ltr">${toArabicNum(m.startTime)} - ${toArabicNum(m.endTime)}</span>
+                    <span class="block text-gray-600 font-bold mt-1" dir="ltr">${window.CITLSecure.htmlEscape(toArabicNum(m.startTime))} - ${window.CITLSecure.htmlEscape(toArabicNum(m.endTime))}</span>
                     ${detailsHTML}
                 </td>
                 <td class="px-6 py-4 text-center">
@@ -2368,7 +2368,7 @@ window.renderAdminMeetingsTable = function(list) {
                     </div>
                 </td>
             `;
-            pendingTbody.appendChild(tr);
+            window.CITLBindMeetingActions(tr, m.id); pendingTbody.appendChild(tr);
         });
     } else {
         pendingSection.classList.add('hidden');
@@ -2390,19 +2390,19 @@ window.renderAdminMeetingsTable = function(list) {
             tr.className = 'border-b border-gray-50 hover:bg-gray-50';
             tr.innerHTML = `
                 <td class="px-6 py-4"><input type="checkbox" class="meeting-checkbox rounded border-gray-300" value="${m.id}"></td>
-                <td class="px-6 py-4 font-bold text-[#2A3475] text-sm">${m.title}</td>
-                <td class="px-6 py-4 text-xs text-gray-600">${deptInfo.name}</td>
+                <td class="px-6 py-4 font-bold text-[#2A3475] text-sm">${window.CITLSecure.htmlEscape(m.title)}</td>
+                <td class="px-6 py-4 text-xs text-gray-600">${window.CITLSecure.htmlEscape(deptInfo.name)}</td>
                 <td class="px-6 py-4 text-xs text-gray-500">
                     <div>${new Date(m.date).toLocaleDateString('ar-EG')}</div>
-                    <div class="text-[10px] font-bold mt-1" dir="ltr">${toArabicNum(m.startTime)} - ${toArabicNum(m.endTime)}</div>
+                    <div class="text-[10px] font-bold mt-1" dir="ltr">${window.CITLSecure.htmlEscape(toArabicNum(m.startTime))} - ${window.CITLSecure.htmlEscape(toArabicNum(m.endTime))}</div>
                 </td>
                 <td class="px-6 py-4">${statusDisplay}</td>
                 <td class="px-6 py-4 text-center">
-                   <button onclick="window.deleteMeetingFromAdmin('${m.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-full"><i class="fas fa-trash-alt"></i></button>
-                   <button onclick="window.editMeetingFromAdmin('${m.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-full"><i class="fas fa-edit"></i></button>
+                   <button data-meeting-action="deleteMeetingFromAdmin" class="text-red-500 hover:bg-red-50 p-2 rounded-full"><i class="fas fa-trash-alt"></i></button>
+                   <button data-meeting-action="editMeetingFromAdmin" class="text-blue-500 hover:bg-blue-50 p-2 rounded-full"><i class="fas fa-edit"></i></button>
                 </td>
             `;
-            approvedTbody.appendChild(tr);
+            window.CITLBindMeetingActions(tr, m.id); approvedTbody.appendChild(tr);
         });
     }
 };
@@ -2479,19 +2479,19 @@ function showConfirmDialog(message, options = {}) {
         
         modal.innerHTML = `
             <div class="p-6 text-center">
-                <div class="w-16 h-16 ${settings.iconBg} rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas ${settings.icon} ${settings.iconColor} text-2xl animate-pulse"></i>
+                <div class="w-16 h-16 ${window.CITLSecure.htmlEscape(settings.iconBg)} rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas ${window.CITLSecure.htmlEscape(settings.icon)} ${window.CITLSecure.htmlEscape(settings.iconColor)} text-2xl animate-pulse"></i>
                 </div>
                 
-                <h3 class="text-xl font-bold text-gray-800 mb-2">${settings.title}</h3>
-                <p class="text-gray-600 text-sm mb-6 leading-relaxed">${message}</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">${window.CITLSecure.htmlEscape(settings.title)}</h3>
+                <p class="text-gray-600 text-sm mb-6 leading-relaxed">${window.CITLSecure.htmlEscape(message)}</p>
                 
                 <div class="flex justify-center space-x-3 space-x-reverse">
                     <button id="confirm-cancel" class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors focus:outline-none">
                         إلغاء
                     </button>
-                    <button id="confirm-ok" class="px-5 py-2.5 rounded-lg text-white font-medium shadow-lg transition-all focus:outline-none flex items-center ${settings.confirmBtnColor}">
-                        <i class="fas ${settings.icon} ml-2"></i> ${settings.confirmBtnText}
+                    <button id="confirm-ok" class="px-5 py-2.5 rounded-lg text-white font-medium shadow-lg transition-all focus:outline-none flex items-center ${window.CITLSecure.htmlEscape(settings.confirmBtnColor)}">
+                        <i class="fas ${window.CITLSecure.htmlEscape(settings.icon)} ml-2"></i> ${window.CITLSecure.htmlEscape(settings.confirmBtnText)}
                     </button>
                 </div>
             </div>
@@ -3202,7 +3202,7 @@ function checkUserNotifications() {
                 </div>
                 <div class="flex-1 min-w-0 text-right">
                     <p class="text-[12px] font-bold text-gray-800 leading-tight">${config.title}</p>
-                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">${m.title}</p>
+                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">${window.CITLSecure.htmlEscape(m.title)}</p>
                     <p class="text-[9px] text-gray-400 mt-1 italic">${new Date(m.date).toLocaleDateString('ar-EG')}</p>
                 </div>
             </div>`;

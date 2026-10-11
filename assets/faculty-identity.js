@@ -99,7 +99,7 @@
      const options={title:approving?'اعتماد ربط الهوية الأكاديمية':'رفض طلب ربط الهوية',confirmText:approving?'اعتماد الربط':'رفض الطلب',
       color:approving?'bg-[#2A3475] hover:bg-[#1f2658]':'bg-red-600 hover:bg-red-700',
       icon:approving?'fa-user-check':'fa-user-times',iconColor:approving?'text-[#2A3475]':'text-red-600',iconBg:approving?'bg-blue-50':'bg-red-100'};
-     const confirmed=root.showConfirmDialog?await root.showConfirmDialog(e(message),options):root.showCustomConfirm?await root.showCustomConfirm(e(message),options):confirm(message);
+     const confirmed=root.showConfirmDialog?await root.showConfirmDialog(message,options):root.showCustomConfirm?await root.showCustomConfirm(message,options):confirm(message);
      if(!confirmed)return;
      card.querySelectorAll('button').forEach(b=>b.disabled=true);
      try{await rpc('citl_faculty_links',button.dataset.review,{id:item.id});await loadAdmin();await root.updateAdminUsersList?.();}

@@ -1,5 +1,1 @@
-{
-  "release": "20261007-r6.8.3",
-  "built_at": "2026-10-07T12:14:55.002201+00:00",
-  "description": "Match waiting-account header and footer to the dashboard visual identity."
-}
+{"release":"20261011-r6.8.6","built_at":"2026-10-11","description":"Require secure registration tickets and safely render administrative data without changing ownership or schedules."}

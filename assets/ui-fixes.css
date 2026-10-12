@@ -1,0 +1,14 @@
+/* Hide the browser's caret-browsing cursor on static page text. */
+html,
+body {
+    caret-color: transparent;
+}
+
+/* Keep the normal typing caret wherever text entry is intended. */
+input,
+textarea,
+[contenteditable=""],
+[contenteditable="true"],
+[contenteditable="plaintext-only"] {
+    caret-color: auto;
+}

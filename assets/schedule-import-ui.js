@@ -33,6 +33,7 @@
    if(!snapshot.archives.length)box.append(el('p','لا توجد نسخ أرشيفية.'));
    $('schedule-file').disabled=false;dates();return true;
   }catch(e){snapshot=null;$('schedule-file').disabled=true;$('schedule-clear').disabled=true;$('schedule-publish').disabled=true;message(e.message,true);return false;}
+  finally{if(root.parent!==root)root.parent.postMessage({type:'citl-schedules-ready'},location.origin);}
  }
  function preview(){
   const box=$('schedule-preview');box.replaceChildren();const table=el('table',''),tr=el('tr','');

@@ -405,7 +405,7 @@ async function updateAdminReports() {
     if (!Array.isArray(meetings) || meetings.length === 0) {
         monthlyChart.innerHTML = `<div class="text-center text-gray-400 text-sm py-6">لا توجد بيانات بعد</div>`;
         peakChart.innerHTML    = `<div class="text-center text-gray-400 text-sm py-6">لا توجد بيانات بعد</div>`;
-        analytics.innerHTML    = `<div class="text-center text-gray-400 text-sm py-6">لا توجد بيانات لتحليلها</div>`;
+        analytics.innerHTML    = `<div class="citl-analytics-empty text-center text-gray-400 text-sm py-6">لا توجد بيانات لتحليلها</div>`;
         return;
     }
 

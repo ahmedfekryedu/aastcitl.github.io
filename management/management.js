@@ -5,7 +5,7 @@
   const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
   const sb=window.supabase.createClient(URL,KEY,{global:{fetch:window.CITLReadFetch},auth:{storageKey:'sb-main-auth',persistSession:true,autoRefreshToken:true}});
   window.sb=sb;
-  try{await window.CITLAuth.loadProfile();}catch(error){window.CITLAuth.showFailure(error);return;}
+  try{await window.CITLAuth.loadProfile();}catch(error){window.CITLAuth.showFailure(error);if(window.parent!==window)window.parent.postMessage({type:'citl-schedules-ready'},location.origin);return;}
   const departments={'transport-logistics':'إدارة لوجستيات النقل','trade-logistics':'إدارة لوجستيات التجارة الدولية','supply-chain':'إدارة لوجستيات سلاسل الإمداد','energy-logistics':'إدارة لوجستيات الطاقة والبترول','training-agency':'وكالة التدريب وخدمة المجتمع','postgrad-agency':'وكالة الدراسات العليا','education-agency':'وكالة شؤون التعليم','students-agency':'وكالة شؤون الطلاب','assistants-office':'مكتب المعيدين','computer-lab':'معمل الحاسب'};
   let state={};
   let statusTimer;

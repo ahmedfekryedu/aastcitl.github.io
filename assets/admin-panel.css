@@ -66,6 +66,13 @@
     color: #374151;
 }
 
+#admin-term-schedules-tab { position: relative; }
+.citl-term-loading { position: absolute; inset: 0; z-index: 1; padding: 24px; background: #f8fafc; border-radius: 12px; }
+.citl-term-loading[hidden] { display: none; }
+.citl-term-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 24px 0; }
+.citl-term-retry { margin-top: 12px; padding: 8px 16px; border-radius: 8px; background: #2a3475; color: white; font: inherit; }
+#detailed-analytics > .citl-analytics-empty { grid-column: 1 / -1; width: 100%; text-align: center; }
+@media (max-width: 640px) { .citl-term-loading { padding: 16px; } .citl-term-fields { grid-template-columns: 1fr; gap: 12px; margin: 16px 0; } }
 /* Keep mobile panel tabs readable instead of shrinking labels into each other. */
 @media (max-width: 767px) {
     #admin-panel-modal nav .admin-tab {

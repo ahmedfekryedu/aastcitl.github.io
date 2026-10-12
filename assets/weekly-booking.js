@@ -49,11 +49,17 @@
  async function save(client,rows){
   const fingerprint=JSON.stringify(rows);
   if(!attempt||attempt.fingerprint!==fingerprint)attempt={fingerprint,ids:rows.map(()=>crypto.randomUUID())};
-  const values=rows.map((row,i)=>({...row,id:attempt.ids[i]}));
+  const values=rows.map((row,i)=>{const value={...row,client_request_id:attempt.ids[i]};delete value.id;return value;});
   let result;try{result=await client.from('meetings').insert(values).select('id');}catch(error){result={error};}
   if(result.error||result.data?.length!==rows.length){
-   let check;try{check=await client.from('meetings').select('id').in('id',attempt.ids);}catch(_){check={error:true};}
-   if(check.error)throw new Error('تعذر تأكيد الحفظ؛ راجع سجل الحجوزات قبل تغيير الطلب. إعادة المحاولة لن تكرر نفس المواعيد.');
+   if(result.error?.code==='PGRST204' && String(result.error.message).includes('client_request_id'))throw new Error('يلزم تطبيق تحديث قاعدة البيانات 018 قبل حفظ حجز جديد.');
+   // A committed retry can hit the overlap trigger before the unique index.
+   // Reconcile by request keys for either case, without masking a known rejection.
+   let check;try{check=await client.from('meetings').select('id,client_request_id').eq('user_id',rows[0].user_id).in('client_request_id',attempt.ids);}catch(_){check={error:true};}
+   if(check.error){
+    if(result.error && result.status>=400 && result.status<500 && result.error.code!=='23505')throw new Error(result.error.message||'رفضت قاعدة البيانات الحجز؛ راجع بيانات الطلب وصلاحيات الحساب.');
+    throw new Error('تعذر تأكيد الحفظ؛ راجع سجل الحجوزات قبل تغيير الطلب. أعد المحاولة بنفس البيانات لتجنب التكرار.');
+   }
    if(check.data?.length!==rows.length)throw new Error(result.error?.message||'لم تكتمل عملية الحفظ؛ راجع التعارضات');
   }
   attempt=null;return values;

@@ -3,7 +3,7 @@
 <head>
 <script>document.documentElement.classList.add("citl-auth-checking");</script>
 <style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery){visibility:hidden!important;pointer-events:none!important}</style>
-<meta name="citl-release" content="20261012-r6.8.8.1">
+<meta name="citl-release" content="20261013-r6.8.9.1">
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="same-origin">
   <title>متابعة الحضور والانصراف | CITL</title>
@@ -41,10 +41,11 @@
     <section id="tab-schedules" class="panel">
       <h1>إدارة الجداول</h1><p>اختر ترمًا أو أضف ترمًا جديدًا، وحدد البداية وارفع ملف الجداول. لتحديث نفس الترم اختره وارفع الملف المعدّل.</p>
       <div id="schedule-import-status" class="summary-box" role="status" aria-live="polite">اختر نوع الجدول والملف.</div>
-      <p id="schedule-current"></p>
+      <p id="schedule-current"></p><p id="schedule-operation-help" class="summary-box"></p>
       <form id="schedule-import-form">
        <div class="grid">
         <label>نوع الجدول<select id="schedule-kind"><option value="study">الجداول الدراسية</option><option value="exam">جداول الامتحانات</option></select></label>
+        <label>العملية<select id="schedule-operation"><option value="update">تحديث جدول ترم موجود</option><option value="new">إضافة ترم جديد</option></select></label>
         <label>الترم<select id="schedule-term"><option value="">إضافة ترم جديد</option></select></label>
         <label>اسم الترم (اختياري)<input id="schedule-name" maxlength="120" placeholder="يُسمّى تلقائيًا حسب تاريخ البداية"></label>
         <label>بداية الترم<input id="schedule-starts_on" type="date" required></label>
@@ -105,6 +106,7 @@
   <script src="/vendor/supabase-js-2.45.4.min.js?v=20260921-r6.5"></script><script src="/vendor/qrcode-1.5.4.min.js?v=20260921-r6.5"></script>
   <script src="/assets/read-timeout.js?v=20260921-r6.5"></script><script src="/assets/data-client.js?v=20260921-r6.5"></script>
   <script src="/assets/pdf-schedule.js?v=20260924-r6.6.1"></script>
-  <script src="/assets/study-model.js?v=20260921-r6.5"></script><script src="/assets/schedule-import-model.js?v=20260921-r6.5"></script><script src="/assets/schedule-import-ui.js?v=20261012-r6.8.8.1"></script>
-  <script src="/management/management.js?v=20261012-r6.8.8.1"></script>
+  <script src="/assets/study-model.js?v=20260921-r6.5"></script><script src="/assets/schedule-import-model.js?v=20260921-r6.5"></script><script src="/assets/schedule-import-ui.js?v=20261013-r6.8.9.1"></script>
+  <script src="/presence.js?v=20261012-r6.8.8.5"></script>
+<script src="/management/management.js?v=20261012-r6.8.8.5"></script>
 </body></html>

@@ -15,7 +15,7 @@
  let timer;
  function start(){
   clearTimeout(timer);placeholder.innerHTML=skeleton;placeholder.hidden=false;frame.style.visibility='hidden';content.setAttribute('aria-busy','true');
-  frame.src='/management/?embedded=1&manage=schedules&v=20261012-r6.8.8.1#schedules';
+  frame.src='/management/?embedded=1&manage=schedules&v=20261013-r6.8.9.1#schedules';
   timer=setTimeout(()=>{
    content.setAttribute('aria-busy','false');placeholder.replaceChildren();
    const text=document.createElement('p');text.textContent='تعذر تحميل إدارة الجداول الآن.';

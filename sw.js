@@ -1,4 +1,4 @@
-const RELEASE = '20261012-r6.8.8.2';
+const RELEASE = '20261013-r6.8.9.1';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

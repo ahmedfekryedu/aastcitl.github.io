@@ -6,6 +6,7 @@
   const sb=window.supabase.createClient(URL,KEY,{global:{fetch:window.CITLReadFetch},auth:{storageKey:'sb-main-auth',persistSession:true,autoRefreshToken:true}});
   window.sb=sb;
   try{await window.CITLAuth.loadProfile();}catch(error){window.CITLAuth.showFailure(error);if(window.parent!==window)window.parent.postMessage({type:'citl-schedules-ready'},location.origin);return;}
+window.presenceTracker?.startForPage('management');
   const departments={'transport-logistics':'إدارة لوجستيات النقل','trade-logistics':'إدارة لوجستيات التجارة الدولية','supply-chain':'إدارة لوجستيات سلاسل الإمداد','energy-logistics':'إدارة لوجستيات الطاقة والبترول','training-agency':'وكالة التدريب وخدمة المجتمع','postgrad-agency':'وكالة الدراسات العليا','education-agency':'وكالة شؤون التعليم','students-agency':'وكالة شؤون الطلاب','assistants-office':'مكتب المعيدين','computer-lab':'معمل الحاسب'};
   let state={};
   let statusTimer;
@@ -185,7 +186,7 @@ function printQrCards() {
     }catch(x){msg(x.message,true)}finally{button.disabled=false}
   });
   document.getElementById('print').addEventListener('click',printQrCards);
-  document.getElementById('logout').addEventListener('click',async()=>{await sb.auth.signOut();location.replace('/')});
+  document.getElementById('logout').addEventListener('click',async()=>{await window.presenceTracker?.logout();await sb.auth.signOut();location.replace('/')});
   window.CITLScheduleImportUI.init(sb);
   if(new URLSearchParams(location.search).get('manage')==='schedules'){document.documentElement.classList.add('schedule-embedded');}
   else load();

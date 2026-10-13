@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const M=root.CITLScheduleImport,$=id=>document.getElementById(id);
- let client,snapshot,rows=[],busy=false,page=0,pdfResult=null,conversion=null,pendingPayload=null;
+ let client,snapshot,initialLoad=true,rows=[],busy=false,page=0,pdfResult=null,conversion=null,pendingPayload=null;
  const message=(text,error=false)=>{$('schedule-import-status').textContent=text;$('schedule-import-status').className=error?'warning':'summary-box';};
  const kind=()=>$('schedule-kind').value;
  async function api(action,payload={}){
@@ -13,13 +13,18 @@
  function reset(){if(conversion)conversion.abort();rows=[];page=0;pdfResult=null;$('schedule-pdf-review').hidden=true;$('schedule-file').value='';$('schedule-preview').replaceChildren();$('schedule-publish').disabled=true;message('اختر الترم وتاريخ البداية ثم ملف الجداول.');}
  function dates(){
   const t=snapshot?.terms.find(t=>t.id===$('schedule-term').value);
-  for(const k of ['name','starts_on']){$('schedule-'+k).value=t?.[k]||'';$('schedule-'+k).readOnly=kind()==='exam'&&!!t;}
+  for(const k of ['name','starts_on']){$('schedule-'+k).value=t?.[k]||'';$('schedule-'+k).readOnly=!!t;}
+  $('schedule-term').disabled=$('schedule-operation').value==='new';
+  $('schedule-operation-help').textContent=t?'تحديث نفس الترم: استبدال الجداول بالملف الجديد مع الاحتفاظ بكود الترم وحسابات الأعضاء وروابط الأسماء والتقارير.':'إضافة ترم جديد: حدد البداية. الأعضاء الذين تظل أسماؤهم موجودة يحتفظون بالربط دون طلب جديد.';
   $('schedule-clear').disabled=!t||busy;$('schedule-publish').textContent=t?'تحديث جدول الترم':'رفع الجدول';
  }
  async function load(){
   try{
    snapshot=await api('snapshot');if(snapshot.api_version!==4)throw Error('شغّل ملف 202609210006_simple_term_management.sql ثم حدّث الصفحة لتفعيل إدارة الترم المبسطة.');const select=$('schedule-term'),selected=select.value;select.replaceChildren(new Option('إضافة ترم جديد',''));
-   snapshot.terms.forEach(t=>select.add(new Option(t.name+(t.is_active?' • نشط':''),t.id)));select.value=snapshot.terms.some(t=>t.id===selected)?selected:'';dates();
+   snapshot.terms.forEach(t=>select.add(new Option(t.name+(t.is_active?' • نشط':''),t.id)));
+   select.value=snapshot.terms.some(t=>t.id===selected)?selected:initialLoad?(snapshot.terms.find(t=>t.is_active)?.id||snapshot.terms[0]?.id||''):'';
+   if(initialLoad){$('schedule-operation').value=select.value?'update':'new';initialLoad=false;}
+   if($('schedule-operation').value==='new')select.value='';dates();
    $('schedule-current').textContent=`الموجود حاليًا: ${snapshot.study.rows.length} حصة دراسية، ${snapshot.exam.rows.length} امتحان. رفع ملف جديد يحدّث جدول النوع المختار، مع حفظ التقارير والحضور السابق.`;
    renderPauses();
    const box=$('schedule-archives');box.replaceChildren();snapshot.archives.forEach(a=>{
@@ -61,6 +66,7 @@
    $('schedule-confirm-text').textContent=`حذف الترم «${t.name}» وجداوله: ${studyCount} حصة دراسية و${examCount} امتحان مرتبط بهذا الترم. سيختفي من قائمة الرفع، وتبقى تقارير الحضور السابقة ونسخة الجداول محفوظة. القاعات والمواد التابعة لترم آخر لن تُحذف.`;
    $('schedule-confirm').showModal();return;
   }
+  if(action==='replace'&&$('schedule-operation').value==='update'&&!$('schedule-term').value)return message('اختر الترم الذي تريد تحديث جدوله.',true);
   if(action!=='clear'){
    if(!$('schedule-import-form').reportValidity())return;
    if(!rows.length)return message('اختر ملف الجداول أولًا',true);
@@ -80,6 +86,8 @@
   const action=$('schedule-confirm').dataset.action,payload=pendingPayload;
   try{
    const result=await api(action,payload);
+   if(action==='replace')$('schedule-operation').value='update';
+   if(action==='term.delete')$('schedule-operation').value='new';
    if(action==='replace'){$('schedule-term').add(new Option('',result.term_id));$('schedule-term').value=result.term_id;}
    if(action==='term.delete')$('schedule-term').value='';
    if(action!=='archive.delete')reset();const refreshed=await load();
@@ -107,11 +115,12 @@
  });}
  function init(sb){client=sb;
   $('schedule-kind').onchange=()=>{if(conversion)conversion.abort();reset();dates();$('schedule-exam-options').hidden=kind()!=='exam';};
+  $('schedule-operation').onchange=()=>{reset();if($('schedule-operation').value==='new')$('schedule-term').value='';else $('schedule-term').value=snapshot?.terms.find(t=>t.is_active)?.id||snapshot?.terms[0]?.id||'';dates();};
   $('schedule-term').onchange=()=>{dates();if(rows.length)summary();};
   $('schedule-file').onchange=async()=>{
    const files=Array.from($('schedule-file').files);if(!files.length)return;rows=[];pdfResult=null;$('schedule-pdf-review').hidden=true;$('schedule-publish').disabled=true;
    const controller=new AbortController();conversion=controller;
-   for(const id of ['schedule-kind','schedule-term','schedule-name','schedule-starts_on','schedule-exam-year','schedule-reload','schedule-clear','schedule-file'])$(id).disabled=true;
+   for(const id of ['schedule-operation','schedule-kind','schedule-term','schedule-name','schedule-starts_on','schedule-exam-year','schedule-reload','schedule-clear','schedule-file'])$(id).disabled=true;
    try{
 
     if(files.every(f=>/\.pdf$/i.test(f.name))){
@@ -128,7 +137,7 @@
     }
     page=0;preview();
    }catch(e){rows=[];message(e.message,true);$('schedule-preview').replaceChildren();}
-   finally{if(conversion===controller){conversion=null;$('schedule-cancel-conversion').hidden=true;for(const id of ['schedule-kind','schedule-term','schedule-name','schedule-starts_on','schedule-exam-year','schedule-reload','schedule-file'])$(id).disabled=false;$('schedule-clear').disabled=!snapshot?.terms.some(t=>t.id===$('schedule-term').value);}}
+   finally{if(conversion===controller){conversion=null;$('schedule-cancel-conversion').hidden=true;for(const id of ['schedule-operation','schedule-kind','schedule-term','schedule-name','schedule-starts_on','schedule-exam-year','schedule-reload','schedule-file'])$(id).disabled=false;$('schedule-clear').disabled=!snapshot?.terms.some(t=>t.id===$('schedule-term').value);$('schedule-term').disabled=$('schedule-operation').value==='new';}}
   };
   $('schedule-cancel-conversion').onclick=()=>conversion?.abort();
   $('schedule-download-sql').onclick=()=>pdfResult&&download(`CITL-${kind()}-extracted.sql`,pdfResult.sql);

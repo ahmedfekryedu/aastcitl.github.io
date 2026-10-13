@@ -3259,19 +3259,17 @@ async function loadWeekScheduleActions(scheduleIds) {
     const startISO = start.toISOString().slice(0, 10);
     const endISO = end.toISOString().slice(0, 10);
 
-    const { data, error } = await supabase
-        .from('schedule_actions')
-        .select('*')
-        .in('schedule_id', scheduleIds)
-        .gte('action_date', startISO)
-        .lte('action_date', endISO);
+    const { data, error } = await supabase.rpc('citl_calendar_effects', {
+        p_from: startISO, p_to: endISO
+    });
 
     if (error) {
         console.error(error);
         return;
     }
 
-    (data || []).forEach(a => {
+    const visibleIds = new Set(scheduleIds.map(String));
+    (data || []).filter(a => visibleIds.has(String(a.schedule_id))).forEach(a => {
         const key = `${a.schedule_id}|${a.action_date}`;
         scheduleActionsMap.set(key, a);
     });

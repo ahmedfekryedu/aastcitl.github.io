@@ -1868,18 +1868,7 @@ function editMeeting() {
         let adminUsersPresenceInterval = null;
 
 function formatLastSeenShort(value) {
-    if (!value) return 'لم يظهر بعد';
-
-    const date = new Date(value);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMin = Math.floor(diffMs / 60000);
-
-    if (diffMin < 1) return 'الآن';
-    if (diffMin < 60) return `منذ ${diffMin} د`;
-    if (diffMin < 1440) return date.toLocaleTimeString('ar-EG', { hour: 'numeric', minute: '2-digit' });
-
-    return date.toLocaleDateString('ar-EG');
+    return window.presenceTracker?.formatLastSeen(value) || 'غير متاح';
 }
 
 async function refreshUsersPresenceOnly() {
@@ -1890,21 +1879,16 @@ async function refreshUsersPresenceOnly() {
     if (!rows.length) return;
 
     try {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('id, presence_status, last_seen_at')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
+        const data = await window.presenceTracker.users();
 
         const map = new Map((data || []).map(u => [u.id, u]));
 
         rows.forEach(row => {
             const userId = row.dataset.userId;
             const user = map.get(userId);
-            if (!user) return;
+            if (!user) { row.remove(); return; }
 
-            const isOnline = window.presenceTracker?.isOnline(user.last_seen_at) || user.presence_status === 'online';
+            const isOnline = window.presenceTracker?.isOnline(user.last_seen_at, user.presence_status);
 
             const badge = row.querySelector('[data-presence-badge]');
             const sub = row.querySelector('[data-presence-subtext]');
@@ -1921,6 +1905,7 @@ async function refreshUsersPresenceOnly() {
 
             if (sub) {
                 sub.textContent = formatLastSeenShort(user.last_seen_at);
+                sub.title = user.last_seen_at ? new Date(user.last_seen_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }) + ' · توقيت القاهرة' : 'لم يُسجّل ظهور بعد';
             }
 
             if (dot) {
@@ -1930,7 +1915,15 @@ async function refreshUsersPresenceOnly() {
             }
         });
     } catch (err) {
-        console.error('Presence silent refresh failed:', err);
+        rows.forEach(row => {
+            const badge = row.querySelector('[data-presence-badge]');
+            if (badge) { badge.textContent = 'غير متاح'; badge.className = 'px-2 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-500 border border-gray-200'; }
+            const sub = row.querySelector('[data-presence-subtext]');
+            if (sub) { sub.textContent = 'تعذر تحديث الحالة'; sub.title = ''; }
+            const dot = row.querySelector('[data-name-dot]');
+            if (dot) dot.className = 'inline-flex w-2.5 h-2.5 rounded-full bg-gray-300';
+        });
+        console.warn('Presence silent refresh failed:', err);
     }
 }
 

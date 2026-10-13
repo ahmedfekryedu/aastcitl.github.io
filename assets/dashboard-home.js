@@ -97,6 +97,7 @@
     if(state.view==='faculty')renderFaculty(items,stats,now);else renderOverview(items,stats,now);
     $('dh-updated').textContent=state.updated?'آخر تحديث '+new Date(state.updated).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Cairo'}):'جاري التحديث';
     $('dh-loading').hidden=true;$('dh-content').hidden=false;
+    root.CITLOversight?.renderDashboard();
   }
   async function refresh(){
     if(!started)return;if(pending)return pending;
@@ -116,7 +117,7 @@
       if(!state.ready||oldKey!==newKey){$('dh-loading').innerHTML=root.CITLLoading.summary()+(M.role(profile).faculty?'<table style="width:100%"><tbody>'+root.CITLLoading.table(5)+'</tbody></table>':'');$('dh-loading').hidden=false;}
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
-      const jobs=[S.loadAll(root.sb),readAll('schedule_actions','*',q=>q.gte('action_date',week.start).lte('action_date',week.end)),
+      const jobs=[S.loadAll(root.sb),root.CITLRequests.rpc(root.sb,'citl_calendar_effects',{p_from:week.start,p_to:week.end}),
         r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested)`)):Promise.resolve([]),
         root.sb.from('site_settings').select('setting_value').eq('setting_key','news_config').maybeSingle()];
       const result=await Promise.allSettled(jobs);state.errors=[];

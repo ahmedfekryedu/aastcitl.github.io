@@ -2,6 +2,7 @@
 
 window.sb=sb;
 try{await window.CITLAuth.loadProfile();}catch(error){window.CITLAuth.showFailure(error);return;}
+window.presenceTracker?.startForPage('attendance');
 let busy=false;
 function show(text,type){
   document.getElementById('loading').classList.add('hidden');

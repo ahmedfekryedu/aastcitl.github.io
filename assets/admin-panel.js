@@ -49,9 +49,12 @@ function openAdminPanel() {
     }
 
     document.getElementById('admin-panel-modal').classList.add('show');
+    window.CITLOversight?.mountAdmin();
 }
 
 function switchAdminTab(tabName) {
+    if (tabName === 'academic-actions') window.CITLOversight?.loadWorkboard();
+    if (tabName === 'academic-review') window.CITLOversight?.loadApprovals();
     if (tabName === 'my-bookings') window.CITLMemberBookings?.load();
     document.querySelectorAll('.admin-tab').forEach(btn => {
         btn.classList.remove('active', 'bg-gray-100');
@@ -198,7 +201,13 @@ async function updateAdminUsersList() {
 
         if (error) throw error;
 
-        users = (users || []).filter(u => !window.CITLAuth.facultyPending(u));
+        let presence = new Map();
+        try { presence = new Map((await window.presenceTracker.users()).map(item => [item.id, item])); }
+        catch (error) { console.warn('Users presence unavailable:', error.message); }
+        users = (users || []).map(user => ({ ...user,
+            last_seen_at: presence.get(user.id)?.last_seen_at || null,
+            presence_status: presence.get(user.id)?.presence_status || 'unknown'
+        })).filter(u => !window.CITLAuth.facultyPending(u));
         const totalAdmins = users.filter(u => u.role === 'manager').length;
         const totalNormal = users.length - totalAdmins;
 
@@ -237,12 +246,12 @@ async function updateAdminUsersList() {
                         ? '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded border border-red-100">مدير</span>'
                         : '<span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded border border-blue-100">مستخدم</span>';
 
-                    const isOnline = window.presenceTracker?.isOnline(user.last_seen_at) || user.presence_status === 'online';
-                    const presenceDot = window.presenceTracker?.dotHtml(user.last_seen_at)
+                    const isOnline = window.presenceTracker?.isOnline(user.last_seen_at, user.presence_status);
+                    const presenceDot = window.presenceTracker?.dotHtml(user.last_seen_at, user.presence_status)
                         || `<span class="inline-flex w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-300'}"></span>`;
 
                     const lastSeenText = user.last_seen_at
-                        ? new Date(user.last_seen_at).toLocaleString('ar-EG')
+                        ? new Date(user.last_seen_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' })
                         : 'لم يظهر بعد';
 
                     const actionBtns = (() => {
@@ -285,10 +294,10 @@ async function updateAdminUsersList() {
                     const statusBlock = `
                         <div class="flex flex-col items-center justify-center text-center gap-1">
                             <span data-presence-badge class="px-2 py-1 rounded-full text-[11px] font-bold ${isOnline ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-gray-100 text-gray-500 border border-gray-200'}">
-                                ${isOnline ? 'Online' : 'Offline'}
+                                ${user.presence_status === 'unknown' ? 'غير متاح' : isOnline ? 'Online' : 'Offline'}
                             </span>
-                            <span data-presence-subtext class="text-[10px] text-gray-400 font-bold leading-4 text-center">
-                                ${formatLastSeenShort(user.last_seen_at)}
+                            <span data-presence-subtext title="${escapeDirectoryText(user.presence_status === 'unknown' ? 'تعذر التحقق' : lastSeenText + ' · توقيت القاهرة')}" class="text-[10px] text-gray-400 font-bold leading-4 text-center">
+                                ${user.presence_status === 'unknown' ? 'تعذر تحديث الحالة' : formatLastSeenShort(user.last_seen_at)}
                             </span>
                         </div>
                     `;
@@ -1238,12 +1247,79 @@ async function loadScheduleInstructorNames() {
     updateNativeSelectDisplay('faculty-directory-name');
 }
 
+// Old deletions left no marker: only an administrator's reviewed selection may
+// retire those unowned entries. Historical identities remain available to reports.
+function renderDirectoryCleanup(activeDept) {
+    document.getElementById('faculty-directory-cleanup')?.remove();
+    const count = document.getElementById('faculty-directory-count');
+    if (!activeDept || !count || !window.CITLPermissions.full(currentUser)) return;
+    const panel = document.createElement('div');
+    panel.id = 'faculty-directory-cleanup';
+    panel.className = 'p-4 border-t border-gray-100 text-xs';
+    panel.innerHTML = `<button type="button" data-review class="px-3 py-2 rounded-lg border border-gray-200 text-[#2A3475] font-bold hover:bg-gray-50">مراجعة الأسماء بدون حساب</button>
+        <div data-results class="hidden mt-3"></div>`;
+    count.parentElement.parentElement.appendChild(panel);
+    const review = panel.querySelector('[data-review]');
+    const results = panel.querySelector('[data-results]');
+    const reportError = error => showNotification(
+        /PGRST202|42883/.test(error.code || '')
+            ? 'شغّل تحديث قاعدة البيانات 202610120019_deleted_account_directory.sql أولًا.'
+            : error.message || 'تعذر تحديث التوزيع الأكاديمي', 'error');
+    review.addEventListener('click', async () => {
+        review.disabled = true;
+        results.classList.remove('hidden');
+        results.innerHTML = '<div class="animate-pulse rounded-lg bg-gray-100 h-12" role="status" aria-label="جاري تحميل الأسماء"></div>';
+        try {
+            const { data, error } = await supabase.rpc('citl_directory_cleanup', {
+                p_action: 'list', p_payload: { department: activeDept }
+            });
+            if (error) throw error;
+            if (!panel.isConnected) return;
+            const entries = data?.entries;
+            if (!Array.isArray(entries)) throw new Error('تعذر قراءة قائمة الأسماء؛ حدّث الصفحة وأعد المحاولة.');
+            if (!entries.length) {
+                results.innerHTML = '<p class="text-center py-4 text-gray-500 font-bold">لا توجد أسماء بدون حساب في هذا القسم</p>';
+                return;
+            }
+            results.innerHTML = `<p class="text-gray-500 leading-relaxed mb-3">قد تشمل القائمة أسماء مضافة يدويًا. حدد فقط أسماء الحسابات التي حذفتها سابقًا لإزالتها من التوزيع؛ الجداول والحضور والتقارير محفوظة.</p>
+                <div class="space-y-2">${entries.map((entry, index) => `<label class="flex items-center gap-3 p-3 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" data-entry="${index}"><span class="font-bold text-[#2A3475]">${escapeDirectoryText(entry.full_name || '—')}</span><span class="text-gray-500">${escapeDirectoryText(entry.position || '')}</span></label>`).join('')}</div>
+                <button type="button" data-retire disabled class="mt-3 px-3 py-2 rounded-lg bg-[#2A3475] text-white font-bold disabled:opacity-50">إزالة المحدد من التوزيع</button>`;
+            const retire = results.querySelector('[data-retire]');
+            let busy = false;
+            const selected = () => [...results.querySelectorAll('[data-entry]:checked')].map(input => entries[Number(input.dataset.entry)]);
+            results.onchange = () => { retire.disabled = busy || !selected().length; };
+            retire.addEventListener('click', async () => {
+                if (busy) return;
+                const chosen = selected();
+                if (!chosen.length) return;
+                busy = true; retire.disabled = true; review.disabled = true;
+                try {
+                    const confirmed = await showConfirmDialog(`إزالة ${chosen.length} اسم من توزيع القسم؟\n${chosen.map(entry => entry.full_name).join('، ')}\nسيتم الاحتفاظ بالجداول والحضور والتقارير.`);
+                    if (!confirmed || !panel.isConnected) return;
+                    const { data: saved, error: failure } = await supabase.rpc('citl_directory_cleanup', {
+                        p_action: 'retire', p_payload: { confirm: 'RETIRE', entries: chosen.map(({ id, revision }) => ({ id, revision })) }
+                    });
+                    if (failure) throw failure;
+                    if (!saved?.ok || saved.retired !== chosen.length) throw new Error('تعذر تأكيد التحديث؛ أعد تحميل القائمة قبل المحاولة.');
+                    showNotification('تمت إزالة الأسماء المحددة من التوزيع', 'success');
+                    await loadFacultyDirectoryEntries();
+                    renderFacultyDirectoryTable();
+                } catch (error) { reportError(error); }
+                finally { busy = false; retire.disabled = !selected().length; review.disabled = false; }
+            });
+        } catch (error) { results.textContent = 'تعذر تحميل القائمة. أعد المحاولة.'; reportError(error); }
+        finally { review.disabled = false; }
+    });
+}
+
 function renderFacultyDirectoryTable() {
     const tbody = document.getElementById('faculty-directory-list');
     const count = document.getElementById('faculty-directory-count');
     const activeDept = document.getElementById('faculty-directory-active-department')?.value || '';
 
     if (!tbody) return;
+    renderDirectoryCleanup(activeDept);
+    window.CITLOversight?.renderStructure(activeDept, facultyDirectoryEntries);
 
     if (!activeDept) {
         if (count) count.textContent = '0 اسم';
@@ -1257,7 +1333,7 @@ function renderFacultyDirectoryTable() {
         return;
     }
 
-    const filteredEntries = facultyDirectoryEntries.filter(item => item.department_key === activeDept);
+    const filteredEntries = facultyDirectoryEntries.filter(item => item.department_key === activeDept && item.is_active !== false);
 
     if (count) {
         count.textContent = `${filteredEntries.length} اسم`;
@@ -1290,7 +1366,7 @@ function renderFacultyDirectoryTable() {
                                 ${escapeDirectoryText(item.full_name || '—')}
                             </div>
                             <div class="text-[11px] text-gray-400 mt-1">
-                                عضو داخل الهيكل الأكاديمي
+                                ${item.profile_id ? 'مرتبط بحساب' : 'اسم أكاديمي بدون حساب مرتبط'}
                             </div>
                         </div>
                     </div>
@@ -1580,7 +1656,7 @@ function showCustomConfirm(message) {
 }
 
 async function deleteFacultyDirectoryEntry(id) {
-    const item = facultyDirectoryEntries.find(x => x.id === id);
+    const item = facultyDirectoryEntries.find(x => String(x.id) === String(id));
     if (!item) return;
 
     const isConfirmed = await showConfirmDialog(
@@ -1589,12 +1665,16 @@ async function deleteFacultyDirectoryEntry(id) {
     if (!isConfirmed) return;
 
     try {
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('faculty_directory')
             .delete()
-            .eq('id', id);
+            .eq('id', item.id)
+            .select('id');
 
         if (error) throw error;
+        if (!data?.some(row => String(row.id) === String(item.id))) {
+            throw new Error('لم يُحذف الاسم؛ حدّث القائمة وتحقق من صلاحية إدارة الهيكل الأكاديمي.');
+        }
 
         showNotification('تم حذف الربط بنجاح', 'success');
         await loadFacultyDirectoryEntries();
@@ -1603,7 +1683,7 @@ async function deleteFacultyDirectoryEntry(id) {
 
     } catch (error) {
         console.error(error);
-        showNotification('تعذر حذف الربط', 'error');
+        showNotification(error.message || 'تعذر حذف الربط', 'error');
     }
 }
 

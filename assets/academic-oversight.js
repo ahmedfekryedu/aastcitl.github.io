@@ -1,0 +1,182 @@
+/* Scoped academic oversight. All decisions and visibility are revalidated by server RPCs. */
+(function(root){
+ 'use strict';
+ const E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const label=k=>root.CITLDepartmentHeads?.label(k)||k||'غير محدد';
+ const types={cancel:'إلغاء محاضرة',replace:'إحلال محاضر',move_room:'تغيير قاعة',replace_and_move:'إحلال وتغيير قاعة'};
+ const btn='citl-ac-button';
+ const skeleton=()=>'<div class="citl-admin-placeholder" role="status" aria-label="جاري التحميل"><span class="citl-skeleton-line"></span><span class="citl-skeleton-line"></span><span class="citl-skeleton-line short"></span></div>';
+ const stamp=v=>v?new Date(v).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'}):'—';
+ async function rpc(name,args={}){await root.CITLAuth.session();return root.CITLRequests.rpc(root.sb,name,args);}
+ const op=(name,action,payload={})=>rpc(name,{p_action:action,p_payload:payload});
+ let access=null,accessUser='',accessPending=null,approvalSerial=0,structureSerial=0,dashboardSerial=0;
+ function reviewLabel(r){if(!r||r.decision==='unassigned')return 'لم يُعيّن مسؤول للمراجعة';if(r.decision==='approved')return 'تمت القراءة واعتماد المراجعة';if(r.decision==='not_approved')return 'تمت القراءة — لم تُعتمد المراجعة';return r.read_at?'قرأها رئيس الجهة — بانتظار قراره':'لم يقرأها رئيس الجهة بعد';}
+ async function loadAccess(){
+  if(accessPending)return accessPending;
+  accessPending=rpc('citl_oversight_access').then(data=>{access=data;accessUser=root.currentUser?.id||'';return data;}).finally(()=>{accessPending=null;});return accessPending;
+ }
+ function makeDialog(title){
+  const d=document.createElement('dialog');d.className='citl-head-dialog citl-ac-dialog';d.dir='rtl';
+  d.innerHTML='<header><strong>'+E(title)+'</strong><button type="button" data-close aria-label="إغلاق">×</button></header><div class="citl-ac-body"></div>';
+  d.querySelector('[data-close]').onclick=()=>d.close();d.addEventListener('close',()=>d.remove());d.onclick=e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}};
+  document.body.append(d);d.showModal();return d;
+ }
+ async function mountAdmin(){
+  const modal=document.getElementById('admin-panel-modal'),sample=modal?.querySelector('.admin-tab[data-tab="profile"]');if(!sample)return;
+  let tab=modal.querySelector('[data-tab="academic-review"]');
+  if(!tab){
+   tab=sample.cloneNode(true);tab.dataset.tab='academic-review';tab.removeAttribute('onclick');tab.classList.remove('active');tab.querySelector('span').textContent='طلبات اعتماد الأعضاء';tab.querySelector('i').className='fas fa-user-check';tab.style.display='none';sample.after(tab);tab.onclick=()=>root.switchAdminTab('academic-review');
+   const panel=document.createElement('section');panel.id='admin-academic-review-tab';panel.className='admin-tab-content hidden';panel.innerHTML='<section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3>طلبات اعتماد الأعضاء</h3><p>طلبات الجهات المصرّح لك بمراجعتها فقط.</p></div><button type="button" data-refresh class="'+btn+'">تحديث</button></div><div data-claims class="citl-claims-list">'+skeleton()+'</div><p data-status class="citl-ac-status" role="status"></p></section>';modal.querySelector('.admin-tab-content').parentElement.append(panel);panel.querySelector('[data-refresh]').onclick=loadApprovals;
+  }
+  mountWorkboard(modal,sample);
+  try{const a=await loadAccess();tab.style.display=a.registration?'flex':'none';
+   modal.querySelector('[data-tab="academic-actions"]').style.display=canAcademicActions()?'flex':'none';if(!a.registration){document.getElementById('admin-academic-review-tab').querySelector('[data-claims]').replaceChildren();}}
+  catch(_){tab.style.display='none';}
+ }
+ const work={term:null,department:'',status:'',search:'',action:null,data:null,serial:0,initialized:false};
+ function canAcademicActions(){return accessUser===root.currentUser?.id&&!root.CITLAuth.facultyPending?.(root.currentUser)&&!!(access?.full||access?.heads?.some(h=>h.can_review_academic)||root.currentUser?.faculty_verification_status==='approved');}
+ function mountWorkboard(modal,sample){
+  if(document.getElementById('admin-academic-actions-tab'))return;
+  const tab=sample.cloneNode(true);tab.dataset.tab='academic-actions';tab.removeAttribute('onclick');tab.classList.remove('active');tab.querySelector('span').textContent='متابعة إجراءات المحاضرات';tab.querySelector('i').className='fas fa-tasks';tab.style.display='none';sample.after(tab);tab.onclick=()=>root.switchAdminTab('academic-actions');
+  const panel=document.createElement('section');panel.id='admin-academic-actions-tab';panel.className='admin-tab-content hidden';
+  panel.innerHTML='<section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3>متابعة إجراءات المحاضرات</h3><p>مسار القراءة والقرار لكل إجراء. الإجراء ينفذ فورًا، والاعتماد يوثّق المراجعة.</p></div><button type="button" data-refresh class="'+btn+'">تحديث</button></div><div class="citl-ac-work-body"><div class="citl-ac-toolbar"><label>الترم<select data-term></select></label><label>القسم أو الوكالة<select data-department></select></label><label>حالة المراجعة<select data-state><option value="">كل الحالات</option><option value="pending">معلّقة</option><option value="approved">معتمدة</option><option value="not_approved">غير معتمدة</option><option value="unassigned">بلا مسؤول مراجعة</option></select></label><label>بحث<input data-search placeholder="العضو أو المادة"></label></div><div data-counts class="citl-ac-counts"></div><div data-rows>'+skeleton()+'</div><p data-status role="status"></p><section id="citl-ac-work-detail" class="citl-ac-work-detail" hidden></section></div></section>';
+  modal.querySelector('.admin-tab-content').parentElement.append(panel);panel.querySelector('[data-refresh]').onclick=loadWorkboard;
+  panel.querySelector('[data-term]').onchange=e=>{work.term=e.target.value||null;work.action=null;loadWorkboard();};
+  for(const [selector,key,event]of [['[data-department]','department','onchange'],['[data-state]','status','onchange'],['[data-search]','search','oninput']])panel.querySelector(selector)[event]=e=>{work[key]=e.target.value;work.action=null;drawWorkboard();};
+ }
+ function drawWorkboard(){
+  const panel=document.getElementById('admin-academic-actions-tab');if(!panel||!work.data)return;
+  const rows=work.data.rows.filter(x=>(!work.department||x.department===work.department)&&(!work.search||[x.instructor,x.course,x.actor].join(' ').toLowerCase().includes(work.search.toLowerCase())));
+  const state=x=>x.review?.decision||'unassigned';
+  panel.querySelector('[data-counts]').innerHTML=[['pending','معلّقة'],['approved','معتمدة'],['not_approved','غير معتمدة'],['unassigned','بلا مسؤول']].map(([k,t])=>'<span>'+t+' <b>'+rows.filter(x=>state(x)===k).length+'</b></span>').join('');
+  const shown=rows.filter(x=>!work.status||state(x)===work.status);
+  panel.querySelector('[data-rows]').innerHTML=shown.length?'<div class="citl-ac-table-wrap"><table class="citl-ac-table"><thead><tr><th>المحاضرة / الإجراء</th><th>العضو / الجهة</th><th>حالة المراجعة</th><th>تاريخ القرار</th><th></th></tr></thead><tbody>'+shown.map(x=>'<tr><td><b>'+E(x.course)+'</b><small>'+E(x.date)+' · '+E(types[x.action_type])+'</small></td><td>'+E(x.instructor)+'<small>'+E(label(x.department))+'</small></td><td>'+E(reviewLabel(x.review))+'<small>'+E(x.review?.head||'')+'</small></td><td>'+E(stamp(x.review?.decision_at))+'</td><td><button type="button" class="'+btn+' secondary" data-open-action="'+E(x.id)+'">المسار والتفاصيل</button></td></tr>').join('')+'</tbody></table></div>':'<div class="citl-admin-empty">لا توجد إجراءات مطابقة للاختيارات الحالية.</div>';
+  panel.querySelectorAll('[data-open-action]').forEach(b=>b.onclick=()=>{work.action=b.dataset.openAction;openAction(work.data.rows.find(x=>x.id===work.action),loadWorkboard);});
+  const detail=panel.querySelector('#citl-ac-work-detail');detail.hidden=!work.action;if(!work.action){detail.dataset.action='';detail.replaceChildren();}
+ }
+ async function loadWorkboard(){
+  const panel=document.getElementById('admin-academic-actions-tab');if(!panel)return;
+  const serial=++work.serial,rows=panel.querySelector('[data-rows]'),status=panel.querySelector('[data-status]');
+  rows.innerHTML=skeleton();rows.setAttribute('aria-busy','true');panel.querySelector('[data-refresh]').disabled=true;status.textContent='';panel.querySelector('#citl-ac-work-detail').hidden=true;
+  try{const data=await rpc('citl_academic_report',{p_term_id:work.term});if(serial!==work.serial)return;if(!data.allowed)throw Error('هذه المتابعة غير متاحة لحسابك.');work.data=data;work.term=data.term?.id||null;
+   if(!work.initialized){work.initialized=true;work.status=data.scope==='personal'?'':'pending';}
+   panel.querySelector('[data-term]').innerHTML=data.terms.map(t=>'<option value="'+E(t.id)+'">'+E(t.name)+(t.is_active?' · نشط':' · أرشيف')+'</option>').join('');panel.querySelector('[data-term]').value=work.term||'';
+   const departments=[...new Set([...(access?.full?['dean','transport-logistics','trade-logistics','supply-chain','energy-logistics','admin-followup','training-agency','postgrad-agency','education-agency','students-agency','assistants-office','computer-lab']:[]),...data.rows.map(x=>x.department),...(access?.heads||[]).filter(h=>h.can_review_academic).map(h=>h.department_key)])].filter(Boolean).sort();
+   panel.querySelector('[data-department]').innerHTML='<option value="">كل الجهات المتاحة</option>'+departments.map(k=>'<option value="'+E(k)+'">'+E(label(k))+'</option>').join('');if(!departments.includes(work.department))work.department='';
+   const target=data.rows.find(x=>x.id===work.action);if(target){work.department='';work.status='';work.search='';}else if(work.action){status.textContent='الإجراء غير موجود في هذا الترم أو خارج نطاق صلاحياتك.';work.action=null;}
+   panel.querySelector('[data-department]').value=work.department;panel.querySelector('[data-state]').value=work.status;panel.querySelector('[data-search]').value=work.search;drawWorkboard();if(target)await openAction(target,loadWorkboard);
+  }catch(error){if(serial===work.serial){work.data=null;rows.innerHTML='<div class="citl-admin-empty">تعذر تحميل الإجراءات. يمكنك إعادة المحاولة.</div>';panel.querySelector('[data-counts]').replaceChildren();status.textContent=error.message;}}
+  finally{if(serial===work.serial){rows.setAttribute('aria-busy','false');panel.querySelector('[data-refresh]').disabled=false;}}
+ }
+ async function openWorkboard(options={}){
+  if(!root.openAdminPanel){location.href='/dashboard/?'+new URLSearchParams({open:'academic',...(options.action?{action:options.action}:{}),...(options.term?{term:options.term}:{})});return;}
+  if(options.term!==undefined)work.term=options.term;if(options.action!==undefined)work.action=options.action;
+  root.openAdminPanel();await mountAdmin();if(canAcademicActions())root.switchAdminTab('academic-actions');else root.showNotification?.('لا تملك صلاحية الوصول لهذه المتابعة','error');
+ }
+ async function openApprovals(){
+  if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
+  root.openAdminPanel();await mountAdmin();if(access?.registration)root.switchAdminTab('academic-review');else root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');
+ }
+ async function loadApprovals(){
+  const panel=document.getElementById('admin-academic-review-tab');if(!panel)return;
+  const serial=++approvalSerial,list=panel.querySelector('[data-claims]'),status=panel.querySelector('[data-status]'),refresh=panel.querySelector('[data-refresh]');list.innerHTML=skeleton();list.setAttribute('aria-busy','true');refresh.disabled=true;status.textContent='';
+  try{
+   const data=await op('citl_faculty_links','list');if(serial!==approvalSerial)return;list.replaceChildren();
+   if(!data.requests.length)list.innerHTML='<div class="citl-admin-empty"><i class="fas fa-check-circle" aria-hidden="true"></i><span>لا توجد طلبات بانتظار الاعتماد.</span></div>';
+   for(const item of data.requests){
+    const card=document.createElement('article');card.className='citl-faculty-claim';card.dataset.claimId=item.id;
+    card.innerHTML='<div class="citl-claim-person"><span class="citl-claim-avatar"><i class="fas fa-user-graduate" aria-hidden="true"></i></span><div><strong>'+E(item.account_name||'عضو هيئة تدريس')+'</strong><span class="citl-claim-email" dir="ltr">'+E(item.account_email)+'</span></div><span class="citl-claim-badge">بانتظار الاعتماد</span></div><dl class="citl-claim-details"><div><dt>الاسم الأكاديمي</dt><dd dir="auto">'+E(item.instructor_name)+'</dd></div><div><dt>القسم أو الوكالة</dt><dd>'+E(label(item.department_key))+'</dd></div><div><dt>تاريخ الطلب</dt><dd>'+E(stamp(item.created_at))+'</dd></div></dl><div class="citl-claim-actions"><button type="button" data-decision="approve" class="citl-claim-approve">اعتماد الربط</button><button type="button" data-decision="reject" class="citl-claim-reject">رفض الطلب</button></div><p data-card-status role="status"></p>';
+    for(const button of card.querySelectorAll('[data-decision]'))button.onclick=async()=>{
+     const approve=button.dataset.decision==='approve',message=approve?'اعتماد ربط الحساب بالاسم الأكاديمي المحدد؟':'رفض طلب الربط مع الاحتفاظ بالحساب؟';
+     const confirmed=root.showConfirmDialog?await root.showConfirmDialog(message,{title:approve?'اعتماد ربط الهوية':'رفض طلب الربط',confirmText:approve?'اعتماد الربط':'رفض الطلب',icon:approve?'fa-user-check':'fa-user-times',color:approve?'bg-[#2A3475]':'bg-red-600'}):confirm(message);if(!confirmed)return;
+     card.querySelectorAll('button').forEach(b=>b.disabled=true);
+     try{await op('citl_faculty_links',button.dataset.decision,{id:item.id});await loadApprovals();root.CITLFacultyAdmin?.load();root.checkUserNotifications?.();}
+     catch(error){card.querySelector('[data-card-status]').textContent=error.message;card.querySelectorAll('button').forEach(b=>b.disabled=false);}
+    };list.append(card);
+   }
+   const request=new URLSearchParams(location.search).get('request');if(request){const card=[...list.children].find(c=>c.dataset.claimId===request);if(card){card.classList.add('citl-ac-highlight');card.scrollIntoView({block:'center'});}else status.textContent='قد يكون الطلب المشار إليه تمت مراجعته بالفعل، أو لم يعد ضمن صلاحياتك.';}
+  }catch(error){if(serial===approvalSerial){list.innerHTML='<div class="citl-admin-empty">تعذر تحميل الطلبات.</div>';status.textContent=error.message;}}
+  finally{if(serial===approvalSerial){refresh.disabled=false;list.setAttribute('aria-busy','false');}}
+ }
+ async function renderStructure(department,entries){
+  const tab=document.getElementById('admin-directory-tab');if(!tab||!root.CITLPermissions.full(root.currentUser))return;
+  let host=document.getElementById('citl-ac-structure');if(!host){host=document.createElement('section');host.id='citl-ac-structure';host.className='citl-admin-section';tab.prepend(host);}
+  const serial=++structureSerial;host.innerHTML='<div class="citl-admin-section-head"><div><h3>مسؤولو الأقسام والوكالات</h3><p>اختر مسؤول الجهة مرة واحدة؛ أعضاؤها المعتمدون يتبعونه تلقائيًا في إجراءات المحاضرات.</p></div></div>'+skeleton();
+  try{
+   const data=await root.CITLDepartmentHeads.rpc('list');if(serial!==structureSerial)return;
+   const head=data.heads.find(h=>h.department_key===department),profile=data.profiles.find(p=>p.id===head?.profile_id);
+   host.innerHTML='<div class="citl-admin-section-head"><div><h3>مسؤول '+E(label(department))+'</h3><p>'+(head?E(head.full_name||head.email):'لم يُعيّن مسؤول لهذه الجهة بعد.')+'</p></div></div><div class="citl-ac-structure-body"><label>الحساب المسؤول<select data-profile><option value="">اختر حسابًا</option>'+data.profiles.map(p=>'<option value="'+E(p.id)+'">'+E((p.full_name||'حساب')+' — '+p.email)+'</option>').join('')+'</select></label><div class="citl-ac-buttons"><button type="button" data-permissions class="'+btn+'">تعيين وتحديد الصلاحيات</button>'+(head?'<button type="button" data-remove class="'+btn+' secondary">إلغاء التعيين</button>':'')+'</div><p data-info class="citl-ac-muted"></p><p class="citl-ac-muted">كل عضو معتمد يتبع رئيس القسم المسجل في حسابه تلقائيًا. قائمة حضور المنتدبين تُختار يدويًا من صفحة الجداول ولا تتغير بهذا التعيين.</p><p data-status role="status"></p></div>';
+   const select=host.querySelector('[data-profile]');select.value=profile?.id||'';
+   host.querySelector('[data-info]').textContent=head?['can_approve_registrations','can_review_academic','can_view_visitors'].filter(k=>head[k]).map(k=>({can_approve_registrations:'اعتماد التسجيل',can_review_academic:'إجراءات المحاضرات والطباعة',can_view_visitors:'متابعة المنتدبين'})[k]).join(' · '):'اختر قسمًا ثم الحساب المسؤول والصلاحيات.';
+   host.querySelector('[data-permissions]').disabled=!department;
+   host.querySelector('[data-permissions]').onclick=()=>{const p=data.profiles.find(x=>x.id===select.value);if(p)root.CITLDepartmentHeads.open({...p,department});else host.querySelector('[data-status]').textContent='اختر الحساب أولًا.';};
+   async function mutate(action,payload,button){button.disabled=true;try{await root.CITLDepartmentHeads.rpc(action,payload);await root.loadFacultyDirectoryTab();}catch(error){host.querySelector('[data-status]').textContent=error.message;}finally{button.disabled=false;}}
+   host.querySelector('[data-remove]')?.addEventListener('click',async e=>{const ok=root.showConfirmDialog?await root.showConfirmDialog('إلغاء تعيين مسؤول هذه الجهة وصلاحياتها فقط؟',{title:'إلغاء التعيين',confirmText:'إلغاء التعيين'}):confirm('إلغاء التعيين؟');if(ok)mutate('remove',{department_key:department,profile_id:head.profile_id},e.currentTarget);});
+
+  }catch(error){if(serial===structureSerial){host.innerHTML='<div class="citl-admin-empty"></div>';host.firstElementChild.textContent=error.message;}}
+ }
+ async function renderDashboard(){
+  const content=document.getElementById('dh-content');if(!content)return;
+  let host=document.getElementById('citl-ac-summary');if(!host){host=document.createElement('section');host.id='citl-ac-summary';host.className='citl-ac-summary';content.append(host);host.innerHTML=skeleton();}
+  const serial=++dashboardSerial;
+  try{const [data,a]=await Promise.all([rpc('citl_academic_report',{p_term_id:null}),loadAccess()]);if(serial!==dashboardSerial||!host.isConnected)return;
+   host.hidden=!data.allowed&&!a.registration;if(host.hidden)return;
+   host.innerHTML=(data.allowed?'<div><strong>متابعة إجراءات الترم</strong><span>'+E(data.term?.name||'لا يوجد ترم نشط')+' · '+E(({college:'الكلية',department:'الجهات التابعة لك',personal:'إجراءات محاضراتك'})[data.scope])+'</span></div><div class="citl-ac-buttons"><button class="'+btn+'" data-workboard>متابعة الإجراءات</button><button class="'+btn+' secondary" data-cancel>المحاضرات الملغاة <b>'+data.count+'</b></button><button class="'+btn+' secondary" data-actions>كل الإجراءات <b>'+data.total+'</b></button></div>':'')+(a.registration?'<button class="'+btn+'" data-approvals>طلبات اعتماد الأعضاء</button>':'');
+   host.querySelector('[data-workboard]')?.addEventListener('click',()=>openWorkboard());
+   host.querySelector('[data-cancel]')?.addEventListener('click',()=>openReport({type:'cancel'}));host.querySelector('[data-actions]')?.addEventListener('click',()=>openReport());host.querySelector('[data-approvals]')?.addEventListener('click',openApprovals);
+  }catch(error){if(serial===dashboardSerial){host.hidden=false;host.replaceChildren();const text=document.createElement('span');text.textContent='تعذر تحديث متابعة الترم. '+error.message;const retry=document.createElement('button');retry.className=btn;retry.textContent='إعادة المحاولة';retry.onclick=renderDashboard;host.append(text,retry);}}
+ }
+ async function openReport(options={}){
+  const d=makeDialog('إجراءات المحاضرات — متابعة الترم'),body=d.querySelector('.citl-ac-body');
+  let data,selectedTerm=options.term||null,selectedType=options.type||'',search='',serial=0;
+  body.innerHTML='<div class="citl-ac-toolbar"><label>الترم<select data-term></select></label><label>نوع الإجراء<select data-type><option value="">كل الإجراءات</option>'+Object.entries(types).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></label><label>بحث<input data-search placeholder="المحاضر أو المادة أو القاعة"></label><button type="button" class="'+btn+' secondary" data-refresh>تحديث</button><button type="button" class="'+btn+'" data-print>طباعة</button></div><p data-scope class="citl-ac-muted"></p><div data-rows>'+skeleton()+'</div><p data-status role="status"></p>';
+  const $=s=>body.querySelector(s);$('[data-type]').value=selectedType;
+  const filtered=()=>data.rows.filter(x=>(!selectedType||x.action_type===selectedType)&&(!search||[x.instructor,x.course,x.room,x.actor].join(' ').toLowerCase().includes(search.toLowerCase())));
+  function draw(){
+   const rows=filtered();$('[data-rows]').innerHTML=rows.length?'<div class="citl-ac-table-wrap"><table class="citl-ac-table"><thead><tr><th>التاريخ / المحاضرة</th><th>المحاضر / الجهة</th><th>الإجراء</th><th>مراجعة رئيس الجهة</th><th></th></tr></thead><tbody>'+rows.map(x=>'<tr data-action="'+E(x.id)+'"><td><b>'+E(x.date)+'</b><br>'+E(x.course)+'<small>'+E(x.time)+' · '+E(x.room)+'</small></td><td>'+E(x.instructor)+'<small>'+E(label(x.department))+'</small></td><td>'+E(types[x.action_type])+'<small>بواسطة '+E(x.actor||'—')+'</small></td><td>'+E(reviewLabel(x.review))+'</td><td><button type="button" data-detail="'+E(x.id)+'" class="'+btn+' secondary">تفاصيل</button></td></tr>').join('')+'</tbody></table></div>':'<div class="citl-admin-empty">لا توجد إجراءات في هذا العرض.</div>';
+   body.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{d.close();openWorkboard({action:b.dataset.detail,term:selectedTerm});});
+  }
+  async function load(){const mine=++serial;$('[data-refresh]').disabled=true;$('[data-print]').disabled=true;$('[data-rows]').innerHTML=skeleton();$('[data-status]').textContent='';try{const result=await rpc('citl_academic_report',{p_term_id:selectedTerm});if(mine!==serial||!d.isConnected)return;if(!result.allowed)throw Error('هذا التقرير غير متاح لحسابك');data=result;selectedTerm=data.term?.id||null;$('[data-term]').innerHTML=data.terms.map(t=>'<option value="'+E(t.id)+'">'+E(t.name)+(t.is_active?' · نشط':' · أرشيف')+'</option>').join('');$('[data-term]').value=selectedTerm||'';$('[data-scope]').textContent='الإجراءات تنفذ فورًا. الاعتماد أو عدم الاعتماد يوثّق مراجعة رئيس الجهة فقط.';draw();$('[data-print]').disabled=!data.can_print;
+    if(options.action){const target=data.rows.find(x=>x.id===options.action);options.action=null;if(target){d.close();await openWorkboard({action:target.id,term:selectedTerm});}else $('[data-status]').textContent='الإجراء غير موجود في هذا الترم أو خارج نطاق صلاحياتك.';}
+   }catch(error){if(mine===serial){$('[data-rows]').replaceChildren();$('[data-status]').textContent=error.message;}}finally{if(mine===serial)$('[data-refresh]').disabled=false;}}
+  $('[data-term]').onchange=e=>{selectedTerm=e.target.value||null;load();};$('[data-type]').onchange=e=>{selectedType=e.target.value;if(data)draw();};$('[data-search]').oninput=e=>{search=e.target.value;if(data)draw();};$('[data-refresh]').onclick=load;
+  $('[data-print]').onclick=()=>{if(!data)return;const w=open('','_blank');if(!w){$('[data-status]').textContent='اسمح بفتح نافذة الطباعة.';return;}w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير إجراءات المحاضرات</title><link rel="stylesheet" href="'+location.origin+'/assets/academic-oversight.css"></head><body class="citl-ac-print"><h1>CITL Smart System</h1><h2>إجراءات المحاضرات — '+E(data.term?.name||'')+'</h2><table class="citl-ac-table"><thead><tr><th>التاريخ</th><th>المادة والمحاضر</th><th>الإجراء والسبب</th><th>المراجعة</th></tr></thead><tbody>'+filtered().map(x=>'<tr><td>'+E(x.date)+'<br>'+E(x.time)+'</td><td>'+E(x.course)+'<br>'+E(x.instructor)+'<br>'+E(x.room)+'</td><td>'+E(types[x.action_type])+'<br>'+E(x.reason)+'<br>'+E(x.replacement_instructor||'')+' '+E(x.replacement_room||'')+'</td><td>'+E(reviewLabel(x.review))+'<br>'+E(x.review?.note||'')+'</td></tr>').join('')+'</tbody></table></body></html>');w.document.close();w.addEventListener('load',()=>{w.focus();w.print();},{once:true});};
+  await load();
+ }
+ async function openAction(item,refresh){
+  const body=document.getElementById('citl-ac-work-detail');if(!body)return;body.hidden=false;body.dataset.action=item.id;
+  body.innerHTML='<dl class="citl-ac-details">'+[['المادة',item.course],['المحاضر',item.instructor],['التاريخ والوقت',item.date+' · '+item.time],['القاعة',item.room],['الإجراء',types[item.action_type]],['بواسطة',item.actor],['السبب',item.reason],['المحاضر البديل',item.replacement_instructor],['القاعة البديلة',item.replacement_room]].filter(x=>x[1]).map(([k,v])=>'<div><dt>'+E(k)+'</dt><dd>'+E(v)+'</dd></div>').join('')+'</dl><p data-review class="citl-ac-review"></p><p class="citl-ac-muted">الإجراء نافذ؛ قرار المراجعة لا يغيّر الجدول.</p><div data-decisions></div><p data-status role="status"></p>';
+  const timeline=document.createElement('ol');timeline.className='citl-ac-timeline';body.prepend(timeline);
+  const status=body.querySelector('[data-status]'),draw=()=>{body.querySelector('[data-review]').textContent=reviewLabel(item.review)+(item.review?.head?' · '+item.review.head:'')+(item.review?.note?' · '+item.review.note:'');timeline.innerHTML=[['تسجيل الإجراء',item.created_at,item.actor],['قراءة المسؤول',item.review?.read_at,item.review?.head],['قرار المراجعة',item.review?.decision_at,item.review?.decision==='approved'?'معتمد':item.review?.decision==='not_approved'?'غير معتمد':'بانتظار القرار']].map(([name,date,who])=>'<li class="'+(date?'done':'')+'"><strong>'+E(name)+'</strong><span>'+E(date?stamp(date):'لم يتم بعد')+'</span><small>'+E(who||'')+'</small></li>').join('');};draw();
+  if(!item.can_review)return;
+  try{const result=await op('citl_academic_review','read',{id:item.id,revision:item.revision});if(body.dataset.action!==item.id||body.hidden)return;item.review=result.review;draw();root.checkUserNotifications?.();if(item.review.decision!=='pending')return;
+   const controls=body.querySelector('[data-decisions]');controls.innerHTML='<label class="citl-ac-note">ملاحظة المراجعة<textarea maxlength="1000" rows="2" placeholder="السبب مطلوب عند عدم الاعتماد"></textarea></label><div class="citl-ac-buttons"><button class="'+btn+'" data-review-action="approve">اعتماد المراجعة</button><button class="'+btn+' danger" data-review-action="not_approve">عدم الاعتماد</button></div>';
+   controls.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const note=controls.querySelector('textarea').value.trim();if(b.dataset.reviewAction==='not_approve'&&!note){status.textContent='اكتب سبب عدم الاعتماد.';return;}controls.querySelectorAll('button').forEach(x=>x.disabled=true);try{await op('citl_academic_review',b.dataset.reviewAction,{id:item.id,revision:item.revision,note});await refresh();renderDashboard();root.checkUserNotifications?.();}catch(error){status.textContent=error.message;controls.querySelectorAll('button').forEach(x=>x.disabled=false);}});
+  }catch(error){status.textContent=error.message;}
+ }
+
+ let nameSerial=0;
+ async function checkScheduleName(){
+  const serial=++nameSerial,user=root.currentUser;
+  const existing=document.getElementById('citl-ac-name-status');
+  if(user?.faculty_verification_status!=='approved'){existing?.remove();return;}
+  try{const status=await rpc('citl_faculty_schedule_status');if(serial!==nameSerial||root.currentUser?.id!==user.id)return;
+   if(!status.needs_name){existing?.remove();return;}
+   let host=existing;if(!host){host=document.createElement('section');host.id='citl-ac-name-status';host.className='citl-ac-summary';host.style.margin='12px 24px';const header=document.querySelector('header');if(!header)return;header.after(host);}
+   host.innerHTML='<div><strong>مراجعة الاسم في الجدول الحالي</strong><span>'+(status.pending_request?'طلب ربط الاسم الجديد بانتظار الاعتماد.':'اسمك المرتبط غير موجود حاليًا. حسابك وربطك السابق محفوظان؛ اختر الاسم الموجود في الجدول إذا تغيّرت كتابته.')+'</span></div><button type="button" class="'+btn+'">'+(status.pending_request?'متابعة الطلب':'اختيار الاسم الحالي')+'</button>';
+   host.querySelector('button').onclick=async()=>{const d=makeDialog('طلب ربط الاسم الحالي');try{await root.CITLFaculty.renderClaimEditor(d.querySelector('.citl-ac-body'));}catch(error){d.querySelector('.citl-ac-body').textContent=error.message;}};
+  }catch(_){/* A network failure is never treated as a missing instructor name. */}
+ }
+
+ let deepLinkHandled=false;
+ async function initialize(){
+  if(root.CITLAuth.facultyPending?.(root.currentUser))return;
+  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='approvals'){deepLinkHandled=true;await openApprovals();}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
+ }
+ root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
+ root.addEventListener('citl-profile-loaded',e=>{if(accessUser&&accessUser!==e.detail?.id){access=null;approvalSerial++;dashboardSerial++;work.serial++;work.data=null;work.action=null;work.term=null;work.initialized=false;document.getElementById('citl-ac-work-detail')?.replaceChildren();document.querySelector('#admin-academic-actions-tab [data-rows]')?.replaceChildren();document.getElementById('citl-ac-summary')?.remove();document.getElementById('admin-academic-review-tab')?.querySelector('[data-claims]')?.replaceChildren();}initialize();});
+ root.addEventListener('load',initialize);
+ root.addEventListener('citl-schedule-update',checkScheduleName);
+ root.addEventListener('storage',e=>{if(e.key==='citl-schedule-update')checkScheduleName();});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkScheduleName();});
+})(window);

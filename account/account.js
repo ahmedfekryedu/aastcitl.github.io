@@ -27,8 +27,9 @@
  }
  $('account-refresh').onclick=()=>refresh(true);
  $('account-edit').onclick=()=>root.CITLFaculty.renderClaimEditor($('account-editor'));
- $('account-logout').onclick=async()=>{try{const {error}=await root.sb.auth.signOut();if(error)throw error;localStorage.removeItem('currentUser');location.replace('/');}catch(_){$('account-feedback').textContent='تعذر تسجيل الخروج. أعد المحاولة.'}};
+ $('account-logout').onclick=async()=>{try{await root.presenceTracker?.logout();const {error}=await root.sb.auth.signOut();if(error)throw error;localStorage.removeItem('currentUser');location.replace('/');}catch(_){$('account-feedback').textContent='تعذر تسجيل الخروج. أعد المحاولة.'}};
  root.addEventListener('citl-profile-loaded',event=>{if(!root.CITLAuth.facultyPending(event.detail))enter();});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});root.addEventListener('online',()=>refresh());
+ root.presenceTracker?.startForPage('account');
  refresh();
 })(window);

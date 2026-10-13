@@ -4,6 +4,8 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'academic-actions') return !!root.CITLOversight?.canAcademicActions();
+    if (tab === 'academic-review') return !!root.CITLOversight?.canReviewRegistration();
     if (tab === 'my-bookings') return !!current() && current().role !== 'manager' && !root.CITLAuth.facultyPending(current());
     if (permissions.full(current()) || tab === 'profile') return true;
     if (tab === 'users') return can('can_manage_users');
@@ -26,6 +28,7 @@
     document.querySelectorAll('.admin-tab').forEach(tab => { tab.style.display = tabAllowed(tab.dataset.tab) ? 'flex' : 'none'; });
     root.switchAdminTab(can('can_manage_users') ? 'users' : (can('can_approve') || can('can_delete')) ? 'meetings' : 'profile');
     document.getElementById('admin-panel-modal')?.classList.add('show');
+    root.CITLOversight?.mountAdmin();
   };
   const oldSwitch = root.switchAdminTab;
   if (oldSwitch) root.switchAdminTab = function (tab) {

@@ -45,6 +45,7 @@
       const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.body || '';
       const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG');
       button.append(title, body, date);
+      if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
         try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); } catch (error) { console.error(error); }
         if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;

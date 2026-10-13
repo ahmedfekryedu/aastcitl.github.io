@@ -1,106 +1,120 @@
 (function () {
-  const HEARTBEAT_MS = 60 * 1000;
-  const STALE_ON_UI_MS = 2 * 60 * 1000;
+  'use strict';
+  const HEARTBEAT_MS = 30000, STALE_MS = 120000;
+  let timer, currentPage = 'unknown', stopped = true, running, legacyIgnored = false;
+  let authSubscription, lastAttempt = 0, lastLegacyAttempt = 0, clockOffset = 0, generation = 0;
 
-  let heartbeatTimer = null;
-  let currentPage = "unknown";
-
-  function getSessionId() {
-    return localStorage.getItem("presence_session_id");
-  }
-
-  function setSessionId(id) {
-    if (id) localStorage.setItem("presence_session_id", id);
-  }
-
-  function clearSessionId() {
-    localStorage.removeItem("presence_session_id");
-  }
-
-  async function sendPresence(eventType) {
-    if (!window.sb?.auth) {
-      return null;
-    }
-    const { data: authData } = await window.sb.auth.getSession();
-    if (!authData?.session) return null;
-    const { data, error } = await window.sb.rpc('citl_presence_track', {
-      p_event_type: eventType, p_session_id: getSessionId(), p_source_page: currentPage
-    });
-    if (error) throw new Error(error.message || "Presence request failed");
-    if (data?.session_id) setSessionId(data.session_id);
-    return data;
-  }
-
-  function markCurrentUserPresence(data) {
-    const currentUserRaw = localStorage.getItem("currentUser");
-    if (!currentUserRaw) return;
-
+  async function rpc(name, args) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
     try {
-      const currentUser = JSON.parse(currentUserRaw);
-      currentUser.last_seen_at = data?.last_seen_at || new Date().toISOString();
-      currentUser.inside_campus = !!data?.inside_campus;
-      currentUser.network_label = data?.network_label || "external";
-      currentUser.public_ip = data?.public_ip || null;
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-    } catch (_) {}
-  }
-
-  async function startForPage(pageName) {
-    currentPage = pageName || "unknown";
-
-    const data = await sendPresence(getSessionId() ? "heartbeat" : "start");
-    markCurrentUserPresence(data);
-
-    // الحضور والتواجد التشغيلي مخصصان للمنتدبين فقط.
-    if (data?.ignored) {
-      if (heartbeatTimer) clearInterval(heartbeatTimer);
-      heartbeatTimer = null;
-      clearSessionId();
+      const { data, error } = await window.sb.rpc(name, args).abortSignal(controller.signal);
+      if (error) throw error;
       return data;
-    }
-
-    if (heartbeatTimer) clearInterval(heartbeatTimer);
-    heartbeatTimer = setInterval(async () => {
-      try {
-        const hbData = await sendPresence("heartbeat");
-        markCurrentUserPresence(hbData);
-      } catch (e) {
-        console.error("Heartbeat error:", e);
-      }
-    }, HEARTBEAT_MS);
+    } finally { clearTimeout(timeout); }
   }
-
-  async function logout() {
+  async function getSession() {
+    let timeout;
     try {
-      await sendPresence("logout");
-    } catch (e) {
-      console.error("Presence logout error:", e);
-    } finally {
-      if (heartbeatTimer) clearInterval(heartbeatTimer);
-      clearSessionId();
+      return await Promise.race([
+        window.sb.auth.getSession(),
+        new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Presence session timeout')), 8000); })
+      ]);
+    } finally { clearTimeout(timeout); }
+  }
+  function stop() { stopped = true; generation++; clearInterval(timer); timer = null; }
+  async function legacy(eventType, session) {
+    if (eventType !== 'logout' && (!['login', 'dashboard', 'smrm', 'schedules'].includes(currentPage) || Date.now() - lastLegacyAttempt < 60000)) return;
+    if (legacyIgnored && eventType !== 'logout') return;
+    lastLegacyAttempt = Date.now();
+    const key = 'citl-visiting-session:' + session.user.id;
+    const id = localStorage.getItem(key);
+    if (eventType === 'logout' && !id) return;
+    const data = await rpc('citl_presence_track', {
+      p_event_type: eventType === 'logout' ? 'logout' : id ? 'heartbeat' : 'start',
+      p_session_id: id, p_source_page: currentPage
+    });
+    if (data?.ignored) legacyIgnored = true;
+    if (data?.session_id && !stopped) localStorage.setItem(key, data.session_id);
+    if (eventType === 'logout') localStorage.removeItem(key);
+    // Ignored/failed attendance calls must not fabricate a last-seen time.
+  }
+  async function beat() {
+    if (stopped || running || !window.sb?.auth) return;
+    const epoch = generation;
+    lastAttempt = Date.now();
+    running = (async () => {
+      const { data } = await getSession();
+      const session = data?.session;
+      if (stopped || epoch !== generation) return;
+      if (!session) { stop(); return; }
+      const results = await Promise.allSettled([
+        rpc('citl_web_presence', { p_action: 'heartbeat' }).then(result => {
+          if (result?.stopped && epoch === generation) stop();
+        }),
+        legacy('heartbeat', session)
+      ]);
+      results.forEach(result => { if (result.status === 'rejected') console.warn('Presence update unavailable:', result.reason?.message || result.reason); });
+    })().catch(error => console.warn('Presence session unavailable:', error?.message || error))
+      .finally(() => { running = null; });
+    return running;
+  }
+  function startForPage(pageName) {
+    currentPage = pageName || 'unknown';
+    if (!window.sb?.auth) return Promise.resolve();
+    if (!authSubscription && window.sb.auth.onAuthStateChange) {
+      authSubscription = window.sb.auth.onAuthStateChange(event => {
+        // Do not call Supabase APIs inside the auth lock.
+        if (event === 'SIGNED_OUT') stop();
+      }).data?.subscription;
     }
+    if (stopped) { stopped = false; generation++; legacyIgnored = false; }
+    clearInterval(timer);
+    // Install retry first: an initial network failure must not disable tracking.
+    timer = setInterval(() => { void beat(); }, HEARTBEAT_MS);
+    return beat();
   }
-
-  function isOnline(lastSeenAt) {
-    if (!lastSeenAt) return false;
-    const diff = Date.now() - new Date(lastSeenAt).getTime();
-    return diff <= STALE_ON_UI_MS;
+  async function logout() {
+    stop();
+    if (!window.sb?.auth) return;
+    try {
+      const { data } = await getSession();
+      if (!data?.session) return;
+      await Promise.allSettled([
+        rpc('citl_web_presence', { p_action: 'logout' }),
+        legacy('logout', data.session)
+      ]);
+    } catch (_) { /* Tracking failure must never prevent actual Auth logout. */ }
   }
-
-  function dotHtml(lastSeenAt) {
-    const online = isOnline(lastSeenAt);
-    return `
-      <span
-        class="inline-block w-2.5 h-2.5 rounded-full ${online ? "bg-green-500" : "bg-gray-300"}"
-        title="${online ? "Online" : "Offline"}"
-      ></span>
-    `;
+  async function users() {
+    const data = await rpc('citl_web_presence', { p_action: 'list' });
+    if (!Array.isArray(data?.users) || !Number.isFinite(Date.parse(data.server_time))) {
+      throw new Error('تعذر قراءة حالة اتصال المستخدمين');
+    }
+    clockOffset = Date.parse(data.server_time) - Date.now();
+    return data.users;
   }
-
-  window.presenceTracker = {
-    startForPage,
-    logout,
-    isOnline,
-    dotHtml,
-  };
+  function isOnline(lastSeenAt, status) {
+    if (status !== 'online' || !lastSeenAt) return false;
+    const age = Date.now() + clockOffset - Date.parse(lastSeenAt);
+    return Number.isFinite(age) && age >= -5000 && age < STALE_MS;
+  }
+  function formatLastSeen(value) {
+    if (!value) return 'لم يُسجّل ظهور بعد';
+    const date = new Date(value), age = Date.now() + clockOffset - date.getTime();
+    if (!Number.isFinite(age)) return 'غير متاح';
+    if (age < 60000) return 'الآن';
+    if (age < 3600000) return `منذ ${Math.floor(age / 60000)} د`;
+    return date.toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', day: 'numeric', month: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+  function dotHtml(lastSeenAt, status) {
+    const online = isOnline(lastSeenAt, status);
+    return `<span class="inline-flex w-2.5 h-2.5 rounded-full ${online ? 'bg-green-500' : 'bg-gray-300'}" title="${status === 'unknown' ? 'تعذر التحقق' : online ? 'Online' : 'Offline'}"></span>`;
+  }
+  function wake() { if (!stopped && Date.now() - lastAttempt > 3000) void beat(); }
+  window.addEventListener('online', wake);
+  window.addEventListener('pageshow', wake);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+  // No logout on unload: navigation or closing one tab must not disconnect others.
+  window.presenceTracker = { startForPage, logout, users, isOnline, dotHtml, formatLastSeen };
 })();

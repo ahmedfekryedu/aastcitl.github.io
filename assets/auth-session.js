@@ -71,13 +71,19 @@
     checkingAccount = true;
     try {
       const current = await session();
-      const result = await root.sb.from('profiles').select('id,account_type,faculty_verification_status').eq('id',current.user.id).maybeSingle();
+      const result = await root.sb.from('profiles').select('id,account_type,faculty_verification_status,role,permissions').eq('id',current.user.id).maybeSingle();
       if (result.error) {
         if (result.status === 401) await verifyAuthUser();
         throw result.error;
       }
       if (!result.data) throw fault('الحساب لم يعد متاحًا', 'PROFILE_MISSING');
       if (protectedPage && facultyPending(result.data)) location.replace('/account/');
+      const previous = root.currentUser;
+      if (previous && (previous.role !== result.data.role || JSON.stringify(previous.permissions) !== JSON.stringify(result.data.permissions))) {
+        await loadProfile();
+        root.applyUserPermissions?.();
+        root.dispatchEvent(new CustomEvent('citl-permissions-changed'));
+      }
     } catch (error) { redirectIfSignedOut(error); /* Transport errors do not mean account deletion. */ }
     finally { checkingAccount = false; }
   }

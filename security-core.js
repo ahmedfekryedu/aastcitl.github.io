@@ -36,29 +36,35 @@
     list.replaceChildren();
     if (!items.length) {
       const empty = document.createElement('div'); empty.className = 'p-8 text-center text-sm text-gray-500 font-bold';
-      empty.textContent = 'لا توجد تنبيهات'; list.appendChild(empty); return;
+      empty.textContent = 'لا توجد إشعارات غير مقروءة'; list.appendChild(empty);
     }
     for (const item of items) {
       const button = document.createElement('button'); button.type = 'button';
       button.className = `w-full text-right p-3 mb-2 rounded-xl border transition ${item.read_at ? 'bg-white border-gray-100' : 'bg-amber-50 border-amber-200'}`;
+      if(item.kind==='admin_announcement'){button.classList.add('citl-administrative-notice');const badge=document.createElement('span');badge.className='citl-administrative-label';badge.textContent='إشعار إداري';button.append(badge);}
       const title = document.createElement('div'); title.className = 'text-sm font-black text-[#2A3475]'; title.textContent = item.title;
-      const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.body || '';
-      const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG');
+      const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&item.body?.length>180?item.body.slice(0,180)+'…':item.body || '';
+      const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
       button.append(title, body, date);
       if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
-        try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); } catch (error) { console.error(error); }
+        if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id);return;}
+        try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); await checkUserNotifications(); } catch (error) { window.showNotification?.('تعذر تحديث قراءة الإشعار؛ أعد المحاولة','error'); return; }
         if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;
         else await checkUserNotifications();
       });
       list.appendChild(button);
     }
+    const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory();};list.append(history);
   }
 
+  let lastRightsNotice = '';
   async function checkUserNotifications() {
     try {
-      const result = await invoke('notifications.list'); const items = result.notifications || [];
-      window.__citlNotifications = items; renderNotifications(items); setBadge(items.filter((x) => !x.read_at).length);
+      await session();const result = await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
+      window.__citlNotifications = items; renderNotifications(items); setBadge(result.total ?? items.length);
+      const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
+      if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
     } catch (error) { console.error('notifications:', error); }
   }
 
@@ -76,8 +82,7 @@
       menu.style.top = `${Math.min((rect?.bottom || 70) + 8, innerHeight - 420)}px`;
       menu.style[document.dir === 'rtl' ? 'right' : 'left'] = `${Math.max(10, innerWidth - (rect?.right || innerWidth - 10))}px`;
       await checkUserNotifications();
-      const unread = (window.__citlNotifications || []).filter((x) => !x.read_at).map((x) => x.id);
-      if (unread.length) { await invoke('notifications.read', { ids: unread }); await checkUserNotifications(); }
+
     }
   }
 
@@ -199,4 +204,5 @@
     } catch (error) { console.error('notification realtime:', error); }
   });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUserNotifications(); });
+  setInterval(()=>{if(!document.hidden&&navigator.onLine)checkUserNotifications();},30000);
 })();

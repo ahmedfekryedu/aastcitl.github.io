@@ -106,7 +106,11 @@
      catch(error){host.querySelector('[data-status]').textContent=error.message;card.querySelectorAll('button').forEach(b=>b.disabled=false);}
     });list.append(card);
    });
-   if(!host.querySelector('[data-code-host] form')){
+   if(root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes'))renderCodes(host.querySelector('[data-code-host]'),codes);
+  }catch(error){host.querySelector('[data-status]').textContent=error.message+' — اضغط تحديث لإعادة المحاولة.';}
+  finally{adminBusy=false;list.setAttribute('aria-busy','false');host.querySelector('[data-refresh]').disabled=false;}
+ }
+ function renderCodes(host,codes){
    const form=document.createElement('form');form.className='p-4 citl-code-form';
    form.innerHTML=`<h4 class="font-bold text-[#2A3475] text-sm">تغيير كود التسجيل</h4><p class="text-xs text-gray-500">يتوقف الكود السابق فور الحفظ. تظل الصلاحيات وحدود الاستخدام والصلاحية كما هي.</p><label class="block text-xs font-bold">الكود المراد تغييره<select name="code-id" class="${fieldClass}" required aria-label="الكود المراد تغييره"></select></label><label class="block text-xs font-bold">الكود الجديد<input name="new-code" type="password" autocomplete="new-password" minlength="8" maxlength="128" required class="${fieldClass}"></label><label class="block text-xs font-bold">تأكيد الكود الجديد<input name="confirm-code" type="password" autocomplete="new-password" required class="${fieldClass}"></label><button type="submit" class="${buttonClass}">حفظ الكود الجديد</button><p role="status" data-code-status class="text-xs"></p>`;
    codes.codes.forEach(c=>form.elements['code-id'].add(new Option(`#${c.id} · ${c.account_type==='faculty'?'أعضاء هيئة التدريس':c.role==='manager'?'إدارة':'تسجيل'} · ${c.is_active?'مفعّل':'متوقف'} · استخدام ${c.uses_count}/${c.max_uses??'بلا حد'}`,c.id)));
@@ -116,13 +120,25 @@
     button.disabled=true;status.textContent='جاري حفظ الكود…';
     try{await rpc('citl_registration_codes','rotate',{id:form.elements['code-id'].value,code:raw});form.elements['new-code'].value='';form.elements['confirm-code'].value='';status.textContent='تم تغيير الكود. استخدم الكود الجديد للتسجيل.';}
     catch(error){status.textContent=error.message;}finally{button.disabled=false;}
-   };host.querySelector('[data-code-host]').replaceChildren(form);
+   };host.replaceChildren(form);
    }
-  }catch(error){host.querySelector('[data-status]').textContent=error.message+' — اضغط تحديث لإعادة المحاولة.';}
-  finally{adminBusy=false;list.setAttribute('aria-busy','false');host.querySelector('[data-refresh]').disabled=false;}
+
+ function mountCodes(modal,sample){
+  if(document.getElementById('admin-registration-codes-tab'))return;
+  const tab=sample.cloneNode(true);tab.dataset.tab='registration-codes';tab.removeAttribute('onclick');tab.classList.remove('active');tab.querySelector('span').textContent='أكواد التسجيل';tab.querySelector('i').className='fas fa-key';tab.onclick=()=>root.switchAdminTab('registration-codes');sample.after(tab);
+  const panel=document.createElement('section');panel.id='admin-registration-codes-tab';panel.className='admin-tab-content hidden';panel.innerHTML='<section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3>أكواد التسجيل</h3><p>تغيير الأكواد مع الحفاظ على شروط التسجيل والاعتماد.</p></div><button type="button" data-refresh class="citl-ac-button">تحديث</button></div><div data-codes>'+skeleton()+'</div></section>';modal.querySelector('.admin-tab-content').parentElement.append(panel);panel.querySelector('[data-refresh]').onclick=loadCodes;
+  tab.style.display=root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes')?'flex':'none';
+ }
+ let codesSerial=0;
+ async function loadCodes(){
+  const panel=document.getElementById('admin-registration-codes-tab');if(!panel||!root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes'))return;
+  const serial=++codesSerial,host=panel.querySelector('[data-codes]'),refresh=panel.querySelector('[data-refresh]');host.innerHTML=skeleton();refresh.disabled=true;
+  try{const data=await rpc('citl_registration_codes','list');if(serial===codesSerial)renderCodes(host,data);}
+  catch(error){if(serial===codesSerial){host.replaceChildren();const text=document.createElement('p');text.className='citl-ac-status';text.textContent=error.message;host.append(text);}}
+  finally{if(serial===codesSerial)refresh.disabled=false;}
  }
  root.CITLFaculty=Object.freeze({key,names,requestName,showStatus,renderClaimEditor,pendingText});
- root.CITLFacultyAdmin=Object.freeze({load:loadAdmin,mount:adminShell});
+ root.CITLFacultyAdmin=Object.freeze({load:loadAdmin,mount:adminShell,mountCodes,loadCodes});
  root.addEventListener('citl-profile-loaded',event=>showStatus(event.detail));
  if(root.currentUser)showStatus(root.currentUser);
  adminShell();

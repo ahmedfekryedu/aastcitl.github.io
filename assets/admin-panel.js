@@ -53,6 +53,9 @@ function openAdminPanel() {
 }
 
 function switchAdminTab(tabName) {
+    if(tabName==='term-schedules')window.CITLLoadTermAdmin?.();
+    if(tabName==='registration-codes')window.CITLFacultyAdmin?.loadCodes();
+    if (tabName === 'activity-history') window.CITLAdminAccess?.loadHistory();
     if (tabName === 'academic-actions') window.CITLOversight?.loadWorkboard();
     if (tabName === 'academic-review') window.CITLOversight?.loadApprovals();
     if (tabName === 'my-bookings') window.CITLMemberBookings?.load();
@@ -86,6 +89,7 @@ function switchAdminTab(tabName) {
     }
 
     if (tabName === 'users') {
+        window.CITLAnnouncements?.mount();
         if (typeof updateAdminUsersList === 'function') {
             try { updateAdminUsersList(); } catch (e) { console.error(e); }
         }
@@ -242,8 +246,9 @@ async function updateAdminUsersList() {
                            </div>`
                         : '';
 
-                    const roleBadge = user.role === 'manager'
+                    const roleBadge = window.CITLPermissions.full(user)
                         ? '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded border border-red-100">مدير</span>'
+                        : window.CITLPermissions.any(user) ? '<span class="px-2 py-1 bg-blue-50 text-[#2A3475] text-[10px] font-bold rounded border border-gray-100">صلاحيات محددة</span>'
                         : '<span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded border border-blue-100">مستخدم</span>';
 
                     const isOnline = window.presenceTracker?.isOnline(user.last_seen_at, user.presence_status);
@@ -281,7 +286,7 @@ async function updateAdminUsersList() {
 
                         if (!isMe) {
 
-                            html += `<button data-user-action="permissions" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="الصلاحيات"><i class="fas fa-user-cog text-xs"></i></button>`;
+                            if(window.CITLPermissions.full(currentUser))html += `<button data-user-action="permissions" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="الصلاحيات"><i class="fas fa-user-cog text-xs"></i></button>`;
                             html += `<button data-user-action="delete" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف"><i class="fas fa-trash-alt text-xs"></i></button>`;
                         } else {
                             html += `<span class="text-[10px] text-gray-400 mx-1 bg-gray-100 px-2 py-1 rounded">أنت</span>`;
@@ -1252,7 +1257,7 @@ async function loadScheduleInstructorNames() {
 function renderDirectoryCleanup(activeDept) {
     document.getElementById('faculty-directory-cleanup')?.remove();
     const count = document.getElementById('faculty-directory-count');
-    if (!activeDept || !count || !window.CITLPermissions.full(currentUser)) return;
+    if (!activeDept || !count || !window.CITLPermissions.can(currentUser,'can_manage_structure')) return;
     const panel = document.createElement('div');
     panel.id = 'faculty-directory-cleanup';
     panel.className = 'p-4 border-t border-gray-100 text-xs';
@@ -2084,13 +2089,13 @@ async function saveSystemSettings() {
 window.CITLAdminMeetings = null;
 let adminMeetingRead = null;
 async function loadAdminMeetingCatalog() {
-    if (!window.CITLPermissions.full(currentUser) && !window.CITLPermissions.can(currentUser,'can_approve') && !window.CITLPermissions.can(currentUser,'can_delete')) return;
+    if (!window.CITLPermissions.full(currentUser) && !window.CITLPermissions.can(currentUser,'can_approve') && !window.CITLPermissions.can(currentUser,'can_delete') && !window.CITLPermissions.can(currentUser,'can_view_reports')) return;
     if (adminMeetingRead) return adminMeetingRead;
     adminMeetingRead = (async()=>{
         try {
             const all=[];
             for(let offset=0;;offset+=500){
-                const {data,error}=await supabase.from('meetings').select('*, profiles(full_name, email)').order('id',{ascending:true}).range(offset,offset+499);
+                const {data,error}=await supabase.from('meetings').select(window.CITLPermissions.can(currentUser,'can_approve')||window.CITLPermissions.can(currentUser,'can_delete')?'*, profiles(full_name, email)':'*').order('id',{ascending:true}).range(offset,offset+499);
                 if(error)throw error;
                 all.push(...(data||[]));if(!data||data.length<500)break;
                 if(offset>=100000)throw new Error('Too many administrative records');

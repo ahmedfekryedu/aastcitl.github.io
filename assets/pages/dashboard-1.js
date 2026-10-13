@@ -142,6 +142,8 @@ window.supabaseAdmin = sb; // توافق للقراءة فقط؛ العمليا�
 
 // المستخدم الحالي
 let currentUser = null;
+// Keep form handlers in sync with a server-verified permission refresh.
+window.addEventListener('citl-profile-loaded', event => { currentUser = event.detail; });
 
 function isCurrentManager() {
     return !!(currentUser && window.CITLPermissions.full(currentUser));
@@ -1237,11 +1239,11 @@ async function handleMeetingSubmission(e) {
         const notifyAllManagers = async (subject, message) => {
             const { data: managers } = await supabase
                 .from('profiles')
-                .select('email, full_name')
+                .select('email, full_name, role, permissions')
                 .eq('role', 'manager');
 
             if (managers && managers.length > 0) {
-                managers.forEach(manager => {
+                managers.filter(manager=>window.CITLPermissions.can(manager,'can_approve')).forEach(manager => {
                     if (manager.email) {
                         sendEmailNotification(
                             manager.email,      
@@ -3698,7 +3700,7 @@ window.openAgenda = function() { window.CITLDashboard?.openAdmin('meetings'); };
 window.setDashboardProfile = function(profile) {
     currentUser = profile; window.currentUser = profile;
     applyUserPermissions();
-    const manager = ['can_approve','can_delete','can_manage_users'].some(key => window.CITLPermissions.can(profile,key));
+    const manager = window.CITLPermissions.any(profile);
     document.querySelectorAll('[data-dashboard-account]').forEach(button => {
         button.textContent = manager ? 'لوحة التحكم' : 'ملفي الشخصي';
     });

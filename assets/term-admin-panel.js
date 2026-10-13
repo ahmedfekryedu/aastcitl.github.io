@@ -15,7 +15,7 @@
  let timer;
  function start(){
   clearTimeout(timer);placeholder.innerHTML=skeleton;placeholder.hidden=false;frame.style.visibility='hidden';content.setAttribute('aria-busy','true');
-  frame.src='/management/?embedded=1&manage=schedules&v=20261013-r6.8.9.1#schedules';
+  frame.src='/management/?embedded=1&manage=schedules&v=20261013-r6.8.10#schedules';
   timer=setTimeout(()=>{
    content.setAttribute('aria-busy','false');placeholder.replaceChildren();
    const text=document.createElement('p');text.textContent='تعذر تحميل إدارة الجداول الآن.';
@@ -27,13 +27,14 @@
   clearTimeout(timer);placeholder.hidden=true;frame.style.visibility='visible';content.setAttribute('aria-busy','false');
  });
  content.append(placeholder,frame);modal.querySelector('.admin-tab-content')?.parentElement.append(content);
+ root.CITLLoadTermAdmin=()=>{if(root.CITLPermissions.can(root.currentUser,'can_manage_schedules')&&!frame.getAttribute('src'))start();};
  button.addEventListener('click',()=>{
-  if(!root.CITLPermissions.full(typeof currentUser!=='undefined'?currentUser:root.currentUser))return;
+  if(!root.CITLPermissions.can(typeof currentUser!=='undefined'?currentUser:root.currentUser,'can_manage_schedules'))return;
   if(!frame.getAttribute('src'))start();
  });
  let opened=false;
  root.CITLOpenTermAdmin=()=>{
-  if(opened||new URLSearchParams(location.search).get('open')!=='term-schedules'||!root.CITLPermissions.full(typeof currentUser!=='undefined'?currentUser:root.currentUser))return;
+  if(opened||new URLSearchParams(location.search).get('open')!=='term-schedules'||!root.CITLPermissions.can(typeof currentUser!=='undefined'?currentUser:root.currentUser,'can_manage_schedules'))return;
   opened=true;root.openAdminPanel();button.click();
  };
 })(window);

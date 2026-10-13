@@ -23,7 +23,7 @@
  const $=selector=>panel.querySelector(selector),rows=$('[data-rows]'),feedback=$('[data-feedback]');
  const labels={pending:['قيد المراجعة','text-amber-700 bg-amber-50'],confirmed:['معتمد','text-green-700 bg-green-50'],rejected:['مرفوض','text-red-700 bg-red-50'],modification_requested:['طلب تعديل قيد المراجعة','text-blue-700 bg-blue-50'],cancellation_requested:['طلب إلغاء قيد المراجعة','text-amber-700 bg-amber-50']};
  let page=0,serial=0,busy=false;const size=25;
- const allowed=()=>root.currentUser && root.currentUser.role!=='manager' && !root.CITLAuth.facultyPending(root.currentUser);
+ const allowed=()=>root.currentUser && !root.CITLPermissions.full(root.currentUser) && !root.CITLAuth.facultyPending(root.currentUser);
  function empty(message){rows.replaceChildren();const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='p-8 text-center text-sm text-gray-500';td.textContent=message;tr.append(td);rows.append(tr);}
  function draw(items){rows.replaceChildren();for(const item of items){const tr=document.createElement('tr');tr.dataset.booking='';tr.className='border-b border-gray-100';
   const state=labels[item.status]||['حالة غير معروفة','text-gray-600 bg-gray-100'];

@@ -4,19 +4,24 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'activity-history') return !!current() && !root.CITLAuth.facultyPending(current());
     if (tab === 'academic-actions') return !!root.CITLOversight?.canAcademicActions();
     if (tab === 'academic-review') return !!root.CITLOversight?.canReviewRegistration();
-    if (tab === 'my-bookings') return !!current() && current().role !== 'manager' && !root.CITLAuth.facultyPending(current());
+    if (tab === 'my-bookings') return !!current() && !permissions.full(current()) && !root.CITLAuth.facultyPending(current());
     if (permissions.full(current()) || tab === 'profile') return true;
     if (tab === 'users') return can('can_manage_users');
     if (tab === 'meetings') return can('can_approve') || can('can_delete');
+    const module={'registration-codes':'can_manage_registration_codes',directory:'can_manage_structure','term-schedules':'can_manage_schedules',settings:'can_manage_settings',rooms:'can_manage_rooms',news:'can_manage_news',reports:'can_view_reports'};
+    if(module[tab])return can(module[tab]);
     return false;
   }
   const oldApply = root.applyUserPermissions;
   if (oldApply) root.applyUserPermissions = function (...args) {
+    const button = document.getElementById('admin-panel-btn') || document.querySelector('header .citl-header-control');
+    if(button)button.id='admin-panel-btn';
     const result = oldApply.apply(this, args);
-    if (can('can_manage_users') || can('can_approve') || can('can_delete')) {
-      const button = document.getElementById('admin-panel-btn');
+    if(button&&current())button.onclick=()=>root.openAdminPanel();
+    if (permissions.any(current()) || root.CITLOversight?.canAcademicActions() || root.CITLOversight?.canReviewRegistration()) {
       if (button) { button.innerHTML = '<img src="/assets/control-panel.svg" width="18" height="18" alt="" class="citl-control-icon" style="display:inline-block;vertical-align:middle;flex-shrink:0"><span>لوحة التحكم</span>'; button.onclick = () => root.openAdminPanel(); }
     }
     return result;
@@ -25,8 +30,10 @@
   if (oldOpen) root.openAdminPanel = function (...args) {
     if (permissions.full(current())) return oldOpen.apply(this, args);
     root.updateSidebarProfile?.();
+    const modal=document.getElementById('admin-panel-modal');root.CITLFacultyAdmin?.mountCodes(modal,modal?.querySelector('.admin-tab[data-tab=profile]'));
     document.querySelectorAll('.admin-tab').forEach(tab => { tab.style.display = tabAllowed(tab.dataset.tab) ? 'flex' : 'none'; });
-    root.switchAdminTab(can('can_manage_users') ? 'users' : (can('can_approve') || can('can_delete')) ? 'meetings' : 'profile');
+    const preferred=['users','meetings','term-schedules','rooms','directory','news','settings','reports','registration-codes'].find(tabAllowed)||'profile';
+    root.switchAdminTab(preferred);
     document.getElementById('admin-panel-modal')?.classList.add('show');
     root.CITLOversight?.mountAdmin();
   };
@@ -38,8 +45,8 @@
   const guards = {
     approveMeeting:'can_approve',rejectMeeting:'can_approve',approveModification:'can_approve',rejectModification:'can_approve',
     rejectDeleteRequest:'can_approve',confirmDeleteRequest:'can_delete',bulkDeleteMeetings:'can_delete',
-    openPermissionsModal:'full',saveRoom:'full',deleteRoom:'full',saveFacultyDirectoryEntry:'full',deleteFacultyDirectoryEntry:'full',saveSystemSettings:'full',
-    saveTvDisplayConfig:'full',saveTvPosterGlobalConfig:'full',saveNewsConfig:'full',updatePosterQuickSettings:'full'
+    openPermissionsModal:'full',saveRoom:'can_manage_rooms',deleteRoom:'can_manage_rooms',saveFacultyDirectoryEntry:'can_manage_structure',deleteFacultyDirectoryEntry:'can_manage_structure',saveSystemSettings:'can_manage_settings',
+    saveTvDisplayConfig:'can_manage_news',saveTvPosterGlobalConfig:'can_manage_news',saveNewsConfig:'can_manage_news',updatePosterQuickSettings:'can_manage_news'
   };
   for (const [name, capability] of Object.entries(guards)) {
     const original = root[name]; if (!original) continue;
@@ -48,4 +55,14 @@
       return original.apply(this, args);
     };
   }
+  root.addEventListener('citl-permissions-changed',async()=>{
+    root.applyUserPermissions?.();
+    document.querySelectorAll('[data-manager-only]').forEach(el=>el.classList.toggle('hidden',!permissions.full(current())));
+    await root.CITLOversight?.mountAdmin();
+    document.querySelectorAll('.admin-tab').forEach(tab=>tab.style.display=tabAllowed(tab.dataset.tab)?'flex':'none');
+    const active=document.querySelector('.admin-tab.active');
+    if(active&&!tabAllowed(active.dataset.tab))root.switchAdminTab('profile');
+    if(!permissions.full(current()))document.getElementById('citl-account-permissions')?.close();if(!can('can_manage_structure'))document.getElementById('citl-head-dialog')?.close();
+    root.CITLAnnouncements?.mount();
+  });
 })(window);

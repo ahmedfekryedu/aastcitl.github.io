@@ -125,7 +125,7 @@
    root.CITLRegistrationReview?.department(host,department);
    const select=host.querySelector('[data-profile]');select.value=profile?.id||'';
    const info=host.querySelector('[data-info]');
-   const grants=head?['can_approve_registrations','can_review_academic','can_view_visitors'].filter(k=>head[k]).map(k=>({can_approve_registrations:'اعتماد التسجيل',can_review_academic:'إجراءات المحاضرات والطباعة',can_view_visitors:'متابعة المنتدبين'})[k]):[];
+   const grants=head?['can_approve_registrations','can_review_academic','can_view_visitors'].filter(k=>head[k]).map(k=>({can_approve_registrations:'اعتماد التسجيل',can_review_academic:'تنفيذ ومراجعة إجراءات أعضاء الجهة',can_view_visitors:'متابعة المنتدبين'})[k]):[];
    info.innerHTML=grants.length?grants.map(t=>'<span>'+E(t)+'</span>').join(''):'<small>'+E(head?'لا توجد مهام مفعّلة لهذه الجهة':'اختر الحساب ثم حدد الجهات والصلاحيات.')+'</small>';
    host.querySelector('[data-permissions]').disabled=!department;
    host.querySelector('[data-permissions]').onclick=()=>{const p=data.profiles.find(x=>x.id===select.value);if(p)root.CITLDepartmentHeads.open({...p,department,source:'structure'});else host.querySelector('[data-status]').textContent='اختر الحساب أولًا.';};

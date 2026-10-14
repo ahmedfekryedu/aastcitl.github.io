@@ -34,4 +34,6 @@
 @media(max-width:1100px){html:not(.citl-desktop-request) .dh-summary-grid.dh-with-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){html:not(.citl-desktop-request) .dh-summary-grid.dh-with-actions,html:not(.citl-desktop-request) .dh-summary-grid.dh-with-admin.dh-with-actions{grid-template-columns:1fr}.dh-metrics.dh-with-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.dh-metrics .dh-action-metric{grid-column:1/-1;border-right:0;border-top:1px solid var(--dh-line);padding-top:5px}}
 
-.dh-admin-summary .dh-facts{grid-template-columns:repeat(4,minmax(0,1fr))}.dh-admin-summary .dh-facts .dh-metric{min-width:0}
+.dh-admin-summary .dh-facts{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}.dh-admin-summary .dh-facts .dh-metric{min-width:0}
+
+.dh-admin-summary .dh-facts .dh-metric{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:3px}.dh-admin-summary .dh-facts .dh-metric-label{min-height:3.2em;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere;width:100%}.dh-admin-summary .dh-summary-foot>span{min-width:0;overflow-wrap:anywhere}

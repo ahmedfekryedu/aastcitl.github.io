@@ -2,7 +2,7 @@
  'use strict';
  const E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const label=k=>root.CITLDepartmentHeads?.label(k)||k;
- const flags=[['can_approve_registrations','اعتماد ربط أعضاء الجهة'],['can_review_academic','مراجعة إجراءات المحاضرات والطباعة'],['can_view_visitors','متابعة المنتدبين المختارين يدويًا']];
+ const flags=[['can_approve_registrations','اعتماد ربط أعضاء الجهة'],['can_review_academic','تنفيذ ومراجعة إجراءات أعضاء الجهة والطباعة'],['can_view_visitors','متابعة المنتدبين المختارين يدويًا']];
  const general=root.CITLPermissions.catalog;
  const skeleton=()=>'<div class="citl-admin-placeholder" role="status"><span class="citl-skeleton-line"></span><span class="citl-skeleton-line"></span></div>';
  async function rpc(name,args){await root.CITLAuth.session();return root.CITLRequests.rpc(root.sb,name,args);}

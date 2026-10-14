@@ -64,3 +64,15 @@
 @media(min-width:1024px){.citl-user-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 .citl-rooms-read-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#805b17;font:700 12px Cairo,sans-serif}.citl-rooms-read-status button{flex-shrink:0}
+
+.citl-academic-booking-fields{border:0;padding:0;margin:14px 0}.citl-academic-booking-fields .citl-ac-toolbar{grid-template-columns:1fr 1fr}.citl-academic-booking-fields textarea{width:100%;font:inherit;padding:10px;border:1px solid #dce2ed;border-radius:8px;resize:vertical}#citl-academic-room-booking [data-status]{font:700 12px Cairo,sans-serif;color:#805b17}#citl-academic-room-booking [hidden]{display:none!important}@media(max-width:600px){.citl-academic-booking-fields .citl-ac-toolbar{grid-template-columns:1fr}}
+
+.citl-head-assignment-summary{display:flex;flex-direction:column;gap:5px;padding:9px 0;border-bottom:1px solid #edf0f6}.citl-head-assignment-summary:last-child{border-bottom:0}.citl-head-assignment-summary span,.citl-head-assignment-summary small{font-size:11px;color:#64748b}
+#citl-academic-room-booking{width:min(680px,calc(100vw - 24px));max-height:90vh}
+#citl-academic-room-booking form{padding:0}
+#citl-academic-room-booking .citl-ac-toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:16px}
+#citl-academic-room-booking .citl-ac-toolbar label{min-width:0;margin:0;line-height:1.8}
+#citl-academic-room-booking .citl-ac-toolbar label:last-child{grid-column:1/-1}
+#citl-academic-room-booking fieldset{min-width:0}
+#citl-academic-room-booking .citl-ac-buttons{padding-top:8px}
+@media(max-width:600px){#citl-academic-room-booking .citl-ac-toolbar{grid-template-columns:1fr}#citl-academic-room-booking .citl-ac-body{max-height:calc(90vh - 60px)}}

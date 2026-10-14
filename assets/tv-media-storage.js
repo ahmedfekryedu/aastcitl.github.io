@@ -144,5 +144,6 @@
     const deleted = await sb.from('tv_posters').delete().eq('id',row.id).eq('image_url',row.image_url).select('id');
     if (deleted.error || !deleted.data?.length) throw new Error('حُذف الملف والإعلان مخفي، لكن تعذر حذف السجل؛ أعد المحاولة بعد تحديث القائمة');
   }
-  root.CITLMediaStorage = Object.freeze({validate, validateVideo, upload, save, remove, removeObject, isR2, putFile});
+  const usage = sb => api(sb, '/api/media/usage', 'GET');
+  root.CITLMediaStorage = Object.freeze({validate, validateVideo, upload, save, remove, removeObject, isR2, putFile, usage});
 })(window);

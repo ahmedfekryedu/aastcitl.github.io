@@ -4,12 +4,14 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'registration-codes') return false;
+    if (tab === 'announcements') return permissions.full(current());
     if (tab === 'activity-history') return !!current() && !root.CITLAuth.facultyPending(current());
     if (tab === 'academic-actions') return !!root.CITLOversight?.canAcademicActions();
     if (tab === 'academic-review') return !!root.CITLOversight?.canReviewRegistration();
     if (tab === 'my-bookings') return !!current() && !permissions.full(current()) && !root.CITLAuth.facultyPending(current());
     if (permissions.full(current()) || tab === 'profile') return true;
-    if (tab === 'users') return can('can_manage_users');
+    if (tab === 'users') return can('can_manage_users') || can('can_manage_registration_codes');
     if (tab === 'meetings') return can('can_approve') || can('can_delete');
     const module={'registration-codes':'can_manage_registration_codes',directory:'can_manage_structure','term-schedules':'can_manage_schedules',settings:'can_manage_settings',rooms:'can_manage_rooms',news:'can_manage_news',reports:'can_view_reports'};
     if(module[tab])return can(module[tab]);
@@ -32,7 +34,7 @@
     root.updateSidebarProfile?.();
     const modal=document.getElementById('admin-panel-modal');root.CITLFacultyAdmin?.mountCodes(modal,modal?.querySelector('.admin-tab[data-tab=profile]'));
     document.querySelectorAll('.admin-tab').forEach(tab => { tab.style.display = tabAllowed(tab.dataset.tab) ? 'flex' : 'none'; });
-    const preferred=['users','meetings','term-schedules','rooms','directory','news','settings','reports','registration-codes'].find(tabAllowed)||'profile';
+    const preferred=(typeof args[0]==='string'&&tabAllowed(args[0])?args[0]:null)||['users','meetings','term-schedules','rooms','directory','news','settings','reports','registration-codes'].find(tabAllowed)||'profile';
     root.switchAdminTab(preferred);
     document.getElementById('admin-panel-modal')?.classList.add('show');
     root.CITLOversight?.mountAdmin();

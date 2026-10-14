@@ -45,7 +45,7 @@
     if(conflicts!==null)for(let i=0;i<confirmed.length;i++)for(let j=i+1;j<confirmed.length;j++){
       const a=confirmed[i],b=confirmed[j];if(a.room_id===b.room_id&&a.start<b.end&&b.start<a.end)conflicts++;
     }
-    return {confirmed,requests:pending(rows,user),live:valid.filter(x=>x.start<=now.minutes&&x.end>now.minutes),next:valid.filter(x=>x.start>now.minutes).sort((a,b)=>a.start-b.start)[0]||null,conflicts};
+    return {cancelled:rows.filter(x=>x.status==='cancelled'),confirmed,requests:pending(rows,user),live:valid.filter(x=>x.start<=now.minutes&&x.end>now.minutes),next:valid.filter(x=>x.start>now.minutes).sort((a,b)=>a.start-b.start)[0]||null,conflicts};
   }
   root.CITLDashboardModel=Object.freeze({role,names,week,lectures,statistics,pending,bookings});
 })(window);

@@ -442,6 +442,7 @@ async function loadTvPosterAdminData() {
     const grid = document.getElementById('admin-posters-grid');
     const countBadge = document.getElementById('admin-posters-count');
     if (!grid) return;
+    window.CITLMediaUsage?.refresh(supabase);
     if (tvPosterSaving) return;
     tvPosterConfigReady = false;
     const toggle = document.getElementById('poster-global-toggle');

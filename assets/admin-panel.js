@@ -13,7 +13,8 @@ let scheduleInstructorNames = [];
 
 let facultyDirectoryEntries = [];
 
-function openAdminPanel() {
+function openAdminPanel(initialTab = 'users') {
+    if(typeof initialTab!=='string')initialTab='users';
     updateSidebarProfile();
 
     const allTabs = document.querySelectorAll('.admin-tab');
@@ -21,20 +22,8 @@ function openAdminPanel() {
     if (window.CITLPermissions.full(currentUser)) {
         allTabs.forEach(tab => tab.style.display = tab.dataset.tab === 'my-bookings' ? 'none' : 'flex');
 
-        if (typeof updateAdminMeetingsList === 'function') {
-            try { updateAdminMeetingsList(); } catch (e) { console.error(e); }
-        }
-
-        if (typeof updateAdminUsersList === 'function') {
-            try { updateAdminUsersList(); } catch (e) { console.error(e); }
-        }
-
-        if (typeof updateAdminReports === 'function') {
-            try { updateAdminReports(); } catch (e) {}
-        }
-
-        switchAdminTab('users');
-        startAdminUsersPresenceLiveRefresh();
+        switchAdminTab(initialTab);
+        if(window.CITLPermissions.can(currentUser,'can_manage_users'))startAdminUsersPresenceLiveRefresh();
 
     } else {
         allTabs.forEach(tab => {
@@ -54,7 +43,7 @@ function openAdminPanel() {
 
 function switchAdminTab(tabName) {
     if(tabName==='rooms')window.CITLRoomAvailability?.config();
-    if(tabName==='reports')window.CITLRoomAvailability?.report();
+    if(tabName==='announcements'){window.CITLAnnouncements?.mount();window.CITLAnnouncements?.load();}
     if(tabName==='term-schedules')window.CITLLoadTermAdmin?.();
     if(tabName==='registration-codes')window.CITLFacultyAdmin?.loadCodes();
     if (tabName === 'activity-history') window.CITLAdminAccess?.loadHistory();
@@ -91,11 +80,12 @@ function switchAdminTab(tabName) {
     }
 
     if (tabName === 'users') {
-        window.CITLAnnouncements?.mount();
+        window.CITLFacultyAdmin?.mountCodes();
+        if(!window.CITLPermissions.full(currentUser))window.CITLFacultyAdmin?.loadCodes();
         if (typeof updateAdminUsersList === 'function') {
             try { updateAdminUsersList(); } catch (e) { console.error(e); }
         }
-        startAdminUsersPresenceLiveRefresh();
+        if(window.CITLPermissions.can(currentUser,'can_manage_users'))startAdminUsersPresenceLiveRefresh();
     }
 
     if (tabName === 'directory' && typeof loadFacultyDirectoryTab === 'function') {
@@ -185,6 +175,7 @@ function filterAdminMeetings(type) {
         }
 
 async function updateAdminUsersList() {
+    if(!window.CITLPermissions.can(currentUser,'can_manage_users'))return;
     window.CITLFacultyAdmin?.load();
     if (typeof updateSidebarProfile === 'function') updateSidebarProfile();
 
@@ -1874,16 +1865,17 @@ window.approveMeeting = async function(id) {
 window.confirmDeleteRequest = async function(id) {
  let meetings = window.CITLAdminMeetings || [];
 
-    if(!confirm('هل أنت متأكد من الموافقة على حذف هذا الحجز؟')) return;
+    if(!await showConfirmDialog('اعتماد إلغاء الحجز مع الاحتفاظ به في السجل؟')) return;
     
     document.body.style.cursor = 'wait';
     try {
-        const { error } = await supabase.from('meetings').delete().eq('id', id);
+        const { error } = await supabase.from('meetings').update({status:'cancelled',pending_changes:null}).eq('id', id);
         if(error) throw error;
 
-        meetings = meetings.filter(m => m.id != id);
+        await loadMeetings();
+        await updateAdminMeetingsList();
         refreshAllViews();
-        showNotification('تم قبول طلب الحذف وإزالة الحجز');
+        showNotification('تم إلغاء الحجز وحفظه في السجل');
     } catch(err) {
         showNotification('خطأ في العملية', 'error');
     } finally {
@@ -2056,7 +2048,7 @@ async function loadAdminMeetingCatalog() {
         try {
             const all=[];
             for(let offset=0;;offset+=500){
-                const {data,error}=await supabase.from('meetings').select(window.CITLPermissions.can(currentUser,'can_approve')||window.CITLPermissions.can(currentUser,'can_delete')?'*, profiles(full_name, email)':'*').order('id',{ascending:true}).range(offset,offset+499);
+                const {data,error}=await supabase.from('meetings').select(window.CITLPermissions.can(currentUser,'can_approve')||window.CITLPermissions.can(currentUser,'can_delete')?'*, profiles!user_id(full_name, email)':'*').order('id',{ascending:true}).range(offset,offset+499);
                 if(error)throw error;
                 all.push(...(data||[]));if(!data||data.length<500)break;
                 if(offset>=100000)throw new Error('Too many administrative records');

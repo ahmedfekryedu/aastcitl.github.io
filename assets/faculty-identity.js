@@ -125,15 +125,19 @@
    };host.replaceChildren(form);
    }
 
- function mountCodes(modal,sample){
-  if(document.getElementById('admin-registration-codes-tab'))return;
-  const tab=sample.cloneNode(true);tab.dataset.tab='registration-codes';tab.removeAttribute('onclick');tab.classList.remove('active');tab.querySelector('span').textContent='أكواد التسجيل';tab.querySelector('i').className='fas fa-key';tab.onclick=()=>root.switchAdminTab('registration-codes');sample.after(tab);
-  const panel=document.createElement('section');panel.id='admin-registration-codes-tab';panel.className='admin-tab-content hidden';panel.innerHTML='<section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3>أكواد التسجيل</h3><p>تغيير الأكواد مع الحفاظ على شروط التسجيل والاعتماد.</p></div><button type="button" data-refresh class="citl-ac-button">تحديث</button></div><div data-codes>'+skeleton()+'</div></section>';modal.querySelector('.admin-tab-content').parentElement.append(panel);panel.querySelector('[data-refresh]').onclick=loadCodes;
-  tab.style.display=root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes')?'flex':'none';
+ function mountCodes(){
+  const parent=document.getElementById('admin-users-tab');if(!parent)return;
+  document.querySelector('.admin-tab[data-tab="registration-codes"]')?.remove();document.getElementById('admin-registration-codes-tab')?.remove();
+  const canUsers=root.CITLPermissions.can(root.currentUser,'can_manage_users'),canCodes=root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes'),full=root.CITLPermissions.full(root.currentUser);
+  for(const child of parent.children){if(child.id==='citl-registration-codes')continue;if(!canUsers){if(!child.hasAttribute('data-citl-code-only-hidden'))child.dataset.citlCodeOnlyHidden=String(child.hidden);child.hidden=true;}else if(child.hasAttribute('data-citl-code-only-hidden')){child.hidden=child.dataset.citlCodeOnlyHidden==='true';delete child.dataset.citlCodeOnlyHidden;}}
+  let panel=document.getElementById('citl-registration-codes');
+  if(full||!canCodes){panel?.remove();return;}
+  if(panel)return;
+  panel=document.createElement('section');panel.id='citl-registration-codes';panel.className='citl-admin-section';panel.innerHTML='<div class="citl-admin-section-head"><div><h3>تغيير كود التسجيل</h3><p>إعدادات التسجيل ضمن إدارة المستخدمين، حسب صلاحيات حسابك.</p></div><button type="button" data-refresh class="citl-ac-button">تحديث</button></div><div data-codes>'+skeleton()+'</div>';parent.append(panel);panel.querySelector('[data-refresh]').onclick=loadCodes;
  }
  let codesSerial=0;
  async function loadCodes(){
-  const panel=document.getElementById('admin-registration-codes-tab');if(!panel||!root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes'))return;
+  mountCodes();const panel=document.getElementById('citl-registration-codes');if(!panel||!root.CITLPermissions.can(root.currentUser,'can_manage_registration_codes'))return;
   const serial=++codesSerial,host=panel.querySelector('[data-codes]'),refresh=panel.querySelector('[data-refresh]');host.innerHTML=skeleton();refresh.disabled=true;
   try{const data=await rpc('citl_registration_codes','list');if(serial===codesSerial)renderCodes(host,data);}
   catch(error){if(serial===codesSerial){host.replaceChildren();const text=document.createElement('p');text.className='citl-ac-status';text.textContent=error.message;host.append(text);}}

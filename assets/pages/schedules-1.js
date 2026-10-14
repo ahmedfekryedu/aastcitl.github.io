@@ -686,21 +686,23 @@ function hasApprovedTeachingIdentity(user) {
 }
 function syncScheduleEntryAccess(user) {
     const faculty = hasApprovedTeachingIdentity(user), manager = isManagerUser(user);
-    document.querySelectorAll('[data-schedule-hub]').forEach(el => el.classList.toggle('hidden', !faculty && !manager));
+    document.querySelectorAll('[data-schedule-hub]').forEach(el => el.classList.toggle('hidden', !faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports')));
     document.querySelectorAll('[data-personal-schedule-entry]').forEach(el => el.classList.toggle('hidden', !faculty));
     const grid = document.getElementById('schedule-entry-tools');
     if (grid) grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))';
     const count = document.getElementById('schedule-entry-count');
-    if (count) count.textContent = faculty ? '3 أدوات رئيسية' : 'أداتان رئيسيتان';
+    if (count) count.textContent = 'أدوات الجداول';
+    grid?.querySelector('button[onclick*="openScheduleReportsModal"]')?.classList.toggle('hidden',!manager);
+    window.CITLBookingReports?.mount();
 }
 window.addEventListener('citl-profile-loaded', event => syncScheduleEntryAccess(event.detail));
 function openScheduleHub() {
     const user = window.currentUser;
-    if (isManagerUser(user)) openScheduleEntryModal();
+    if (isManagerUser(user)||window.CITLPermissions.can(user,'can_view_reports')) openScheduleEntryModal();
     else if (hasApprovedTeachingIdentity(user)) openMyScheduleModal();
 }
 function openScheduleEntryModal() {
-    if (!isManagerUser(window.currentUser)) return;
+    if (!isManagerUser(window.currentUser)&&!window.CITLPermissions.can(window.currentUser,'can_view_reports')) return;
     syncScheduleEntryAccess(window.currentUser);
     const modal = document.getElementById('schedule-entry-modal');
     if (!modal) return;

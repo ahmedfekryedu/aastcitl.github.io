@@ -1,4 +1,26 @@
 @import url('/assets/fonts.css');
+.citl-booking-report-body{min-height:0;flex:1;overflow:auto;background:#f8fafc;padding:20px}
+#citl-booking-report{margin:0!important}
+#citl-booking-report .citl-ac-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+#citl-booking-report .citl-ac-toolbar label{min-width:0}
+#citl-booking-report [data-report-rows]{margin-top:16px;min-height:120px}
+#citl-booking-report .citl-ac-table th{background:#2a3475;color:white}
+#citl-booking-report .citl-ac-table tbody tr:nth-child(even){background:#f8fafc}
+@media(max-width:640px){.citl-booking-report-body{padding:12px}#citl-booking-report .citl-ac-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.citl-ac-button:disabled:hover{cursor:default}
+#admin-activity-history-tab [data-prev]:disabled,#admin-activity-history-tab [data-next]:disabled,#citl-admin-announcements [data-prev]:disabled,#citl-admin-announcements [data-next]:disabled{cursor:default;background:#f4f6fa;color:#8791a5;border-color:#e2e7ef}
+#admin-directory-tab>section,#admin-directory-tab>div{margin-bottom:18px}
+#citl-manual-faculty-link .citl-ac-work-body{display:grid;gap:18px}
+#citl-manual-faculty-link .citl-ac-toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#citl-manual-faculty-link .citl-ac-toolbar label{min-width:0;line-height:1.8}
+#citl-manual-faculty-link button[type=submit]{justify-self:start;min-height:38px}
+#citl-manual-faculty-link [role=status]{margin:0;font-size:12px;line-height:1.8}
+#citl-ac-structure .citl-structure-editor{display:grid;gap:14px}
+#citl-ac-structure .citl-ac-buttons{margin:0}
+#admin-directory-tab .citl-admin-section-head h3{font-size:14px;line-height:1.8}
+#admin-directory-tab .citl-admin-section-head p{line-height:1.8}
+#citl-admin-announcements{margin-top:0!important}
+@media(max-width:640px){#citl-manual-faculty-link .citl-ac-toolbar{grid-template-columns:1fr}#citl-manual-faculty-link button[type=submit]{width:100%}}
 .citl-ac-summary{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:#fff;border:1px solid #e3e7ef;border-radius:12px;padding:12px 16px;margin-top:12px;color:#2a3475;font-family:Cairo,sans-serif}
 .citl-ac-summary[hidden]{display:none}.citl-ac-summary strong{font-size:13px}.citl-ac-summary span{display:block;font-size:11px;color:#64748b;margin-top:3px}
 .citl-ac-button{font:700 12px Cairo,sans-serif;color:white;background:#2a3475;border:1px solid transparent;border-radius:8px;padding:8px 12px;cursor:pointer;white-space:normal}.citl-ac-button:hover{background:#20295d}.citl-ac-button.secondary{background:#fff;color:#2a3475;border-color:#dde3ef}.citl-ac-button.danger{color:#b91c1c;background:#fef2f2;border-color:#fecaca}.citl-ac-button:disabled{opacity:.5;cursor:wait}.citl-ac-button b{margin-inline-start:8px}.citl-ac-buttons{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -29,3 +51,7 @@
 .citl-booking-toggle{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}.citl-booking-extras{margin:14px 0;padding:14px 0;border-block:1px solid #e5e8f1;color:#2a3475}.citl-booking-extras [hidden],#citl-free-rooms[hidden]{display:none!important}.citl-booking-extras .citl-ac-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.citl-booking-extras [role=status]{font-size:12px}#citl-booking-report{margin-top:20px}#citl-free-config{margin-top:20px}@media(max-width:640px){.citl-booking-extras .citl-ac-toolbar{grid-template-columns:1fr}}
 
 #citl-manual-faculty-link{margin:16px 0}#citl-manual-faculty-link [data-state=success]{color:#15803d}#citl-free-rooms{margin-bottom:20px}
+
+.citl-free-room-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px;padding:0;border:0;margin:14px 0;max-height:300px;overflow:auto}.citl-free-room-options label{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #e1e5ef;border-radius:8px;background:#f8f9fc;font:700 12px Cairo,sans-serif;cursor:pointer}.citl-free-room-options label.selected{background:#fff8e7;border-color:#f3a628}.citl-free-room-options input{accent-color:#2a3475}.citl-free-room{margin-top:18px}.citl-free-room h4{background:#2a3475;color:#fff;font:800 14px Cairo,sans-serif;padding:12px 16px;border-radius:10px 10px 0 0;margin:0;border-bottom:3px solid #f3a628}.citl-free-grid{width:100%;border-collapse:separate;border-spacing:0;font:700 11px Cairo,sans-serif;table-layout:fixed;min-width:650px}.citl-free-grid th,.citl-free-grid td{border:1px solid #e2e6ef;text-align:center;padding:10px;min-width:75px;height:65px}.citl-free-grid thead th{background:#edf0f8;color:#2a3475;height:54px}.citl-free-grid tbody th{background:#f6f7fb;width:125px}.citl-free-grid .available{background:#edf8f2;color:#166534;transition:background .15s}.citl-free-grid .available:hover{background:#d8f1e4}.citl-free-grid .booked{background:#fff1dc;color:#9a5b00}.citl-free-grid .occupied{background:#f1f3f7;color:#7a8397}.citl-free-grid .outside{background:#fafbfc;color:#b4bdcb}.citl-free-book{width:100%;min-height:40px;border:0;background:transparent;color:inherit;font:800 12px Cairo,sans-serif;cursor:pointer;border-radius:6px}.citl-free-book:focus-visible{outline:2px solid #2a3475}.citl-free-book:disabled{opacity:.5;cursor:wait}.citl-free-legend{display:flex;gap:12px;flex-wrap:wrap;font:700 11px Cairo,sans-serif;margin:14px 0}.citl-free-legend span{padding:5px 9px;border-radius:5px;background:#f1f3f7}.citl-free-legend span:first-child{background:#edf8f2;color:#166534}.citl-free-legend span:nth-child(2){background:#fff1dc;color:#9a5b00}.citl-free-analysis{padding:14px;background:#f4f6fc;border-right:3px solid #f3a628;border-radius:8px;color:#2a3475;font:12px Cairo,sans-serif}.citl-free-analysis strong{font-size:14px}.citl-free-analysis p{margin:8px 0}.citl-free-analysis small{color:#64748b}#citl-free-rooms [data-free-status]:empty{display:none}#citl-free-rooms [data-free-status]{color:#b91c1c;font-size:12px}#citl-free-config [data-selected-count]{font-size:11px;color:#64748b}
+
+.citl-free-navigation{margin-bottom:14px}.citl-free-grid caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}

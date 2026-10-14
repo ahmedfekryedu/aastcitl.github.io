@@ -301,7 +301,7 @@ function refreshAllViews() {
     updateDashboard();
     
     // تشغيل الـ Skeleton
-    showDashboardSkeleton();
+    if(!window.CITLRoomAvailability?.isFree())showDashboardSkeleton();
 
     // تحديث التحليل الذكي
     setTimeout(() => {
@@ -310,8 +310,10 @@ function refreshAllViews() {
     
     // تحديث لوحات الأدمن
     try { 
-        updateAdminMeetingsList(); 
-        updateAdminReports();
+        if(document.getElementById('admin-panel-modal')?.classList.contains('show')) {
+            if(!document.getElementById('admin-meetings-tab')?.classList.contains('hidden'))updateAdminMeetingsList();
+            if(!document.getElementById('admin-reports-tab')?.classList.contains('hidden'))updateAdminReports();
+        }
         if(typeof updateActivityLogs === 'function') updateActivityLogs(); 
     } catch(e) {}
 
@@ -323,7 +325,7 @@ async function loadMeetings() {
             try {
 let query = supabase
     .from('meetings')
-    .select('*, profiles(full_name, email)');
+    .select('*, profiles!user_id(full_name, email)');
 
 if (currentRoomId) {
     query = query.eq('room_id', currentRoomId);
@@ -1113,7 +1115,7 @@ async function handleMeetingSubmission(e) {
     showLoader('جاري حفظ الحجز وإبلاغ المديرين...'); 
 
     try {
-        const endTimeVal = calculateEndTime(timeVal, parseInt(durVal));
+        const endTimeVal = calculateEndTime(timeVal, Number(durVal));
         const originalMeeting = meetingId ? (window.CITLAdminMeetings || []).find(m => String(m.id) === String(meetingId)) || meetings.find(m => String(m.id) === String(meetingId)) : null;
         if (meetingId && !originalMeeting) throw new Error('تعذر تحميل الحجز الأصلي؛ حدّث سجل الحجوزات وأعد المحاولة.');
         const bookingRoomId = originalMeeting ? originalMeeting.room_id : currentRoomId;
@@ -1243,6 +1245,7 @@ const meetingData = {
         }
 
         await loadMeetings();
+        window.CITLRoomAvailability?.refresh(true);
         closeModal('add-meeting-modal');
         resetFormUI();
 
@@ -1274,8 +1277,9 @@ function calculateEndTime(startTime, duration) {
         // التأكد من أن الأرقام صحيحة
         if (isNaN(hours) || isNaN(minutes)) return "00:00";
 
-        const endHour = hours + parseInt(duration);
-        return `${endHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        const total=hours*60+minutes+Math.round(Number(duration)*60);
+        if(!Number.isFinite(total)||Number(duration)<=0||total>=1440)throw new Error('Invalid duration');
+        return `${Math.floor(total/60).toString().padStart(2,'0')}:${(total%60).toString().padStart(2,'0')}`;
     } catch (e) {
         console.error("Error calculating time:", e);
         return "00:00";
@@ -1649,6 +1653,7 @@ function editMeeting() {
 
 // Generate Smart AI Analytics (النسخة المتطورة جداً)
         function generateAISuggestions() {
+            if(window.CITLRoomAvailability?.isFree()){window.CITLRoomAvailability.assistant();return;}
             const container = document.getElementById('ai-suggestions');
             container.innerHTML = '';
             
@@ -2182,7 +2187,7 @@ window.renderAdminMeetingsTable = function(list) {
     );
     
     // تصفية الحجوزات المعتمدة
-    const approvedList = list.filter(m => m.status === 'confirmed' || m.status === 'modification_requested' || m.status === 'cancellation_requested');
+    const approvedList = list.filter(m => m.status === 'confirmed' || m.status === 'modification_requested' || m.status === 'cancellation_requested' || m.status === 'cancelled');
 
     // === 1. قسم الطلبات (الأعلى) ===
     if (requestsList.length > 0) {
@@ -2214,7 +2219,7 @@ window.renderAdminMeetingsTable = function(list) {
             else if (m.status === 'cancellation_requested') {
                 statusBadge = '<span class="text-red-600 font-bold text-xs"><i class="fas fa-trash-alt ml-1"></i> طلب إلغاء</span>';
                 actionButtons = `
-                    <button data-meeting-action="confirmDeleteRequest" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm ml-2">تأكيد الحذف</button>
+                    <button data-meeting-action="confirmDeleteRequest" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm ml-2">اعتماد الإلغاء</button>
                     <button data-meeting-action="rejectDeleteRequest" class="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-600 shadow-sm">رفض</button>
                 `;
             }
@@ -2259,7 +2264,7 @@ window.renderAdminMeetingsTable = function(list) {
 
     // === 2. القسم السفلي (المعتمد) ===
     if (approvedList.length === 0) {
-        approvedTbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-500">لا توجد حجوزات معتمدة</td></tr>';
+        approvedTbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-500">لا توجد حجوزات معتمدة أو ملغاة</td></tr>';
     } else {
         approvedList.sort((a, b) => new Date(b.date) - new Date(a.date));
         approvedList.forEach(m => {
@@ -2267,6 +2272,7 @@ window.renderAdminMeetingsTable = function(list) {
             
             let statusDisplay = '<span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded-full border border-green-100">مؤكد</span>';
             if(m.status === 'modification_requested') statusDisplay = '<span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full border border-blue-100 animate-pulse">جاري التعديل...</span>';
+            if(m.status === 'cancelled') statusDisplay = '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded-full">ملغي</span>';
             if(m.status === 'cancellation_requested') statusDisplay = '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded-full border border-red-100 animate-pulse">جاري الحذف...</span>';
 
             const tr = document.createElement('tr');
@@ -2286,6 +2292,7 @@ window.renderAdminMeetingsTable = function(list) {
                    <button data-meeting-action="editMeetingFromAdmin" class="text-blue-500 hover:bg-blue-50 p-2 rounded-full"><i class="fas fa-edit"></i></button>
                 </td>
             `;
+            if(m.status==='cancelled')tr.querySelector('[data-meeting-action=editMeetingFromAdmin]')?.remove();
             window.CITLBindMeetingActions(tr, m.id); approvedTbody.appendChild(tr);
         });
     }

@@ -2,7 +2,7 @@
   'use strict';
   const S=root.CITLStudy,M=root.CITLDashboardModel,E=S.escape;
   const state={user:null,rows:[],actions:[],meetings:[],errors:[],ready:false,view:null,day:'',updated:null};
-  let pending,started=false,queued;
+  let pending,started=false,queued,renderKey;
   const $=id=>document.getElementById(id);
   const clock=minutes=>minutes===null?'—':`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;
   const dateLabel=date=>new Date(date+'T12:00:00Z').toLocaleDateString('ar-EG',{day:'numeric',month:'long',timeZone:'Africa/Cairo'});
@@ -76,7 +76,7 @@
     if(r.meetings){
       const b=M.bookings(state.meetings,state.user,now);
       const nextText=meetingFailed?'تعذر التحديث':b.next?`التالي <bdi>${clock(b.next.start)}</bdi>`:'لا يوجد حجز تالٍ اليوم';
-      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات تحتاج إجراء',meetingFailed?'—':b.requests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
+      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات تحتاج إجراء',meetingFailed?'—':b.requests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts),metric('ملغاة بالسجل',meetingFailed?'—':b.cancelled.length)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
     }
     $('dh-workspace').innerHTML=`<div class="dh-summary-grid${r.meetings?' dh-with-admin':''}">${rooms}${lectures}${administration}</div>${r.users&&!r.meetings?'<div class="dh-permission-link"><button class="dh-button" data-dh-admin="users">إدارة المستخدمين</button></div>':''}`;
     $('dh-metrics').innerHTML='';
@@ -94,7 +94,14 @@
     for(const button of $('dh-role-tabs').querySelectorAll('button'))button.setAttribute('aria-selected',String(button.dataset.dhView===state.view));
     $('dh-errors').hidden=!state.errors.length;
     $('dh-errors').textContent=state.errors.includes('profile')?'تعذر التحقق من حسابك؛ أعد المحاولة.':'تعذر تحديث بعض البيانات. الأرقام غير المتاحة تظهر بشرطة، ويمكنك إعادة المحاولة.';
-    if(state.view==='faculty')renderFaculty(items,stats,now);else renderOverview(items,stats,now);
+    const nextKey=JSON.stringify([state.user.id,r,M.names(state.user),state.view,state.day,stats,state.meetings,state.errors]);
+    if(renderKey!==nextKey||!$('dh-workspace').children.length){
+      const actionCard=$('citl-ac-summary');
+      if(state.view==='faculty')renderFaculty(items,stats,now);else renderOverview(items,stats,now);
+      const target=state.view==='faculty'?$('dh-metrics'):$('dh-workspace').querySelector('.dh-summary-grid');
+      if(actionCard&&!actionCard.isConnected&&target)target.insertBefore(actionCard,state.view==='faculty'?null:target.querySelector('.dh-admin-summary'));
+      renderKey=nextKey;
+    }
     $('dh-updated').textContent=state.updated?'آخر تحديث '+new Date(state.updated).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Cairo'}):'جاري التحديث';
     $('dh-loading').hidden=true;$('dh-content').hidden=false;
     root.CITLOversight?.renderDashboard();
@@ -118,7 +125,7 @@
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
       const jobs=[S.loadAll(root.sb),root.CITLRequests.rpc(root.sb,'citl_calendar_effects',{p_from:week.start,p_to:week.end}),
-        r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested)`)):Promise.resolve([]),
+        r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested,cancelled)`)):Promise.resolve([]),
         root.sb.from('site_settings').select('setting_value').eq('setting_key','news_config').maybeSingle()];
       const result=await Promise.allSettled(jobs);state.errors=[];
       ['rows','actions','meetings'].forEach((key,i)=>{state[key]=result[i].status==='fulfilled'?result[i].value:[];if(result[i].status==='rejected')state.errors.push(['schedule','actions','meetings'][i]);});

@@ -76,7 +76,7 @@
     if(r.meetings){
       const b=M.bookings(state.meetings,state.user,now);
       const nextText=meetingFailed?'تعذر التحديث':b.next?`التالي <bdi>${clock(b.next.start)}</bdi>`:'لا يوجد حجز تالٍ اليوم';
-      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات تحتاج إجراء',meetingFailed?'—':b.requests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts),metric('ملغاة بالسجل',meetingFailed?'—':b.cancelled.length)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
+      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات تحتاج إجراء',meetingFailed?'—':b.requests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
     }
     $('dh-workspace').innerHTML=`<div class="dh-summary-grid${r.meetings?' dh-with-admin':''}">${rooms}${lectures}${administration}</div>${r.users&&!r.meetings?'<div class="dh-permission-link"><button class="dh-button" data-dh-admin="users">إدارة المستخدمين</button></div>':''}`;
     $('dh-metrics').innerHTML='';
@@ -125,7 +125,7 @@
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
       const jobs=[S.loadAll(root.sb),root.CITLRequests.rpc(root.sb,'citl_calendar_effects',{p_from:week.start,p_to:week.end}),
-        r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested,cancelled)`)):Promise.resolve([]),
+        r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id,booking_type',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested)`)):Promise.resolve([]),
         root.sb.from('site_settings').select('setting_value').eq('setting_key','news_config').maybeSingle()];
       const result=await Promise.allSettled(jobs);state.errors=[];
       ['rows','actions','meetings'].forEach((key,i)=>{state[key]=result[i].status==='fulfilled'?result[i].value:[];if(result[i].status==='rejected')state.errors.push(['schedule','actions','meetings'][i]);});

@@ -38,6 +38,7 @@
   }
   function pending(rows,user){const r=role(user);return rows.filter(x=>(r.approve&&['pending','modification_requested','cancellation_requested','deletion_requested'].includes(x.status))||(r.remove&&['cancellation_requested','deletion_requested'].includes(x.status)));}
   function bookings(rows,user,now=S.cairo()){
+    rows=rows.filter(x=>x.booking_type!=='lecture');
     const minutes=value=>{const m=/^(\d{1,2}):(\d{2})/.exec(String(value||''));return m&&+m[1]<24&&+m[2]<60?+m[1]*60+(+m[2]):null;};
     const confirmed=rows.filter(x=>x.date===now.date&&x.status==='confirmed').map(x=>({...x,start:minutes(x.start_time),end:minutes(x.end_time)}));
     const valid=confirmed.filter(x=>x.start!==null&&x.end!==null&&x.end>x.start);

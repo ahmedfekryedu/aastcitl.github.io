@@ -205,14 +205,18 @@ async function updateAdminUsersList() {
             last_seen_at: presence.get(user.id)?.last_seen_at || null,
             presence_status: presence.get(user.id)?.presence_status || 'unknown'
         })).filter(u => !window.CITLAuth.facultyPending(u));
+        let headIds = new Set(), headCountKnown = true;
+        try { const heads = await window.CITLRequests.rpc(window.sb,'citl_department_permission_holders',{});if(!Array.isArray(heads))throw Error('يلزم تحديث033');headIds=new Set(heads.map(h=>h.profile_id)); }
+        catch (_) { headCountKnown=false; }
         const totalAdmins = users.filter(u => window.CITLPermissions.full(u)).length;
-        const totalDelegated = users.filter(u => !window.CITLPermissions.full(u) && window.CITLPermissions.any(u)).length;
+        const totalDelegated = users.filter(u => !window.CITLPermissions.full(u) && (window.CITLPermissions.any(u) || headIds.has(u.id))).length;
         const totalNormal = users.length - totalAdmins - totalDelegated;
-        if (document.getElementById('stats-total-delegated')) document.getElementById('stats-total-delegated').textContent = totalDelegated;
+        if (document.getElementById('stats-total-delegated')) document.getElementById('stats-total-delegated').textContent = headCountKnown ? totalDelegated : '—';
+        if(document.getElementById('stats-total-delegated'))document.getElementById('stats-total-delegated').title=headCountKnown?'يشمل رؤساء الجهات ذوي المهام المفعلة، دون المدير الكامل':'تعذر قراءة تعيينات الجهات؛ تأكد من تنفيذ SQL033 ثم حدّث القائمة';
 
         if (document.getElementById('stats-total-users')) document.getElementById('stats-total-users').textContent = users.length;
         if (document.getElementById('stats-total-admins')) document.getElementById('stats-total-admins').textContent = totalAdmins;
-        if (document.getElementById('stats-total-normal')) document.getElementById('stats-total-normal').textContent = totalNormal;
+        if (document.getElementById('stats-total-normal')) document.getElementById('stats-total-normal').textContent = headCountKnown ? totalNormal : '—';
 
         if (filterDept) users = users.filter(u => u.department === filterDept);
 

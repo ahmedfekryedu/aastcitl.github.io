@@ -1,7 +1,8 @@
 (function(root) {
   'use strict';
   const weeks = new Map(), pending = new Map();
-  let watching = false;
+  let watching = false, generation = 0;
+  const invalidate = () => { generation++;weeks.clear(); };
   const dateKey = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   function weekStart(value = new Date()) {
     const date = new Date(value); date.setHours(12,0,0,0);
@@ -18,11 +19,11 @@
     if (!room) return;
     if (!watching) {
       watching = true;
-      const refresh = () => { weeks.clear(); if (!document.hidden) redraw(); };
+      const refresh = () => { invalidate(); if (!document.hidden) redraw(); };
       setInterval(refresh, 60000);
       if (sb.channel) {
         const channel = sb.channel('citl-academic-booking-calendar');
-        for (const table of ['academic_schedule','schedule_actions','rooms']) channel.on('postgres_changes',{event:'*',schema:'public',table},refresh);
+        for (const table of ['academic_schedule','schedule_actions','rooms','academic_terms','citl_study_pauses']) channel.on('postgres_changes',{event:'*',schema:'public',table},refresh);
         channel.subscribe();
       }
       root.addEventListener('online',refresh);
@@ -31,10 +32,12 @@
     }
     const k = key(room,start), cached = weeks.get(k);
     if ((cached && Date.now()-cached.at<15000) || pending.has(k)) return;
+    const version=generation;
     const end = new Date(start); end.setDate(end.getDate()+6);
     pending.set(k, sb.rpc('citl_booking_lectures',{p_room:room,p_from:dateKey(start),p_to:dateKey(end)}).then(({data,error}) => {
+      if(version!==generation)return;
       weeks.set(k,{at:Date.now(),rows:error?null:data || [],error:!!error});
-    }).catch(() => weeks.set(k,{at:Date.now(),rows:null,error:true})).finally(() => { pending.delete(k); redraw(); }));
+    }).catch(() => {if(version===generation)weeks.set(k,{at:Date.now(),rows:null,error:true});}).finally(() => { pending.delete(k); redraw(); }));
   }
   function rowsFor(room,start,day,from,to) {
     return (weeks.get(key(room,start))?.rows||[]).filter(r=>r.lecture_date===dateKey(day)&&minutes(r.start_time)<to&&minutes(r.end_time)>from);
@@ -111,5 +114,5 @@
     for(const name of [...names].sort((a,b)=>a.localeCompare(b,'ar'))) select.add(new Option(name,name));
     select.value=selected;select.disabled=false;select.dispatchEvent(new Event('change',{bubbles:true}));
   }
-  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,rowsFor,timeline,setTiming,invalidate:()=>weeks.clear()});
+  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,rowsFor,timeline,setTiming,invalidate});
 })(window);

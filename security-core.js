@@ -50,6 +50,7 @@
       button.addEventListener('click', async () => {
         if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id);return;}
         try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); await checkUserNotifications(); } catch (error) { window.showNotification?.('تعذر تحديث قراءة الإشعار؛ أعد المحاولة','error'); return; }
+        if(window.CITLOversight?.openRegistrationNotice(item))return;
         if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;
         else await checkUserNotifications();
       });

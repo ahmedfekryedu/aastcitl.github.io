@@ -1148,7 +1148,7 @@ function setupEventListeners() {
             const startMinutes = timeToMinutes(selectedMeeting.startTime);
             const endMinutes = timeToMinutes(selectedMeeting.endTime);
             const duration = (endMinutes - startMinutes) / 60;
-            setDropdownValue('duration', duration.toString());
+            window.CITLAcademicBooking.setTiming(selectedMeeting.startTime,duration);
             
             closeModal('meeting-details-modal');
             document.getElementById('add-meeting-modal').classList.add('show');
@@ -1633,11 +1633,9 @@ function editMeeting() {
     // 6. حساب المدة وتحديدها تلقائياً
     let duration = 1; // الافتراضي
     if (selectedMeeting.startTime && selectedMeeting.endTime) {
-        const startH = parseInt(selectedMeeting.startTime.split(':')[0]);
-        const endH = parseInt(selectedMeeting.endTime.split(':')[0]);
-        duration = endH - startH;
+        duration = (timeToMinutes(selectedMeeting.endTime)-timeToMinutes(selectedMeeting.startTime))/60;
     }
-    setDropdownValue('duration', duration.toString());
+    window.CITLAcademicBooking.setTiming(selectedMeeting.startTime,duration);
 
     // 7. تعبئة الحقول النصية الإضافية
     document.getElementById('attendees').value = selectedMeeting.attendees || '';

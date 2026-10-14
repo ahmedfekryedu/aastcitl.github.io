@@ -76,10 +76,21 @@
  }
  async function openApprovals(){
   if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
-  root.openAdminPanel('academic-review');await mountAdmin();if(access?.registration)root.switchAdminTab('academic-review');else root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');
+  await mountAdmin();if(accessUser===root.currentUser?.id&&access?.registration)root.openAdminPanel('academic-review');else root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');
+ }
+ // Completed notices describe a decision; they must not open the pending-approval action.
+ // The item is supplied by the recipient-scoped notification RPC, not an account lookup.
+ function openRegistrationNotice(item){
+  if(item?.kind!=='faculty_registration'||!['approved','rejected'].includes(item.payload?.status))return false;
+  document.getElementById('notif-menu')?.classList.add('hidden');
+  document.getElementById('citl-registration-decision')?.close();
+  const d=makeDialog(item.title||'نتيجة اعتماد الحساب');d.id='citl-registration-decision';
+  const status=item.payload.status==='approved'?'تم الاعتماد':'لم يتم الاعتماد';
+  d.querySelector('.citl-ac-body').innerHTML='<article class="citl-faculty-claim"><div class="citl-claim-person"><span class="citl-claim-avatar"><i class="fas fa-user-check" aria-hidden="true"></i></span><strong>'+E(status)+'</strong></div><p>'+E(item.body||'')+'</p><dl class="citl-claim-details"><div><dt>القسم / الجهة</dt><dd>'+E(label(item.payload.department_key)||'—')+'</dd></div><div><dt>تاريخ الإشعار</dt><dd>'+E(stamp(item.created_at))+'</dd></div></dl><p class="citl-ac-muted">هذا إشعار بنتيجة المراجعة في التاريخ الموضح، ولا يتطلب اعتمادًا جديدًا.</p></article>';
+  return true;
  }
  async function loadApprovals(){
-  const panel=document.getElementById('admin-academic-review-tab');if(!panel)return;
+  const panel=document.getElementById('admin-academic-review-tab');if(!panel)return;root.CITLRegistrationReview?.load(panel);
   const serial=++approvalSerial,list=panel.querySelector('[data-claims]'),status=panel.querySelector('[data-status]'),refresh=panel.querySelector('[data-refresh]');list.innerHTML=skeleton();list.setAttribute('aria-busy','true');refresh.disabled=true;status.textContent='';
   try{
    const data=await op('citl_faculty_links','list');if(serial!==approvalSerial)return;list.replaceChildren();
@@ -108,9 +119,10 @@
   try{
    const data=await root.CITLDepartmentHeads.rpc('list');if(serial!==structureSerial)return;
    root.CITLFacultyAdmin?.mountManualLink(tab,data.profiles);
-   if(!department){host.innerHTML='<div class="citl-admin-section-head"><div><h3>مسؤول القسم أو الجهة</h3><p>اختر القسم من القائمة بالأعلى لعرض مسؤوله وتعديل مهام المتابعة والاعتماد.</p></div></div>';return;}
+   if(!department){document.getElementById('citl-department-members')?.remove();host.innerHTML='<div class="citl-admin-section-head"><div><h3>مسؤول القسم أو الجهة</h3><p>اختر القسم من القائمة بالأعلى لعرض مسؤوله وتعديل مهام المتابعة والاعتماد.</p></div></div>';return;}
    const head=data.heads.find(h=>h.department_key===department),profile=data.profiles.find(p=>p.id===head?.profile_id);
    host.innerHTML='<div class="citl-admin-section-head"><div><h3><i class="fas fa-sitemap" aria-hidden="true"></i> رئاسة '+E(label(department))+'</h3><p>تعيين مسؤول الجهة وتحديد مهام المتابعة والاعتماد.</p></div><span class="citl-structure-state '+(head?'assigned':'')+'">'+(head?'مسؤول معيّن':'بانتظار التعيين')+'</span></div><div class="citl-ac-structure-body"><div class="citl-structure-current"><span class="citl-structure-avatar"><i class="fas fa-user-tie" aria-hidden="true"></i></span><div><small>المسؤول الحالي</small><strong>'+E(head?(head.full_name||head.email):'لم يُعيّن مسؤول بعد')+'</strong><div data-info class="citl-structure-badges"></div></div></div><div class="citl-structure-editor"><label>الحساب المسؤول<select data-profile><option value="">اختر حسابًا معتمدًا</option>'+data.profiles.map(p=>'<option value="'+E(p.id)+'">'+E((p.full_name||'حساب')+' — '+p.email)+'</option>').join('')+'</select></label><div class="citl-ac-buttons"><button type="button" data-permissions class="'+btn+'"><i class="fas fa-user-cog" aria-hidden="true"></i> '+(head?'تعديل التعيين والصلاحيات':'تعيين المسؤول والصلاحيات')+'</button>'+(head?'<button type="button" data-remove class="'+btn+' secondary">إلغاء التعيين</button>':'')+'</div></div><details><summary>نطاق التعيين وارتباط الأعضاء</summary><p class="citl-ac-muted">أعضاء الجهة المعتمدون يتبعون مسؤولها تلقائيًا في إجراءات المحاضرات، وتظهر له الإجراءات السابقة المعلّقة عند تعيينه. يمكن تعيين الحساب نفسه لأكثر من جهة بصلاحيات مستقلة.</p><p class="citl-ac-muted">صلاحيات الحساب العامة مستقلة عن هذا التعيين. حضور المنتدبين يظل بالقائمة اليدوية في صفحة الجداول.</p></details><p data-status role="status"></p></div>';
+   root.CITLRegistrationReview?.department(host,department);
    const select=host.querySelector('[data-profile]');select.value=profile?.id||'';
    const info=host.querySelector('[data-info]');
    const grants=head?['can_approve_registrations','can_review_academic','can_view_visitors'].filter(k=>head[k]).map(k=>({can_approve_registrations:'اعتماد التسجيل',can_review_academic:'إجراءات المحاضرات والطباعة',can_view_visitors:'متابعة المنتدبين'})[k]):[];
@@ -220,7 +232,7 @@
   if(root.CITLAuth.facultyPending?.(root.currentUser))return;
   try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){deepLinkHandled=true;await openApprovals();}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
  }
- root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
+ root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,openRegistrationNotice,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
  root.addEventListener('citl-profile-loaded',e=>{if(accessUser&&accessUser!==e.detail?.id){access=null;approvalSerial++;dashboardSerial++;work.serial++;work.data=null;work.action=null;work.term=null;work.initialized=false;document.getElementById('citl-ac-work-detail')?.replaceChildren();document.querySelector('#admin-academic-actions-tab [data-rows]')?.replaceChildren();document.getElementById('citl-ac-summary')?.remove();document.getElementById('admin-academic-review-tab')?.querySelector('[data-claims]')?.replaceChildren();}initialize();});
  root.addEventListener('load',initialize);
  function scheduleChanged(){checkScheduleName();renderDashboard();const panel=document.getElementById('admin-academic-actions-tab');if(panel&&!panel.classList.contains('hidden'))loadWorkboard();}

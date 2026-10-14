@@ -206,7 +206,9 @@ async function updateAdminUsersList() {
             presence_status: presence.get(user.id)?.presence_status || 'unknown'
         })).filter(u => !window.CITLAuth.facultyPending(u));
         const totalAdmins = users.filter(u => window.CITLPermissions.full(u)).length;
-        const totalNormal = users.length - totalAdmins;
+        const totalDelegated = users.filter(u => !window.CITLPermissions.full(u) && window.CITLPermissions.any(u)).length;
+        const totalNormal = users.length - totalAdmins - totalDelegated;
+        if (document.getElementById('stats-total-delegated')) document.getElementById('stats-total-delegated').textContent = totalDelegated;
 
         if (document.getElementById('stats-total-users')) document.getElementById('stats-total-users').textContent = users.length;
         if (document.getElementById('stats-total-admins')) document.getElementById('stats-total-admins').textContent = totalAdmins;
@@ -673,14 +675,21 @@ let editingRoomId = null;
 
 const ROOM_STORAGE_KEY = 'selected_room_id';
 
-async function loadRooms() {
-    const { data, error } = await supabase
-        .from('rooms')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-    if (error) throw error;
-    rooms = data || [];
+let roomsLoadPending = null;
+async function loadRooms(force = false) {
+    if (roomsLoadPending) {
+        if (!force) return roomsLoadPending;
+        try { await roomsLoadPending; } catch (_) {}
+    }
+    if (roomsLoadPending) return roomsLoadPending;
+    roomsLoadPending = (async () => {
+        const { data, error } = await supabase.from('rooms').select('*').order('created_at', { ascending: true });
+        if (error) throw error;
+        if (!Array.isArray(data)) throw new Error('تعذر قراءة قائمة القاعات');
+        rooms = data;
+        return rooms;
+    })().finally(() => { roomsLoadPending = null; });
+    return roomsLoadPending;
 }
 
 function updateRoomHeaderUI() {
@@ -855,17 +864,34 @@ async function openRoomsManager() {
   await initRoomsTab();
 }
 
-async function initRoomsTab() {
-  if (!rooms || rooms.length === 0) {
-    try { await loadRooms(); }
-    catch (e) {
-      console.error(e);
-      return showNotification('تعذر تحميل القاعات من قاعدة البيانات', 'error');
-    }
+let roomsTabPending = null, roomsFormInitialized = false;
+function initRoomsTab(force = false) {
+  if (roomsTabPending) return roomsTabPending;
+  const list = document.getElementById('rooms-admin-list');
+  if (!list) return Promise.resolve();
+  let status = document.getElementById('citl-rooms-read-status');
+  if (!status) {
+    status = document.createElement('div');status.id = 'citl-rooms-read-status';status.className='citl-rooms-read-status';
+    status.innerHTML='<span role="status"></span><button type="button" class="citl-ac-button secondary">تحديث القاعات</button>';
+    list.before(status);status.querySelector('button').onclick=()=>initRoomsTab(true);
   }
-
-  renderRoomsAdminList();
-  resetRoomForm();
+  const message=status.querySelector('span'),retry=status.querySelector('button');
+  retry.disabled=true;message.textContent='';list.setAttribute('aria-busy','true');
+  if (!list.children.length) list.innerHTML='<div class="citl-admin-placeholder"><span class="citl-skeleton-line"></span><span class="citl-skeleton-line"></span><span class="citl-skeleton-line short"></span></div>';
+  roomsTabPending=(async()=>{
+    try {
+      if (force || !rooms.length) await loadRooms(force);
+      renderRoomsAdminList();
+      if (!roomsFormInitialized) { resetRoomForm();roomsFormInitialized=true; }
+      retry.textContent='تحديث القاعات';
+    } catch (error) {
+      const timeout=/abort|timeout|signal/i.test(String(error.message||'')+' '+String(error.details||''))||String(error.code)==='20';
+      message.textContent=timeout?'انتهت مهلة تحميل القاعات؛ أعد المحاولة عند تحسن الاتصال.':'تعذر تحميل القاعات؛ تحقق من الاتصال وأعد المحاولة.';
+      if (!rooms.length) list.replaceChildren();
+      retry.textContent='إعادة المحاولة';
+    } finally {retry.disabled=false;list.setAttribute('aria-busy','false');}
+  })().finally(()=>{roomsTabPending=null;});
+  return roomsTabPending;
 }
 
 
@@ -937,7 +963,7 @@ async function saveRoom() {
         if (error) return showNotification('فشل الإضافة', 'error');
     }
 
-    await loadRooms();
+    await loadRooms(true);
     renderRoomsAdminList();
 
     // لو القاعة الحالية اتعدلت بياناتها → حدّث الهيدر فوراً
@@ -985,7 +1011,7 @@ async function deleteRoom() {
     resetRoomForm();
     
     // جلب البيانات الجديدة وتحديث القوائم
-    if (typeof loadRooms === 'function') await loadRooms();
+    if (typeof loadRooms === 'function') await loadRooms(true);
     if (typeof renderRoomsAdminList === 'function') renderRoomsAdminList();
     
     // تحديث القائمة المنسدلة في الواجهة الرئيسية إذا لزم الأمر

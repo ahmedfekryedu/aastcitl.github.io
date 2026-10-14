@@ -654,32 +654,42 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
         container.appendChild(cell);
     }
 
-    // 2. جسم الجدول (الساعات والمواعيد)
-    timeSlots.forEach(time => {
+    // Exact minute boundaries keep 08:30–10:20 lectures out of the 08:00 slot.
+    const academic=window.CITLAcademicBooking;
+    const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,meetings);
+    const covered=new Map();
+    const meetingAt=(date,slot)=>meetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
+    const identity=(date,slot)=>{const m=meetingAt(date,slot);return m?'meeting:'+m.id:academic.rowsFor(currentRoomId,currentWeekStart,date,slot.start,slot.end).map(r=>'lecture:'+r.schedule_id).sort().join('|');};
+    container.style.gridTemplateRows='70px '+intervals.map(slot=>Math.max(22,Math.round((slot.end-slot.start)*.85))+'px').join(' ');
+    intervals.forEach((slot,rowIndex) => {
+        const time=slot.time;
         // عمود الوقت الجانبي
         const timeLabel = document.createElement('div');
         timeLabel.className = 'time-slot sticky right-0 z-20 bg-gray-50 flex items-center justify-center font-bold text-[#2A3475] border-b border-gray-200 text-xs md:text-sm shadow-[2px_0_5px_rgba(0,0,0,0.05)]';
-        timeLabel.textContent = toArabicNum(time); // عرض الوقت بالأرقام العربية
+        timeLabel.textContent = toArabicNum(time+' – '+slot.endTime);
+        timeLabel.style.cssText='grid-column:1;grid-row:'+(rowIndex+2)+';min-height:0;font-size:10px;direction:ltr';
         container.appendChild(timeLabel);
 
-        for (const currentDate of dates) {
+        for (const [dayIndex,currentDate] of dates.entries()) {
+            if((covered.get(dayIndex)||0)>rowIndex)continue;
+            const signature=identity(currentDate,slot);let span=1;
+            if(signature)while(rowIndex+span<intervals.length&&identity(currentDate,intervals[rowIndex+span])===signature)span++;
+            covered.set(dayIndex,rowIndex+span);
+            const finalSlot=intervals[rowIndex+span-1];
             const cell = document.createElement('div');
             cell.className = 'time-slot relative border-b border-l border-gray-100 cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:shadow-inner group min-h-[70px]';
             
             cell.dataset.calendarDate = window.CITLAcademicBooking.dateKey(currentDate);
             cell.dataset.calendarTime = time;
+            cell.dataset.calendarEnd=finalSlot.endTime;
+            cell.style.gridColumn=String(dayIndex+2);cell.style.gridRow=(rowIndex+2)+' / span '+span;cell.style.minHeight='0';
             
             // التعديل 1: البحث عن الحجوزات المؤكدة (confirmed) فقط لتظهر في الجدول
-            const meeting = meetings.find(m => {
-                const meetingDate = new Date(m.date);
-                return meetingDate.toDateString() === currentDate.toDateString() && 
-                       timeToMinutes(m.startTime) < timeToMinutes(time) + 60 && timeToMinutes(m.endTime) > timeToMinutes(time) &&
-                       ['confirmed','modification_requested','cancellation_requested'].includes(m.status);
-            });
+            const meeting = meetingAt(currentDate,slot);
 
             if (meeting) {
                 const meetingBlock = document.createElement('div');
-                meetingBlock.className = `meeting-block ${departments[meeting.department].color} shadow-md rounded border-r-4 border-black/20 hover:scale-[1.02] transition-transform z-10 h-[calc(100%-8px)] m-1`;
+                meetingBlock.className = `meeting-block ${(departments[meeting.department]||departments['other']||{color:'bg-[#2A3475]'}).color} shadow-md rounded border-r-4 border-black/20 hover:scale-[1.02] transition-transform z-10 h-[calc(100%-8px)] m-1`;
                 
                 // التعديل 2: إضافة الجهة الحاجزة وتنسيق المحتوى ليكون متجاوباً مع الموبايل والكمبيوتر
                 meetingBlock.innerHTML = `
@@ -690,13 +700,13 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                             </p>
                             <p class="text-[7px] md:text-[9px] font-bold opacity-90 truncate text-right flex items-center justify-start gap-1">
                                 <i class="fas fa-building text-[6px] md:text-[8px] opacity-70"></i>
-                                <span>${departments[meeting.department].name}</span>
+                                <span>${window.CITLSecure.htmlEscape(departments[meeting.department]?.name||meeting.department||'غير محدد')}</span>
                             </p>
                         </div>
                         
                         <div class="flex items-center justify-between mt-0.5 border-t border-white/20 pt-0.5">
                             <span class="text-[8px] md:text-[10px] font-bold opacity-90 whitespace-nowrap">
-                                ${window.CITLSecure.htmlEscape(toArabicNum(meeting.startTime))}
+                                ${window.CITLSecure.htmlEscape(toArabicNum(meeting.startTime+' – '+meeting.endTime))}
                             </span>
                             <i class="fas fa-bookmark text-[7px] md:text-[9px] opacity-60"></i>
                         </div>
@@ -714,7 +724,11 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                 addIcon.innerHTML = '<i class="fas fa-plus text-[#F3A628] text-xl opacity-50"></i>';
                 cell.appendChild(addIcon);
 
-                window.CITLAcademicBooking.paint(cell,supabase,currentRoomId,currentWeekStart,currentDate,time,() => openAddMeetingModal(currentDate,time));
+                window.CITLAcademicBooking.paint(cell,supabase,currentRoomId,currentWeekStart,currentDate,time,() => {
+                    openAddMeetingModal(currentDate,time);
+                    // Ordinary empty cells retain the one-hour default; a lecture uses its full block.
+                    academic.setTiming(time,signature?(finalSlot.end-slot.start)/60:1);
+                },finalSlot.end);
             }
             container.appendChild(cell);
         }
@@ -1020,7 +1034,7 @@ function setupEventListeners() {
             if (time) {
                 // لو جاي من الجدول، نختار الوقت ونحدث شكله
                 if(typeof setDropdownValue === 'function') {
-                    setDropdownValue('meeting-time', time);
+                    window.CITLAcademicBooking.setTiming(time,1);
                 }
             }
         }
@@ -1047,7 +1061,7 @@ function setupEventListeners() {
             const startMinutes = timeToMinutes(selectedMeeting.startTime);
             const endMinutes = timeToMinutes(selectedMeeting.endTime);
             const duration = (endMinutes - startMinutes) / 60;
-            setDropdownValue('duration', duration.toString());
+            window.CITLAcademicBooking.setTiming(selectedMeeting.startTime,duration);
             
             closeModal('meeting-details-modal');
             document.getElementById('add-meeting-modal').classList.add('show');
@@ -1534,11 +1548,9 @@ function editMeeting() {
     // 6. حساب المدة وتحديدها تلقائياً
     let duration = 1; // الافتراضي
     if (selectedMeeting.startTime && selectedMeeting.endTime) {
-        const startH = parseInt(selectedMeeting.startTime.split(':')[0]);
-        const endH = parseInt(selectedMeeting.endTime.split(':')[0]);
-        duration = endH - startH;
+        duration = (timeToMinutes(selectedMeeting.endTime)-timeToMinutes(selectedMeeting.startTime))/60;
     }
-    setDropdownValue('duration', duration.toString());
+    window.CITLAcademicBooking.setTiming(selectedMeeting.startTime,duration);
 
     // 7. تعبئة الحقول النصية الإضافية
     document.getElementById('attendees').value = selectedMeeting.attendees || '';

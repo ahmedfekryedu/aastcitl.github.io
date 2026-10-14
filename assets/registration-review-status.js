@@ -1,0 +1,39 @@
+/* Read-only account review diagnostics and department membership. Mutations stay in existing approval RPCs. */
+(function(root){
+ 'use strict';
+ const E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const label=k=>root.CITLDepartmentHeads?.label(k)||k||'غير محدد';
+ const rpc=(name,args)=>root.CITLRequests.rpc(root.sb,name,args);
+ const skeleton=()=>'<div class="citl-admin-placeholder" role="status"><span class="citl-skeleton-line"></span><span class="citl-skeleton-line"></span><span class="citl-skeleton-line short"></span></div>';
+ const type=p=>['faculty','visiting_lecturer'].includes(p.account_type)?'عضو هيئة تدريس':'إداري';
+ const state=p=>({pending:'بانتظار الاعتماد',rejected:'لم يتم الاعتماد',approved:'معتمد',not_required:'حساب متاح'})[p.verification_status]||'يحتاج مراجعة';
+ const messages={ready:['الحساب سليم','الاعتماد والربط الحاليان لا يحتاجان إجراء حسب الفحص.'],pending:['بانتظار الاعتماد','يوجد طلب ينتظر المراجعة. استخدم بطاقة الطلب الموجودة بالأعلى.'],pending_without_request:['يحتاج مراجعة إدارية','الحساب معلّق، لكن لا يوجد طلب منتظر. راجع بيانات الحساب وربط الاسم من الهيكل الأكاديمي؛ لم يغيّر الفحص أي بيانات.'],rejected:['لم يتم الاعتماد','آخر حالة للحساب مرفوضة؛ راجع سبب القرار أو طلبًا جديدًا إن وُجد.'],identity_review:['ربط الهوية يحتاج مراجعة','حالة الحساب أو ملكية الاسم الأكاديمي غير مكتملة. راجع الربط من الهيكل الأكاديمي.'],schedule_name_changed:['الاسم غير موجود في الجدول الحالي','الربط المعتمد محفوظ. راجع اختلاف كتابة الاسم في الجدول الجديد؛ لا يلزم إعادة اعتماد الحساب تلقائيًا.']};
+ let serial=0,host=null;
+ function load(panel){
+  if(!panel)return;
+  if(!host?.isConnected){host=document.createElement('section');host.id='citl-registration-health';host.className='citl-admin-section';host.innerHTML='<div class="citl-admin-section-head"><div><h3>فحص حالة عضو</h3><p>قراءة الاعتماد وربط الاسم فقط؛ لا يغيّر الفحص بيانات الحساب.</p></div></div><div class="citl-ac-work-body"><div class="citl-ac-toolbar"><label>الحساب<select data-health-account><option value="">اختر عضوًا للفحص</option></select></label><button type="button" class="citl-ac-button secondary" data-health-refresh>تحديث وفحص الحالة</button></div><div data-health-result></div></div>';panel.append(host);host.querySelector('[data-health-refresh]').onclick=refresh;host.querySelector('select').onchange=refresh;}
+  refresh();
+ }
+ async function refresh(){
+  if(!host?.isConnected)return;const id=++serial,select=host.querySelector('select'),result=host.querySelector('[data-health-result]'),button=host.querySelector('[data-health-refresh]'),selected=select.value,user=root.currentUser?.id;
+  button.disabled=true;select.disabled=true;result.innerHTML=skeleton();
+  try{const data=await rpc('citl_registration_review_status',{p_profile:selected||null});if(id!==serial||user!==root.currentUser?.id||!host.isConnected)return;if(!Array.isArray(data.accounts))throw Error('يلزم تطبيق تحديث فحص الاعتماد 032');
+   select.replaceChildren(new Option('اختر عضوًا للفحص',''),...data.accounts.map(p=>new Option((p.name||p.email)+' — '+p.email,p.id)));select.value=selected;
+   const p=data.selected;if(!p){result.innerHTML='<div class="citl-admin-empty">اختر اسم العضو لعرض حالة اعتماده وربطه الحالي.</div>';return;}
+   const message=messages[p.state]||['حالة غير معروفة','حدّث البيانات أو راجع الإدارة.'];
+   result.innerHTML='<article class="citl-faculty-claim"><div class="citl-claim-person"><strong>'+E(p.name)+'</strong><span class="citl-claim-badge">'+E(message[0])+'</span></div><p>'+E(message[1])+'</p><dl class="citl-claim-details"><div><dt>نوع الحساب</dt><dd>'+type(p)+'</dd></div><div><dt>القسم / الجهة</dt><dd>'+E(label(p.department))+'</dd></div><div><dt>الاسم الأكاديمي المرتبط</dt><dd>'+E((p.linked_instructors||[]).join(' / ')||'لا يوجد ربط أكاديمي')+'</dd></div><div><dt>حالة الاعتماد</dt><dd>'+E(state(p))+'</dd></div></dl><small>آخر فحص: '+E(new Date(data.checked_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'}))+'</small>'+(p.request?.status==='pending'?'<div class="citl-ac-buttons"><button type="button" class="citl-ac-button secondary" data-health-request>عرض الطلب المنتظر</button></div>':'')+'</article>';
+   result.querySelector('[data-health-request]')?.addEventListener('click',async()=>{await root.CITLOversight.loadApprovals();const card=[...document.querySelectorAll('#admin-academic-review-tab [data-claim-id]')].find(c=>c.dataset.claimId===p.request.id);if(card){card.classList.add('citl-ac-highlight');card.scrollIntoView({block:'center',behavior:'smooth'});}else root.showNotification?.('لم يعد الطلب ضمن المنتظر؛ حدّث الفحص لمعرفة حالته الحالية.');});
+  }catch(error){if(id===serial){result.innerHTML='<div class="citl-admin-empty"></div>';result.firstElementChild.textContent='تعذر فحص الحالة: '+error.message;}}
+  finally{if(id===serial){button.disabled=false;select.disabled=false;}}
+ }
+ function department(container,department){
+  let section=document.getElementById('citl-department-members');if(section?.dataset.department===department&&section.previousElementSibling===container)return;section?.remove();if(!department)return;
+  section=document.createElement('section');section.id='citl-department-members';section.dataset.department=department;section.className='citl-admin-section';section.innerHTML='<div class="citl-admin-section-head"><div><h3>الحسابات المرتبطة بهذه الجهة</h3><p>'+E(label(department))+' — حسب القسم المسجل بالحساب. التوزيع الأكاديمي للأسماء بدون حساب مستقل عن هذه القائمة.</p></div><button type="button" class="citl-ac-button secondary" data-members-refresh>تحديث</button></div><div class="citl-ac-work-body"><label class="citl-ac-muted">بحث بالاسم أو البريد<input data-members-search class="citl-ac-search" placeholder="ابحث عن عضو"></label><div data-members-rows></div><p data-members-count class="citl-ac-muted"></p></div>';container.after(section);
+  let rows=[],request=0;const body=section.querySelector('[data-members-rows]'),search=section.querySelector('input'),button=section.querySelector('button');
+  function draw(){const query=search.value.trim().toLocaleLowerCase();const filtered=rows.filter(p=>[p.name,p.email,...p.linked_instructors||[]].join(' ').toLocaleLowerCase().includes(query));body.innerHTML=filtered.length?'<div class="citl-ac-table-wrap"><table class="citl-ac-table"><thead><tr><th>العضو</th><th>البريد</th><th>نوع الحساب</th><th>الاسم الأكاديمي</th><th>الاعتماد</th></tr></thead><tbody>'+filtered.map(p=>'<tr><td>'+E(p.name)+'</td><td dir="ltr">'+E(p.email)+'</td><td>'+type(p)+'</td><td>'+E((p.linked_instructors||[]).join(' / ')||'غير مرتبط باسم أكاديمي')+'</td><td>'+E(state(p))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="citl-admin-empty">لا توجد حسابات مطابقة في هذه الجهة.</div>';section.querySelector('[data-members-count]').textContent='الحسابات: '+filtered.length+' / '+rows.length;}
+  async function fetch(){const id=++request;button.disabled=true;body.innerHTML=skeleton();try{const data=await rpc('citl_department_account_members',{p_department:department});if(id!==request||!section.isConnected)return;if(!Array.isArray(data))throw Error('يلزم تطبيق تحديث قائمة أعضاء الجهة 032');rows=data;draw();}catch(error){if(section.isConnected){body.innerHTML='<div class="citl-admin-empty"></div>';body.firstElementChild.textContent='تعذر تحديث أعضاء الجهة: '+error.message;}}finally{if(id===request)button.disabled=false;}}
+  button.onclick=fetch;search.oninput=draw;fetch();
+ }
+ root.CITLRegistrationReview=Object.freeze({load,refresh,department});
+ root.addEventListener('citl-permissions-changed',()=>{serial++;host?.remove();host=null;document.getElementById('citl-department-members')?.remove();});
+})(window);

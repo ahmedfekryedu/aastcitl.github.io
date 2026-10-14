@@ -36,7 +36,32 @@
       weeks.set(k,{at:Date.now(),rows:error?null:data || [],error:!!error});
     }).catch(() => weeks.set(k,{at:Date.now(),rows:null,error:true})).finally(() => { pending.delete(k); redraw(); }));
   }
-  function paint(cell, sb, room, start, day, time, open) {
+  function rowsFor(room,start,day,from,to) {
+    return (weeks.get(key(room,start))?.rows||[]).filter(r=>r.lecture_date===dateKey(day)&&minutes(r.start_time)<to&&minutes(r.end_time)>from);
+  }
+  function timeline(room,start,hours,meetings=[]) {
+    const clock=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+    const cuts=new Set(hours.map(minutes));if(hours.length)cuts.add(minutes(hours[hours.length-1])+60);
+    for(const row of weeks.get(key(room,start))?.rows||[]){cuts.add(minutes(row.start_time));cuts.add(minutes(row.end_time));}
+    const dates=new Set(weekDays(start).map(dateKey));
+    for(const row of meetings)if(dates.has(row.date)&&['confirmed','modification_requested','cancellation_requested'].includes(row.status)){cuts.add(minutes(row.startTime));cuts.add(minutes(row.endTime));}
+    const sorted=[...cuts].filter(n=>Number.isFinite(n)&&n>=0&&n<=1440).sort((a,b)=>a-b);
+    return sorted.slice(0,-1).map((n,i)=>({start:n,end:sorted[i+1],time:clock(n),endTime:clock(sorted[i+1])}));
+  }
+  function setTiming(time,duration) {
+    for(const [id,value,label]of [['meeting-time',time,time],['duration',String(duration),Math.round(duration*60)+' دقيقة']]){
+      const select=document.getElementById(id);if(!select)continue;
+      if(![...select.options].some(o=>o.value===value))select.add(new Option(label,value));
+      const list=select.closest('.custom-dropdown')?.querySelector('.custom-dropdown-options');
+      if(list&&![...list.children].some(o=>o.dataset.value===value)){
+        const item=document.createElement('li');item.className='custom-option';item.dataset.value=value;item.textContent=label;
+        item.onclick=event=>{event.stopPropagation();root.setDropdownValue(id,value);select.dispatchEvent(new Event('change',{bubbles:true}));list.classList.add('hidden');};list.append(item);
+      }
+      root.setDropdownValue(id,value);
+      const span=select.closest('.custom-dropdown')?.querySelector('.custom-dropdown-display span');if(span)span.textContent=label;
+    }
+  }
+  function paint(cell, sb, room, start, day, time, open, endMinutes=minutes(time)+60) {
     const cached = weeks.get(key(room,start));
     if (!cached || cached.error) {
       cell.textContent = cached?.error ? 'تعذر التحقق من المحاضرات' : 'جاري التحقق…';
@@ -44,12 +69,12 @@
       // Submission always rechecks on the server, even if the calendar could not load.
       cell.addEventListener('click',open); return;
     }
-    const rows = cached.rows.filter(r => r.lecture_date===dateKey(day) && minutes(r.start_time)<minutes(time)+60 && minutes(r.end_time)>minutes(time));
+    const rows = rowsFor(room,start,day,minutes(time),endMinutes);
     if (!rows.length) { cell.addEventListener('click',open); return; }
     const block = document.createElement('div');
     block.style.cssText='background:#eef0fa;color:#2A3475;border-right:3px solid #F3A628;margin:4px;padding:7px;border-radius:6px;font-size:10px;line-height:1.6;height:calc(100% - 8px)';
     const title=document.createElement('strong');title.textContent='محجوز لمحاضرة';block.append(title);
-    for (const row of rows) { const line=document.createElement('div'); line.textContent=`${row.course_name || 'محاضرة'} · ${row.start_time.slice(0,5)}–${row.end_time.slice(0,5)}`;block.append(line); }
+    for (const row of rows) { const line=document.createElement('div');line.append(document.createTextNode((row.course_name||'محاضرة')+' · '));const clock=document.createElement('bdi');clock.dir='ltr';clock.textContent=row.start_time.slice(0,5)+'–'+row.end_time.slice(0,5);line.append(clock);block.append(line); }
     cell.append(block);
     cell.addEventListener('click',async () => {
       const approved = root.CITLPermissions.can(root.currentUser,'can_approve');
@@ -86,5 +111,5 @@
     for(const name of [...names].sort((a,b)=>a.localeCompare(b,'ar'))) select.add(new Option(name,name));
     select.value=selected;select.disabled=false;select.dispatchEvent(new Event('change',{bubbles:true}));
   }
-  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,invalidate:()=>weeks.clear()});
+  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,rowsFor,timeline,setTiming,invalidate:()=>weeks.clear()});
 })(window);

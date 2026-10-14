@@ -121,7 +121,7 @@
       $('citl-connection-recovery')?.remove();
       const newKey=JSON.stringify([profile.id,M.role(profile),M.names(profile)]);
       if(oldKey&&oldKey!==newKey){state.view=null;state.meetings=[];state.rows=[];state.actions=[];root.clearDashboardPrivateState?.();$('dh-content').hidden=true;}
-      if(!state.ready||oldKey!==newKey){$('dh-loading').innerHTML=root.CITLLoading.summary()+(M.role(profile).faculty?'<table style="width:100%"><tbody>'+root.CITLLoading.table(5)+'</tbody></table>':'');$('dh-loading').hidden=false;}
+      if(!state.ready||oldKey!==newKey){$('dh-loading').innerHTML=root.CITLLoading.summary(M.role(profile).full||M.role(profile).faculty?4:3)+(M.role(profile).faculty?'<table style="width:100%"><tbody>'+root.CITLLoading.table(5)+'</tbody></table>':'');$('dh-loading').hidden=false;}
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
       const jobs=[S.loadAll(root.sb),root.CITLRequests.rpc(root.sb,'citl_calendar_effects',{p_from:week.start,p_to:week.end}),

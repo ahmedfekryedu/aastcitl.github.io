@@ -1,7 +1,7 @@
 /* Exact QR payloads composed over the supplied artwork; entirely local exports. */
 (function(root){
  'use strict';
- const TEMPLATE='/assets/faculty-qr-template.png?v=20261014-r6.8.16.1',Q={x:375,y:436,size:504},L={x:350,y:945,width:554,height:40};
+ const TEMPLATE='/assets/faculty-qr-template.png?v=20261014-r6.8.16.1',Q={x:360,y:423,size:534},L={x:350,y:958,width:554,height:30};
  let templatePromise,pdfPromise;
  function template(){return templatePromise||(templatePromise=fetch(TEMPLATE).then(async response=>{if(!response.ok)throw Error('تعذر تحميل قالب QR');const bytes=await response.arrayBuffer(),url=URL.createObjectURL(new Blob([bytes],{type:'image/png'})),image=new Image();try{image.src=url;await image.decode();return {image,bytes};}finally{URL.revokeObjectURL(url);}}).catch(error=>{templatePromise=null;throw error;}));}
  function pdfLibrary(){if(root.PDFLib)return Promise.resolve(root.PDFLib);return pdfPromise||(pdfPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/vendor/pdf-lib-1.17.1.min.js';script.onload=()=>resolve(root.PDFLib);script.onerror=()=>{script.remove();pdfPromise=null;reject(Error('تعذر تحميل أداة PDF؛ أعد المحاولة'));};document.head.append(script);}));}

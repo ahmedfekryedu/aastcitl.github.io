@@ -48,7 +48,7 @@
       button.append(title, body, date);
       if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
-        if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id);return;}
+        if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
         try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); await checkUserNotifications(); } catch (error) { window.showNotification?.('تعذر تحديث قراءة الإشعار؛ أعد المحاولة','error'); return; }
         if(window.CITLOversight?.openRegistrationNotice(item))return;
         if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;

@@ -60,6 +60,7 @@
   async function check(sb, data, user, confirm = root.showConfirmDialog) {
     const {data:collisions,error} = await sb.rpc('citl_booking_conflicts',{p_room:data.room_id,p_date:data.date,p_start:data.start_time || data.startTime,p_end:data.end_time || data.endTime});
     if (error || !Array.isArray(collisions)) throw new Error('تعذر التحقق من تعارض المحاضرات؛ لم يُحفظ الحجز. تأكد من تطبيق ملف ربط القاعات.');
+    if(data.booking_type==='lecture'&&collisions.length)throw new Error('القاعة مشغولة بمحاضرة في هذا الموعد؛ اختر فترة أخرى.');
     if (!root.CITLPermissions.can(user,'can_approve')) {
       if (collisions.length && !await confirm('الموعد محجوز لمحاضرة. هل تريد إرسال طلب اجتماع لمراجعة مسؤول الاعتماد؟ لن يصبح حجزًا مؤكدًا الآن.')) throw new Error('تم إلغاء الطلب');
       return {};

@@ -53,6 +53,8 @@ function openAdminPanel() {
 }
 
 function switchAdminTab(tabName) {
+    if(tabName==='rooms')window.CITLRoomAvailability?.config();
+    if(tabName==='reports')window.CITLRoomAvailability?.report();
     if(tabName==='term-schedules')window.CITLLoadTermAdmin?.();
     if(tabName==='registration-codes')window.CITLFacultyAdmin?.loadCodes();
     if (tabName === 'activity-history') window.CITLAdminAccess?.loadHistory();
@@ -212,7 +214,7 @@ async function updateAdminUsersList() {
             last_seen_at: presence.get(user.id)?.last_seen_at || null,
             presence_status: presence.get(user.id)?.presence_status || 'unknown'
         })).filter(u => !window.CITLAuth.facultyPending(u));
-        const totalAdmins = users.filter(u => u.role === 'manager').length;
+        const totalAdmins = users.filter(u => window.CITLPermissions.full(u)).length;
         const totalNormal = users.length - totalAdmins;
 
         if (document.getElementById('stats-total-users')) document.getElementById('stats-total-users').textContent = users.length;
@@ -1939,6 +1941,7 @@ window.approveModification = async function(id) {
             title: changes.title, department: changes.department, date: changes.date,
             start_time: changes.start_time, end_time: changes.end_time,
             description: changes.description, attendees: changes.attendees,
+            ...Object.fromEntries(['booking_type','academic_schedule_id','course_name','course_manual','booking_reason','booking_reason_detail'].filter(k=>Object.prototype.hasOwnProperty.call(changes,k)).map(k=>[k,changes[k]])),
             status: 'confirmed', pending_changes: null, ...override
         }).eq('id', id);
         if(error) throw error;
@@ -2007,53 +2010,11 @@ window.editMeetingFromAdmin = function(meetingId) {
         };
 
 function exportReport() {
- const meetings = window.CITLAdminMeetings || [];
-
-            // العناوين (رأس الجدول)
-            const headers = ['عنوان الاجتماع', 'الجهة الحاجزة', 'التاريخ', 'الوقت', 'الحالة', 'الحضور', 'الملاحظات'];
-            
-            // تجهيز البيانات
-            const rows = meetings.map(m => {
-                const deptName = departments[m.department] ? departments[m.department].name : m.department;
-                const status = m.status === 'confirmed' ? 'مؤكد' : 'قيد الانتظار';
-                
-                // تنظيف النصوص من الفواصل عشان ملف الإكسيل ميبوظش
-                const clean = (text) => `"${(text || '').replace(/"/g, '""')}"`;
-
-                return [
-                    clean(m.title),
-                    clean(deptName),
-                    clean(new Date(m.date).toLocaleDateString('ar-EG')),
-                    clean(`${m.startTime} - ${m.endTime}`),
-                    clean(status),
-                    clean(m.attendees || 'لا يوجد'),
-                    clean(m.description || 'لا يوجد')
-                ];
-            });
-
-            // دمج العناوين مع البيانات
-            const csvContent = [
-                headers.join(','),
-                rows.map(row => row.join(','))
-                ].join('\n');
-
-            // إضافة BOM لضمان ظهور اللغة العربية بشكل صحيح في الإكسيل
-            const bom = '\uFEFF'; 
-            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-            
-            // إنشاء رابط التحميل
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `تقرير-الحجوزات-${new Date().toISOString().split('T')[0]}.csv`; // اسم الملف بالعربي
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            showNotification('تم تحميل تقرير الإكسيل بنجاح 📊');
-        }
+ const meetings=window.CITLAdminMeetings||[];
+ window.CITLDownloadCSV(['عنوان الاجتماع','الجهة الحاجزة','التاريخ','الوقت','الحالة','الحضور','الملاحظات'],meetings.map(m=>[
+ m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime} - ${m.endTime}`,m.status==='confirmed'?'مؤكد':'قيد الانتظار',m.attendees||'لا يوجد',m.description||'لا يوجد']),`تقرير-الحجوزات-${new Date().toISOString().split('T')[0]}`);
+ showNotification('تم تحميل تقرير الإكسيل بنجاح');
+}
 
 async function saveSystemSettings() {
             const start = parseInt(document.getElementById('setting-start-hour').value);
@@ -2142,3 +2103,10 @@ async function loadSystemSettings() {
                 for (let hour = 8; hour < 18; hour++) timeSlots.push(`${hour}:00`);
             }
         }
+
+// Shared existing CSV download path, with spreadsheet formula injection protection.
+window.CITLDownloadCSV = function(headers, rows, filename) {
+ const clean=value=>{let text=String(value??'');if(/^[=+@\-\t\r]/.test(text))text="'"+text;return '"'+text.replace(/"/g,'""')+'"';};
+ const blob=new Blob(['\uFEFF'+[headers,...rows].map(row=>row.map(clean).join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+'.csv';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
+};

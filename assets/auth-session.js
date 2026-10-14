@@ -4,7 +4,7 @@
   let recoveryAttempts = 0;
   let monitoring = false, checkingAccount = false, leaving = false;
   const fault = (message, code) => Object.assign(new Error(message), { code });
-  const facultyPending = profile => ['faculty','visiting_lecturer'].includes(profile?.account_type) && profile.faculty_verification_status !== 'approved';
+  const facultyPending = profile => ['pending','rejected'].includes(profile?.faculty_verification_status) || (['faculty','visiting_lecturer'].includes(profile?.account_type) && profile.faculty_verification_status !== 'approved');
   const protectedPage = /^\/(dashboard|smrm|schedules|management|attendance)(\/|$)/.test(location.pathname);
   async function session() {
     if (!root.sb?.auth) throw fault('عميل تسجيل الدخول غير جاهز', 'CLIENT_NOT_READY');
@@ -71,7 +71,7 @@
     checkingAccount = true;
     try {
       const current = await session();
-      const result = await root.sb.from('profiles').select('id,account_type,faculty_verification_status,role,permissions').eq('id',current.user.id).maybeSingle();
+      const result = await root.sb.from('profiles').select('id,account_type,faculty_verification_status,linked_instructors,department,position,role,permissions').eq('id',current.user.id).maybeSingle();
       if (result.error) {
         if (result.status === 401) await verifyAuthUser();
         throw result.error;
@@ -79,7 +79,7 @@
       if (!result.data) throw fault('الحساب لم يعد متاحًا', 'PROFILE_MISSING');
       if (protectedPage && facultyPending(result.data)) location.replace('/account/');
       const previous = root.currentUser;
-      if (previous && (previous.role !== result.data.role || JSON.stringify(previous.permissions) !== JSON.stringify(result.data.permissions))) {
+      if (previous && (['role','permissions','account_type','faculty_verification_status','linked_instructors','department','position'].some(key => JSON.stringify(previous[key]) !== JSON.stringify(result.data[key])))) {
         await loadProfile();
         root.applyUserPermissions?.();
         root.dispatchEvent(new CustomEvent('citl-permissions-changed'));

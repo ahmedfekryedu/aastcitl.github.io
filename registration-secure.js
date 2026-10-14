@@ -47,7 +47,7 @@
       }
       window.hideLoader?.();
       const message=document.getElementById('registration-success-message');
-      if(message)message.textContent=details.account_type==='faculty'?'تم إنشاء الحساب، ويجري انتظار اعتماد ربط حسابك بعضو هيئة التدريس من الإدارة.':'تم إنشاء الحساب. يمكنك تسجيل الدخول بعد تأكيد البريد إذا كان مطلوبًا.';
+      if(message)message.textContent=details.account_type==='faculty'?'تم إنشاء الحساب، ويجري انتظار اعتماد ربط حسابك بعضو هيئة التدريس من الإدارة.':'تم إنشاء الحساب الإداري، ويجري انتظار اعتماده من الإدارة.';
       window.showSuccessModal?.();
     } catch (error) {
       window.hideLoader?.();

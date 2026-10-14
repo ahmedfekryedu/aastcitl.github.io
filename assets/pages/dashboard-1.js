@@ -1215,6 +1215,10 @@ async function handleMeetingSubmission(e) {
 
     try {
         const endTimeVal = calculateEndTime(timeVal, parseInt(durVal));
+        const originalMeeting = meetingId ? (window.CITLAdminMeetings || []).find(m => String(m.id) === String(meetingId)) || meetings.find(m => String(m.id) === String(meetingId)) : null;
+        if (meetingId && !originalMeeting) throw new Error('تعذر تحميل الحجز الأصلي؛ حدّث سجل الحجوزات وأعد المحاولة.');
+        const bookingRoomId = originalMeeting ? originalMeeting.room_id : currentRoomId;
+        if (!bookingRoomId) throw new Error('اختر القاعة من صفحة حجوزات القاعات أولًا.');
 
         const meetingData = {
             title: titleVal,
@@ -1224,10 +1228,12 @@ async function handleMeetingSubmission(e) {
             end_time: endTimeVal,
             description: document.getElementById('description').value,
             attendees: document.getElementById('attendees').value,
-            user_id: currentUser.id
+            user_id: originalMeeting ? originalMeeting.user_id : currentUser.id,
+            room_id: bookingRoomId
         };
 
         hideLoader();
+        Object.assign(meetingData, window.CITLBookingExtras?.values() || {});
         Object.assign(meetingData, await window.CITLAcademicBooking.check(supabase,meetingData,currentUser));
         showLoader('جاري حفظ الحجز…');
         const conflict = checkConflicts(meetingData, meetingId);
@@ -1259,7 +1265,6 @@ async function handleMeetingSubmission(e) {
 
         // === السيناريو 1: تعديل حجز موجود ===
         if (meetingId) {
-            const originalMeeting = meetings.find(m => String(m.id) === String(meetingId));
             const isManager = window.CITLPermissions.can(currentUser, 'can_approve');
             const isOwner = originalMeeting && originalMeeting.user_id === currentUser.id;
 
@@ -1383,6 +1388,7 @@ function checkConflicts(newMeeting, excludeId = null) {
 
                 if (!meeting || !meeting.startTime || !meeting.endTime || ['rejected','cancelled'].includes(meeting.status)) return false;
                 if (meeting.date !== newMeeting.date) return false;
+                if (String(meeting.room_id) !== String(newMeeting.room_id)) return false;
                 
                 const newStart = timeToMinutes(newMeeting.start_time || newMeeting.startTime);
                 const newEnd = timeToMinutes(newMeeting.end_time || newMeeting.endTime);

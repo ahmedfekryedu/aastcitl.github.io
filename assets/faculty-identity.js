@@ -72,7 +72,7 @@
   let host=document.getElementById('faculty-admin');
   if(!host){
    host=document.createElement('section');host.id='faculty-admin';host.className='citl-identity-admin';
-   host.innerHTML='<div data-code-host class="citl-admin-section"></div><section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3><i class="fas fa-user-check" aria-hidden="true"></i> طلبات ربط أعضاء هيئة التدريس</h3><p>مراجعة الحساب والاسم الأكاديمي قبل اعتماد الربط.</p></div><button type="button" data-refresh class="'+buttonClass+'">تحديث</button></div><div data-claims class="citl-claims-list" aria-busy="true">'+skeleton()+'</div><p data-status role="status" class="text-xs px-4 my-2"></p></section>';
+   host.innerHTML='<div data-code-host class="citl-admin-section"></div><section class="citl-admin-section"><div class="citl-admin-section-head"><div><h3><i class="fas fa-user-check" aria-hidden="true"></i> طلبات اعتماد الأعضاء</h3><p>مراجعة التسجيل الإداري وربط أعضاء هيئة التدريس.</p></div><button type="button" data-refresh class="'+buttonClass+'">تحديث</button></div><div data-claims class="citl-claims-list" aria-busy="true">'+skeleton()+'</div><p data-status role="status" class="text-xs px-4 my-2"></p></section>';
    host.querySelector('[data-code-host]').innerHTML='<div class="p-4"><h3>تغيير كود التسجيل</h3>'+skeleton()+'</div>';
    tab.append(host);host.querySelector('[data-refresh]').onclick=loadAdmin;
   }
@@ -91,11 +91,13 @@
    list.replaceChildren();
    if(!claims.requests.length)list.innerHTML='<div class="citl-admin-empty"><i class="fas fa-check-circle" aria-hidden="true"></i><span>لا توجد طلبات بانتظار الاعتماد.</span></div>';
    claims.requests.forEach(item=>{
+    const administrative=item.request_kind==='administrative';
     const card=document.createElement('article');card.className='citl-faculty-claim';
-    card.innerHTML=`<div class="citl-claim-person"><span class="citl-claim-avatar" aria-hidden="true"><i class="fas fa-user-graduate"></i></span><div><strong>${e(item.account_name||'عضو هيئة تدريس')}</strong><span class="citl-claim-email" dir="ltr">${e(item.account_email)}</span></div><span class="citl-claim-badge">بانتظار الاعتماد</span></div><dl class="citl-claim-details"><div><dt>الاسم الأكاديمي</dt><dd dir="auto">${e(item.instructor_name)}</dd></div><div><dt>القسم</dt><dd>${e(departmentLabel(item.department_key))}</dd></div><div><dt>تاريخ الطلب</dt><dd>${e(new Date(item.created_at).toLocaleString('ar-EG'))}</dd></div></dl><div class="citl-claim-actions"><button type="button" data-review="approve" class="citl-claim-approve"><i class="fas fa-check" aria-hidden="true"></i> اعتماد الربط</button><button type="button" data-review="reject" class="citl-claim-reject">رفض الطلب</button></div>`;
+    card.innerHTML=`<div class="citl-claim-person"><span class="citl-claim-avatar" aria-hidden="true"><i class="fas fa-user-graduate"></i></span><div><strong>${e(item.account_name||'عضو هيئة تدريس')}</strong><span class="citl-claim-email" dir="ltr">${e(item.account_email)}</span></div><span class="citl-claim-badge">بانتظار الاعتماد</span></div><dl class="citl-claim-details"><div><dt>نوع التسجيل / الاسم الأكاديمي</dt><dd dir="auto">${e(administrative?'حساب إداري':item.instructor_name)}</dd></div><div><dt>القسم</dt><dd>${e(departmentLabel(item.department_key))}</dd></div><div><dt>تاريخ الطلب</dt><dd>${e(new Date(item.created_at).toLocaleString('ar-EG'))}</dd></div></dl><div class="citl-claim-actions"><button type="button" data-review="approve" class="citl-claim-approve"><i class="fas fa-check" aria-hidden="true"></i> اعتماد الربط</button><button type="button" data-review="reject" class="citl-claim-reject">رفض الطلب</button></div>`;
+    if(administrative)card.querySelector('[data-review=approve]').textContent='اعتماد الحساب الإداري';
     card.querySelectorAll('[data-review]').forEach(button=>button.onclick=async()=>{
      const approving=button.dataset.review==='approve';
-     const message=approving?`اعتماد ربط حساب «${item.account_name}» بالاسم «${item.instructor_name}»؟`:'رفض طلب الربط مع الاحتفاظ بحساب المستخدم؟';
+     const message=administrative?(approving?'اعتماد تسجيل الحساب الإداري؟':'رفض تسجيل الحساب الإداري مع الاحتفاظ به؟'):approving?`اعتماد ربط حساب «${item.account_name}» بالاسم «${item.instructor_name}»؟`:'رفض طلب الربط مع الاحتفاظ بحساب المستخدم؟';
      const options={title:approving?'اعتماد ربط الهوية الأكاديمية':'رفض طلب ربط الهوية',confirmText:approving?'اعتماد الربط':'رفض الطلب',
       color:approving?'bg-[#2A3475] hover:bg-[#1f2658]':'bg-red-600 hover:bg-red-700',
       icon:approving?'fa-user-check':'fa-user-times',iconColor:approving?'text-[#2A3475]':'text-red-600',iconBg:approving?'bg-blue-50':'bg-red-100'};
@@ -137,8 +139,23 @@
   catch(error){if(serial===codesSerial){host.replaceChildren();const text=document.createElement('p');text.className='citl-ac-status';text.textContent=error.message;host.append(text);}}
   finally{if(serial===codesSerial)refresh.disabled=false;}
  }
+ async function mountManualLink(tab,profiles){
+  let section=document.getElementById('citl-manual-faculty-link');
+  if(!root.CITLPermissions.can(root.currentUser,'can_review_registrations')){section?.remove();return;}
+  if(!section){section=document.createElement('section');section.id='citl-manual-faculty-link';section.className='citl-admin-section';const head=document.getElementById('citl-ac-structure');if(head)head.after(section);else tab.append(section);}
+  section.innerHTML='<div class="citl-admin-section-head"><div><h3>ربط حساب باسم أكاديمي</h3><p>تصحيح حساب سُجل إداريًا أو اعتماد اسم من الجدول الحالي، مع الحفاظ على بيانات الحساب وصلاحياته.</p></div></div><form class="citl-ac-work-body"><div class="citl-ac-toolbar"><label>حساب العضو<select name="profile" required><option value="">اختر الحساب</option>'+profiles.filter(p=>p.id!==root.currentUser.id).map(p=>'<option value="'+e(p.id)+'">'+e((p.full_name||p.email)+' — '+p.email)+'</option>').join('')+'</select></label><label>الاسم من الجدول الحالي<select name="instructor" required disabled><option>جاري تحميل الأسماء…</option></select></label></div><button type="submit" class="citl-ac-button" disabled>اعتماد الربط وتحويل الحساب لهيئة التدريس</button><p data-status role="status"></p></form>';
+  const form=section.querySelector('form'),select=form.elements.instructor,button=form.querySelector('button'),status=form.querySelector('[data-status]');
+  try{const available=await names();if(!form.isConnected)return;select.replaceChildren(new Option('اختر الاسم الأكاديمي',''));available.forEach(n=>select.add(new Option(n,n)));select.disabled=false;button.disabled=!available.length;root.CITLSelects?.refresh?.();}catch(error){status.textContent=error.message;}
+  form.onsubmit=async event=>{event.preventDefault();if(button.disabled||!form.reportValidity())return;
+   const name=select.value,profile=form.elements.profile.value;
+   if(!await root.showConfirmDialog('اعتماد ربط الحساب بالاسم «'+name+'» وتحويله إلى عضو هيئة تدريس؟',{title:'اعتماد الهوية الأكاديمية',confirmText:'اعتماد الربط',icon:'fa-user-check',color:'bg-[#2A3475]'}))return;
+   button.disabled=true;status.dataset.state='loading';status.textContent='جاري اعتماد الربط…';
+   try{await root.CITLRequests.rpc(root.sb,'citl_admin_link_faculty',{p_profile:profile,p_instructor:name});status.dataset.state='success';status.textContent='تم ربط الاسم واعتماد الحساب كعضو هيئة تدريس. تتحدث جلسته تلقائيًا.';root.showNotification?.(status.textContent,'success');await root.updateAdminUsersList?.();}
+   catch(error){status.dataset.state='error';status.textContent=error.message;}finally{button.disabled=false;}
+  };
+ }
  root.CITLFaculty=Object.freeze({key,names,requestName,showStatus,renderClaimEditor,pendingText});
- root.CITLFacultyAdmin=Object.freeze({load:loadAdmin,mount:adminShell,mountCodes,loadCodes});
+ root.CITLFacultyAdmin=Object.freeze({load:loadAdmin,mount:adminShell,mountCodes,loadCodes,mountManualLink});
  root.addEventListener('citl-profile-loaded',event=>showStatus(event.detail));
  if(root.currentUser)showStatus(root.currentUser);
  adminShell();

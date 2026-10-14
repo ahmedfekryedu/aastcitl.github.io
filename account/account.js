@@ -10,14 +10,15 @@
    const profile=await root.CITLAuth.loadProfile();
    if(!root.CITLAuth.facultyPending(profile)){enter();return;}
    const mine=await root.CITLRequests.rpc(root.sb,'citl_faculty_links',{p_action:'mine'}),request=mine.requests?.[0];
-   const rejected=profile.faculty_verification_status==='rejected';
+   const rejected=profile.faculty_verification_status==='rejected',administrative=!['faculty','visiting_lecturer'].includes(profile.account_type);
    $('account-state').textContent=rejected?'يحتاج الطلب إلى مراجعة':'بانتظار اعتماد الإدارة';
    $('account-title').textContent=rejected?'راجع الاسم الأكاديمي المطلوب':'حسابك جاهز، وفي انتظار الاعتماد';
    $('account-description').textContent=rejected?'لم تعتمد الإدارة طلب الربط. يمكنك تصحيح الاسم وإرسال طلب جديد من نفس الحساب.':'تم استلام طلب ربط حسابك بعضو هيئة التدريس. ستتاح لك خدمات النظام فور موافقة الإدارة.';
    $('account-name').textContent=profile.full_name||'عضو هيئة تدريس';$('account-email').textContent=profile.email||'';
-   $('account-instructor').textContent=request?.instructor_name||'لم يتم إرسال طلب بعد';
+   $('account-instructor').textContent=administrative?'حساب إداري':request?.instructor_name||'لم يتم إرسال طلب بعد';
+   if(administrative){$('account-title').textContent=rejected?'لم يُعتمد الحساب الإداري':'حسابك الإداري بانتظار الاعتماد';$('account-description').textContent=rejected?'تواصل مع مسؤول الجهة لمراجعة بيانات الحساب.':'تم استلام تسجيلك الإداري. ستتاح خدمات النظام بعد موافقة المسؤول.';}
    document.querySelectorAll('.account-skeleton').forEach(el=>el.classList.remove('account-skeleton'));
-   $('account-edit').hidden=profile.faculty_verification_status==='pending';
+   $('account-edit').hidden=administrative||profile.faculty_verification_status==='pending';
    if(profile.faculty_verification_status==='pending')$('account-editor').replaceChildren();
    $('account-feedback').textContent=manual?'تم تحديث الحالة. طلبك '+(rejected?'يحتاج إلى مراجعة.':'ما زال بانتظار الاعتماد.'):'يتم تحديث حالة الطلب تلقائيًا.';
    document.querySelector('.account-card').setAttribute('aria-busy','false');

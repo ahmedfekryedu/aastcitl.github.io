@@ -1,6 +1,6 @@
 <!doctype html><html lang="ar" dir="rtl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><meta name="citl-release" content="20261015-r6.9.1">
+<meta name="robots" content="noindex,nofollow"><meta name="citl-release" content="20261015-r6.9.1.1">
 <title>المقررات الدراسية | CITL Smart System</title>
 <script>document.documentElement.classList.add('citl-auth-checking');</script>
 <style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery){visibility:hidden!important;pointer-events:none!important}</style>
@@ -8,10 +8,10 @@
 <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css"><link rel="stylesheet" href="/assets/ui-fixes.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="/assets/academic-oversight.css"><link rel="stylesheet" href="/assets/interface-controls.css"><link rel="stylesheet" href="/assets/desktop-mode.css"><script src="/assets/desktop-mode.js"></script>
-<link rel="stylesheet" href="/assets/course-monitoring.css?v=20261015-r6.9.0">
-<link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1">
+<link rel="stylesheet" href="/assets/course-monitoring.css?v=20261015-r6.9.1.1">
+<link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.1">
 <script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
-<script src="/assets/service-availability.js?v=20261015-r6.9.1"></script>
+<script src="/assets/service-availability.js?v=20261015-r6.9.1.1"></script>
 </head><body><header class="metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
         <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
 
@@ -24,7 +24,7 @@
 </div>
     <div class="w-full max-w-[98%] mx-auto px-3 py-5 md:px-6 md:py-5">
         
-        <div class="hidden lg:flex flex-row items-center justify-between gap-3">
+        <div class="cm-header-desktop hidden lg:flex flex-row items-center justify-between gap-3">
             <div class="flex items-center justify-start gap-4 text-right">
                 <div class="bg-white p-2 rounded-xl shadow-lg shrink-0 group hover:scale-105 transition-transform duration-300">
                     <img src="/CITL.png" alt="Logo" class="h-16 w-auto object-contain transform scale-110">
@@ -36,8 +36,8 @@
                 </div>
             </div>
 
-    <div class="mr-auto flex items-center gap-2">
-<a href="/dashboard/" class="cm-home">الرئيسية ←</a>
+    <div class="cm-header-actions mr-auto flex items-center gap-2">
+<a data-header-home href="/dashboard/" class="bg-gradient-to-b from-[#F3A628] to-[#d48a1b] text-[#2A3475] px-4 py-2 rounded-lg font-black hover:brightness-110 shadow-lg border border-white/20 text-[13px]"><i class="fas fa-home ml-2"></i> الرئيسية</a><a href="/schedules/" class="cm-header-link"><i class="fas fa-calendar-alt"></i> الجداول الدراسية</a><a data-cm-personal hidden href="/dashboard/#dashboard-home" class="cm-header-link"><i class="fas fa-user-graduate"></i> جدولي الدراسي</a><a href="/dashboard/?open=control" class="cm-header-link"><img src="/assets/control-panel.svg" width="18" height="18" alt=""> لوحة التحكم</a>
 <div class="w-px h-8 bg-white/20 mx-1"></div>
         <div class="relative shrink-0" id="notif-btn-wrapper-pc">
             <button type="button" onclick="toggleNotifications()" class="bg-white/10 hover:bg-white/20 text-white border border-white/10 p-2.5 rounded-xl backdrop-blur-sm transition-all shadow-sm flex items-center justify-center group relative">
@@ -98,7 +98,7 @@
 	    </div>
 	</div>
 </header>
-<main id="cm-main" class="cm-main"><div class="cm-title"><div><small>COURSE MONITORING</small><h1>المقررات الدراسية</h1><p>متابعة التنفيذ والمعايير الأكاديمية لكل ترم</p></div><button id="cm-refresh" class="cm-btn secondary">تحديث</button></div>
+<main id="cm-main" class="cm-main"><div class="cm-title"><div><h1>المقررات الدراسية</h1><p>متابعة التنفيذ والمعايير الأكاديمية لكل ترم</p></div><button id="cm-refresh" class="cm-heading-refresh" type="button" aria-label="تحديث بيانات المقررات">تحديث</button></div>
 <p id="cm-status" role="status" aria-live="polite"></p>
 <div id="cm-app"><div class="cm-grid" aria-busy="true"><div class="cm-skeleton"></div><div class="cm-skeleton"></div><div class="cm-skeleton"></div></div></div></main>
 <footer id="dashboard-footer" class="metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50 mt-auto">
@@ -138,10 +138,10 @@
     </div>
 </footer>
 <div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="cm-toolbar"><strong>التنبيهات</strong><button onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div>
-<dialog id="cm-mobile-nav" class="cm-dialog"><header><strong>CITL Smart System</strong><button data-close aria-label="إغلاق">×</button></header><nav class="cm-body"><a href="/dashboard/">الرئيسية</a><a href="/smrm/">القاعات الدراسية</a><a href="/schedules/">الجداول الدراسية</a><a href="/courses/">المقررات الدراسية</a><button onclick="window.logout()">تسجيل الخروج</button></nav></dialog>
+<dialog id="cm-mobile-nav" class="cm-dialog"><header><strong>CITL Smart System</strong><button data-close aria-label="إغلاق">×</button></header><nav class="cm-body cm-mobile-links"><a data-header-home href="/dashboard/" class="bg-gradient-to-b from-[#F3A628] to-[#d48a1b] text-[#2A3475] px-4 py-2 rounded-lg font-black hover:brightness-110 shadow-lg border border-white/20 text-[13px]"><i class="fas fa-home ml-2"></i> الرئيسية</a><a href="/smrm/"><i class="fas fa-building"></i> القاعات الدراسية</a><a href="/schedules/"><i class="fas fa-calendar-alt"></i> الجداول الدراسية</a><a href="/courses/"><i class="fas fa-book-open"></i> المقررات الدراسية</a><a data-cm-personal hidden href="/dashboard/#dashboard-home"><i class="fas fa-user-graduate"></i> جدولي الدراسي</a><a href="/dashboard/?open=control"><img src="/assets/control-panel.svg" width="18" height="18" alt=""> لوحة التحكم</a><button onclick="window.logout()">تسجيل الخروج</button></nav></dialog>
 <script src="/vendor/supabase-js-2.45.4.min.js"></script><script src="/assets/read-timeout.js"></script>
 <script src="/assets/permissions.js?v=20261015-r6.9.0"></script><script src="/assets/auth-session.js?v=20261015-r6.9.1"></script><script src="/assets/data-client.js?v=20261015-r6.9.1"></script>
-<script src="/assets/course-shell.js?v=20261015-r6.9.0"></script><script src="/presence.js?v=20261012-r6.8.8.5"></script>
+<script src="/assets/course-shell.js?v=20261015-r6.9.1.1"></script><script src="/presence.js?v=20261012-r6.8.8.5"></script>
 <script src="/assets/admin-announcements.js?v=20261014-r6.8.17"></script><script src="/security-core.js?v=20261015-r6.9.0"></script>
 <script src="/assets/interface-controls.js"></script><script src="/assets/site-updates.js"></script>
 <script src="/assets/course-model.js?v=20261015-r6.9.0"></script><script src="/assets/course-monitoring.js?v=20261015-r6.9.0"></script></body></html>

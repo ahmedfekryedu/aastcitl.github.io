@@ -42,7 +42,7 @@ root.toggleProfileInfoMenu=()=>{const d=document.createElement('dialog');d.class
 root.showNotification=(message)=>{const el=document.getElementById('cm-status');el.textContent=message;};
 root.CITLOversight={openRegistrationNotice:item=>{if(['faculty_registration','account_registered'].includes(item.kind)&&['approved','rejected'].includes(item.payload?.status)){location.assign('/dashboard/?open=activity');return true;}return false;}};
 root.CITLAdminAccess={openHistory:()=>location.assign('/dashboard/?open=activity')};
-root.addEventListener('citl-profile-loaded',e=>{const p=e.detail||root.currentUser;for(const suffix of['','-mob']){
+root.addEventListener('citl-profile-loaded',e=>{const p=e.detail||root.currentUser;document.querySelectorAll('[data-cm-personal]').forEach(el=>{el.hidden=!(p.faculty_verification_status==='approved'&&(['faculty','visiting_lecturer'].includes(p.account_type)||p.is_visiting_lecturer===true));});for(const suffix of['','-mob']){
  const name=document.getElementById('profile-name'+suffix),role=document.getElementById('profile-role'+suffix);
  if(name)name.textContent=p.full_name||p.email;if(role)role.textContent=[root.CITLCourseDepartments[p.department]?.name||p.department,p.position].filter(Boolean).join(' — ');
 }});

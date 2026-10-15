@@ -22,6 +22,7 @@
   document.body.append(d);d.showModal();return d;
  }
  async function mountAdmin(){
+  if(!root.currentUser)return;
   const modal=document.getElementById('admin-panel-modal'),sample=modal?.querySelector('.admin-tab[data-tab="profile"]');if(!sample)return;
   let tab=modal.querySelector('[data-tab="academic-review"]');
   if(!tab){
@@ -76,7 +77,8 @@
  }
  async function openApprovals(){
   if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
-  await mountAdmin();if(accessUser===root.currentUser?.id&&access?.registration)root.openAdminPanel('academic-review');else root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');
+  if(!root.currentUser)await root.CITLAuth.loadProfile();
+  const verified=await loadAccess();await mountAdmin();if(accessUser===root.currentUser?.id&&verified.registration)root.openAdminPanel('academic-review');else root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');
  }
  // Completed notices describe a decision; they must not open the pending-approval action.
  // The item is supplied by the recipient-scoped notification RPC, not an account lookup.
@@ -232,8 +234,8 @@
 
  let deepLinkHandled=false;
  async function initialize(){
-  if(root.CITLAuth.facultyPending?.(root.currentUser))return;
-  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){deepLinkHandled=true;await openApprovals();}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
+  if(!root.currentUser||root.CITLAuth.facultyPending?.(root.currentUser))return;
+  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){await openApprovals();deepLinkHandled=true;}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
  }
  root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,openRegistrationNotice,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
  root.addEventListener('citl-profile-loaded',e=>{if(accessUser&&accessUser!==e.detail?.id){access=null;approvalSerial++;dashboardSerial++;work.serial++;work.data=null;work.action=null;work.term=null;work.initialized=false;document.getElementById('citl-ac-work-detail')?.replaceChildren();document.querySelector('#admin-academic-actions-tab [data-rows]')?.replaceChildren();document.getElementById('citl-ac-summary')?.remove();document.getElementById('admin-academic-review-tab')?.querySelector('[data-claims]')?.replaceChildren();}initialize();});

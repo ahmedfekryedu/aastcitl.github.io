@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNotification("تعذر تحميل بيانات الجداول. يمكنك إعادة المحاولة من زر البحث.", "error");
     } finally {
         if (typeof setupCustomDropdowns === 'function') setupCustomDropdowns();
+        window.CITLPageBoot?.finish();
         if (typeof window.hideLoader === 'function') {
             window.hideLoader();
         }

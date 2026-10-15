@@ -569,7 +569,8 @@ async function initializeApp() {
 
         // ---------------------------------------------------------
         await window.CITLDashboard.start();
-        if (!currentUser) { hideLoader(); return; }
+        if (!currentUser) { hideLoader();
+        window.CITLPageBoot?.finish(); return; }
 
         // 🔥 تشغيل نظام التواجد Presence للدashboard
         // ---------------------------------------------------------
@@ -655,12 +656,14 @@ async function initializeApp() {
         
         // 🔥🔥🔥 نهاية التعديل: إخفاء اللودر بعد اكتمال التحميل 🔥🔥🔥
         hideLoader();
+        window.CITLPageBoot?.finish();
 
     } catch (error) {
         if (!currentUser) window.CITLAuth.showFailure(error);
         console.error("Error initializing app:", error);
         // في حالة الخطأ نخفي اللودر حتى لا يعلق النظام
         hideLoader();
+        window.CITLPageBoot?.finish();
     }
 }
 

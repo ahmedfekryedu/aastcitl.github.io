@@ -31,13 +31,15 @@
       root.addEventListener('citl-schedule-update',refresh);
     }
     const k = key(room,start), cached = weeks.get(k);
-    if ((cached && Date.now()-cached.at<15000) || pending.has(k)) return;
+    if (pending.has(k)) return pending.get(k);
+    if (cached && Date.now()-cached.at<15000) return;
     const version=generation;
     const end = new Date(start); end.setDate(end.getDate()+6);
     pending.set(k, sb.rpc('citl_booking_lectures',{p_room:room,p_from:dateKey(start),p_to:dateKey(end)}).then(({data,error}) => {
       if(version!==generation)return;
       weeks.set(k,{at:Date.now(),rows:error?null:data || [],error:!!error});
     }).catch(() => {if(version===generation)weeks.set(k,{at:Date.now(),rows:null,error:true});}).finally(() => { pending.delete(k); redraw(); }));
+    return pending.get(k);
   }
   function rowsFor(room,start,day,from,to) {
     return (weeks.get(key(room,start))?.rows||[]).filter(r=>r.lecture_date===dateKey(day)&&minutes(r.start_time)<to&&minutes(r.end_time)>from);

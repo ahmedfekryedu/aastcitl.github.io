@@ -300,14 +300,8 @@ function refreshAllViews() {
     renderCalendar();
     updateDashboard();
     
-    // تشغيل الـ Skeleton
-    if(!window.CITLRoomAvailability?.isFree())showDashboardSkeleton();
+    window.CITLMeetingUI?.upcoming();
 
-    // تحديث التحليل الذكي
-    setTimeout(() => {
-        generateAISuggestions();
-    }, 600);
-    
     // تحديث لوحات الأدمن
     try { 
         if(document.getElementById('admin-panel-modal')?.classList.contains('show')) {
@@ -340,7 +334,7 @@ const { data, error } = await query;
                 if(stale())return;
                 if (error) throw error;
 
-                meetings = data.filter(m=>m.booking_type!=='lecture').map(m => {
+                meetings = data.map(m => {
                     // التحقق من وجود القسم (كود الأمان القديم)
                     const deptInfo = departments[m.department] || { 
                         name: 'قسم غير معروف', 
@@ -370,11 +364,11 @@ const { data, error } = await query;
                 console.error('Error:', error);
                 
                 // كود الأمان (Fallback): لو فشل الربط، هات الاجتماعات بس عشان الجدول ميوقفش
-                if (error.code === 'PGRST200') {
+                if (['PGRST200','PGRST201'].includes(error.code)) {
                      const { data: retryData } = await supabase.from('meetings').select('*');
                      if(stale())return;
                      if (retryData) {
-                        meetings = retryData.filter(m=>m.booking_type!=='lecture'&&(!currentRoomId||String(m.room_id)===String(currentRoomId))).map(m => {
+                        meetings = retryData.filter(m=>!currentRoomId||String(m.room_id)===String(currentRoomId)).map(m => {
                             // التأكد من القسم في حالة الخطأ أيضاً
                             const deptInfo = departments[m.department] || { name: 'غير معروف' };
                             return {
@@ -557,14 +551,18 @@ async function initializeApp() {
             setupRealtimeSubscription();
         }
         
+        await window.CITLAcademicBooking.load(supabase,currentRoomId,currentWeekStart,renderCalendar);
+        await window.CITLMeetingUI?.upcoming();
         // 🔥🔥🔥 نهاية التعديل: إخفاء اللودر بعد اكتمال التحميل 🔥🔥🔥
         hideLoader();
+        window.CITLPageBoot?.finish();
 
     } catch (error) {
         if (!currentUser) window.CITLAuth.showFailure(error);
         console.error("Error initializing app:", error);
         // في حالة الخطأ نخفي اللودر حتى لا يعلق النظام
         hideLoader();
+        window.CITLPageBoot?.finish();
     }
 }
 
@@ -1592,11 +1590,12 @@ function editMeeting() {
 
 // Update dashboard (النسخة الذكية المطورة)
         function updateDashboard() {
+            const meetingStats=meetings.filter(m=>m.booking_type!=='lecture');
             // 1. تحديث الأرقام الرئيسية
-            document.getElementById('total-meetings').textContent = meetings.length;
+            document.getElementById('total-meetings').textContent = meetingStats.length;
             
             // حساب نسبة الإشغال بدقة
-            const totalHours = meetings.reduce((sum, meeting) => {
+            const totalHours = meetingStats.reduce((sum, meeting) => {
                 const duration = timeToMinutes(meeting.endTime) - timeToMinutes(meeting.startTime);
                 return sum + (duration / 60);
             }, 0);
@@ -1607,13 +1606,13 @@ function editMeeting() {
             document.getElementById('usage-bar').style.width = `${usagePercentage}%`;
             
             // الجهات النشطة
-            const activeDepts = new Set(meetings.map(m => m.department));
+            const activeDepts = new Set(meetingStats.map(m => m.department));
             document.getElementById('active-departments').textContent = activeDepts.size;
             
             // 2. تحديث قائمة "الأكثر استخداماً" (Leaderboard)
             const deptUsage = {};
-            meetings.forEach(meeting => {
-                const dept = departments[meeting.department].name;
+            meetingStats.forEach(meeting => {
+                const dept = (departments[meeting.department]?.name||meeting.department||'غير محدد');
                 deptUsage[dept] = (deptUsage[dept] || 0) + 1;
             });
             
@@ -1626,7 +1625,7 @@ function editMeeting() {
                 chartContainer.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد بيانات كافية</div>';
             } else {
                 sortedDepts.forEach(([dept, count], index) => {
-                    const percentage = Math.round((count / meetings.length) * 100);
+                    const percentage = Math.round((count / meetingStats.length) * 100);
                     const rankColor = index === 0 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-gray-50 text-gray-600 border-gray-100';
                     const icon = index === 0 ? '<i class="fas fa-crown text-yellow-500 ml-2"></i>' : '';
                     
@@ -1645,7 +1644,7 @@ function editMeeting() {
             }
             
             // 3. تحديث الحجوزات الأخيرة (Timeline)
-            const recentMeetings = meetings
+            const recentMeetings = meetingStats
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(0, 4);
             
@@ -1667,7 +1666,7 @@ function editMeeting() {
                                 <i class="far fa-clock ml-1"></i> ${new Date(meeting.date).toLocaleDateString('ar-EG', {month:'numeric', day:'numeric'})} | ${meeting.startTime}
                             </div>
                             <span class="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">
-                                ${departments[meeting.department].name}
+                                ${(departments[meeting.department]?.name||meeting.department||'غير محدد')}
                             </span>
                         </div>
                     `;

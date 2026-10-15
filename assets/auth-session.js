@@ -100,6 +100,7 @@
   function showFailure(error) {
     if (['FACULTY_PENDING','SERVICE_MAINTENANCE'].includes(error?.code)) return;
     if (redirectIfSignedOut(error)) return;
+    root.CITLPageBoot?.failure();
     let box = document.getElementById('citl-connection-recovery');
     if (!box) {
       box = document.createElement('div'); box.id = 'citl-connection-recovery'; box.setAttribute('role', 'alert');

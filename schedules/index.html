@@ -1,10 +1,42 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<meta charset="utf-8">
+<!-- CITL first-paint loader: source: tools/page-loader.html; sync with tools/sync-page-loader.py -->
+<style id="citl-boot-style">
+@font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-display:swap}
+html.citl-page-booting{background:#f8fafc;overflow:hidden!important}
+html.citl-page-booting body>*:not(script):not(#global-loader){visibility:hidden!important}
+#global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
+#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif}
+html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:#f8fafc!important}
+#global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:min(400px,90vw);display:flex;flex-direction:column;align-items:center;gap:8px}
+html.citl-page-booting #global-loader>.relative{transform:none!important}
+#global-loader.citl-unified-loader img{width:auto;height:150px;max-width:100%;object-fit:contain}
+#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:0}
+#global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:0}
+#global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px}#global-loader.citl-unified-loader img{height:96px}#global-loader.citl-unified-loader h3{font-size:18px}#global-loader.citl-unified-loader p{font-size:12px}}
+</style>
+<script>
+(function(w,d){
+ var html=d.documentElement,done=false,ready=false;html.classList.add('citl-page-booting');
+ var box=d.createElement('div');box.id='global-loader';box.className='citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0';box.setAttribute('role','status');box.setAttribute('aria-live','polite');
+ box.innerHTML='<div class="relative"><img src="/CITL.png" alt="CITL" fetchpriority="high"><h3>جاري تهيئة النظام</h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p><button type="button" data-boot-retry hidden>استغرق التحميل وقتًا أطول — إعادة المحاولة</button></div>';
+ html.appendChild(box);box.querySelector('button').onclick=function(){location.reload();};
+ var timer=setTimeout(function(){if(!done)box.querySelector('button').hidden=false;},25000);
+ function release(){if(done)return;done=true;clearTimeout(timer);observer.disconnect();box.querySelector('button').hidden=true;box.classList.add('hidden','opacity-0');box.classList.remove('flex');html.classList.remove('citl-page-booting');}
+ function check(){if(ready&&!d.querySelector('link[data-citl-boot-style][media=print]')&&!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking'))release();}
+ d.addEventListener('load',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);d.addEventListener('error',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);
+ var observer=new MutationObserver(check);observer.observe(html,{attributes:true,attributeFilter:['class']});
+ w.CITLPageBoot=Object.freeze({finish:function(){ready=true;check();},failure:release});
+ d.addEventListener('DOMContentLoaded',function(){d.body.prepend(box);},{once:true});
+})(window,document);
+</script>
 <script>document.documentElement.classList.add("citl-auth-checking");</script>
-<style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery){visibility:hidden!important;pointer-events:none!important}</style>
-<meta name="citl-release" content="20261015-r6.9.1.1">
-    <meta charset="UTF-8">
+<style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery):not(#global-loader){visibility:hidden!important;pointer-events:none!important}</style>
+<meta name="citl-release" content="20261015-r6.9.1.2">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
     <meta name="description" content="CITL Smart System">
@@ -24,19 +56,19 @@
     <link rel="shortcut icon" type="image/png" href="/CITL_Logo-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/CITL_Logo-192.png">
     <link rel="apple-touch-icon" href="/CITL_Logo-192.png">
-    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20260921-r6.5">
-    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20260921-r6.5">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20260921-r6.5" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20260921-r6.5" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
     
-    <script src="/vendor/supabase-js-2.45.4.min.js?v=20260921-r6.5"></script>
-    <script src="/assets/read-timeout.js?v=20260921-r6.5"></script>
-<script src="/assets/permissions.js?v=20261014-r6.8.16"></script>
-<script src="/assets/auth-session.js?v=20261015-r6.9.1"></script>
-<script src="/assets/data-client.js?v=20261015-r6.9.1"></script>
-    <script src="/vendor/qrcode-1.5.4.min.js?v=20260921-r6.5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/presence.js?v=20261012-r6.8.8.5"></script>
+    
+    
+
+
+
+    
+    
+    
+    
     <style>
         /* إضافات لتصميم المودال الجديد */
         .bg-navy { background-color: #2A3475; }
@@ -462,36 +494,38 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
     padding-left: 38px;
 }
     </style>
-<link rel="stylesheet" href="/assets/interface-controls.css?v=20261014-r6.8.14">
-<script src="/assets/loading-placeholders.js?v=20261014-r6.8.14"></script>
+<link rel="stylesheet" href="/assets/interface-controls.css?v=20261014-r6.8.14" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+
 <script defer src="/assets/interface-controls.js?v=20260929-r6.8"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5">
+<link rel="stylesheet" href="/assets/fonts.css?v=20260921-r6.5" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <script defer src="/assets/site-updates.js?v=20260921-r6.5"></script>
-<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261014-r6.8.17">
-<script src="/assets/desktop-mode.js?v=20261013-r6.8.10"></script>
-<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10">
-<link rel="stylesheet" href="/assets/registration-correction.css?v=20261015-r6.8.18">
-<link rel="stylesheet" href="../assets/lecture-action-dates.css?v=20261015-r6.8.18">
-<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261015-r6.8.21">
-<link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.1">
-<script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
-<script src="/assets/service-availability.js?v=20261015-r6.9.1.1"></script>
+<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261014-r6.8.17" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+
+<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/registration-correction.css?v=20261015-r6.8.18" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="../assets/lecture-action-dates.css?v=20261015-r6.8.18" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261015-r6.8.21" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+
+
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
-<div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
-    <div class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center border border-gray-100 transform scale-95 transition-transform duration-300 min-w-[85vw] md:min-w-[400px] gap-0">
-        
-        <div class="mb-0 -mt-6 md:-mt-10">
-            <img src="/CITL.png" alt="Loading..." class="h-28 md:h-48 w-auto object-contain mix-blend-multiply brightness-110 contrast-110 saturate-110 loader-logo">
-        </div>
+<script>document.body.prepend(document.getElementById("global-loader"));</script>
+<script src="/vendor/supabase-js-2.45.4.min.js?v=20260921-r6.5"></script>
+<script src="/assets/read-timeout.js?v=20260921-r6.5"></script>
+<script src="/assets/permissions.js?v=20261014-r6.8.16"></script>
+<script src="/assets/auth-session.js?v=20261015-r6.9.1.2"></script>
+<script src="/assets/data-client.js?v=20261015-r6.9.1"></script>
+<script src="/vendor/qrcode-1.5.4.min.js?v=20260921-r6.5"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/presence.js?v=20261012-r6.8.8.5"></script>
+<script src="/assets/loading-placeholders.js?v=20261014-r6.8.14"></script>
+<script src="/assets/desktop-mode.js?v=20261013-r6.8.10"></script>
+<script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
+<script src="/assets/service-availability.js?v=20261015-r6.9.1.2"></script>
 
-        <div class="text-center -mt-2 md:-mt-6">
-            <h3 class="text-[#2A3475] font-black text-lg md:text-2xl tracking-wide leading-tight">جاري التحميل</h3>
-            <p id="loader-text" class="text-gray-400 text-[11px] md:text-sm font-bold mt-1 md:mt-2">يرجى الانتظار لحظات...</p>
-        </div>
-    </div>
-</div>
 <script>
     
         // التحقق الحقيقي من جلسة Supabase يتم بعد تهيئة العميل أدناه.
@@ -1559,11 +1593,11 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20260921-r6.5"></script>
-<script src="/assets/pages/schedules-1.js?v=20261015-r6.8.18"></script>
+<script src="/assets/pages/schedules-1.js?v=20261015-r6.9.1.2"></script>
 <script src="/security-core.js?v=20261015-r6.8.20"></script>
 <script src="/assets/department-heads.js?v=20261013-r6.8.10"></script>
 <script src="/assets/registration-review-status.js?v=20261014-r6.8.16"></script>
-<script src="/assets/academic-oversight.js?v=20261015-r6.9.1.1"></script>
+<script src="/assets/academic-oversight.js?v=20261015-r6.9.1.2"></script>
 <script src="/assets/admin-access.js?v=20261015-r6.8.20"></script>
 <script src="/assets/admin-announcements.js?v=20261014-r6.8.17"></script>
 <script src="/assets/faculty-identity.js?v=20261015-r6.8.20"></script>

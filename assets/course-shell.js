@@ -37,7 +37,11 @@ root.CITLCourseDepartments={
             'business-dept': { name: 'قسم إدارة الأعمال (سابقاً)', priority: 3, color: 'department-priority' },
             'assistant': { name: 'معيد (سابقاً)', priority: 4, color: 'assistant-priority' }
         };
-root.toggleMobileMenu=()=>document.getElementById('cm-mobile-nav').showModal();
+let menuReturnFocus=null,menuScroll='';
+function closeMobileMenu(){const menu=document.getElementById('cm-mobile-nav');if(menu.hidden)return;menu.hidden=true;document.body.style.overflow=menuScroll;document.querySelectorAll('[onclick="toggleMobileMenu()"]').forEach(b=>b.setAttribute('aria-expanded','false'));menuReturnFocus?.focus();}
+root.toggleMobileMenu=()=>{const menu=document.getElementById('cm-mobile-nav');if(!menu.hidden){closeMobileMenu();return;}menuReturnFocus=document.activeElement;menuScroll=document.body.style.overflow;menu.hidden=false;document.body.style.overflow='hidden';document.querySelectorAll('[onclick="toggleMobileMenu()"]').forEach(b=>{b.setAttribute('aria-expanded','true');b.setAttribute('aria-controls','cm-mobile-nav');});menu.querySelector('[data-close][type=button]').focus();};
+document.addEventListener('keydown',e=>{const menu=document.getElementById('cm-mobile-nav');if(menu.hidden)return;if(e.key==='Escape'){e.preventDefault();closeMobileMenu();}if(e.key==='Tab'){const list=[...menu.querySelectorAll('a,button')].filter(x=>x.getClientRects().length),first=list[0],last=list[list.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+root.addEventListener('resize',()=>{if(innerWidth>=1024)closeMobileMenu();});
 root.toggleProfileInfoMenu=()=>{const d=document.createElement('dialog');d.className='cm-dialog';d.innerHTML='<header><strong>الملف الشخصي</strong><button data-close aria-label="إغلاق">×</button></header><div class="cm-body"><strong data-name></strong><span data-position></span><span data-department></span><span data-email dir="ltr"></span><a class="cm-btn secondary" href="/dashboard/">لوحة التحكم والملف الشخصي</a><button class="cm-btn" data-logout>تسجيل الخروج</button></div>';const p=root.currentUser;d.querySelector('[data-name]').textContent=p.full_name||p.email;d.querySelector('[data-position]').textContent=p.position||'';d.querySelector('[data-department]').textContent=root.CITLCourseDepartments[p.department]?.name||p.department||'';d.querySelector('[data-email]').textContent=p.email;d.querySelector('[data-logout]').onclick=()=>root.logout();d.onclick=e=>{if(e.target===d||e.target.closest('[data-close]'))d.close();};d.onclose=()=>d.remove();document.body.append(d);d.showModal();};
 root.showNotification=(message)=>{const el=document.getElementById('cm-status');el.textContent=message;};
 root.CITLOversight={openRegistrationNotice:item=>{if(['faculty_registration','account_registered'].includes(item.kind)&&['approved','rejected'].includes(item.payload?.status)){location.assign('/dashboard/?open=activity');return true;}return false;}};
@@ -46,7 +50,7 @@ root.addEventListener('citl-profile-loaded',e=>{const p=e.detail||root.currentUs
  const name=document.getElementById('profile-name'+suffix),role=document.getElementById('profile-role'+suffix);
  if(name)name.textContent=p.full_name||p.email;if(role)role.textContent=[root.CITLCourseDepartments[p.department]?.name||p.department,p.position].filter(Boolean).join(' — ');
 }});
-document.getElementById('cm-mobile-nav').addEventListener('click',e=>{if(e.target===e.currentTarget||e.target.closest('[data-close]'))e.currentTarget.close();});
+document.getElementById('cm-mobile-nav').addEventListener('click',e=>{if(e.target.closest('[data-close],a'))closeMobileMenu();});
 document.addEventListener('click',e=>{if(!e.target.closest('#notif-menu,#notif-btn-wrapper,#notif-btn-wrapper-pc'))document.getElementById('notif-menu').classList.add('hidden');});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })(window);

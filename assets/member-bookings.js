@@ -16,12 +16,12 @@
  }
  </style><div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
   <div class="p-4 border-b border-gray-100 flex items-center justify-between gap-3"><div><h3 class="font-bold text-[#2A3475] text-base">سجل حجوزاتي</h3><p class="text-xs text-gray-500 mt-1">طلبات حجز القاعات التي قدمتها وحالة مراجعتها.</p></div><button type="button" data-refresh class="px-3 py-2 rounded-lg border border-gray-200 text-xs font-bold text-[#2A3475] hover:bg-gray-50">تحديث</button></div>
-  <div class="p-4 border-b border-gray-100"><label class="text-xs font-bold text-gray-600">حالة الحجز<select data-status class="block mt-2 w-full md:w-64 rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-[#2A3475]" aria-label="حالة الحجز"><option value="">كل الحالات</option value="pending">قيد المراجعة</option><option value="confirmed">معتمدة</option><option value="rejected">مرفوضة</option><option value="modification_requested">طلب تعديل</option><option value="cancellation_requested">طلب إلغاء</option></select></label></div>
+  <div class="p-4 border-b border-gray-100"><label class="text-xs font-bold text-gray-600">حالة الحجز<select data-status class="block mt-2 w-full md:w-64 rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white text-[#2A3475]" aria-label="حالة الحجز"><option value="">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="confirmed">معتمدة</option><option value="cancelled">ملغية</option><option value="rejected">مرفوضة</option><option value="modification_requested">طلب تعديل</option><option value="cancellation_requested">طلب إلغاء</option></select></label></div>
   <div class="overflow-x-auto"><table class="w-full text-right text-sm"><thead class="bg-gray-50 text-xs text-gray-500"><tr><th class="p-3">الحجز</th><th class="p-3">القاعة</th><th class="p-3">التاريخ</th><th class="p-3">الوقت</th><th class="p-3">الحالة</th></tr></thead><tbody data-rows></tbody></table></div>
   <div class="p-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2"><p data-feedback role="status" class="text-xs text-gray-500"></p><div class="flex gap-2"><button type="button" data-prev class="px-3 py-1 rounded-lg border border-gray-200 text-xs text-[#2A3475] disabled:opacity-50">السابق</button><button type="button" data-next class="px-3 py-1 rounded-lg border border-gray-200 text-xs text-[#2A3475] disabled:opacity-50">التالي</button></div></div></div>`;
  modal.querySelector('.admin-tab-content').parentElement.append(panel);
  const $=selector=>panel.querySelector(selector),rows=$('[data-rows]'),feedback=$('[data-feedback]');
- const labels={pending:['قيد المراجعة','text-amber-700 bg-amber-50'],confirmed:['معتمد','text-green-700 bg-green-50'],rejected:['مرفوض','text-red-700 bg-red-50'],modification_requested:['طلب تعديل قيد المراجعة','text-blue-700 bg-blue-50'],cancellation_requested:['طلب إلغاء قيد المراجعة','text-amber-700 bg-amber-50']};
+ const labels={cancelled:['ملغي','text-red-700 bg-red-50'],pending:['قيد المراجعة','text-amber-700 bg-amber-50'],confirmed:['معتمد','text-green-700 bg-green-50'],rejected:['مرفوض','text-red-700 bg-red-50'],modification_requested:['طلب تعديل قيد المراجعة','text-blue-700 bg-blue-50'],cancellation_requested:['طلب إلغاء قيد المراجعة','text-amber-700 bg-amber-50']};
  let page=0,serial=0,busy=false;const size=25;
  const allowed=()=>root.currentUser && !root.CITLPermissions.full(root.currentUser) && !root.CITLAuth.facultyPending(root.currentUser);
  function empty(message){rows.replaceChildren();const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='p-8 text-center text-sm text-gray-500';td.textContent=message;tr.append(td);rows.append(tr);}
@@ -31,7 +31,7 @@
    const td=document.createElement('td');td.className='p-3 text-xs text-gray-700';td.dataset.label=['الحجز','القاعة','التاريخ','الوقت','الحالة'][index];
    if(index===4){const badge=document.createElement('span');badge.className='inline-block rounded-full px-2 py-1 font-bold '+state[1];badge.textContent=text;td.append(badge);}else if(index===2||index===3){const value=document.createElement('bdi');value.dir='ltr';value.textContent=text;td.append(value);}else td.textContent=text;
    if(index===2||index===3){td.dir='ltr';td.style.whiteSpace='nowrap';}if(index===0){td.style.minWidth='120px';td.style.overflowWrap='anywhere';}tr.append(td);
-  }rows.append(tr);
+  }const first=tr.firstElementChild;if(root.CITLMeetingUI){const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.textContent='التفاصيل';b.onclick=()=>root.CITLMeetingUI.open(item.id,false);first.append(b);}rows.append(tr);
  }}
  async function load(quiet=false){
   if(!allowed())return;

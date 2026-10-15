@@ -25,6 +25,7 @@
   function metric(label,value,note='',gold=false){return `<div class="dh-metric${gold?' gold':''}"><div class="dh-metric-label">${E(label)}</div><div class="dh-metric-value">${E(value)}</div><div class="dh-metric-note">${E(note)}</div></div>`;}
   const empty=(title,body='')=>`<div class="dh-empty"><strong>${E(title)}</strong>${E(body)}</div>`;
   function badge(item,personal=false){
+    if(item.occurs===false)return '<span class="dh-badge changed">'+E((item.study_pauses||[]).some(p=>item.date>=p.starts_on&&item.date<=p.ends_on)?'الدراسة متوقفة في هذا التاريخ':item.date<(item.effective_from||item.term_starts_on)?'يسري من '+dateLabel(item.effective_from||item.term_starts_on):'خارج فترة الترم')+'</span>';
     if(item.cancelled)return '<span class="dh-badge cancelled">ملغاة</span>';
     if(personal&&!item.effectiveOwn)return '<span class="dh-badge changed">لمحاضر بديل</span>';
     if(item.live)return '<span class="dh-badge live">جارية الآن</span>';
@@ -46,19 +47,20 @@
     $('dh-title').textContent='جدولي الدراسي';
     $('dh-subtitle').textContent=M.names(state.user).length?`الأسبوع الحالي · ${dateLabel(M.week(now).start)} — ${dateLabel(M.week(now).end)}`:'اربط اسمك الأكاديمي بحسابك ليظهر جدولك هنا';
     const failed=state.errors.some(x=>['schedule','actions'].includes(x));
-    $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('محاضرات الأسبوع',failed?'—':stats.assigned.length,'حسب الجدول الحالي')+metric('ساعات التدريس',failed?'—':stats.hours,'خلال هذا الأسبوع')+metric('القاعات',failed?'—':new Set(stats.assigned.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك',true);
+    $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('محاضرات الأسبوع',failed?'—':stats.assigned.length,'حسب الجدول الحالي')+metric('ساعات التدريس',failed?'—':stats.hours,'حسب الجدول الحالي')+metric('القاعات',failed?'—':new Set(stats.assigned.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك',true);
     const next=stats.next;
     const link=`<a class="dh-button" href="/schedules/" aria-label="فتح صفحة الجداول وربط اسمي">${M.names(state.user).length?'فتح الجداول':'ربط اسمي'}</a>`;
     const focus=`<div class="dh-focus"><div class="dh-focus-copy">${failed?'<strong>تعذر تحديث جدولك</strong>':next?`<span class="dh-focus-label">${next.live?'محاضرتك الآن':'المحاضرة القادمة'}</span><strong>${E(next.course_name)}</strong><span>${E(dayLabel(next.day))} · <bdi>${E(next.time)}</bdi> · القاعة <bdi>${E(next.room||'غير محددة')}</bdi>${next.moved?' · تم نقل القاعة':''}</span>`:`<strong>${M.names(state.user).length?'لا توجد محاضرات قادمة هذا الأسبوع':'ابدأ بربط اسمك الأكاديمي'}</strong><span>${M.names(state.user).length?'أي جدول جديد باسمك يظهر تلقائيًا.':'اختر اسمك المعتمد من صفحة الجداول.'}</span>`}</div>${link}</div>`;
     const options=[['','الأسبوع كاملًا'],...S.days.map((d,i)=>[d,S.labels[i]])].map(([v,l])=>`<option value="${v}"${state.day===v?' selected':''}>${l}</option>`).join('');
     const filtered=stats.own.filter(x=>!state.day||x.day===state.day);
-    const table=filtered.length?`<div class="dh-scroll" tabindex="0" aria-label="جدول محاضرات الأسبوع"><table class="dh-table"><thead><tr><th>اليوم</th><th>المادة</th><th>الوقت</th><th>القاعة</th><th>الحالة</th></tr></thead><tbody>${filtered.map(x=>`<tr class="${x.cancelled?'dh-cancelled':''}"><td class="dh-day"><strong>${E(dayLabel(x.day))}</strong><small>${E(dateLabel(x.date))}</small></td><td class="dh-course"><strong>${E(x.course_name)}</strong><small>${E(x.course_code||'')}${x.replaced?` · ${E(x.effectiveInstructor)}`:''}</small>${x.action?.reason?`<small>${E(x.action.reason)}</small>`:''}</td><td><bdi>${E(x.time)}</bdi></td><td><bdi>${E(x.room||'—')}</bdi></td><td>${badge(x,true)}</td></tr>`).join('')}</tbody></table></div>`:empty(M.names(state.user).length?'لا توجد محاضرات باسمك في هذا العرض':'ابدأ بربط اسمك الأكاديمي',M.names(state.user).length?'قد يكون الجدول قيد التحديث. ارتباط حسابك باسمك محفوظ.':'الربط باسمك المعتمد يتيح عرض جدولك تلقائيًا.');
+    const table=filtered.length?`<div class="dh-scroll" tabindex="0" aria-label="جدول محاضرات الأسبوع"><table class="dh-table"><thead><tr><th>اليوم</th><th>المادة</th><th>الوقت</th><th>القاعة</th><th>الحالة</th></tr></thead><tbody>${filtered.map(x=>`<tr class="${x.cancelled?'dh-cancelled':''}"><td class="dh-day"><strong>${E(dayLabel(x.day))}</strong><small>${x.occurs===false?'الجدول الأسبوعي':E(dateLabel(x.date))}</small></td><td class="dh-course"><strong>${E(x.course_name)}</strong><small>${E(x.course_code||'')}${x.replaced?` · ${E(x.effectiveInstructor)}`:''}</small>${x.action?.reason?`<small>${E(x.action.reason)}</small>`:''}</td><td><bdi>${E(x.time)}</bdi></td><td><bdi>${E(x.room||'—')}</bdi></td><td>${badge(x,true)}</td></tr>`).join('')}</tbody></table></div>`:empty(M.names(state.user).length?'لا توجد محاضرات باسمك في هذا العرض':'ابدأ بربط اسمك الأكاديمي',M.names(state.user).length?'قد يكون الجدول قيد التحديث. ارتباط حسابك باسمك محفوظ.':'الربط باسمك المعتمد يتيح عرض جدولك تلقائيًا.');
     $('dh-workspace').innerHTML=`<div class="dh-personal">${focus}${panel('تفاصيل الجدول',failed?empty('تعذر تحميل التفاصيل'):table,'',`<select id="dh-day-filter" class="dh-select" aria-label="يوم الجدول">${options}</select>`)}</div>`;
   }
   function summaryCard(title,totalLabel,total,facts,footer,extraClass=''){
     return `<article class="dh-summary-card ${extraClass}"><div class="dh-summary-head"><h3>${E(title)}</h3>${metric(totalLabel,total)}</div><div class="dh-facts">${facts.join('')}</div><div class="dh-summary-foot">${footer}</div></article>`;
   }
   function renderOverview(items,stats,now){
+    items=items.filter(x=>x.occurs!==false);
     const r=M.role(state.user),failed=state.errors.some(x=>['schedule','actions'].includes(x)),meetingFailed=state.errors.includes('meetings');
     $('dh-title').textContent=r.manager?'متابعة اليوم':'نظرة على اليوم';
     $('dh-subtitle').textContent=`${dayLabel(now.day)}، ${dateLabel(now.date)} · توقيت القاهرة`;

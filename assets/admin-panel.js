@@ -1,6 +1,6 @@
 // Dispatch only the established actions; database values never become script source.
 window.CITLBindMeetingActions = function(row, id) {
-    const allowed = ['approveModification','rejectModification','confirmDeleteRequest','rejectDeleteRequest','approveMeeting','rejectMeeting','deleteMeetingFromAdmin','editMeetingFromAdmin'];
+    const allowed = ['approveModification','rejectModification','confirmDeleteRequest','rejectDeleteRequest','approveMeeting','rejectMeeting','deleteMeetingFromAdmin','editMeetingFromAdmin','viewMeetingFromAdmin'];
     row.querySelectorAll('[data-meeting-action]').forEach(button => {
         const action = button.dataset.meetingAction;
         if (allowed.includes(action)) button.addEventListener('click', () => window[action](id));
@@ -2020,6 +2020,7 @@ window.rejectModification = async function(id) {
     }
 };
 
+window.viewMeetingFromAdmin = id => window.CITLMeetingUI?.open(id,false);
 window.editMeetingFromAdmin = function(meetingId) {
  let meetings = window.CITLAdminMeetings || [];
 
@@ -2027,7 +2028,7 @@ window.editMeetingFromAdmin = function(meetingId) {
             if (meeting) {
                 selectedMeeting = meeting;
                 editMeeting();
-                closeModal('admin-panel-modal');
+                window.CITLMeetingUI?.rememberAdminEdit();
             }
         };
 

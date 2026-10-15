@@ -3,7 +3,7 @@
 <head>
 <script>document.documentElement.classList.add("citl-auth-checking");</script>
 <style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery){visibility:hidden!important;pointer-events:none!important}</style>
-<meta name="citl-release" content="20261014-r6.8.17">
+<meta name="citl-release" content="20261015-r6.8.19">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
@@ -471,6 +471,9 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <link rel="stylesheet" href="/assets/academic-oversight.css?v=20261014-r6.8.17">
 <script src="/assets/desktop-mode.js?v=20261013-r6.8.10"></script>
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10">
+<link rel="stylesheet" href="/assets/registration-correction.css?v=20261015-r6.8.18">
+<link rel="stylesheet" href="../assets/lecture-action-dates.css?v=20261015-r6.8.18">
+<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261015-r6.8.20">
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 <div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
@@ -1415,7 +1418,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
   <div class="bg-white rounded-2xl shadow-2xl w-[95%] max-w-lg relative z-10 overflow-hidden border-t-4 border-[#F3A628]">
     <div class="bg-[#2A3475] px-6 py-4 flex justify-between items-center">
 <h3 id="schedule-action-modal-title" class="text-lg font-bold text-white flex items-center gap-2">
-  <i class="fas fa-sliders-h text-[#F3A628]"></i> إجراء هذا الأسبوع
+  <i class="fas fa-sliders-h text-[#F3A628]"></i> إجراء المحاضرة
 </h3>
       <button onclick="closeScheduleActionModal()" class="text-white/70 hover:text-white">
         <i class="fas fa-times text-xl"></i>
@@ -1434,7 +1437,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
       <div>
         <label class="block text-xs font-bold text-gray-500 mb-1">نوع الإجراء</label>
         <select id="sa-type" onchange="onScheduleActionTypeChange()" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#2A3475] outline-none font-bold text-gray-700 bg-white">
-          <option value="cancel">إلغاء (لهذا الأسبوع فقط)</option>
+          <option value="cancel">إلغاء (للموعد المحدد فقط)</option>
           <option value="replace">إحلال محاضر</option>
           <option value="move_room">تحويل لقاعة أخرى</option>
           <option value="replace_and_move">إحلال + تحويل قاعة</option>
@@ -1470,7 +1473,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
       </div>
 
       <div class="text-[11px] text-gray-500 font-bold leading-relaxed">
-        ملحوظة: الإجراء بيتطبق على “الموعد القادم” لنفس اليوم فقط، والأسبوع اللي بعده يرجع تلقائي.
+        الإجراء يُطبق على التاريخ المحدد فقط؛ باقي مواعيد المحاضرة تبقى كما هي.
       </div>
     </div>
   </div>
@@ -1553,17 +1556,20 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20260921-r6.5"></script>
-<script src="/assets/pages/schedules-1.js?v=20261014-r6.8.13"></script>
-<script src="/security-core.js?v=20261014-r6.8.17"></script>
+<script src="/assets/pages/schedules-1.js?v=20261015-r6.8.18"></script>
+<script src="/security-core.js?v=20261015-r6.8.20"></script>
 <script src="/assets/department-heads.js?v=20261013-r6.8.10"></script>
 <script src="/assets/registration-review-status.js?v=20261014-r6.8.16"></script>
-<script src="/assets/academic-oversight.js?v=20261014-r6.8.16"></script>
-<script src="/assets/admin-access.js?v=20261014-r6.8.17"></script>
+<script src="/assets/academic-oversight.js?v=20261015-r6.8.18"></script>
+<script src="/assets/admin-access.js?v=20261015-r6.8.20"></script>
 <script src="/assets/admin-announcements.js?v=20261014-r6.8.17"></script>
-<script src="/assets/faculty-identity.js?v=20261014-r6.8.13"></script>
+<script src="/assets/faculty-identity.js?v=20261015-r6.8.20"></script>
+<script src="/assets/registration-correction.js?v=20261015-r6.8.18"></script>
 <script src="/assets/room-qr-export.js?v=20261014-r6.8.17"></script>
 <script src="/assets/room-qr.js?v=20261014-r6.8.13"></script>
 <script src="/assets/booking-reports.js?v=20261014-r6.8.14"></script>
-<script src="/assets/delegated-lecture-actions.js?v=20261014-r6.8.16"></script>
+<script src="/assets/delegated-lecture-actions.js?v=20261015-r6.8.18"></script>
+<script src="/assets/attendance-admin.js?v=20261015-r6.8.18"></script>
+<script src="../assets/lecture-action-dates.js?v=20261015-r6.8.18"></script>
 </body>
 </html>

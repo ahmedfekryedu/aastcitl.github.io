@@ -67,7 +67,13 @@
         const d=days.findIndex((d,j)=>norm(d)===norm(r.day_of_week)||norm(ar[j])===norm(r.day_of_week));
         if(d<0)throw Error(`راجع يوم الصف ${i+1}؛ الأيام من السبت إلى الخميس`);r.day_of_week=days[d];
         const parsed=root.CITLStudy.slot(r.time_slot);if(parsed.start===null)throw Error(`راجع التوقيت في الصف ${i+1}`);
-        r.time_slot=parsed.label.replace(' – ',' - ');r.status=r.status||'active';r.period_order=r.period_order??1;
+        r.period_order=r.period_order??1;
+        let end=parsed.end;const first=Number(r.period_order),start=510+(first-1)*60;
+        let span=r.period_span==null?null:Number(r.period_span);
+        if(span===null&&[1,3,5,7,9].includes(first)&&parsed.start===start&&parsed.end===start+50)span=2;
+        if(span!==null){if(!Number.isInteger(span)||span<1||first+span-1>10||parsed.start!==start||![start+50,start+span*60-10].includes(parsed.end))throw Error(`راجع امتداد فترات الصف ${i+1}`);end=start+span*60-10;r.period_span=span;}
+        const clock=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+        r.time_slot=clock(parsed.start)+' - '+clock(end);r.status=r.status||'active';
         // Historical cancellations/actions must not leak into the next term's import.
         r.cancelled_dates=[];
       }else{

@@ -51,6 +51,7 @@
         if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
         try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); await checkUserNotifications(); } catch (error) { window.showNotification?.('تعذر تحديث قراءة الإشعار؛ أعد المحاولة','error'); return; }
         if(window.CITLOversight?.openRegistrationNotice(item))return;
+        if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}
         if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;
         else await checkUserNotifications();
       });
@@ -94,7 +95,9 @@
     sessionStorage.clear(); location.replace('/');
   }
 
+  let scheduleSaving = false;
   async function secureScheduleAction() {
+    if (scheduleSaving) return;
     const scheduleId = document.getElementById('sa-schedule-id')?.value;
     const actionDate = document.getElementById('sa-action-date')?.value; const type = document.getElementById('sa-type')?.value;
     const reason = document.getElementById('sa-reason')?.value.trim() || '';
@@ -103,7 +106,11 @@
     if (!scheduleId || !actionDate || !type || !reason) return window.showNotification?.('بيانات الإجراء والسبب مطلوبة', 'error');
     if (['replace', 'replace_and_move'].includes(type) && !replacementInstructor) return window.showNotification?.('اختر المحاضر البديل', 'error');
     if (['move_room', 'replace_and_move'].includes(type) && !replacementRoom) return window.showNotification?.('اختر القاعة البديلة', 'error');
+    scheduleSaving = true;
+    const button = document.getElementById('sa-save-btn');
+    if (button) button.disabled = true;
     try {
+      if (!await window.CITLLectureDates.confirm(actionDate,type)) return;
       const current = JSON.parse(localStorage.getItem('currentUser') || '{}');
       const result = await invoke('schedule_action.save', { data: { schedule_id: scheduleId, action_date: actionDate,
         action_type: type, reason, replacement_instructor: replacementInstructor || null, replacement_room: replacementRoom || null,
@@ -112,6 +119,7 @@
       if (current.linked_instructors) await window.showMyScheduleView?.(current.linked_instructors);
       if (document.getElementById('schedule-reports-modal')?.classList.contains('flex')) await window.loadScheduleReports?.();
     } catch (error) { window.showNotification?.(error.message, 'error'); }
+    finally { scheduleSaving = false; if (button) button.disabled = false; }
   }
 
   async function secureDeleteUser(userId, userName) {

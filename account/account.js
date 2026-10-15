@@ -12,13 +12,14 @@
    const mine=await root.CITLRequests.rpc(root.sb,'citl_faculty_links',{p_action:'mine'}),request=mine.requests?.[0];
    const rejected=profile.faculty_verification_status==='rejected',administrative=!['faculty','visiting_lecturer'].includes(profile.account_type);
    $('account-state').textContent=rejected?'يحتاج الطلب إلى مراجعة':'بانتظار اعتماد الإدارة';
-   $('account-title').textContent=rejected?'راجع الاسم الأكاديمي المطلوب':'حسابك جاهز، وفي انتظار الاعتماد';
-   $('account-description').textContent=rejected?'لم تعتمد الإدارة طلب الربط. يمكنك تصحيح الاسم وإرسال طلب جديد من نفس الحساب.':'تم استلام طلب ربط حسابك بعضو هيئة التدريس. ستتاح لك خدمات النظام فور موافقة الإدارة.';
+   $('account-title').textContent=rejected?'صحح بياناتك وأعد طلب الاعتماد':'حسابك جاهز، وفي انتظار الاعتماد';
+   $('account-description').textContent=rejected?'لم تعتمد الإدارة الطلب. راجع سبب الرفض وصحح بياناتك من نفس الحساب، ثم أعد إرسالها للمراجعة.':'تم استلام طلب ربط حسابك بعضو هيئة التدريس. ستتاح لك خدمات النظام فور موافقة الإدارة.';
    $('account-name').textContent=profile.full_name||'عضو هيئة تدريس';$('account-email').textContent=profile.email||'';
    $('account-instructor').textContent=administrative?'حساب إداري':request?.instructor_name||'لم يتم إرسال طلب بعد';
-   if(administrative){$('account-title').textContent=rejected?'لم يُعتمد الحساب الإداري':'حسابك الإداري بانتظار الاعتماد';$('account-description').textContent=rejected?'تواصل مع مسؤول الجهة لمراجعة بيانات الحساب.':'تم استلام تسجيلك الإداري. ستتاح خدمات النظام بعد موافقة المسؤول.';}
+   if(administrative){$('account-title').textContent=rejected?'لم يُعتمد الحساب الإداري':'حسابك الإداري بانتظار الاعتماد';$('account-description').textContent=rejected?'راجع سبب الرفض وصحح بياناتك، ثم أعد إرسالها للمراجعة من نفس الحساب.':'تم استلام تسجيلك الإداري. ستتاح خدمات النظام بعد موافقة المسؤول.';}
    document.querySelectorAll('.account-skeleton').forEach(el=>el.classList.remove('account-skeleton'));
-   $('account-edit').hidden=administrative||profile.faculty_verification_status==='pending';
+   $('account-edit').hidden=!rejected;
+   $('account-reason').hidden=!rejected;$('account-reason').textContent=rejected?'سبب الرفض: '+(request?.rejection_reason||'لم يُسجل سبب لهذا الطلب القديم. راجع الإدارة لمعرفة التصحيح المطلوب.') : ''; 
    if(profile.faculty_verification_status==='pending')$('account-editor').replaceChildren();
    $('account-feedback').textContent=manual?'تم تحديث الحالة. طلبك '+(rejected?'يحتاج إلى مراجعة.':'ما زال بانتظار الاعتماد.'):'يتم تحديث حالة الطلب تلقائيًا.';
    document.querySelector('.account-card').setAttribute('aria-busy','false');
@@ -27,7 +28,7 @@
   }finally{busy=false;$('account-refresh').disabled=false;clearTimeout(timer);timer=setTimeout(()=>{if(!document.hidden)refresh();},20000);}
  }
  $('account-refresh').onclick=()=>refresh(true);
- $('account-edit').onclick=()=>root.CITLFaculty.renderClaimEditor($('account-editor'));
+ $('account-edit').onclick=()=>root.CITLRegistrationCorrection.editor($('account-editor'),null,()=>refresh(true));
  $('account-logout').onclick=async()=>{try{await root.presenceTracker?.logout();const {error}=await root.sb.auth.signOut();if(error)throw error;localStorage.removeItem('currentUser');location.replace('/');}catch(_){$('account-feedback').textContent='تعذر تسجيل الخروج. أعد المحاولة.'}};
  root.addEventListener('citl-profile-loaded',event=>{if(!root.CITLAuth.facultyPending(event.detail))enter();});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});root.addEventListener('online',()=>refresh());

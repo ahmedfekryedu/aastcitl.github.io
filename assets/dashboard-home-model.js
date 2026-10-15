@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
   const S=root.CITLStudy,P=root.CITLPermissions;
-  const names=user=>(Array.isArray(user?.linked_instructors)?user.linked_instructors:[]).map(S.normalize).filter(Boolean);
+  const names=user=>[...new Set([...(Array.isArray(user?.linked_instructors)?user.linked_instructors:[]),user?.linked_instructor].map(S.normalize).filter(Boolean))];
   function role(user){
     const full=P.full(user),approve=P.can(user,'can_approve'),remove=P.can(user,'can_delete'),users=P.can(user,'can_manage_users');
     return {full,approve,remove,users,manager:full||approve||remove||users,meetings:full||approve||remove,
@@ -16,23 +16,24 @@
     for(const a of actions)if(a.action_date>=range.start&&a.action_date<=range.end)byLecture.set(String(a.schedule_id)+'|'+a.action_date,a);
     return rows.map(row=>{
       const day=S.day(row);if(!S.days.includes(day))return null;
-      const date=S.weekDate(day,now),action=byLecture.get(String(row.id)+'|'+date),slot=S.slot(row.time_slot);
-      if(!S.runsOn(row,date))return null;
+      const date=S.weekDate(day,now),occurs=S.runsOn(row,date),slot=S.slot(row.time_slot);
+      if(row.term_id&&row.term_active!==true)return null;
+      const action=occurs?byLecture.get(String(row.id)+'|'+date):null;
       const replaced=['replace','replace_and_move'].includes(action?.action_type),moved=['move_room','replace_and_move'].includes(action?.action_type);
       const effectiveInstructor=replaced?action.replacement_instructor:row.instructor;
       const cancelled=S.normalize(row.status)==='cancelled'||(Array.isArray(row.cancelled_dates)&&row.cancelled_dates.includes(date))||action?.action_type==='cancel';
       const originalOwn=linked.has(S.normalize(row.instructor)),effectiveOwn=linked.has(S.normalize(effectiveInstructor));
-      return {...row,day,date,start:slot.start,end:slot.end,time:slot.label,action,originalOwn,effectiveOwn,
+      return {...row,day,date,occurs,start:slot.start,end:slot.end,time:slot.label,action,originalOwn,effectiveOwn,
         room:moved?action.replacement_room:row.room_name,effectiveInstructor,cancelled,replaced,moved,
         own:originalOwn||effectiveOwn,assigned:effectiveOwn&&!cancelled,
-        live:!cancelled&&date===now.date&&slot.start!==null&&now.minutes>=slot.start&&now.minutes<slot.end};
+        live:occurs&&!cancelled&&date===now.date&&slot.start!==null&&now.minutes>=slot.start&&now.minutes<slot.end};
     }).filter(Boolean).sort((a,b)=>a.date.localeCompare(b.date)||(a.start??9999)-(b.start??9999)||String(a.course_name).localeCompare(String(b.course_name),'ar'));
   }
   function statistics(items,user,now=S.cairo()){
-    const active=items.filter(x=>!x.cancelled),today=active.filter(x=>x.date===now.date),live=today.filter(x=>x.live);
+    const active=items.filter(x=>x.occurs!==false&&!x.cancelled),today=active.filter(x=>x.date===now.date),live=today.filter(x=>x.live);
     const rooms=new Set(active.map(x=>x.room).filter(Boolean)),busy=new Set(live.map(x=>x.room).filter(Boolean));
-    const own=items.filter(x=>x.own),assigned=own.filter(x=>x.assigned),ownToday=assigned.filter(x=>x.date===now.date);
-    const future=assigned.filter(x=>x.start!==null&&(x.date>now.date||(x.date===now.date&&x.end>now.minutes)));
+    const own=items.filter(x=>x.own),assigned=own.filter(x=>x.assigned),ownToday=assigned.filter(x=>x.occurs!==false&&x.date===now.date);
+    const future=assigned.filter(x=>x.occurs!==false&&x.start!==null&&(x.date>now.date||(x.date===now.date&&x.end>now.minutes)));
     return {today,live,rooms:[...rooms].sort(),available:[...rooms].filter(x=>!busy.has(x)).sort(),own,assigned,ownToday,
       next:future[0]||null,hours:Math.round(assigned.reduce((sum,x)=>sum+(x.start===null?0:x.end-x.start),0)/60*10)/10};
   }

@@ -1,8 +1,15 @@
-const RELEASE = '20261014-r6.8.17';
+const RELEASE = '20261015-r6.8.20';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/assets/meeting-ui.js',
+  '/assets/meeting-ui.css',
+  '/assets/lecture-action-dates.css',
+  '/assets/lecture-action-dates.js',
+  '/assets/attendance-admin.js',
+  '/assets/registration-correction.css',
+  '/assets/registration-correction.js',
   '/assets/room-availability.js',
   '/assets/desktop-mode.css',
   '/assets/desktop-mode.js',

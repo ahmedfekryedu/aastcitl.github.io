@@ -336,7 +336,7 @@ const { data, error } = await query;
                 
                 if (error) throw error;
 
-                meetings = data.map(m => {
+                meetings = data.filter(m=>m.booking_type!=='lecture').map(m => {
                     // التحقق من وجود القسم (كود الأمان القديم)
                     const deptInfo = departments[m.department] || { 
                         name: 'قسم غير معروف', 
@@ -368,7 +368,7 @@ const { data, error } = await query;
                 if (error.code === 'PGRST200') {
                      const { data: retryData } = await supabase.from('meetings').select('*');
                      if (retryData) {
-                        meetings = retryData.map(m => {
+                        meetings = retryData.filter(m=>m.booking_type!=='lecture'&&(!currentRoomId||String(m.room_id)===String(currentRoomId))).map(m => {
                             // التأكد من القسم في حالة الخطأ أيضاً
                             const deptInfo = departments[m.department] || { name: 'غير معروف' };
                             return {
@@ -623,6 +623,7 @@ function updateWeekDisplay() {
 function renderCalendar() {
     window.CITLRoomAvailability?.week(currentWeekStart);
     window.CITLAcademicBooking.load(supabase,currentRoomId,currentWeekStart,renderCalendar);
+    window.CITLMeetingUI?.weekPicker(currentWeekStart);
     const container = document.getElementById('calendar-container');
     if (!container) return; // حماية للتأكد من وجود الحاوية
     container.innerHTML = '';
@@ -656,7 +657,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
     // Exact minute boundaries keep 08:30–10:20 lectures out of the 08:00 slot.
     const academic=window.CITLAcademicBooking;
-    const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,meetings);
+    const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,meetings,!!currentRoom?.academic_room_name);
     const covered=new Map();
     const meetingAt=(date,slot)=>meetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
     const identity=(date,slot)=>{const m=meetingAt(date,slot);return m?'meeting:'+m.id:academic.rowsFor(currentRoomId,currentWeekStart,date,slot.start,slot.end).map(r=>'lecture:'+r.schedule_id).sort().join('|');};
@@ -715,7 +716,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                 
                 meetingBlock.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    showMeetingDetails(meeting);
+                    if(window.CITLMeetingUI)window.CITLMeetingUI.open(meeting.id,true);else showMeetingDetails(meeting);
                 });
                 cell.appendChild(meetingBlock);
             } else {
@@ -726,8 +727,8 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
                 window.CITLAcademicBooking.paint(cell,supabase,currentRoomId,currentWeekStart,currentDate,time,() => {
                     openAddMeetingModal(currentDate,time);
-                    // Ordinary empty cells retain the one-hour default; a lecture uses its full block.
-                    academic.setTiming(time,signature?(finalSlot.end-slot.start)/60:1);
+                    // Use the complete displayed interval, including paired academic periods.
+                    academic.setTiming(time,(finalSlot.end-slot.start)/60);
                 },finalSlot.end);
             }
             container.appendChild(cell);
@@ -1022,6 +1023,7 @@ function setupEventListeners() {
             
             document.getElementById('save-text').textContent = 'حفظ الحجز';
             const modal = document.getElementById('add-meeting-modal');
+            modal.style.zIndex='1800';
             modal.classList.add('show');
             
             // تعبئة التاريخ والوقت لو ضغطت على الجدول
@@ -1262,6 +1264,7 @@ const meetingData = {
         window.CITLRoomAvailability?.refresh(true);
         closeModal('add-meeting-modal');
         resetFormUI();
+        await window.CITLMeetingUI?.afterSave(meetingId);
 
     } catch (error) {
         console.error(error);
@@ -1344,13 +1347,14 @@ function checkConflicts(newMeeting, excludeId = null) {
 // Show meeting details (معدلة للحماية + إصلاح تشغيل الأزرار)
 // دالة عرض التفاصيل المحدثة لتناسب جميع الشاشات (تعديل نهائي)
 function showMeetingDetails(meeting) {
+    meeting=window.CITLMeetingUI?.normalize(meeting)||meeting;
     selectedMeeting = meeting;
     const modal = document.getElementById('meeting-details-modal');
     const content = document.getElementById('meeting-details-content');
     
     const startDt = new Date(`2000-01-01T${meeting.startTime}`);
     const endDt = new Date(`2000-01-01T${meeting.endTime}`);
-    const durationHrs = (endDt - startDt) / (1000 * 60 * 60);
+    const durationLabel = window.CITLMeetingUI?.duration(meeting.startTime,meeting.endTime) || Math.round((endDt-startDt)/60000)+' دقيقة';
 
     const createdDateDisplay = meeting.createdAt ? new Date(meeting.createdAt).toLocaleString('ar-EG') : 'غير مسجل';
     const creatorName = meeting.createdBy || 'غير معروف';
@@ -1386,7 +1390,7 @@ function showMeetingDetails(meeting) {
                 </div>
                 <span class="px-3 py-1 bg-green-50 text-green-700 border border-green-100 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap self-start flex items-center">
                     <span class="w-2 h-2 bg-green-500 rounded-full ml-2 inline-block animate-pulse"></span>
-                    ${meeting.status === 'confirmed' ? 'مؤكد / فعال' : 'قيد الانتظار'}
+                    ${window.CITLSecure.htmlEscape(window.CITLMeetingUI?.status(meeting.status)||meeting.status)}
                 </span>
             </div>
         </div>
@@ -1405,7 +1409,7 @@ function showMeetingDetails(meeting) {
                 <div class="text-xs md:text-sm font-bold text-gray-800 flex items-center">
                     <i class="far fa-clock text-[#2A3475] ml-2"></i>
                     ${window.CITLSecure.htmlEscape(toArabicNum(meeting.startTime))} - ${window.CITLSecure.htmlEscape(toArabicNum(meeting.endTime))} 
-                    <span class="text-[10px] text-gray-400 mr-2">(${durationHrs} ساعة)</span>
+                    <span class="text-[10px] text-gray-400 mr-2">(${durationLabel})</span>
                 </div>
             </div>
         </div>
@@ -1439,6 +1443,8 @@ function showMeetingDetails(meeting) {
         if(editBtn) editBtn.onclick = editMeeting;   
     }, 50);
 
+    window.CITLMeetingUI?.decorateDetails(meeting,content);
+    modal.style.zIndex='1800';
     modal.classList.add('show');
 }
 
@@ -1665,6 +1671,7 @@ function editMeeting() {
 
 // Generate Smart AI Analytics (النسخة المتطورة جداً)
         function generateAISuggestions() {
+            if(window.CITLMeetingUI)return window.CITLMeetingUI.upcoming();
             if(window.CITLRoomAvailability?.isFree()){window.CITLRoomAvailability.assistant();return;}
             const container = document.getElementById('ai-suggestions');
             container.innerHTML = '';
@@ -2268,7 +2275,7 @@ window.renderAdminMeetingsTable = function(list) {
                     </div>
                 </td>
             `;
-            window.CITLBindMeetingActions(tr, m.id); pendingTbody.appendChild(tr);
+            window.CITLMeetingUI?.addDetailsButton(tr,m); window.CITLBindMeetingActions(tr, m.id); pendingTbody.appendChild(tr);
         });
     } else {
         pendingSection.classList.add('hidden');
@@ -2305,7 +2312,7 @@ window.renderAdminMeetingsTable = function(list) {
                 </td>
             `;
             if(m.status==='cancelled')tr.querySelector('[data-meeting-action=editMeetingFromAdmin]')?.remove();
-            window.CITLBindMeetingActions(tr, m.id); approvedTbody.appendChild(tr);
+            window.CITLMeetingUI?.addDetailsButton(tr,m); window.CITLBindMeetingActions(tr, m.id); approvedTbody.appendChild(tr);
         });
     }
 };
@@ -3127,60 +3134,7 @@ function checkUserNotifications() {
 
 
 // --- دالة معالجة النقر على الإشعار (التوجيه الذكي) ---
-window.handleNotificationClick = function(id, status) {
-    const meeting = meetings.find(m => String(m.id) === String(id));
-    if(!meeting) return;
-
-    // 1. إغلاق قائمة الإشعارات
-    const menu = document.getElementById('notif-menu');
-    if(menu && !menu.classList.contains('hidden')) toggleNotifications();
-
-    // 2. منطق التوجيه
-    const isPendingRequest = status === 'pending' || status === 'modification_requested' || status === 'cancellation_requested';
-    const isMyMeeting = meeting.user_id === currentUser.id;
-
-    // --- السيناريو أ: المدير يضغط على طلب يحتاج موافقة (وليس طلبه الشخصي) ---
-    if (window.CITLPermissions.can(currentUser, 'can_approve') && isPendingRequest && !isMyMeeting) {
-        
-        // فتح لوحة التحكم
-        openAdminPanel();
-        
-        // الانتقال لتبويب الحجوزات
-        switchAdminTab('meetings');
-        
-        // التأكد من عرض "الكل" أو الفلتر المناسب
-        if(typeof filterAdminMeetings === 'function') filterAdminMeetings('all');
-
-        // الانتظار قليلاً حتى يتم رسم الجدول داخل الـ Modal
-        setTimeout(() => {
-            // البحث عن الصف باستخدام ID الذي أضفناه في الخطوة 1
-            const row = document.getElementById(`req-row-${id}`);
-            if(row) {
-                // التمرير (Scroll) إلى الصف
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // وميض (Highlight) للصف عشان المدير يشوفه
-                row.classList.remove('bg-white');
-                row.classList.add('bg-yellow-100'); 
-                
-                // إزالة الوميض بعد ثانيتين
-                setTimeout(() => {
-                    row.classList.remove('bg-yellow-100');
-                    row.classList.add('bg-white');
-                }, 2000);
-            } else {
-                // لو الصف مش ظاهر (نادر الحدوث)، نحاول نحدث القائمة
-                updateAdminMeetingsList();
-            }
-        }, 300); // 300ms تأخير لضمان فتح النافذة
-    } 
-    
-    // --- السيناريو ب: المستخدم العادي (أو المدير يضغط على حجز يخصه) ---
-    else {
-        // فتح نافذة تفاصيل الاجتماع العادية
-        showMeetingDetails(meeting);
-    }
-};
+window.handleNotificationClick = function(id, status) { return window.CITLMeetingUI?.open(id,true); };
 
 // --- كود إصلاح تحديث الملف الشخصي (Profile Update Fix) ---
 // هذا الكود يربط الفورم الموجود فعلياً في لوحة التحكم

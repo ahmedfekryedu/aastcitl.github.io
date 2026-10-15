@@ -1383,7 +1383,7 @@ async function amLoadVisitorAttendance() {
         for (let from = 0; ; from += pageSize) {
             const { data, error } = await window.supabase
                 .from('attendance_scans')
-                .select('id,lecture_date,room_name,scanned_at,inside_campus,lecturer_profile_id,visiting_lecture_sessions!inner(term_id,course_name,start_time,end_time)')
+                .select('id,lecture_date,room_name,scanned_at,inside_campus,lecturer_profile_id,status,recording_source,admin_reason,revision,visiting_lecture_sessions!inner(term_id,course_name,start_time,end_time)')
                 .eq('lecturer_profile_id', visitor.profile_id)
                 .eq('visiting_lecture_sessions.term_id', termId)
                 .order('scanned_at', { ascending: false })
@@ -1405,6 +1405,7 @@ async function amLoadVisitorAttendance() {
 }
 
 function amRenderReports() {
+    window.CITLAttendanceAdmin?.mount();
     const visitor = amSelectedReportVisitor();
     const scansBody = document.getElementById('am-scans-rows'); if (!scansBody) return; scansBody.replaceChildren();
     const summary = document.getElementById('am-report-summary');
@@ -1419,12 +1420,13 @@ function amRenderReports() {
         return;
     }
     const scans = attendanceManagement.reportScans || [];
-    if (summary) summary.textContent = `${visitor.full_name} • إجمالي مرات الحضور المسجلة: ${scans.length}`;
+    if (summary) summary.textContent = `${visitor.full_name} • إجمالي مرات الحضور المحتسبة: ${scans.filter(scan=>scan.status!=='rejected').length}`;
     if (!scans.length) scansBody.appendChild(amEmptyRow(6, `لا توجد تسجيلات حضور للمنتدب ${visitor.full_name}`));
     scans.forEach(scan => {
         const session = scan.visiting_lecture_sessions || {};
         const row = document.createElement('tr');
         row.append(amCell(scan.lecture_date), amCell(session.course_name || '—'), amCell(scan.room_name), amCell(amFormatLectureTime(session)), amCell(amFormatDate(scan.scanned_at)), amCell(scan.inside_campus ? 'نعم' : 'لا'));
+        window.CITLAttendanceAdmin?.decorate(row,scan);
         scansBody.appendChild(row);
     });
 }
@@ -2786,7 +2788,7 @@ const statusLabel = !actionRow
             // ==========================================
             if (mobileContainer) {
 const actionBtn = `<button onclick="openScheduleActionModal('${encodeURIComponent(JSON.stringify(item))}')" class="w-full mt-3 py-2.5 bg-[#2A3475]/5 text-[#2A3475] border border-[#2A3475]/15 rounded-xl text-xs font-bold hover:bg-[#2A3475]/10 transition-colors flex items-center justify-center gap-2">
-    <i class="fas fa-sliders-h"></i> إجراء هذا الأسبوع
+    <i class="fas fa-sliders-h"></i> اختيار موعد الإجراء
 </button>`;
 
 const statusBadge = !actionRow
@@ -2827,7 +2829,7 @@ const statusBadge = !actionRow
             if (desktopBody) {
                 // تعديل هنا: خلينا النص "إلغاء هذا الأسبوع" بدلاً من "إلغاء" فقط
 const actionBtn = `<button onclick="openScheduleActionModal('${encodeURIComponent(JSON.stringify(item))}')" class="px-3 py-1.5 bg-[#2A3475]/5 text-[#2A3475] rounded-lg border border-[#2A3475]/15 hover:bg-[#2A3475]/10 text-xs font-bold transition-colors whitespace-nowrap flex items-center justify-center gap-1 mx-auto">
-    <i class="fas fa-sliders-h"></i> إجراء هذا الأسبوع
+    <i class="fas fa-sliders-h"></i> اختيار موعد الإجراء
 </button>`;
 
 const statusBadge = !actionRow
@@ -3070,24 +3072,17 @@ function closeScheduleActionModal() {
     modal.classList.remove('flex');
 }
 
-async function openScheduleActionModal(encodedItemJson) {
+async function openScheduleActionModal(encodedItemJson, selectedDate) {
     try {
         const item = JSON.parse(decodeURIComponent(encodedItemJson));
 
-        const targetDate =
-            (typeof getNextDateForDay === 'function')
-                ? getNextDateForDay(item.day_of_week)
-                : null;
-
-        if (!targetDate) {
-            return showNotification('تعذر تحديد تاريخ المحاضرة', 'error');
-        }
-
+        const dateData = await window.CITLLectureDates.prepare(item.id, selectedDate);
+        if (!dateData) return;
+        const targetDate = dateData.selected || '';
         document.getElementById('sa-schedule-id').value = item.id;
         document.getElementById('sa-action-date').value = targetDate;
-
-        const actionKey = `${item.id}|${targetDate}`;
-        const existingAction = scheduleActionsMap.get(actionKey) || null;
+        const existingAction = dateData.action || null;
+        document.getElementById('schedule-action-modal-title').textContent = 'إجراء المحاضرة';
 
         const arDay =
             (typeof daysMapAr !== 'undefined')
@@ -3123,7 +3118,7 @@ async function openScheduleActionModal(encodedItemJson) {
                     existingAction
                         ? `
                         <div class="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs space-y-1">
-                            <div class="font-black text-blue-800">تم تسجيل إجراء سابق لهذا الأسبوع</div>
+                            <div class="font-black text-blue-800">تم تسجيل إجراء سابق لهذا الموعد</div>
                             <div><b>النوع:</b> ${getActionTypeLabel(existingAction.action_type)}</div>
                             ${existingAction.replacement_instructor ? `<div><b>المحاضر البديل:</b> ${existingAction.replacement_instructor}</div>` : ''}
                             ${existingAction.replacement_room ? `<div><b>القاعة البديلة:</b> ${existingAction.replacement_room}</div>` : ''}
@@ -3132,7 +3127,7 @@ async function openScheduleActionModal(encodedItemJson) {
                         `
                         : `
                         <div class="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-500 font-bold">
-                            لا يوجد إجراء مسجل لهذه المحاضرة هذا الأسبوع.
+                            لا يوجد إجراء مسجل لهذه المحاضرة في الموعد المحدد.
                         </div>
                         `
                 }
@@ -3173,13 +3168,16 @@ async function openScheduleActionModal(encodedItemJson) {
             saveBtn.innerHTML = existingAction ? 'تعديل الإجراء' : 'حفظ الإجراء';
         }
 
+        window.CITLLectureDates.mount(item, dateData);
         const modal = document.getElementById('schedule-action-modal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        const card = modal.querySelector('div.relative');
+        if (card) card.scrollTop = 0;
 
     } catch (e) {
         console.error(e);
-        showNotification('تعذر فتح نافذة الإجراء', 'error');
+        showNotification(e.message || 'تعذر فتح نافذة الإجراء', 'error');
     }
 }
 
@@ -3332,6 +3330,7 @@ function updateScheduleReportsSummary(rows) {
 }
 
 async function openScheduleReportEditor(actionId) {
+    window.CITLLectureDates?.report();
     if (!actionId) return;
 
     try {

@@ -42,10 +42,13 @@
   function rowsFor(room,start,day,from,to) {
     return (weeks.get(key(room,start))?.rows||[]).filter(r=>r.lecture_date===dateKey(day)&&minutes(r.start_time)<to&&minutes(r.end_time)>from);
   }
-  function timeline(room,start,hours,meetings=[]) {
+  function timeline(room,start,hours,meetings=[],academicRoom=false) {
     const clock=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
-    const cuts=new Set(hours.map(minutes));if(hours.length)cuts.add(minutes(hours[hours.length-1])+60);
-    for(const row of weeks.get(key(room,start))?.rows||[]){cuts.add(minutes(row.start_time));cuts.add(minutes(row.end_time));}
+    const lectures=weeks.get(key(room,start))?.rows||[];
+    const paired=academicRoom||lectures.some(r=>minutes(r.start_time)>=510&&minutes(r.start_time)<=1050&&(minutes(r.start_time)-510)%120===0&&minutes(r.end_time)-minutes(r.start_time)===110);
+    const cuts=new Set(paired?Array.from({length:5},(_,i)=>[510+i*120,620+i*120]).flat():hours.map(minutes));
+    if(hours.length){cuts.add(minutes(hours[0]));cuts.add(minutes(hours[hours.length-1])+60);}
+    for(const row of lectures){cuts.add(minutes(row.start_time));cuts.add(minutes(row.end_time));}
     const dates=new Set(weekDays(start).map(dateKey));
     for(const row of meetings)if(dates.has(row.date)&&['confirmed','modification_requested','cancellation_requested'].includes(row.status)){cuts.add(minutes(row.startTime));cuts.add(minutes(row.endTime));}
     const sorted=[...cuts].filter(n=>Number.isFinite(n)&&n>=0&&n<=1440).sort((a,b)=>a-b);

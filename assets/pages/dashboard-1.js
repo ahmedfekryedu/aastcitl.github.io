@@ -758,9 +758,10 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
     // Exact minute boundaries keep 08:30–10:20 lectures out of the 08:00 slot.
     const academic=window.CITLAcademicBooking;
-    const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,meetings,!!currentRoom?.academic_room_name);
+    const calendarMeetings=meetings.filter(m=>!currentRoomId||String(m.room_id)===String(currentRoomId));
+    const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,calendarMeetings,!!currentRoom?.academic_room_name);
     const covered=new Map();
-    const meetingAt=(date,slot)=>meetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
+    const meetingAt=(date,slot)=>calendarMeetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
     const identity=(date,slot)=>{const m=meetingAt(date,slot);return m?'meeting:'+m.id:academic.rowsFor(currentRoomId,currentWeekStart,date,slot.start,slot.end).map(r=>'lecture:'+r.schedule_id).sort().join('|');};
     container.style.gridTemplateRows='70px '+intervals.map(slot=>Math.max(22,Math.round((slot.end-slot.start)*.85))+'px').join(' ');
     intervals.forEach((slot,rowIndex) => {
@@ -791,8 +792,13 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
             if (meeting) {
                 const meetingBlock = document.createElement('div');
+                meetingBlock.dataset.bookingId=String(meeting.id);
                 meetingBlock.className = `meeting-block ${(departments[meeting.department]||departments['other']||{color:'bg-[#2A3475]'}).color} shadow-md rounded border-r-4 border-black/20 hover:scale-[1.02] transition-transform z-10 h-[calc(100%-8px)] m-1`;
                 
+                if(timeToMinutes(meeting.endTime)-timeToMinutes(meeting.startTime)<=20)meetingBlock.classList.add('citl-short-booking');
+                meetingBlock.title=meeting.title+' · '+meeting.startTime+' – '+meeting.endTime;
+                meetingBlock.setAttribute('role','button');meetingBlock.tabIndex=0;
+                meetingBlock.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();meetingBlock.click();}});
                 // التعديل 2: إضافة الجهة الحاجزة وتنسيق المحتوى ليكون متجاوباً مع الموبايل والكمبيوتر
                 meetingBlock.innerHTML = `
                     <div class="p-1 md:p-1.5 h-full flex flex-col justify-between overflow-hidden text-white">
@@ -820,6 +826,9 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                     if(window.CITLMeetingUI)window.CITLMeetingUI.open(meeting.id,true);else showMeetingDetails(meeting);
                 });
                 cell.appendChild(meetingBlock);
+            } else if(slot.isBreak&&!signature) {
+                cell.classList.add('citl-calendar-break');cell.textContent='استراحة';cell.dataset.calendarBreak='true';
+                cell.addEventListener('click',()=>{openAddMeetingModal(currentDate,time);academic.setTiming(time,(finalSlot.end-slot.start)/60);});
             } else {
                 const addIcon = document.createElement('div');
                 addIcon.className = 'absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none';
@@ -965,6 +974,7 @@ if (!sbAdmin) {
 // --- نظام التنبيه الذكي (النسخة المحسنة للاختفاء) ---
 
         function checkHiddenMeetings() {
+            if(window.CITLMeetingUI)return window.CITLMeetingUI.hiddenBookings();
             const indicator = document.getElementById('scroll-indicator');
             const countSpan = document.getElementById('hidden-count');
             
@@ -1011,6 +1021,7 @@ if (!sbAdmin) {
 
 // زر النزول الذكي (يذهب لأول اجتماع مخفي)
         function scrollToNextMeeting() {
+            if(window.CITLMeetingUI)return window.CITLMeetingUI.scrollToBooking();
             const windowHeight = window.innerHeight;
             const meetingBlocks = document.querySelectorAll('.meeting-block');
             

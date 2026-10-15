@@ -52,7 +52,7 @@
     const dates=new Set(weekDays(start).map(dateKey));
     for(const row of meetings)if(dates.has(row.date)&&['confirmed','modification_requested','cancellation_requested'].includes(row.status)){cuts.add(minutes(row.startTime));cuts.add(minutes(row.endTime));}
     const sorted=[...cuts].filter(n=>Number.isFinite(n)&&n>=0&&n<=1440).sort((a,b)=>a-b);
-    return sorted.slice(0,-1).map((n,i)=>({start:n,end:sorted[i+1],time:clock(n),endTime:clock(sorted[i+1])}));
+    return sorted.slice(0,-1).map((n,i)=>({start:n,end:sorted[i+1],time:clock(n),endTime:clock(sorted[i+1]),isBreak:paired&&n>=620&&n<1100&&(n-620)%120<10&&sorted[i+1]<=n+10-(n-620)%120}));
   }
   function setTiming(time,duration) {
     for(const [id,value,label]of [['meeting-time',time,time],['duration',String(duration),Math.round(duration*60)+' دقيقة']]){

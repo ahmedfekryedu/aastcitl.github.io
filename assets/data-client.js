@@ -6,7 +6,7 @@
     try {
       const { data, error } = await client.rpc(name, args).abortSignal(controller.signal);
       if (controller.signal.aborted) throw new Error('انتهت مهلة الاتصال. لو كنت بتحفظ تغييرًا، حدّث البيانات للتأكد من نتيجته قبل تكراره.');
-      if (error) throw Object.assign(new Error(error.message || 'تعذر إتمام العملية'), { code: error.code });
+      if (error) {const service=/^CITL_SERVICE_MAINTENANCE:([a-z_]+)$/.exec(error.message||'');const label=service&&root.CITLServices?.decision(service[1])?.label;throw Object.assign(new Error(service?(label||'هذه الخدمة')+' قيد التحديث حاليًا':error.message || 'تعذر إتمام العملية'), { code: error.code });}
       if (!data || data.ok === false) throw new Error(data?.error || 'تعذر إتمام العملية');
       return data;
     } finally { clearTimeout(timer); }

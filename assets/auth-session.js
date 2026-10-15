@@ -5,7 +5,7 @@
   let monitoring = false, checkingAccount = false, leaving = false;
   const fault = (message, code) => Object.assign(new Error(message), { code });
   const facultyPending = profile => ['pending','rejected'].includes(profile?.faculty_verification_status) || (['faculty','visiting_lecturer'].includes(profile?.account_type) && profile.faculty_verification_status !== 'approved');
-  const protectedPage = /^\/(dashboard|smrm|schedules|management|attendance)(\/|$)/.test(location.pathname);
+  const protectedPage = /^\/(dashboard|smrm|schedules|management|attendance|courses)(\/|$)/.test(location.pathname);
   async function session() {
     if (!root.sb?.auth) throw fault('عميل تسجيل الدخول غير جاهز', 'CLIENT_NOT_READY');
     const { data, error } = await root.sb.auth.getSession();
@@ -34,6 +34,7 @@
         location.replace('/account/');
         throw fault('حسابك بانتظار اعتماد الإدارة', 'FACULTY_PENDING');
       }
+      if(root.CITLServices && !await root.CITLServices.checkPage())throw fault('الخدمة قيد التحديث','SERVICE_MAINTENANCE');
       document.documentElement.classList.remove('citl-auth-checking');
       root.currentUser = profile;
       verifiedOnce = true;
@@ -97,7 +98,7 @@
     document.addEventListener('visibilitychange', checkAccount);
   }
   function showFailure(error) {
-    if (error?.code === 'FACULTY_PENDING') return;
+    if (['FACULTY_PENDING','SERVICE_MAINTENANCE'].includes(error?.code)) return;
     if (redirectIfSignedOut(error)) return;
     let box = document.getElementById('citl-connection-recovery');
     if (!box) {

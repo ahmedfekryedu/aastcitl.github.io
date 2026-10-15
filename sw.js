@@ -1,8 +1,18 @@
-const RELEASE = '20261015-r6.8.20';
+const RELEASE = '20261015-r6.9.1';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/assets/service-connection.js',
+  '/assets/service-availability.js',
+  '/assets/service-availability.css',
+  '/assets/service-admin.js',
+  '/assets/maintenance-page.js',
+  '/maintenance/',
+  '/assets/course-shell.js',
+  '/assets/course-model.js',
+  '/assets/course-monitoring.js',
+  '/assets/course-monitoring.css',
   '/assets/meeting-ui.js',
   '/assets/meeting-ui.css',
   '/assets/lecture-action-dates.css',
@@ -95,7 +105,7 @@ self.addEventListener('fetch', (e) => {
   // R2 images/video and authenticated APIs use the browser's native request path.
   // Do not turn a cross-origin/CORS failure into an unhandled FetchEvent rejection.
   if (url.origin !== self.location.origin) return;
-  if (['/dashboard/','/schedules/','/smrm/','/management/','/attendance/'].some(p => url.pathname.startsWith(p))) {
+  if (['/dashboard/','/schedules/','/smrm/','/management/','/attendance/', '/courses/'].some(p => url.pathname.startsWith(p))) {
     e.respondWith(fetch(e.request, {cache: 'no-cache'}).catch(() => Response.error()));
     return;
   }

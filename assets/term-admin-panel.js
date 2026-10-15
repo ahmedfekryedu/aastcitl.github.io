@@ -14,6 +14,7 @@
  const skeleton='<span class="citl-loading-label">جارٍ تحميل إدارة الجداول…</span><div aria-hidden="true"><span class="citl-skeleton-line short"></span><span class="citl-skeleton-line"></span><span class="citl-skeleton-line tall"></span><div class="citl-term-fields">'+Array.from({length:4},()=>'<div><span class="citl-skeleton-line short"></span><span class="citl-skeleton-line tall"></span></div>').join('')+'</div><span class="citl-skeleton-line tall"></span><span class="citl-skeleton-line tall"></span></div>';
  let timer;
  function start(){
+  if(root.CITLServices?.decision('schedule_admin')?.allowed===false){root.CITLServices.enter('schedule_admin');return;}
   clearTimeout(timer);placeholder.innerHTML=skeleton;placeholder.hidden=false;frame.style.visibility='hidden';content.setAttribute('aria-busy','true');
   frame.src='/management/?embedded=1&manage=schedules&v=20261013-r6.8.10#schedules';
   timer=setTimeout(()=>{

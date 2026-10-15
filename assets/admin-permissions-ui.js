@@ -4,6 +4,7 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'service-availability') return can('can_manage_settings');
     if (tab === 'registration-codes') return false;
     if (tab === 'announcements') return permissions.full(current());
     if (tab === 'activity-history') return !!current() && !root.CITLAuth.facultyPending(current());
@@ -29,7 +30,7 @@
   function orderTabs(){
     const parent=document.querySelector('#admin-panel-modal .admin-tab')?.parentElement;if(!parent)return;
     const tabs=[...parent.children].filter(e=>e.classList.contains('admin-tab'));
-    const rank=e=>e.dataset.tab==='profile'?1000:e.dataset.tab==='reports'?1001:tabOrder.includes(e.dataset.tab)?tabOrder.indexOf(e.dataset.tab):100;
+    const rank=e=>e.dataset.tab==='service-availability'?999:e.dataset.tab==='profile'?1000:e.dataset.tab==='reports'?1001:tabOrder.includes(e.dataset.tab)?tabOrder.indexOf(e.dataset.tab):100;
     const wanted=[...tabs].sort((a,b)=>rank(a)-rank(b));
     if(wanted.every((e,i)=>e===tabs[i]))return;
     for(const tab of wanted)parent.append(tab);
@@ -62,6 +63,7 @@
   const oldSwitch = root.switchAdminTab;
   if (oldSwitch) root.switchAdminTab = function (tab) {
     if (!tabAllowed(tab)) { root.showNotification?.('هذا القسم غير متاح لصلاحيات حسابك', 'error'); return; }
+    const entry=root.CITLServices?.decisionByTab?.(tab);if(entry&&!entry.allowed){root.CITLServices.enter(entry.key);return;}
     return oldSwitch.call(this, tab);
   };
   const guards = {

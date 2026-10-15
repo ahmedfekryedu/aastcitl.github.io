@@ -3,7 +3,7 @@
  <head>
 <script>document.documentElement.classList.add("citl-auth-checking");</script>
 <style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery){visibility:hidden!important;pointer-events:none!important}</style>
-<meta name="citl-release" content="20261015-r6.8.19">
+<meta name="citl-release" content="20261015-r6.9.1">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
@@ -34,8 +34,8 @@
     <script src="/assets/read-timeout.js?v=20260921-r6.5"></script>
 <script src="/assets/permissions.js?v=20261014-r6.8.16"></script>
 <script src="/assets/study-settings.js?v=20260921-r6.5"></script>
-<script src="/assets/auth-session.js?v=20261014-r6.8.12"></script>
-<script src="/assets/data-client.js?v=20260921-r6.5"></script>
+<script src="/assets/auth-session.js?v=20261015-r6.9.1"></script>
+<script src="/assets/data-client.js?v=20261015-r6.9.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="/presence.js?v=20261012-r6.8.8.5"></script>
   <style>
@@ -515,7 +515,10 @@ body {
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10">
 <link rel="stylesheet" href="/assets/tv-media-usage.css?v=20261014-r6.8.13">
 <link rel="stylesheet" href="/assets/registration-correction.css?v=20261015-r6.8.18">
-<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261015-r6.8.20">
+<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261015-r6.8.21">
+<link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1">
+<script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
+<script src="/assets/service-availability.js?v=20261015-r6.9.1"></script>
 </head>
  <body class="bg-gray-50">
   <div class="min-h-full"><!-- Header -->
@@ -737,9 +740,9 @@ body {
     </div>
 
     <div id="scroll-indicator" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 opacity-0 transition-all duration-500 pointer-events-none translate-y-10">
-        <button onclick="scrollToNextMeeting()" class="bg-[#2A3475] text-white px-5 py-2.5 rounded-full shadow-2xl border-2 border-[#F3A628] flex items-center space-x-3 space-x-reverse hover:bg-[#1f2658] hover:scale-105 transition-all cursor-pointer pointer-events-auto animate-bounce">
+        <button onclick="scrollToNextMeeting()" class="bg-[#2A3475] text-white px-5 py-2.5 rounded-full shadow-2xl border-2 border-[#F3A628] flex items-center space-x-3 space-x-reverse hover:bg-[#1f2658] hover:scale-105 transition-all cursor-pointer pointer-events-auto">
             <span class="w-6 h-6 bg-[#F3A628] text-[#2A3475] rounded-full flex items-center justify-center text-sm font-bold shadow-sm" id="hidden-count">0</span>
-            <span class="text-sm font-bold">يوجد حجوزات بالأسفل</span>
+            <span class="text-sm font-bold">حجوزات خارج الجزء الظاهر</span>
             <i class="fas fa-arrow-down mr-2"></i>
         </button>
     </div>
@@ -1233,17 +1236,17 @@ body {
 
   <script src="/assets/admin-panel-ui.js?v=20261015-r6.8.20"></script>
 <script src="/assets/member-bookings.js?v=20261015-r6.8.20"></script>
-<script src="/assets/term-admin-panel.js?v=20261014-r6.8.13"></script>
+<script src="/assets/term-admin-panel.js?v=20261015-r6.9.1"></script>
 <script src="/assets/tv-admin-ui.js?v=20260921-r6.5"></script>
-<script src="/assets/weekly-booking.js?v=20261012-r6.8.8"></script><script src="/assets/pages/smrm-1.js?v=20261015-r6.8.20"></script>
-<script src="/assets/academic-booking.js?v=20261015-r6.8.19"></script>
-<script src="/assets/admin-panel.js?v=20261015-r6.8.20"></script>
+<script src="/assets/weekly-booking.js?v=20261012-r6.8.8"></script><script src="/assets/pages/smrm-1.js?v=20261015-r6.8.21"></script>
+<script src="/assets/academic-booking.js?v=20261015-r6.8.21"></script>
+<script src="/assets/admin-panel.js?v=20261015-r6.9.1"></script>
 <script src="/assets/tv-display-dates.js?v=20260923-r6.6"></script><script src="/assets/tv-room-catalog.js?v=20260921-r6.5"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-video-converter.js?v=20260921-r6.5.1"></script>
 <script src="/assets/tv-media-storage.js?v=20261014-r6.8.13"></script>
 <script src="/assets/tv-media-usage.js?v=20261014-r6.8.13"></script>
 <script src="/assets/tv-admin.js?v=20261014-r6.8.13"></script>
 <script src="/security-core.js?v=20261015-r6.8.20"></script>
-<script src="/assets/admin-permissions-ui.js?v=20261014-r6.8.14"></script>
+<script src="/assets/admin-permissions-ui.js?v=20261015-r6.9.1"></script>
 <script src="/assets/department-heads.js?v=20261013-r6.8.10"></script>
 <script src="/assets/registration-review-status.js?v=20261014-r6.8.16"></script>
 <script src="/assets/academic-oversight.js?v=20261015-r6.8.18"></script>
@@ -1251,9 +1254,10 @@ body {
 <script src="/assets/admin-announcements.js?v=20261014-r6.8.17"></script>
 <script src="/assets/faculty-identity.js?v=20261015-r6.8.20"></script>
 <script src="/assets/registration-correction.js?v=20261015-r6.8.18"></script>
-<script src="/assets/academic-room-reservation.js?v=20261014-r6.8.16"></script>
+<script src="/assets/academic-room-reservation.js?v=20261015-r6.9.1"></script>
 <script src="/assets/room-availability.js?v=20261015-r6.8.20"></script>
 <script src="/assets/faculty-registration-census.js?v=20261014-r6.8.17"></script>
-<script src="/assets/meeting-ui.js?v=20261015-r6.8.20"></script>
+<script src="/assets/meeting-ui.js?v=20261015-r6.8.21"></script>
+<script src="/assets/service-admin.js?v=20261015-r6.9.1"></script>
 </body>
 </html>

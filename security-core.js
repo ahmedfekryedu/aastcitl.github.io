@@ -13,7 +13,7 @@
   }
 
   async function validateProtectedPage() {
-    if (!['/dashboard/', '/smrm/', '/schedules/', '/management/'].some((p) => location.pathname.startsWith(p))) return;
+    if (!['/dashboard/', '/smrm/', '/schedules/', '/management/', '/courses/'].some((p) => location.pathname.startsWith(p))) return;
     try {
       const safeUser = await window.CITLAuth.loadProfile();
       document.querySelectorAll('[data-manager-only]').forEach((el) => el.classList.toggle('hidden', !window.CITLPermissions.full(safeUser)));

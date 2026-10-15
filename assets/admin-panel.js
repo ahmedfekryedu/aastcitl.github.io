@@ -42,6 +42,7 @@ function openAdminPanel(initialTab = 'users') {
 }
 
 function switchAdminTab(tabName) {
+    if(tabName==='service-availability')window.CITLServiceAdmin?.load();
     if(tabName==='rooms')window.CITLRoomAvailability?.config();
     if(tabName==='announcements'){window.CITLAnnouncements?.mount();window.CITLAnnouncements?.load();}
     if(tabName==='term-schedules')window.CITLLoadTermAdmin?.();

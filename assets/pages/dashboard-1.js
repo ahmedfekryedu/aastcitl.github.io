@@ -34,43 +34,8 @@ logoutBtns.forEach(btn => {
 });
 
 // --- دوال التحكم في شاشة التحميل (Unified) ---
-window.showLoader = function(text = "جاري المعالجة...") {
-    const loader = document.getElementById('global-loader');
-    const textEl = document.getElementById('loader-text');
-    
-    if(textEl) textEl.textContent = text;
-
-    if(loader) {
-        loader.classList.remove('hidden');
-        loader.classList.add('flex');
-        
-        setTimeout(() => {
-            loader.classList.remove('opacity-0');
-            const inner = loader.querySelector('.relative');
-            if(inner) {
-                inner.classList.remove('scale-95');
-                inner.classList.add('scale-100');
-            }
-        }, 10);
-    }
-}; // 👈 (1) ضفنا فاصلة منقوطة هنا
-
-window.hideLoader = function() {
-    const loader = document.getElementById('global-loader');
-    if(loader) {
-        loader.classList.add('opacity-0');
-        const inner = loader.querySelector('.relative');
-        if(inner) {
-            inner.classList.remove('scale-100');
-            inner.classList.add('scale-95');
-        }
-        
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-        }, 300);
-    }
-}; // 👈 (2) ضفنا فاصلة منقوطة هنا
+window.showLoader = function(text) { window.CITLPageBoot.show(text); };
+window.hideLoader = function() { window.CITLPageBoot.hide(); };// 👈 (2) ضفنا فاصلة منقوطة هنا
 
   // --- إعدادات البريد الإلكتروني (EmailJS) ---
         ;(function(){ // 👈 (3) ضفنا فاصلة منقوطة قبل القوس للأمان
@@ -569,7 +534,7 @@ async function initializeApp() {
 
         // ---------------------------------------------------------
         await window.CITLDashboard.start();
-        if (!currentUser) { hideLoader();
+        if (!currentUser) { 
         window.CITLPageBoot?.finish(); return; }
 
         // 🔥 تشغيل نظام التواجد Presence للدashboard
@@ -583,7 +548,7 @@ async function initializeApp() {
         }
 
         // 🔥🔥🔥 بداية التعديل: تشغيل اللودر الشامل 🔥🔥🔥
-        showLoader('جاري تهيئة النظام...');
+        
 
         // ---------------------------------------------------------
         // 🔥 تشغيل شاشة الانتظار (Skeleton) فوراً (خلفية للودر)
@@ -655,14 +620,14 @@ async function initializeApp() {
         }
         
         // 🔥🔥🔥 نهاية التعديل: إخفاء اللودر بعد اكتمال التحميل 🔥🔥🔥
-        hideLoader();
+        
         window.CITLPageBoot?.finish();
 
     } catch (error) {
         if (!currentUser) window.CITLAuth.showFailure(error);
         console.error("Error initializing app:", error);
         // في حالة الخطأ نخفي اللودر حتى لا يعلق النظام
-        hideLoader();
+        
         window.CITLPageBoot?.finish();
     }
 }
@@ -3655,26 +3620,7 @@ window.addEventListener('click', (e) => {
     }
 });
 
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    const content = document.getElementById('mobile-menu-content');
-    
-    if (!menu || !content) return;
-
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        // تأخير 10ms للسماح للمتصفح برسم العنصر قبل تفعيل الأنيميشن
-        setTimeout(() => {
-            content.classList.remove('translate-x-full');
-        }, 10);
-    } else {
-        content.classList.add('translate-x-full');
-        // انتظار انتهاء الأنيميشن (300ms) قبل إخفاء الحاوية بالكامل
-        setTimeout(() => {
-            menu.classList.add('hidden');
-        }, 300);
-    }
-}
+function toggleMobileMenu() { window.CITLMobileShell?.toggle(); }
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

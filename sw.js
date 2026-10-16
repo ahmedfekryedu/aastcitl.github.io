@@ -1,8 +1,10 @@
-const RELEASE = '20261015-r6.9.1.2';
+const RELEASE = '20261016-r6.9.1.3';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/assets/mobile-shell.css',
+  '/assets/mobile-shell.js',
   '/assets/service-connection.js',
   '/assets/service-availability.js',
   '/assets/service-availability.css',

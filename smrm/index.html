@@ -6,30 +6,39 @@
 <style id="citl-boot-style">
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-display:swap}
 html.citl-page-booting{background:#f8fafc;overflow:hidden!important}
-html.citl-page-booting body>*:not(script):not(#global-loader){visibility:hidden!important}
+html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:none!important;user-select:none}
 #global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
-#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif}
-html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:#f8fafc!important}
+#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:rgba(21,28,64,.22)!important}
 #global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:min(400px,90vw);display:flex;flex-direction:column;align-items:center;gap:8px}
-html.citl-page-booting #global-loader>.relative{transform:none!important}
+#global-loader>.relative{transform:none!important;transition:none!important}
 #global-loader.citl-unified-loader img{width:auto;height:150px;max-width:100%;object-fit:contain}
 #global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:0}
 #global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:0}
 #global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
 @media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px}#global-loader.citl-unified-loader img{height:96px}#global-loader.citl-unified-loader h3{font-size:18px}#global-loader.citl-unified-loader p{font-size:12px}}
+#global-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px}
+.citl-loader-dots{display:inline-flex;direction:ltr;width:1.15em;flex:none;justify-content:space-between}
+.citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}
+.citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
+@keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}}
 </style>
 <script>
 (function(w,d){
  var html=d.documentElement,done=false,ready=false;html.classList.add('citl-page-booting');
- var box=d.createElement('div');box.id='global-loader';box.className='citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0';box.setAttribute('role','status');box.setAttribute('aria-live','polite');
- box.innerHTML='<div class="relative"><img src="/CITL.png" alt="CITL" fetchpriority="high"><h3>جاري تهيئة النظام</h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p><button type="button" data-boot-retry hidden>استغرق التحميل وقتًا أطول — إعادة المحاولة</button></div>';
+ var box=d.createElement('div');box.id='global-loader';box.className='citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] opacity-0';box.setAttribute('role','status');box.setAttribute('aria-live','polite');
+ box.innerHTML='<div class="relative"><img src="/CITL.png" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p><button type="button" data-boot-retry hidden>استغرق التحميل وقتًا أطول — إعادة المحاولة</button></div>';
  html.appendChild(box);box.querySelector('button').onclick=function(){location.reload();};
  var timer=setTimeout(function(){if(!done)box.querySelector('button').hidden=false;},25000);
  function release(){if(done)return;done=true;clearTimeout(timer);observer.disconnect();box.querySelector('button').hidden=true;box.classList.add('hidden','opacity-0');box.classList.remove('flex');html.classList.remove('citl-page-booting');}
- function check(){if(ready&&!d.querySelector('link[data-citl-boot-style][media=print]')&&!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking'))release();}
+ var releasing=false;function check(){if(ready&&!done&&!releasing&&!d.querySelector('link[data-citl-boot-style][media=print]')&&!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking')){releasing=true;requestAnimationFrame(function(){requestAnimationFrame(function(){releasing=false;if(!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking'))release();});});}}
  d.addEventListener('load',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);d.addEventListener('error',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);
  var observer=new MutationObserver(check);observer.observe(html,{attributes:true,attributeFilter:['class']});
- w.CITLPageBoot=Object.freeze({finish:function(){ready=true;check();},failure:release});
+ function show(text){if(!done)return;box.classList.remove('hidden','opacity-0');box.classList.add('flex');if(text)d.getElementById('loader-text').textContent=text;}
+ function hide(){if(!done)return;box.classList.add('hidden','opacity-0');box.classList.remove('flex');}
+ d.addEventListener('keydown',function(e){if(!done&&e.key==='Tab'){e.preventDefault();if(!box.querySelector('button').hidden)box.querySelector('button').focus();}},true);
+ w.CITLPageBoot=Object.freeze({finish:function(){ready=true;check();},failure:release,show:show,hide:hide,isStarting:function(){return !done;}});
  d.addEventListener('DOMContentLoaded',function(){d.body.prepend(box);},{once:true});
 })(window,document);
 </script>
@@ -551,6 +560,7 @@ body {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261016-r6.9.1.3" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 </head>
  <body class="bg-gray-50">
 <script>document.body.prepend(document.getElementById("global-loader"));</script>
@@ -568,7 +578,7 @@ body {
 <script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
 <script src="/assets/service-availability.js?v=20261015-r6.9.1.2"></script>
   <div class="min-h-full"><!-- Header -->
-<header class="metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
+<header class="citl-main-header metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
         <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
 
     <div class="absolute top-[15px] left-[-30px] w-[110px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1 shadow-md border-b-2 border-[#2A3475] tracking-wider">
@@ -632,41 +642,7 @@ body {
             </div>
         </div>
 
-        <div class="lg:hidden flex flex-row items-center justify-between w-full gap-1">
-            
-            <div class="flex items-center gap-1.5 flex-1 min-w-0">
-                <div class="relative shrink-0" id="notif-btn-wrapper">
-                    <div class="bg-white p-1 rounded-lg shadow-md relative h-11 w-11 flex items-center justify-center border border-white/20">
-                        <img src="/CITL.png" alt="Logo" class="h-8 w-auto object-contain cursor-pointer" onclick="toggleMobileMenu()">
-                        <div onclick="toggleMobileMenu()" class="absolute -bottom-1 -right-1 bg-[#2A3475] text-[#F3A628] w-5 h-5 rounded-full flex items-center justify-center text-[8px] border border-white shadow-sm cursor-pointer">
-                            <i class="fas fa-bars"></i>
-                        </div>
-                        <div onclick="event.stopPropagation(); toggleNotifications();" class="absolute -top-1.5 -left-1.5 bg-[#F3A628] text-[#2A3475] w-5 h-5 rounded-full flex items-center justify-center text-[10px] border border-white shadow-md cursor-pointer active:scale-110 transition-transform">
-                            <i class="fas fa-bell"></i>
-                            <span id="notif-badge-mob" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[7px] font-black border border-white hidden">0</span>
-                        </div>
-                    </div>
-                </div>
-
-<div class="flex flex-col text-right leading-tight overflow-hidden flex-1 min-w-0">
-    <h1 class="text-white font-black text-[clamp(10.5px,3.5vw,13.5px)] whitespace-nowrap drop-shadow-sm">
-        كلية النقل الدولي واللوجستيات
-    </h1>
-<h2 class="text-[#F3A628] text-[clamp(7.25px,2.05vw,8.75px)] font-bold uppercase opacity-90 leading-none mt-0.5 whitespace-nowrap">
-    College of International Transport & Logistics
-</h2>
-    <p class="text-[clamp(8px,2.3vw,9.2px)] text-blue-100/70 font-bold leading-none mt-0.5 whitespace-nowrap">
-        التحكم وإدارة القاعات الدراسية - CITL Smart System
-    </p>
-</div>
-
-<div id="mob-profile-capsule" onclick="toggleProfileInfoMenu()" class="flex flex-col justify-center text-left leading-tight bg-black/20 px-2.5 h-11 rounded-xl border border-white/10 backdrop-blur-md shadow-inner w-[clamp(82px,23.5vw,95px)] overflow-hidden shrink-0 cursor-pointer active:bg-black/40 transition-all ml-1">
-    <span id="profile-name-mob" class="text-[10.5px] font-bold text-white truncate block w-full">...</span>
-    <span id="profile-role-mob" class="text-[8.5px] text-[#F3A628] font-bold opacity-100 uppercase truncate block w-full">...</span>
-</div>
-
-	        </div>
-	    </div>
+        <div class="citl-mobile-header lg:hidden"><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div><div class="citl-mobile-toolbar"><div class="citl-mobile-controls"><button type="button" class="citl-mobile-menu-button" onclick="toggleMobileMenu()" aria-label="فتح القائمة الرئيسية" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i><span>القائمة</span></button><span id="notif-btn-wrapper"><button type="button" class="citl-mobile-bell" onclick="event.stopPropagation(); window.CITLMobileShell.notifications()" aria-label="الإشعارات" aria-expanded="false" aria-controls="notif-menu"><i class="fas fa-bell" aria-hidden="true"></i><span id="notif-badge-mob" class="hidden">0</span></button></span></div><button type="button" id="mob-profile-capsule" class="citl-mobile-profile" onclick="toggleProfileInfoMenu()" aria-label="بيانات الحساب"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><span class="citl-mobile-profile-copy"><span id="profile-name-mob"></span><span id="profile-role-mob"></span></span></button></div></div>
 	</div>
 </header><!-- Main Content -->
 <main class="w-full max-w-[96%] mx-auto px-4 py-6">
@@ -835,8 +811,8 @@ body {
 </div>
 
 </main>
-<footer class="metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50">
-    <div class="w-full max-w-[98%] mx-auto px-6 py-2 md:py-3">
+<footer class="citl-main-footer metallic-blue-fill random-slanted-lines border-t-4 border-[#F3A628] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] relative z-50">
+    <div data-citl-footer-desktop class="w-full max-w-[98%] mx-auto px-6 py-2 md:py-3">
         <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
 
             <div class="hidden md:flex items-center gap-4">
@@ -870,7 +846,7 @@ body {
             </div>
         </div>
     </div>
-</footer>
+<div class="citl-mobile-footer"><div class="citl-mobile-footer-info"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><p class="citl-mobile-english">College of International Transport &amp; Logistics</p><p>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</p><p>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</p></div></div><div class="citl-mobile-social"><a href="https://www.facebook.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/in/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-linkedin-in"></i></a><a href="https://www.instagram.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-instagram"></i></a><a href="https://x.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[10px] md:text-[13px]"><i class="fab fa-twitter"></i></a><a href="https://www.youtube.com/@CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-youtube"></i></a><a href="https://www.aast.edu/en/colleges/citl/alex" target="_blank" class="text-[#F3A628] hover:scale-125 transition-all text-[12px] md:text-sm"><i class="fas fa-globe"></i></a></div></div></footer>
 
 
 <div id="add-meeting-modal" class="modal">
@@ -1182,64 +1158,26 @@ body {
 </div>
 
 
-<div id="mobile-menu" class="hidden fixed inset-0 z-[10002] lg:hidden">
-    <div class="absolute inset-0 bg-[#2A3475]/60 backdrop-blur-sm transition-opacity" onclick="toggleMobileMenu()"></div>
-    
-<div id="mobile-menu-content" class="absolute right-0 top-0 bottom-0 w-60 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
-    
-    <div class="metallic-blue-fill p-5 relative overflow-hidden shrink-0 border-b-2 border-[#F3A628]">
-        <div class="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-10 -mt-10"></div>
-        <div class="flex flex-col items-center text-center gap-3 relative z-10">
-            <img src="/CITL.png" class="h-14 w-auto bg-white p-1 rounded-lg shadow-sm" alt="Logo">
-            <div class="flex flex-col gap-1">
-                <h1 class="text-white font-black text-[12px] leading-tight drop-shadow-md">كلية النقل الدولي واللوجستيات</h1>
-                <h2 class="text-[#F3A628] text-[8px] font-bold uppercase opacity-90">College of International Transport & Logistics</h2>
-                <p class="text-[9px] text-blue-100/90 font-bold leading-tight">التحكم وإدارة القاعات الدراسية - CITL Smart System</p>
-            </div>
-        </div>
-    </div>
-
-        <div class="flex-1 py-5 px-4 space-y-3 overflow-y-auto custom-scrollbar">
-            <button onclick="openAddMeetingModal(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl bg-orange-50 text-[#d48a1b] font-bold text-sm border border-orange-100 transform active:scale-95 transition-all">
+<div id="mobile-menu" class="citl-mobile-overlay hidden" hidden><div class="citl-drawer-backdrop" data-mobile-close></div><section id="mobile-menu-content" class="citl-drawer" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية" tabindex="-1"><div class="citl-drawer-head"><div class="citl-drawer-heading"><strong>القائمة الرئيسية</strong><button type="button" data-mobile-close aria-label="إغلاق القائمة">×</button></div><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div></div><div class="citl-drawer-body"><div class="citl-drawer-account"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><div><strong data-mobile-account></strong><small data-mobile-position></small></div></div><p class="citl-drawer-label">صفحات النظام</p><nav class="citl-drawer-primary"><a href="/dashboard/"><i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span></a><a href="/smrm/" aria-current="page"><i class="fas fa-building" aria-hidden="true"></i><span>القاعات الدراسية</span></a><a href="/schedules/"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>الجداول الدراسية</span></a><a href="/courses/"><i class="fas fa-book-open" aria-hidden="true"></i><span>المقررات الدراسية</span></a></nav><hr><p class="citl-drawer-label">الحساب والإدارة</p><nav class="citl-drawer-actions"><a data-citl-mobile-personal data-cm-personal hidden href="/dashboard/#dashboard-home"><i class="fas fa-user-graduate" aria-hidden="true"></i><span>جداولي الدراسية</span></a><button onclick="toggleMobileMenu(); openAddMeetingModal();" class="w-full flex items-center justify-between p-4 rounded-xl bg-orange-50 text-[#d48a1b] font-bold text-sm border border-orange-100 transform active:scale-95 transition-all">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-plus-circle text-lg"></i>
                     <span>حجز قاعة اجتماعات</span>
                 </div>
                 <i class="fas fa-chevron-left text-[10px] opacity-50"></i>
-            </button>
-            
-            <a href="/schedules/" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-chalkboard text-lg text-[#2A3475]"></i>
-                    <span>القاعات الدراسية</span>
-                </div>
-            </a>
-
-            <button onclick="openDashboard(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
+            </button><button onclick="toggleMobileMenu(); openDashboard();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-chart-pie text-lg text-[#2A3475]"></i>
                     <span>إحصائيات النظام</span>
                 </div>
-            </button>
-
-            <button onclick="openAdminPanel(); toggleMobileMenu();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
+            </button><button onclick="toggleMobileMenu(); openAdminPanel();" class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-cogs text-lg text-[#2A3475]"></i>
                     <span>لوحة التحكم</span>
                 </div>
-            </button>
-
-            <div class="border-t border-gray-100 my-4"></div>
-            
-            <button onclick="logout();" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
+            </button><button type="button" onclick="toggleMobileMenu(); window.CITLMobileShell.profile()"><i class="fas fa-user" aria-hidden="true"></i><span>الملف الشخصي</span></button></nav></div><div class="citl-drawer-bottom"><button onclick="logout();" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
                 <i class="fas fa-sign-out-alt text-lg"></i>
                 <span>تسجيل الخروج</span>
-            </button>
-        </div>
-
-<div class="p-4 bg-gray-50 border-t border-gray-100"></div>
-    </div>
-</div>
+            </button><small>CITL Smart System</small></div></section></div>
 
 <div id="profile-info-menu" class="hidden fixed w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300">
     <div class="metallic-blue-fill p-4 border-b border-[#F3A628] relative overflow-hidden">
@@ -1272,7 +1210,7 @@ body {
 <script src="/assets/member-bookings.js?v=20261015-r6.8.20"></script>
 <script src="/assets/term-admin-panel.js?v=20261015-r6.9.1"></script>
 <script src="/assets/tv-admin-ui.js?v=20260921-r6.5"></script>
-<script src="/assets/weekly-booking.js?v=20261012-r6.8.8"></script><script src="/assets/pages/smrm-1.js?v=20261015-r6.9.1.2"></script>
+<script src="/assets/weekly-booking.js?v=20261012-r6.8.8"></script><script src="/assets/pages/smrm-1.js?v=20261016-r6.9.1.3"></script>
 <script src="/assets/academic-booking.js?v=20261015-r6.9.1.2"></script>
 <script src="/assets/admin-panel.js?v=20261015-r6.9.1"></script>
 <script src="/assets/tv-display-dates.js?v=20260923-r6.6"></script><script src="/assets/tv-room-catalog.js?v=20260921-r6.5"></script><script src="/assets/video-layout.js?v=20260921-r6.5"></script><script src="/assets/tv-video-converter.js?v=20260921-r6.5.1"></script>
@@ -1293,5 +1231,6 @@ body {
 <script src="/assets/faculty-registration-census.js?v=20261014-r6.8.17"></script>
 <script src="/assets/meeting-ui.js?v=20261015-r6.9.1.2"></script>
 <script src="/assets/service-admin.js?v=20261015-r6.9.1"></script>
+<script src="/assets/mobile-shell.js?v=20261016-r6.9.1.3"></script>
 </body>
 </html>

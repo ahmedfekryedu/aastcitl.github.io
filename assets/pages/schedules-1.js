@@ -43,45 +43,8 @@
     let loaderStartTime = 0;
 
 // --- دوال التحكم في شاشة التحميل (نسخة index المتطورة) ---
-window.showLoader = function(text = "يرجى الانتظار لحظات...") {
-    const loader = document.getElementById('global-loader');
-    const textEl = document.getElementById('loader-text');
-    
-    if(textEl) textEl.textContent = text;
-
-    if(loader) {
-        loader.classList.remove('hidden');
-        loader.classList.add('flex');
-        
-        // تفعيل أنيميشن الـ Zoom In
-        setTimeout(() => {
-            loader.classList.remove('opacity-0');
-            const inner = loader.querySelector('.relative');
-            if(inner) {
-                inner.classList.remove('scale-95');
-                inner.classList.add('scale-100');
-            }
-        }, 10);
-    }
-};
-
-window.hideLoader = function() {
-    const loader = document.getElementById('global-loader');
-    if(loader) {
-        loader.classList.add('opacity-0');
-        const inner = loader.querySelector('.relative');
-        if(inner) {
-            inner.classList.remove('scale-100');
-            inner.classList.add('scale-95');
-        }
-        
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-        }, 300);
-    }
-};
-    // دالة مساعدة
+window.showLoader = function(text) { window.CITLPageBoot.show(text); };
+window.hideLoader = function() { window.CITLPageBoot.hide(); };    // دالة مساعدة
     window.showLoading = function(show) {
         if (show) { window.showLoader('جاري البحث...'); } 
         else { window.hideLoader(); }
@@ -118,7 +81,7 @@ window.hideLoader = function() {
 document.addEventListener('DOMContentLoaded', async () => {
     
     if (typeof window.showLoader === 'function') {
-        window.showLoader('جاري تهيئة النظام...');
+        // First-paint loader remains visible until initialization finishes.
     }
 
     try {
@@ -5198,17 +5161,7 @@ function applyAdminVisibility(user) {
 }
 
 // دالة فتح/إغلاق القائمة الجانبية بنمط smrm
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    const content = document.getElementById('mobile-menu-content');
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        setTimeout(() => content.classList.remove('translate-x-full'), 10);
-    } else {
-        content.classList.add('translate-x-full');
-        setTimeout(() => menu.classList.add('hidden'), 300);
-    }
-}
+function toggleMobileMenu() { window.CITLMobileShell?.toggle(); }
 
 // 1. دالة تحديث البيانات (لضمان ظهور الإنجليزية والوظيفة)
 // التعديل النهائي لظهور (الجهة - المسمى الوظيفي) في الخارج والداخل

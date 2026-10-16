@@ -1,0 +1,94 @@
+/* Shared mobile chrome. Desktop and requested desktop mode retain existing styles. */
+.citl-mobile-header,.citl-mobile-footer{display:none}
+.citl-mobile-overlay[hidden],.citl-mobile-overlay.hidden{display:none!important}
+@media(max-width:1023px){
+ html:not(.citl-desktop-request) .citl-mobile-header{display:block;width:100%;font-family:Cairo,sans-serif}
+ html:not(.citl-desktop-request) .citl-main-header{background:linear-gradient(to bottom,#2a3475,#1e255a);border-bottom:3px solid #f3a628}
+ html:not(.citl-desktop-request) .citl-main-header:before,html:not(.citl-desktop-request) .citl-main-footer:before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-30deg,transparent,transparent 10px,#ffffff0d 10px,#ffffff0d 11px)}
+ html:not(.citl-desktop-request) .citl-main-header>div:not(.absolute){width:100%;max-width:none;padding:12px 14px 10px;position:relative}
+ .citl-mobile-brand{display:flex;align-items:center;gap:10px;min-width:0;text-align:right}
+ .citl-mobile-logo{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:9px;flex:none;width:52px;height:52px;overflow:hidden;padding:0}
+ .citl-mobile-logo img{width:100%;height:100%;object-fit:contain;transform:scale(1.16);max-width:none}
+ .citl-mobile-brand>div{min-width:0}
+ .citl-mobile-brand h1{font:900 14px/1.6 Cairo,sans-serif;color:white;margin:0;white-space:nowrap}
+ .citl-mobile-brand h2{font:700 7.7px/1.8 Cairo,sans-serif;color:#f3a628;text-transform:uppercase;margin:0;white-space:nowrap}
+ .citl-mobile-brand p{font:700 9px/1.7 Cairo,sans-serif;color:#dbeafe;margin:0}
+ .citl-mobile-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:9px;border-top:1px solid #ffffff20}
+ .citl-mobile-controls{display:flex;align-items:stretch;flex:none;border:1px solid #f3a628;background:#f3a628;border-radius:10px;color:#1e255a;position:relative}
+ .citl-mobile-menu-button,.citl-mobile-bell{height:40px;display:flex;align-items:center;justify-content:center;gap:7px;background:none;border:0;color:inherit;font:900 11px Cairo,sans-serif;cursor:pointer}
+ .citl-mobile-menu-button{padding:0 10px;border-radius:0 9px 9px 0}.citl-mobile-menu-button i{font-size:16px}
+ .citl-mobile-controls #notif-btn-wrapper{position:relative;display:block}
+ .citl-mobile-bell{width:36px;background:#ffffff30;border-right:1px solid #25316e30;border-radius:9px 0 0 9px;font-size:15px;position:relative}
+ .citl-mobile-bell #notif-badge-mob{position:absolute;top:1px;right:1px;width:15px;height:15px;border-radius:50%;border:2px solid #f6bb58;background:#c94549;color:white;font:800 8px/11px Cairo,sans-serif;text-align:center}
+ .citl-mobile-profile{min-width:0;display:flex;gap:7px;align-items:center;justify-content:flex-end;margin:0;padding:0;background:none;border:0;color:white;flex:1;text-align:right;cursor:pointer}
+ .citl-mobile-avatar{width:33px;height:33px;display:grid;place-items:center;border:1px solid #ffffff30;background:#ffffff0d;border-radius:50%;flex:none;font-size:15px}
+ .citl-mobile-profile-copy{display:flex;flex-direction:column;min-width:0;max-width:100%;line-height:1.65}
+ #mob-profile-capsule #profile-name-mob{display:block;font:800 10.5px/1.65 Cairo,sans-serif;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ #mob-profile-capsule #profile-role-mob{display:block;font:700 8px/1.7 Cairo,sans-serif;color:#f3a628;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ .citl-mobile-controls #mobileEditBtn{display:none!important} /* same permission-controlled action is retained in the drawer */
+ html:not(.citl-desktop-request) .citl-main-footer{background:linear-gradient(to bottom,#2a3475,#1e255a);border-top:3px solid #f3a628}
+ html:not(.citl-desktop-request) .citl-main-footer>[data-citl-footer-desktop]{display:none}
+ html:not(.citl-desktop-request) .citl-mobile-footer{display:block;position:relative;padding:6px 10px 4px;color:#dbeafe;font-family:Cairo,sans-serif;text-align:center}
+ .citl-mobile-footer-info{display:flex;align-items:center;justify-content:center;gap:7px}
+ .citl-mobile-footer-info .citl-mobile-logo{width:30px;height:30px;border-radius:6px}
+ .citl-mobile-footer-info p{margin:0;font:500 8px/1.6 Cairo,sans-serif}
+ .citl-mobile-footer-info .citl-mobile-english{font:700 6.5px/1.4 Cairo,sans-serif;color:#f3a628;text-transform:uppercase}
+ .citl-mobile-social{display:flex;align-items:center;justify-content:center;direction:ltr;gap:4px;width:max-content;margin:4px auto 0;padding:0 7px;border:1px solid #ffffff18;border-radius:24px;background:#0002}
+ .citl-mobile-social a{display:grid;place-items:center;width:24px;height:20px;font-size:11px;color:white}.citl-mobile-social a:last-child{color:#f3a628;border-left:1px solid #ffffff20}
+ .citl-mobile-header button:focus-visible,.citl-drawer button:focus-visible,.citl-drawer a:focus-visible{outline:3px solid #f3a628;outline-offset:3px}
+ .citl-mobile-overlay{position:fixed;inset:0;z-index:10002;direction:rtl;font-family:Cairo,sans-serif}
+ .citl-drawer-backdrop{position:absolute;inset:0;background:#10193660;backdrop-filter:blur(3px)}
+ #mobile-menu-content.citl-drawer,#cm-mobile-content.citl-drawer{position:absolute;inset:0 0 0 auto;width:min(304px,calc(100vw - 44px));max-width:none;background:#fff;box-shadow:-10px 0 40px #10193630;display:flex;flex-direction:column;transform:none;animation:none;transition:none;color:#2a3475}
+ .citl-drawer-head{padding:14px;border-bottom:3px solid #f3a628;background:repeating-linear-gradient(-30deg,transparent,transparent 10px,#ffffff0d 10px,#ffffff0d 11px),linear-gradient(#2a3475,#1e255a);color:#fff;flex:none}
+ .citl-drawer-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:14px;font-weight:900}
+ .citl-drawer-heading button{display:grid;place-items:center;width:32px;height:32px;background:#ffffff12;border:1px solid #ffffff26;border-radius:8px;color:#fff;font-size:22px;line-height:1;cursor:pointer}
+ .citl-drawer .citl-mobile-brand{gap:8px}.citl-drawer .citl-mobile-logo{width:40px;height:40px}.citl-drawer .citl-mobile-brand h1{font-size:11px}.citl-drawer .citl-mobile-brand h2{font-size:5.7px}
+ .citl-drawer-body{padding:14px;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+ .citl-drawer-account{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #e3e7f1;border-radius:11px;background:#f8f9fc;margin-bottom:16px}
+ .citl-drawer-account .citl-mobile-avatar{background:#2a3475;color:white;width:36px;height:36px}.citl-drawer-account strong{font-size:12px;display:block}.citl-drawer-account small{display:block;font-size:10px;color:#7c899f}
+ .citl-drawer .citl-drawer-label{font:700 10px Cairo,sans-serif;color:#929cb0;margin:10px 10px 5px}
+ #mobile-menu-content.citl-drawer nav,#cm-mobile-content.citl-drawer nav{display:block;padding:0;overflow:visible;flex:none}
+ .citl-drawer nav>a,.citl-drawer nav>button{width:100%;display:flex;align-items:center;justify-content:flex-start;gap:11px;margin:3px 0;padding:10px 11px;border:1px solid transparent;border-radius:9px;min-height:42px;background:transparent;color:#2a3475;font:800 12px Cairo,sans-serif;text-align:right;box-shadow:none;white-space:normal}
+ #mobile-menu-content.citl-drawer nav>a,#mobile-menu-content.citl-drawer nav>button,#cm-mobile-content.citl-drawer nav>a,#cm-mobile-content.citl-drawer nav>button{padding:10px 11px;font-size:12px}
+ .citl-drawer nav [hidden],.citl-drawer nav>.hidden{display:none!important}
+ .citl-drawer nav i{color:#7f8ca7;font-size:16px;width:19px;text-align:center}.citl-drawer nav>button>i.fa-chevron-left{margin-right:auto;font-size:9px}
+ .citl-drawer nav a[aria-current=page]{background:#fff6e4;border-color:#f5d39a;box-shadow:inset -3px 0 #f3a628}.citl-drawer nav a[aria-current=page] i{color:#d68e18}
+ .citl-drawer hr{border:0;border-top:1px solid #edf0f5;margin:12px 0}
+ .citl-drawer-bottom{padding:12px 14px;border-top:1px solid #e9edf5;flex:none}.citl-drawer-bottom button{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;background:#fff9f9;color:#a44b54;border:1px solid #eadde0;border-radius:9px;padding:8px;font:800 11px Cairo,sans-serif;min-height:38px}.citl-drawer-bottom small{font:500 9px Cairo,sans-serif;color:#8d98ad;text-align:center;display:block;margin-top:8px}
+ html:not(.citl-desktop-request) #notif-menu{max-width:calc(100vw - 20px);overflow-y:auto;transition:none}
+ html:not(.citl-desktop-request) #profile-info-menu{max-width:calc(100vw - 20px)}
+}
+@media(max-width:1023px){
+ html:not(.citl-desktop-request) :is(#schedule-entry-modal,#schedule-action-modal,#my-schedule-modal,#schedule-reports-modal,#schedule-presence-modal,#admin-edit-modal)>div.relative{width:calc(100% - 20px);max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;animation:none}
+ html:not(.citl-desktop-request) :is(#schedule-entry-modal,#schedule-action-modal,#admin-edit-modal)>div.relative>div:first-child{padding:12px 14px;position:sticky;top:0;z-index:2}
+ html:not(.citl-desktop-request) :is(#schedule-entry-modal,#schedule-action-modal,#admin-edit-modal)>div.relative>div:nth-child(2){padding:14px}
+ html:not(.citl-desktop-request) :is(#schedule-entry-modal,#schedule-action-modal,#admin-edit-modal) h3{font-size:14px}
+ html:not(.citl-desktop-request) :is(#schedule-entry-modal,#schedule-action-modal,#admin-edit-modal)>div.relative>div:first-child>button{width:32px;height:32px;flex:none}
+ html:not(.citl-desktop-request) #citl-academic-room-booking{width:calc(100vw - 20px);max-width:calc(100vw - 20px);max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto}
+ html:not(.citl-desktop-request) #citl-academic-room-booking .citl-ac-body{padding:14px}
+ html:not(.citl-desktop-request) :is(#add-meeting-modal,#meeting-details-modal)>.modal-content{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);width:calc(100% - 20px)!important}
+ html:not(.citl-desktop-request) #admin-panel-modal>.modal-content{width:calc(100% - 20px)!important;height:calc(100vh - 24px);height:calc(100dvh - 24px);max-height:calc(100dvh - 24px)}
+ html:not(.citl-desktop-request) #admin-panel-modal nav{scrollbar-width:thin;overscroll-behavior-x:contain}
+ html:not(.citl-desktop-request) #admin-panel-modal nav .admin-tab{flex-shrink:0;min-width:max-content}
+}
+@media(max-width:640px){
+ /* Auto rows share a height; no fact, footer or action is removed or clipped. */
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-grid{grid-auto-rows:1fr;gap:7px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-card{display:flex;flex-direction:column;padding:7px 10px;border-radius:12px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-head{margin-bottom:4px;min-height:24px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-head h3{font-size:11px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-head .dh-metric-value{font-size:21px;line-height:1.15}
+ html:not(.citl-desktop-request) #dashboard-home .dh-facts{padding:4px 2px;gap:3px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-facts .dh-metric-label{font-size:9px;line-height:1.5;min-height:14px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-facts .dh-metric-value{font-size:16px;line-height:1.35}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-foot{margin-top:auto;padding-top:4px;min-height:25px;font-size:9px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-summary-foot .dh-button{min-height:24px;padding:2px 7px}
+ html:not(.citl-desktop-request) #dashboard-home .dh-heading{margin-bottom:6px}
+}
+@media(max-width:350px){
+ .citl-mobile-brand{gap:7px}.citl-mobile-brand h1{font-size:12px}.citl-mobile-brand h2{font-size:6.5px}.citl-mobile-logo{width:45px;height:45px}
+ .citl-mobile-toolbar{gap:6px}.citl-mobile-menu-button{font-size:10px;padding:0 7px}.citl-mobile-bell{width:32px}
+ .citl-mobile-profile{gap:5px}.citl-mobile-avatar{width:28px;height:28px}
+ #mob-profile-capsule #profile-name-mob{font-size:9px}#mob-profile-capsule #profile-role-mob{font-size:7px}
+ .citl-mobile-footer-info{gap:4px}.citl-mobile-footer-info p{font-size:7.5px}
+}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta name="citl-release" content="20261018-r6.9.1.5">
+<meta name="citl-release" content="20261018-r6.9.1.6">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
@@ -153,17 +153,20 @@
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10">
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.2">
 <script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
-<script src="/assets/service-availability.js?v=20261018-r6.9.1.5"></script>
+<script src="/assets/service-availability.js?v=20261018-r6.9.1.6"></script>
 <style id="citl-login-loader-style">
-@font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-display:swap}
+@font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-style:normal;font-weight:200 1000;font-display:block}
 html.citl-page-booting{background:#dce2ed;overflow:hidden!important}
 html.citl-page-booting::before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#dce2ed,#c6cede);z-index:-1}
 html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:none!important;user-select:none}
 #global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
-#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;width:100%;height:100%;margin:0!important;padding:16px;box-sizing:border-box;transform:none!important;align-items:center;justify-content:center;direction:rtl;font-family:CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:rgba(21,28,64,.22)!important}
 #global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:400px;max-width:94vw;display:flex;flex-direction:column;align-items:center;gap:0}
-#global-loader>.relative{transform:none!important;transition:none!important}
+#global-loader>.relative{transform:none!important;animation:none!important;transition:none!important;margin:0!important;flex-shrink:0}
+#global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
+@media(min-width:1024px){html{scrollbar-gutter:stable}}
+html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-ready) #global-loader p{visibility:hidden}
 #global-loader.citl-unified-loader img{width:auto;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
 #global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
 #global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
@@ -526,6 +529,7 @@ async function autoRedirect() {
 // تشغيل الفحص
 autoRedirect();
 
+        if(document.fonts)document.fonts.load('900 24px CITLBootCairo','جاري تهيئة النظام').then(()=>document.documentElement.classList.add('citl-loader-font-ready'),()=>document.documentElement.classList.add('citl-loader-font-ready'));
         // الربط العام
         window.supabase = sb;
 

@@ -19,9 +19,10 @@
  function canReview(){return P.full(root.currentUser)||P.can(root.currentUser,'can_approve')||P.can(root.currentUser,'can_delete');}
  let opening=false;
  async function open(id,management=true){if(opening)return;opening=true;try{
-  const {data,error}=await root.sb.from('meetings').select('*, profiles!user_id(full_name,email), rooms!room_id(name)').eq('id',id).maybeSingle();if(error)throw error;if(!data)throw Error('الحجز غير موجود أو غير متاح لحسابك');
+  const {data:privateData,error}=await root.sb.from('meetings').select('*, profiles!user_id(full_name,email), rooms!room_id(name)').eq('id',id).maybeSingle();
+  let data=privateData;if(!data){try{data=await root.CITLRequests.rpc(root.sb,'citl_visible_meeting',{p_id:String(id)});}catch(e){throw error||e;}}if(!data)throw Error('الحجز غير موجود أو غير متاح لحسابك');
   document.getElementById('notif-menu')?.classList.add('hidden');
-  if(management){root.openAdminPanel(canReview()?'meetings':'my-bookings');if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}
+  if(management&&(canReview()||data.user_id===root.currentUser?.id)){root.openAdminPanel(canReview()?'meetings':'my-bookings');if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}
   root.showMeetingDetails(normalize(data));
  }catch(error){root.showNotification?.('تعذر فتح تفاصيل الحجز: '+error.message,'error');}finally{opening=false;}}
  function addDetailsButton(row,m){if(row.querySelector('[data-meeting-action=viewMeetingFromAdmin]'))return;const cell=row.lastElementChild;if(!cell)return;const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.dataset.meetingAction='viewMeetingFromAdmin';b.textContent='التفاصيل';cell.prepend(b);}
@@ -38,14 +39,22 @@
  function upcoming(force=false){if(root.CITLRoomAvailability?.isFree()){root.CITLRoomAvailability.assistant();return;}const owner=root.currentUser?.id;if(!owner)return;const host=document.getElementById('ai-suggestions');if(!host)return;
   if(upcomingOwner!==owner){upcomingRows=null;lastLoad=0;visibleUpcoming=6;upcomingOwner=owner;}if(upcomingRows)renderUpcoming();if(loading||(!force&&Date.now()-lastLoad<15000))return loading;
   if(!upcomingRows)host.innerHTML=root.CITLLoading?.summary(2)||'';
-  loading=(async()=>{try{const now=cairo();const {data,error}=await root.sb.from('meetings').select('id,title,department,date,start_time,end_time,status,booking_type,booking_reason,room_id,rooms!room_id(name)').gte('date',now.date).in('status',['confirmed','modification_requested','cancellation_requested','pending']).order('date').order('start_time').limit(100);if(error)throw error;if(root.currentUser?.id!==owner)return;upcomingRows=(data||[]).filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status));lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
+  loading=(async()=>{try{const now=cairo(),end=new Date(now.date+'T12:00:00Z');end.setUTCDate(end.getUTCDate()+369);
+ const [privateResult,publicResult]=await Promise.allSettled([
+ root.sb.from('meetings').select('id,title,department,date,start_time,end_time,status,booking_type,booking_reason,course_name,room_id,rooms!room_id(name)').gte('date',now.date).in('status',['confirmed','modification_requested','cancellation_requested','pending']).order('date').order('start_time').limit(100),
+ root.CITLRequests.rpc(root.sb,'citl_visible_meetings',{p_from:now.date,p_to:end.toISOString().slice(0,10),p_room:null})]);
+ const privateData=privateResult.status==='fulfilled'&&!privateResult.value.error?privateResult.value.data||[]:[];
+ const publicData=publicResult.status==='fulfilled'&&Array.isArray(publicResult.value)?publicResult.value:[];
+ if((privateResult.status==='rejected'||privateResult.value.error)&&publicResult.status==='rejected')throw (privateResult.reason||privateResult.value.error);
+ if(root.currentUser?.id!==owner)return;
+ upcomingRows=[...new Map([...publicData,...privateData].filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status)&&(m.booking_type!=='lecture'||!m.course_name)).map(m=>[String(m.id),{...m,rooms:m.rooms||{name:m.room_name}}])).values()];lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
  }
  function weekPicker(){document.querySelector('.citl-meeting-date-picker')?.remove();const wrapper=document.getElementById('week-dropdown-wrapper');if(wrapper)wrapper.style.removeProperty('display');}
  let locating=false;
  async function locate(id){if(locating)return;locating=true;try{
-  const {data:m,error}=await root.sb.from('meetings').select('id,room_id,date,status,booking_type').eq('id',id).maybeSingle();if(error)throw error;if(!m)throw Error('الحجز غير متاح');
+  const {data:privateMeeting,error}=await root.sb.from('meetings').select('id,room_id,date,status,booking_type').eq('id',id).maybeSingle();let m=privateMeeting;if(!m){try{m=await root.CITLRequests.rpc(root.sb,'citl_visible_meeting',{p_id:String(id)});}catch(e){throw error||e;}}if(!m)throw Error('الحجز غير متاح');
   if(root.CITLRoomAvailability?.isFree())document.querySelector('[data-mode=bookings]')?.click();
-  await root.selectRoom(m.room_id);root.jumpToWeek(m.date+'T12:00:00');
+  await root.selectRoom(m.room_id);await root.jumpToWeek(m.date+'T12:00:00');
   const block=[...document.querySelectorAll('#calendar-container [data-booking-id]')].find(b=>b.dataset.bookingId===String(m.id));
   if(block){block.scrollIntoView({behavior:'smooth',block:'center',inline:'center'});block.classList.add('citl-booking-highlight');setTimeout(()=>block.classList.remove('citl-booking-highlight'),2500);}
   else {document.getElementById('calendar-container')?.scrollIntoView({behavior:'smooth',block:'start'});root.showNotification?.(m.status==='pending'?'الحجز بانتظار الاعتماد؛ لن يشغل القاعة قبل الموافقة.':'تم فتح أسبوع الحجز؛ حدّث البيانات إذا لم يظهر.','info');}

@@ -293,11 +293,15 @@ if (requestedRoom) {
     query = query.eq('room_id', requestedRoom);
 }
 
-const { data, error } = await query;
+const weekEndDate=new Date(currentWeekStart);weekEndDate.setDate(weekEndDate.getDate()+6);
+const [privateResult,publicResult]=await Promise.allSettled([query,window.CITLRequests.rpc(window.sb,'citl_visible_meetings',{p_from:window.CITLAcademicBooking.dateKey(currentWeekStart),p_to:window.CITLAcademicBooking.dateKey(weekEndDate),p_room:requestedRoom||null})]);
+const {data:privateRows,error}=privateResult.status==='fulfilled'?privateResult.value:{data:[],error:privateResult.reason};
+const publicRows=publicResult.status==='fulfilled'?publicResult.value:[];
+const data=[...new Map([...(Array.isArray(publicRows)?publicRows:[]),...(privateRows||[])].map(m=>[String(m.id),m])).values()];
  
                 
                 if(stale())return;
-                if (error) throw error;
+                if (error && publicResult.status!=='fulfilled') throw error;
 
                 meetings = data.map(m => {
                     // التحقق من وجود القسم (كود الأمان القديم)
@@ -316,7 +320,7 @@ const { data, error } = await query;
                         endTime: m.end_time.slice(0, 5),
                         createdAt: m.created_at,
                         // الاسم: لو موجود في البروفايل هاته، لو لأ هات اسم القسم
-                        createdBy: (m.profiles && m.profiles.full_name) ? m.profiles.full_name : deptInfo.name,
+                        createdBy: (m.profiles && m.profiles.full_name) ? m.profiles.full_name : (m.createdBy || deptInfo.name),
                         creatorEmail: creatorEmail, // التعديل 3: تخزين الإيميل لاستخدامه لاحقاً
                         priority: deptInfo.priority 
                     };
@@ -491,6 +495,7 @@ async function initializeApp() {
         }
 
         // 3. تحميل الحجوزات من السيرفر (للقاعة المختارة فقط)
+        currentWeekStart = window.CITLAcademicBooking.weekStart();
         await loadMeetings();
 
         // 4. تشغيل الجدول والواجهة
@@ -661,7 +666,9 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
             if (meeting) {
                 const meetingBlock = document.createElement('div');
                 meetingBlock.dataset.bookingId=String(meeting.id);
-                meetingBlock.className = `meeting-block ${(departments[meeting.department]||departments['other']||{color:'bg-[#2A3475]'}).color} shadow-md rounded border-r-4 border-black/20 hover:scale-[1.02] transition-transform z-10 h-[calc(100%-8px)] m-1`;
+                const nowParts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+                const today=nowParts.year+'-'+nowParts.month+'-'+nowParts.day,expired=meeting.date<today||(meeting.date===today&&timeToMinutes(meeting.endTime)<=Number(nowParts.hour)*60+Number(nowParts.minute));
+                meetingBlock.className = `meeting-block ${expired?'bg-gray-400 text-white':(departments[meeting.department]||departments['other']||{color:'bg-[#2A3475]'}).color} shadow-md rounded border-r-4 border-black/20 hover:scale-[1.02] transition-transform z-10 h-[calc(100%-8px)] m-1`;
                 
                 if(timeToMinutes(meeting.endTime)-timeToMinutes(meeting.startTime)<=20)meetingBlock.classList.add('citl-short-booking');
                 meetingBlock.title=meeting.title+' · '+meeting.startTime+' – '+meeting.endTime;
@@ -924,13 +931,13 @@ function setupEventListeners() {
     addListener('prev-week', 'click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         updateWeekDisplay();
-        renderCalendar();
+        loadMeetings().then(renderCalendar);
     });
 
     addListener('next-week', 'click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         updateWeekDisplay();
-        renderCalendar();
+        loadMeetings().then(renderCalendar);
     });
 
     // 🔥🔥🔥 الإضافة الجديدة: ربط زر فتح القائمة المنسدلة للأسبوع 🔥🔥🔥
@@ -1348,8 +1355,8 @@ function showMeetingDetails(meeting) {
         // التعديل: الأزرار تحت بعض في الموبايل (w-full) وجنب بعض في الكمبيوتر (w-auto)
         buttonsHTML = `
             <div class="flex flex-col md:flex-row justify-end gap-3 pt-4 border-t border-gray-100 mt-6 shrink-0">
-                <button id="delete-meeting" ${((isOwner && meeting.status === 'pending') || window.CITLPermissions.can(currentUser, 'can_delete')) ? '' : 'hidden'} class="w-full md:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold text-xs md:text-sm flex items-center justify-center order-2 md:order-1 active:scale-95"> 
-                    <i class="fas fa-trash ml-2"></i> حذف الحجز 
+                <button id="delete-meeting" ${(isOwner || window.CITLPermissions.can(currentUser, 'can_delete')) ? '' : 'hidden'} class="w-full md:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold text-xs md:text-sm flex items-center justify-center order-2 md:order-1 active:scale-95"> 
+                    <i class="fas fa-trash ml-2"></i> ${isOwner && !isManager ? 'طلب إلغاء الحجز' : 'حذف الحجز'} 
                 </button> 
                 <button id="edit-meeting" ${(isOwner || isManager) ? '' : 'hidden'} class="w-full md:w-auto px-6 py-2.5 bg-[#2A3475] text-white rounded-lg hover:bg-[#1f2658] transition-all font-bold text-xs md:text-sm shadow-md flex items-center justify-center transform active:scale-95 order-1 md:order-2"> 
                     <i class="fas fa-edit ml-2"></i> تعديل الحجز 
@@ -2408,46 +2415,6 @@ function showConfirmDialog(message, options = {}) {
     });
 }
 
-// دالة الحذف (تم إصلاح صلاحيات المدير)
-async function deleteMeeting() {
-    if (!selectedMeeting) return;
-    
-    // 1. تحديد الصلاحيات
-    const isOwner = selectedMeeting.user_id === currentUser.id;
-    const isManager = window.CITLPermissions.full(currentUser); // المدير يملك صلاحية مطلقة
-    const canDeleteSpecific = window.CITLPermissions.can(currentUser, 'can_delete');
-
-    // الشرط المصحح: لو مش صاحب الحجز، ومش مدير، ومعهوش صلاحية خاصة => امنعه
-    if (!(isOwner && selectedMeeting.status === 'pending') && !canDeleteSpecific) {
-        showNotification('⛔ عفواً، لا تملك صلاحية لحذف هذا الحجز!', 'error');
-        return;
-    }
-
-    // 2. طلب التأكيد (نستخدم النافذة الاحترافية)
-    const isConfirmed = await showConfirmDialog('هل أنت متأكد تماماً من حذف هذا الحجز من النظام؟');
-    if (!isConfirmed) return;
-
-    document.body.style.cursor = 'wait';
-
-    try {
-        const { error } = await supabase.from('meetings').delete().eq('id', selectedMeeting.id);
-        
-        if (error) throw error;
-
-        // تحديث الواجهة
-        meetings = meetings.filter(m => m.id !== selectedMeeting.id);
-        refreshAllViews();
-        closeModal('meeting-details-modal');
-        showNotification('تم حذف الحجز بنجاح ✅');
-
-    } catch (error) {
-        console.error(error);
-        showNotification('فشل الحذف: ' + error.message, 'error');
-    } finally {
-        document.body.style.cursor = 'default';
-    }
-}
-
         document.addEventListener('DOMContentLoaded', initializeApp);
        
         // ============================================
@@ -3210,7 +3177,7 @@ function toArabicNum(str) {
 }
 
 // 🔥 دالة الانتقال لأسبوع محدد
-function jumpToWeek(dateISO) {
+async function jumpToWeek(dateISO) {
     // تحويل التاريخ من ISO string إلى كائن Date
     const newDate = new Date(dateISO);
     
@@ -3218,6 +3185,7 @@ function jumpToWeek(dateISO) {
     currentWeekStart = window.CITLAcademicBooking.weekStart(newDate);
     
     updateWeekDisplay();
+    await loadMeetings();
     renderCalendar();
     
     // إخفاء القائمة

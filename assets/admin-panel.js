@@ -134,6 +134,17 @@ if (tabName === 'news' && typeof loadNewsConfig === 'function') {
     if (targetContent) {
         targetContent.classList.remove('hidden');
     }
+    requestAnimationFrame(() => {
+        if (activeBtn && matchMedia('(max-width:1023px)').matches) activeBtn.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});
+        if (targetContent) {
+            targetContent.scrollTop=0;
+            let parent=targetContent.parentElement;
+            while(parent && parent.id!=='admin-panel-modal') {
+                if(/auto|scroll/.test(getComputedStyle(parent).overflowY))parent.scrollTop=0;
+                parent=parent.parentElement;
+            }
+        }
+    });
 }
 
 async function updateAdminMeetingsList() {

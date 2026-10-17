@@ -32,6 +32,10 @@
     document.querySelectorAll('#notif-btn-wrapper .citl-mobile-bell,#notif-btn-wrapper-pc button').forEach((button) => button.classList.toggle('citl-has-unread', count > 0));
   }
 
+  function syncUnreadPulse(){for(const id of ['notif-badge','notif-badge-mob']){const badge=document.getElementById(id),button=badge?.closest('button');if(button)button.classList.toggle('citl-has-unread',!badge.classList.contains('hidden')&&Number(badge.textContent)>0);}}
+  for(const id of ['notif-badge','notif-badge-mob']){const badge=document.getElementById(id);if(badge)new MutationObserver(syncUnreadPulse).observe(badge,{attributes:true,attributeFilter:['class'],childList:true,characterData:true,subtree:true});}
+  syncUnreadPulse();
+
   function renderNotifications(items) {
     const list = document.getElementById('notif-list'); if (!list) return;
     list.replaceChildren();

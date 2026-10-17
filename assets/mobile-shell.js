@@ -25,6 +25,16 @@
    popup.style.maxHeight=Math.max(120,innerHeight-parseFloat(popup.style.top)-12)+'px';
   }}fit();await pending;fit();
  }
+ let confirmingLogout=false;
+ document.addEventListener('click',async e=>{
+  const button=e.target.closest('button,a');if(!button||(!/\blogout\s*\(/.test(button.getAttribute('onclick')||'')&&!button.hasAttribute('data-logout')))return;
+  e.preventDefault();e.stopImmediatePropagation();if(confirmingLogout)return;confirmingLogout=true;close(false);
+  const dialog=document.createElement('dialog');dialog.className='citl-logout-confirm';dialog.dir='rtl';
+  dialog.innerHTML='<h3>تأكيد تسجيل الخروج</h3><p>هل تريد تسجيل الخروج من حسابك في نظام الكلية؟</p><footer><button type="button" data-cancel>البقاء في النظام</button><button type="button" data-confirm>تسجيل الخروج</button></footer>';
+  document.body.append(dialog);dialog.showModal();
+  const accepted=await new Promise(resolve=>{dialog.querySelector('[data-cancel]').onclick=()=>{dialog.close();resolve(false);};dialog.querySelector('[data-confirm]').onclick=()=>{dialog.close();resolve(true);};dialog.addEventListener('cancel',()=>resolve(false),{once:true});});
+  dialog.remove();confirmingLogout=false;if(accepted)await root.logout();else if(button.isConnected)button.focus({preventScroll:true});
+ },true);
  trigger.setAttribute('aria-controls',menu.id);
  menu.addEventListener('click',e=>{
   if(e.target.closest('[data-mobile-close]')){e.preventDefault();close();}
@@ -59,5 +69,5 @@
   const target=new URL(link.href,location.href);
   if(target.origin===location.origin&&target.pathname!==location.pathname)root.CITLPageBoot?.show('جاري تهيئة النظام');
  });
- root.CITLMobileShell=Object.freeze({toggle,close,notifications,profile:()=>{if(typeof root.openAdminPanel==='function')root.openAdminPanel('profile');else root.toggleProfileInfoMenu?.();}});
+ root.CITLMobileShell=Object.freeze({toggle,close,notifications,profile:()=>{if(typeof root.openAdminPanel==='function')root.openAdminPanel('profile');else {root.CITLPageBoot?.show('جاري تهيئة النظام');location.href='/dashboard/?open=profile';}}});
 })(window);

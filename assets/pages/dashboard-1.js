@@ -1441,8 +1441,8 @@ function showMeetingDetails(meeting) {
         // التعديل: الأزرار تحت بعض في الموبايل (w-full) وجنب بعض في الكمبيوتر (w-auto)
         buttonsHTML = `
             <div class="flex flex-col md:flex-row justify-end gap-3 pt-4 border-t border-gray-100 mt-6 shrink-0">
-                <button id="delete-meeting" ${((isOwner && meeting.status === 'pending') || window.CITLPermissions.can(currentUser, 'can_delete')) ? '' : 'hidden'} class="w-full md:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold text-xs md:text-sm flex items-center justify-center order-2 md:order-1 active:scale-95"> 
-                    <i class="fas fa-trash ml-2"></i> حذف الحجز 
+                <button id="delete-meeting" ${(isOwner || window.CITLPermissions.can(currentUser, 'can_delete')) ? '' : 'hidden'} class="w-full md:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-600 hover:text-white transition-all font-bold text-xs md:text-sm flex items-center justify-center order-2 md:order-1 active:scale-95"> 
+                    <i class="fas fa-trash ml-2"></i> ${isOwner && !isManager ? 'طلب إلغاء الحجز' : 'حذف الحجز'} 
                 </button> 
                 <button id="edit-meeting" ${(isOwner || isManager) ? '' : 'hidden'} class="w-full md:w-auto px-6 py-2.5 bg-[#2A3475] text-white rounded-lg hover:bg-[#1f2658] transition-all font-bold text-xs md:text-sm shadow-md flex items-center justify-center transform active:scale-95 order-1 md:order-2"> 
                     <i class="fas fa-edit ml-2"></i> تعديل الحجز 
@@ -2515,46 +2515,6 @@ function showConfirmDialog(message, options = {}) {
         cancelBtn.addEventListener('click', () => closeAndResolve(false));
         overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAndResolve(false); });
     });
-}
-
-// دالة الحذف (تم إصلاح صلاحيات المدير)
-async function deleteMeeting() {
-    if (!selectedMeeting) return;
-    
-    // 1. تحديد الصلاحيات
-    const isOwner = selectedMeeting.user_id === currentUser.id;
-    const isManager = window.CITLPermissions.full(currentUser); // المدير يملك صلاحية مطلقة
-    const canDeleteSpecific = window.CITLPermissions.can(currentUser, 'can_delete');
-
-    // الشرط المصحح: لو مش صاحب الحجز، ومش مدير، ومعهوش صلاحية خاصة => امنعه
-    if (!(isOwner && selectedMeeting.status === 'pending') && !canDeleteSpecific) {
-        showNotification('⛔ عفواً، لا تملك صلاحية لحذف هذا الحجز!', 'error');
-        return;
-    }
-
-    // 2. طلب التأكيد (نستخدم النافذة الاحترافية)
-    const isConfirmed = await showConfirmDialog('هل أنت متأكد تماماً من حذف هذا الحجز من النظام؟');
-    if (!isConfirmed) return;
-
-    document.body.style.cursor = 'wait';
-
-    try {
-        const { error } = await supabase.from('meetings').delete().eq('id', selectedMeeting.id);
-        
-        if (error) throw error;
-
-        // تحديث الواجهة
-        meetings = meetings.filter(m => m.id !== selectedMeeting.id);
-        refreshAllViews();
-        closeModal('meeting-details-modal');
-        showNotification('تم حذف الحجز بنجاح ✅');
-
-    } catch (error) {
-        console.error(error);
-        showNotification('فشل الحذف: ' + error.message, 'error');
-    } finally {
-        document.body.style.cursor = 'default';
-    }
 }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
@@ -3635,7 +3595,7 @@ window.setDashboardProfile = function(profile) {
     applyUserPermissions();
     const manager = window.CITLPermissions.any(profile);
     document.querySelectorAll('[data-dashboard-account]').forEach(button => {
-        button.textContent = 'لوحة التحكم';
+        button.innerHTML = '<div class="flex items-center gap-3"><img src="/assets/control-panel.svg" width="20" height="20" alt=""><span>لوحة التحكم</span></div>';
     });
 };
 window.clearDashboardPrivateState = function() {

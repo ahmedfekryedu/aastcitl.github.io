@@ -301,7 +301,7 @@ const data=[...new Map([...(Array.isArray(publicRows)?publicRows:[]),...(private
  
                 
                 if(stale())return;
-                if (error && publicResult.status!=='fulfilled') throw error;
+                if(error && publicResult.status==='rejected')throw error;
 
                 meetings = data.map(m => {
                     // التحقق من وجود القسم (كود الأمان القديم)

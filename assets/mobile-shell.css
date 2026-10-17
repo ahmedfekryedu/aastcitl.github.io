@@ -38,10 +38,10 @@
  .citl-mobile-header button:focus-visible,.citl-drawer button:focus-visible,.citl-drawer a:focus-visible{outline:3px solid #f3a628;outline-offset:3px}
  .citl-mobile-overlay{position:fixed;inset:0;z-index:10002;direction:rtl;font-family:Cairo,sans-serif}
  .citl-drawer-backdrop{position:absolute;inset:0;background:#10193660;backdrop-filter:blur(3px)}
- #mobile-menu-content.citl-drawer,#cm-mobile-content.citl-drawer{position:absolute;inset:0 0 0 auto;width:min(280px,70vw);max-width:none;background:#fff;box-shadow:-10px 0 40px #10193630;display:flex;flex-direction:column;transform:none;animation:none;transition:none;color:#2a3475}
+ #mobile-menu-content.citl-drawer,#cm-mobile-content.citl-drawer{position:absolute;inset:0 0 0 auto;width:min(300px,76vw);max-width:none;background:#fff;box-shadow:-10px 0 40px #10193630;display:flex;flex-direction:column;transform:none;animation:none;transition:none;color:#2a3475}
  .citl-drawer-head{padding:14px;border-bottom:3px solid #f3a628;background:repeating-linear-gradient(-30deg,transparent,transparent 10px,#ffffff0d 10px,#ffffff0d 11px),linear-gradient(#2a3475,#1e255a);color:#fff;flex:none}
  .citl-drawer-heading{display:flex;align-items:center;justify-content:flex-start;gap:10px;margin-bottom:12px;font-size:14px;font-weight:900}
- .citl-drawer-heading button{display:grid;place-items:center;width:32px;height:32px;background:#ffffff12;border:1px solid #ffffff26;border-radius:8px;color:#fff;font-size:22px;line-height:1;cursor:pointer}
+ .citl-drawer-heading button{display:grid;place-items:center;order:-1;padding:0;flex:none;width:32px;height:32px;background:#ffffff12;border:1px solid #ffffff26;border-radius:8px;color:#fff;font-size:22px;line-height:1;cursor:pointer}
  .citl-drawer .citl-mobile-brand{gap:8px}.citl-drawer .citl-mobile-logo{width:40px;height:40px}.citl-drawer .citl-mobile-brand h1{font-size:11px}.citl-drawer .citl-mobile-brand h2{font-size:5.7px}
  .citl-drawer-body{padding:14px;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
  .citl-drawer-account{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #e3e7f1;border-radius:11px;background:#f8f9fc;margin-bottom:16px}
@@ -96,7 +96,7 @@
 
 /* Unread state is visible without moving the bell or changing its hit area. */
 #notif-btn-wrapper .citl-mobile-bell.citl-has-unread,#notif-btn-wrapper-pc button.citl-has-unread{animation:citl-unread-breathe 2.2s ease-in-out infinite!important;background-image:none!important}
-@keyframes citl-unread-breathe{0%,100%{background-color:#2a3475;color:#ffffff;box-shadow:0 0 0 0 rgba(243,166,40,0)}50%{background-color:#f3a628;color:#1e255a;box-shadow:0 0 0 3px rgba(243,166,40,.16)}}
+@keyframes citl-unread-breathe{0%,100%{background-color:#f3a628;color:#1e255a;box-shadow:0 0 0 0 rgba(243,166,40,0)}50%{background-color:#ffd88a;color:#1e255a;box-shadow:0 0 0 3px rgba(243,166,40,.16)}}
 @media(prefers-reduced-motion:reduce){.citl-has-unread{animation:none;box-shadow:0 0 0 2px rgba(243,166,40,.4)}}
 
 /* Each scroll region is bounded below the personal-schedule header. */
@@ -112,3 +112,25 @@
 .citl-logout-confirm{width:min(390px,calc(100vw - 32px));box-sizing:border-box;border:1px solid #e2e6ef;border-top:4px solid #f3a628;border-radius:20px;padding:24px;color:#2a3475;background:#fff;font-family:Cairo,sans-serif;text-align:right;box-shadow:0 24px 70px #151c4040}
 .citl-logout-confirm::backdrop{background:#151c4059;backdrop-filter:blur(5px)}
 .citl-logout-confirm h3{font:900 19px Cairo,sans-serif;margin:0 0 12px}.citl-logout-confirm p{font:600 13px/1.9 Cairo,sans-serif;margin:0 0 20px;color:#64748b}.citl-logout-confirm footer{display:flex;gap:10px}.citl-logout-confirm button{flex:1;border:1px solid #e2e6ef;border-radius:10px;padding:10px;background:#fff;color:#2a3475;font:700 13px Cairo,sans-serif;cursor:pointer}.citl-logout-confirm [data-confirm]{background:#2a3475;color:#fff;border-color:#2a3475}
+
+.citl-drawer nav img[src*="control-panel.svg"]{filter:grayscale(1);opacity:.7}
+@media(max-width:767px){
+ #my-schedule-modal .schedule-tool-modal-shell{height:92dvh;max-height:92dvh;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+ #my-schedule-modal .schedule-tool-modal-shell>div:first-child{flex:0 0 auto;z-index:10;position:relative;background-color:#2a3475}
+ #my-schedule-modal .schedule-tool-modal-shell>div:nth-child(2){flex:1 1 0%;min-height:0;overflow:hidden!important;contain:paint}
+ #my-schedule-content,#my-schedule-setup{min-height:0;overflow:hidden!important}
+ #mobile-schedule-list,#my-schedule-setup>.overflow-y-auto{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ #admin-hub-modal .schedule-tool-modal-shell{overflow:hidden!important}
+}
+
+@media(max-width:1023px){
+ html:not(.citl-desktop-request) #schedule-entry-modal>div.relative{display:flex;flex-direction:column;overflow:hidden!important}
+ html:not(.citl-desktop-request) #schedule-entry-modal>div.relative>div:first-child{position:relative;flex-shrink:0;z-index:3}
+ html:not(.citl-desktop-request) #schedule-entry-modal>div.relative>div:nth-child(2){min-height:0;overflow-y:auto;overscroll-behavior:contain;isolation:isolate}
+ .citl-drawer-primary a{gap:7px!important;flex-wrap:nowrap;white-space:nowrap!important}
+ .citl-drawer-primary .citl-maintenance-badge{font-size:8px;padding:2px 3px;flex-shrink:0;white-space:nowrap;margin-inline-start:auto}
+}
+
+#citl-delegated-options{max-height:220px;overflow:auto;border:1px solid #dce1ee;border-radius:10px;background:white;margin-top:4px;box-shadow:0 8px 20px #18245012}
+#citl-delegated-options button{display:block;width:100%;padding:9px 12px;border:0;background:white;color:#2a3475;font:600 12px Cairo,sans-serif;text-align:right;cursor:pointer}
+#citl-delegated-options button:hover,#citl-delegated-options button[aria-selected=true]{background:#fff3dc}

@@ -45,9 +45,9 @@
  root.CITLRequests.rpc(root.sb,'citl_visible_meetings',{p_from:now.date,p_to:end.toISOString().slice(0,10),p_room:null})]);
  const privateData=privateResult.status==='fulfilled'&&!privateResult.value.error?privateResult.value.data||[]:[];
  const publicData=publicResult.status==='fulfilled'&&Array.isArray(publicResult.value)?publicResult.value:[];
- if((privateResult.status==='rejected'||privateResult.value.error)&&publicResult.status==='rejected')throw (privateResult.reason||privateResult.value.error);
+ if(publicResult.status==='rejected' && (privateResult.status==='rejected'||privateResult.value.error))throw (privateResult.reason||privateResult.value.error);
  if(root.currentUser?.id!==owner)return;
- upcomingRows=[...new Map([...publicData,...privateData].filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status)&&(m.booking_type!=='lecture'||!m.course_name)).map(m=>[String(m.id),{...m,rooms:m.rooms||{name:m.room_name}}])).values()];lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
+ upcomingRows=[...new Map([...publicData,...privateData].filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status)).map(m=>[String(m.id),{...m,rooms:m.rooms||{name:m.room_name}}])).values()];lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
  }
  function weekPicker(){document.querySelector('.citl-meeting-date-picker')?.remove();const wrapper=document.getElementById('week-dropdown-wrapper');if(wrapper)wrapper.style.removeProperty('display');}
  let locating=false;

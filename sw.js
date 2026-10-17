@@ -1,8 +1,9 @@
-const RELEASE = '20261018-r6.9.1.6';
+const RELEASE = '20261018-r6.9.1.7';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/dashboard/', '/smrm/', '/schedules/', '/courses/',
   '/assets/mobile-shell.css',
   '/assets/mobile-shell.js',
   '/assets/service-connection.js',
@@ -107,9 +108,21 @@ self.addEventListener('fetch', (e) => {
   // R2 images/video and authenticated APIs use the browser's native request path.
   // Do not turn a cross-origin/CORS failure into an unhandled FetchEvent rejection.
   if (url.origin !== self.location.origin) return;
-  if (['/dashboard/','/schedules/','/smrm/','/management/','/attendance/', '/courses/'].some(p => url.pathname.startsWith(p))) {
-    e.respondWith(fetch(e.request, {cache: 'no-cache'}).catch(() => Response.error()));
-    return;
+  const shell=url.pathname.replace(/index\.html$/,'');
+  if (['/dashboard/','/schedules/','/smrm/','/courses/'].includes(shell)) {
+    // Only static HTML is cached. Profiles, API responses and tokens never enter this cache.
+    e.respondWith((async()=>{
+      const cache=await caches.open(CACHE_NAME),saved=await cache.match(shell);
+      const refresh=fetch(e.request,{cache:'no-cache'}).then(async response=>{
+        if(response.ok&&(response.headers.get('content-type')||'').includes('text/html')){try{await cache.put(shell,response.clone());}catch(_){/* Cache quota must not discard a successful response. */}}
+        return response;
+      }).catch(()=>saved||Response.error());
+      if(saved){if(e.waitUntil)e.waitUntil(refresh.then(()=>{}));return saved;}
+      return refresh;
+    })());return;
+  }
+  if (['/management/','/attendance/'].some(p=>url.pathname.startsWith(p))) {
+    e.respondWith(fetch(e.request,{cache:'no-cache'}).catch(()=>Response.error()));return;
   }
   e.respondWith((async () => {
     // Versioned, same-origin fonts are reused immediately even on a slow connection.

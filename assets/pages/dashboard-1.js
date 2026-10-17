@@ -267,16 +267,11 @@ function applyUserPermissions() {
         } else {
             adminBtn.innerHTML = `
                 <i class="fas fa-user-circle text-base text-[#F3A628]"></i>
-                <span>ملفي الشخصي</span>
+                <span>لوحة التحكم</span>
             `;
 
             adminBtn.onclick = function () {
-                if (typeof openEditUserInfoModal === 'function') {
-                    openEditUserInfoModal();
-                } else if (typeof openAdminPanel === 'function') {
-                    // احتياطي فقط لو مفيش دالة بروفايل مستقلة
-                    openAdminPanel();
-                }
+                if (typeof openAdminPanel === 'function') openAdminPanel('profile');
             };
         }
     }
@@ -3640,7 +3635,7 @@ window.setDashboardProfile = function(profile) {
     applyUserPermissions();
     const manager = window.CITLPermissions.any(profile);
     document.querySelectorAll('[data-dashboard-account]').forEach(button => {
-        button.textContent = manager ? 'لوحة التحكم' : 'ملفي الشخصي';
+        button.textContent = 'لوحة التحكم';
     });
 };
 window.clearDashboardPrivateState = function() {

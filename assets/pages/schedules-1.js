@@ -122,9 +122,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // إظهار زر الإدارة
         const adminBtn = document.getElementById('admin-toggle-btn');
-        if (window.CITLPermissions.full(user) && adminBtn) {
+        if (window.CITLPermissions.can(user,'can_manage_schedules') && adminBtn) {
             adminBtn.classList.remove('hidden');
         }
+        document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!window.CITLPermissions.can(user,'can_manage_schedules'));
 
         // تحميل بيانات الصفحة
         if (typeof loadFilterOptions === 'function') await loadFilterOptions();
@@ -650,8 +651,15 @@ function hasApprovedTeachingIdentity(user) {
 }
 function syncScheduleEntryAccess(user) {
     const faculty = hasApprovedTeachingIdentity(user), manager = isManagerUser(user);
-    document.querySelectorAll('[data-schedule-hub]').forEach(el => el.classList.toggle('hidden', !faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports')));
+    document.querySelectorAll('[data-schedule-hub]').forEach(el => {
+        el.classList.toggle('hidden', !faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports'));
+        const label = faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports') ? 'إجراءات جدولي الدراسي' : 'إدارة الجداول الدراسية';
+        const span = el.querySelector('span');
+        if(span) span.textContent=label;
+        else for(const node of el.childNodes)if(node.nodeType===Node.TEXT_NODE&&node.textContent.trim())node.textContent=' '+label+' ';
+    });
     document.querySelectorAll('[data-personal-schedule-entry]').forEach(el => el.classList.toggle('hidden', !faculty));
+    document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!window.CITLPermissions.can(user,'can_manage_schedules'));
     const grid = document.getElementById('schedule-entry-tools');
     if (grid) grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))';
     const count = document.getElementById('schedule-entry-count');
@@ -665,6 +673,13 @@ function openScheduleHub() {
     if (isManagerUser(user)||window.CITLPermissions.can(user,'can_view_reports')) openScheduleEntryModal();
     else if (hasApprovedTeachingIdentity(user)) openMyScheduleModal();
 }
+let citlPersonalScheduleRouteOpened=false;
+window.addEventListener('citl-profile-loaded',event=>{
+    if(citlPersonalScheduleRouteOpened||new URLSearchParams(location.search).get('open')!=='my-schedule')return;
+    if(!hasApprovedTeachingIdentity(event.detail))return;
+    citlPersonalScheduleRouteOpened=true;
+    setTimeout(()=>openMyScheduleModal(),0);
+});
 function openScheduleEntryModal() {
     if (!isManagerUser(window.currentUser)&&!window.CITLPermissions.can(window.currentUser,'can_view_reports')) return;
     syncScheduleEntryAccess(window.currentUser);
@@ -5154,7 +5169,7 @@ function applyAdminVisibility(user) {
     const adminButton = document.getElementById('admin-toggle-btn');
     
     // 🔥 الشرط: إذا كان الزر موجوداً AND المستخدم موجوداً AND دوره هو 'manager'
-    if (adminButton && user && window.CITLPermissions.full(user)) {
+    if (adminButton && user && window.CITLPermissions.can(user,'can_manage_schedules')) {
         // إذا تحقق الشرط، نزيل كلاس الإخفاء
         adminButton.classList.remove('hidden');
     }
@@ -5203,12 +5218,7 @@ function updateSystemProfile(user) {
     const mobEditBtn = document.getElementById('mob-edit-btn');
     if (mobEditBtn) {
         mobEditBtn.onclick = () => {
-            if(typeof toggleProfileInfoMenu === 'function') toggleProfileInfoMenu();
-            if (window.CITLPermissions.full(user)) {
-                if (typeof toggleAdminPanel === 'function') toggleAdminPanel();
-            } else {
-                if (typeof openEditUserInfoModal === 'function') openEditUserInfoModal();
-            }
+            window.location.assign('/dashboard/?open=profile');
         };
     }
 }

@@ -111,6 +111,23 @@
      try{await op('citl_faculty_links',button.dataset.decision,{id:item.id,...(!approve?{reason}:{})});root.showNotification?.(approve?(administrative?'تم اعتماد الحساب الإداري':'تم اعتماد ربط الحساب بعضو هيئة التدريس'):'تم رفض الطلب مع الاحتفاظ بالحساب');await loadApprovals();root.CITLFacultyAdmin?.load();root.checkUserNotifications?.();}
      catch(error){card.querySelector('[data-card-status]').textContent=error.message;card.querySelectorAll('button').forEach(b=>b.disabled=false);}
     };list.append(card);
+    if(root.CITLPermissions.full(root.currentUser)&&!administrative){
+     root.CITLRequests.rpc(root.sb,'citl_duplicate_registration',{p_action:'inspect',p_request:item.id}).then(info=>{
+      if(!card.isConnected||!info?.duplicate)return;
+      const warning=document.createElement('p');warning.className='citl-ac-muted';warning.textContent='الاسم مرتبط بالفعل بحساب معتمد: '+info.owner_name+'. اختر الطلب الذي سيبقى؛ لا يُنقل الربط تلقائيًا.';
+      card.querySelector('.citl-claim-details').after(warning);
+      const approveButton=card.querySelector('[data-decision=approve]');approveButton.disabled=true;approveButton.title='الاسم مملوك لحساب معتمد؛ راجع الحسابين قبل الاعتماد';
+      const remove=document.createElement('button');remove.type='button';remove.className='citl-claim-reject';remove.textContent='رفض نهائي وحذف الحساب المكرر';
+      remove.onclick=async()=>{
+       if(remove.disabled)return;
+       const ok=await root.showConfirmDialog?.('سيُحذف الحساب المكرر وطلبه نهائيًا. سيظل الحساب المعتمد وصاحب الاسم كما هو.',{title:'حذف حساب مكرر',confirmText:'حذف الحساب المكرر',icon:'fa-trash',color:'bg-red-600'});
+       if(!ok)return;remove.disabled=true;
+       try{await root.CITLRequests.rpc(root.sb,'citl_duplicate_registration',{p_action:'delete',p_request:item.id});root.showNotification?.('تم حذف الحساب المكرر وطلبه نهائيًا','success');await loadApprovals();}
+       catch(error){card.querySelector('[data-card-status]').textContent=error.message;remove.disabled=false;}
+      };
+      card.querySelector('.citl-claim-actions').append(remove);
+     }).catch(()=>{});
+    }
    }
    const request=new URLSearchParams(location.search).get('request');if(request){const card=[...list.children].find(c=>c.dataset.claimId===request);if(card){card.classList.add('citl-ac-highlight');card.scrollIntoView({block:'center'});}else status.textContent='قد يكون الطلب المشار إليه تمت مراجعته بالفعل، أو لم يعد ضمن صلاحياتك.';}
   }catch(error){if(serial===approvalSerial){list.innerHTML='<div class="citl-admin-empty">تعذر تحميل الطلبات.</div>';status.textContent=error.message;}}
@@ -235,7 +252,7 @@
  let deepLinkHandled=false;
  async function initialize(){
   if(!root.currentUser||root.CITLAuth.facultyPending?.(root.currentUser))return;
-  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){await openApprovals();deepLinkHandled=true;}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
+  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='profile'){deepLinkHandled=true;root.openAdminPanel('profile');}else if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){await openApprovals();deepLinkHandled=true;}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
  }
  root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,openRegistrationNotice,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
  root.addEventListener('citl-profile-loaded',e=>{if(accessUser&&accessUser!==e.detail?.id){access=null;approvalSerial++;dashboardSerial++;work.serial++;work.data=null;work.action=null;work.term=null;work.initialized=false;document.getElementById('citl-ac-work-detail')?.replaceChildren();document.querySelector('#admin-academic-actions-tab [data-rows]')?.replaceChildren();document.getElementById('citl-ac-summary')?.remove();document.getElementById('admin-academic-review-tab')?.querySelector('[data-claims]')?.replaceChildren();}initialize();});

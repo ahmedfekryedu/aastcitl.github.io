@@ -165,12 +165,12 @@ function applyUserPermissions() {
             // (زر المدير يعمل بشكل افتراضي لفتح المودال)
         } else {
             // للمستخدم العادي
-            if(btnText) btnText.textContent = 'ملفي الشخصي';
-            if(btnIcon) btnIcon.className = 'fas fa-user-circle text-[#F3A628]';
+            if(btnText) btnText.textContent = 'لوحة التحكم';
+            if(btnIcon) btnIcon.className = 'fas fa-cogs text-[#F3A628]';
             
             // تحويل الزر لفتح الملف الشخصي عند الضغط
             adminBtn.onclick = function() { 
-                if(typeof openEditUserInfoModal === 'function') openEditUserInfoModal(); 
+                if(typeof openAdminPanel === 'function') openAdminPanel('profile'); 
             };
         }
     }

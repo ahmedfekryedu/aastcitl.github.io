@@ -5,20 +5,21 @@
 <!-- CITL first-paint loader: source: tools/page-loader.html; sync with tools/sync-page-loader.py -->
 <style id="citl-boot-style">
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-display:swap}
-html.citl-page-booting{background:#f8fafc;overflow:hidden!important}
+html.citl-page-booting{background:#dce2ed;overflow:hidden!important}
+html.citl-page-booting::before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#dce2ed,#c6cede);z-index:-1}
 html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:none!important;user-select:none}
 #global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
 #global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:rgba(21,28,64,.22)!important}
-#global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:min(400px,90vw);display:flex;flex-direction:column;align-items:center;gap:8px}
+#global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:400px;max-width:94vw;display:flex;flex-direction:column;align-items:center;gap:0}
 #global-loader>.relative{transform:none!important;transition:none!important}
-#global-loader.citl-unified-loader img{width:auto;height:150px;max-width:100%;object-fit:contain}
-#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:0}
-#global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:0}
+#global-loader.citl-unified-loader img{width:auto;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
+#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
+#global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
 #global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
-@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px}#global-loader.citl-unified-loader img{height:96px}#global-loader.citl-unified-loader h3{font-size:18px}#global-loader.citl-unified-loader p{font-size:12px}}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{height:96px;margin-top:-24px}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:-8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
 #global-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px}
-.citl-loader-dots{display:inline-flex;direction:ltr;width:1.15em;flex:none;justify-content:space-between}
+.citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}
 .citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}
 .citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
 @keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
@@ -44,7 +45,7 @@ html.citl-page-booting #global-loader{display:flex!important;visibility:visible!
 </script>
 <script>document.documentElement.classList.add("citl-auth-checking");</script>
 <style>html.citl-auth-checking body>*:not(script):not(#citl-connection-recovery):not(#global-loader){visibility:hidden!important;pointer-events:none!important}</style>
-<meta name="citl-release" content="20261015-r6.9.1.2">
+<meta name="citl-release" content="20261018-r6.9.1.5">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كلية النقل الدولي واللوجستيات - CITL Smart System</title>
@@ -518,7 +519,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261016-r6.9.1.3" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261018-r6.9.1.5" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 <script>document.body.prepend(document.getElementById("global-loader"));</script>
@@ -534,7 +535,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <script src="/assets/loading-placeholders.js?v=20261014-r6.8.14"></script>
 <script src="/assets/desktop-mode.js?v=20261013-r6.8.10"></script>
 <script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
-<script src="/assets/service-availability.js?v=20261015-r6.9.1.2"></script>
+<script src="/assets/service-availability.js?v=20261018-r6.9.1.5"></script>
 
 <script>
     
@@ -635,7 +636,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
                     <i class="fas fa-cogs text-lg text-[#2A3475]"></i>
                     <span>وضع التعديل</span>
                 </div>
-            </button><a href="/dashboard/?open=control"><i class="fas fa-cogs" aria-hidden="true"></i><span>لوحة التحكم</span></a><button type="button" onclick="toggleMobileMenu(); window.CITLMobileShell.profile()"><i class="fas fa-user" aria-hidden="true"></i><span>الملف الشخصي</span></button></nav></div><div class="citl-drawer-bottom"><button onclick="handleLogout()" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors text-right">
+            </button><a href="/dashboard/?open=control"><i class="fas fa-cogs" aria-hidden="true"></i><span>لوحة التحكم</span></a></nav></div><div class="citl-drawer-bottom"><button onclick="handleLogout()" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors text-right">
                 <i class="fas fa-sign-out-alt text-lg"></i>
                 <span>تسجيل الخروج</span>
             </button><small>CITL Smart System</small></div></section></div>
@@ -1544,21 +1545,21 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20260921-r6.5"></script>
-<script src="/assets/pages/schedules-1.js?v=20261016-r6.9.1.3"></script>
-<script src="/security-core.js?v=20261015-r6.8.20"></script>
+<script src="/assets/pages/schedules-1.js?v=20261018-r6.9.1.5"></script>
+<script src="/security-core.js?v=20261018-r6.9.1.5"></script>
 <script src="/assets/department-heads.js?v=20261013-r6.8.10"></script>
 <script src="/assets/registration-review-status.js?v=20261014-r6.8.16"></script>
-<script src="/assets/academic-oversight.js?v=20261015-r6.9.1.2"></script>
+<script src="/assets/academic-oversight.js?v=20261018-r6.9.1.5"></script>
 <script src="/assets/admin-access.js?v=20261015-r6.8.20"></script>
 <script src="/assets/admin-announcements.js?v=20261014-r6.8.17"></script>
 <script src="/assets/faculty-identity.js?v=20261015-r6.8.20"></script>
-<script src="/assets/registration-correction.js?v=20261015-r6.8.18"></script>
+<script src="/assets/registration-correction.js?v=20261018-r6.9.1.5"></script>
 <script src="/assets/room-qr-export.js?v=20261014-r6.8.17"></script>
 <script src="/assets/room-qr.js?v=20261014-r6.8.13"></script>
 <script src="/assets/booking-reports.js?v=20261014-r6.8.14"></script>
 <script src="/assets/delegated-lecture-actions.js?v=20261015-r6.8.18"></script>
 <script src="/assets/attendance-admin.js?v=20261015-r6.8.18"></script>
 <script src="../assets/lecture-action-dates.js?v=20261015-r6.8.21"></script>
-<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261016-r6.9.1.3"></script>
+<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261018-r6.9.1.5"></script>
 </body>
 </html>

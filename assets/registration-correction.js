@@ -69,7 +69,21 @@
   try{const data=await api('list');list.replaceChildren();
    if(!data.accounts.length){list.innerHTML='<div class="citl-admin-empty">لا توجد حسابات مرفوضة تحتاج إلى تصحيح ضمن صلاحياتك.</div>';}
    for(const p of data.accounts){const card=document.createElement('article');card.className='citl-correction-person';card.innerHTML='<div><strong>'+E(p.full_name||p.email)+'</strong><small dir="ltr">'+E(p.email)+'</small><span>'+(['faculty','visiting_lecturer'].includes(p.account_type)?'عضو هيئة تدريس':'حساب إداري')+'</span><p>'+E(p.rejection_reason||'طلب قديم بدون سبب مسجل')+'</p></div><button type="button" class="citl-ac-button">تصحيح وإعادة للمراجعة</button>';
-    if(root.CITLPermissions?.full(root.currentUser))card.querySelector('button').textContent='تصحيح واعتماد الحساب';card.querySelector('button').onclick=()=>{const d=dialog('تصحيح بيانات الحساب');editor(d.querySelector('[data-content]'),p.id,async()=>{await mount(parent,suffix);await root.CITLOversight?.loadApprovals();await root.updateAdminUsersList?.();});};list.append(card);}
+    if(root.CITLPermissions?.full(root.currentUser))card.querySelector('button').textContent='تصحيح واعتماد الحساب';card.querySelector('button').onclick=()=>{const d=dialog('تصحيح بيانات الحساب');editor(d.querySelector('[data-content]'),p.id,async()=>{await mount(parent,suffix);await root.CITLOversight?.loadApprovals();await root.updateAdminUsersList?.();});};list.append(card);
+    if(root.CITLPermissions?.full(root.currentUser)&&p.request_id){
+     root.CITLRequests.rpc(root.sb,'citl_duplicate_registration',{p_action:'inspect',p_request:p.request_id}).then(info=>{
+      if(!card.isConnected||!info?.duplicate)return;
+      const remove=document.createElement('button');remove.type='button';remove.className='citl-ac-button danger';remove.textContent='حذف الحساب المكرر نهائيًا';
+      remove.onclick=async()=>{
+       if(remove.disabled)return;
+       const ok=await root.showConfirmDialog?.('سيُحذف هذا الحساب المرفوض وطلبه نهائيًا. الحساب المعتمد لن يتغير.',{title:'حذف حساب مكرر',confirmText:'حذف الحساب المكرر',icon:'fa-trash',color:'bg-red-600'});
+       if(!ok)return;remove.disabled=true;
+       try{await root.CITLRequests.rpc(root.sb,'citl_duplicate_registration',{p_action:'delete',p_request:p.request_id});root.showNotification?.('تم حذف الحساب المكرر نهائيًا','success');section.dataset.loading='false';await mount(parent,suffix);}
+       catch(error){root.showNotification?.(error.message,'error');remove.disabled=false;}
+      };card.append(remove);
+     }).catch(()=>{});
+    }
+   }
   }catch(error){list.textContent=error.message;}finally{section.dataset.loading='false';}
  }
  function openAdmin(profileId){const d=dialog(root.CITLPermissions?.full(root.currentUser)?'تصحيح بيانات العضو واعتماد الحساب':'تصحيح بيانات الحساب المرفوض');editor(d.querySelector('[data-content]'),profileId,async()=>{await root.CITLOversight?.loadApprovals();await root.updateAdminUsersList?.();root.checkUserNotifications?.();});}

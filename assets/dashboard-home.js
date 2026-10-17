@@ -49,7 +49,7 @@
     const failed=state.errors.some(x=>['schedule','actions'].includes(x));
     $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('محاضرات الأسبوع',failed?'—':stats.assigned.length,'حسب الجدول الحالي')+metric('ساعات التدريس',failed?'—':stats.hours,'حسب الجدول الحالي')+metric('القاعات',failed?'—':new Set(stats.assigned.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك',true);
     const next=stats.next;
-    const link=`<a class="dh-button" href="/schedules/" aria-label="فتح صفحة الجداول وربط اسمي">${M.names(state.user).length?'فتح الجداول':'ربط اسمي'}</a>`;
+    const link=`<a class="dh-button" href="/schedules/?open=my-schedule" aria-label="فتح إجراءات جدولي الدراسي">${M.names(state.user).length?'إجراءات جدولي الدراسي':'ربط اسمي'}</a>`;
     const focus=`<div class="dh-focus"><div class="dh-focus-copy">${failed?'<strong>تعذر تحديث جدولك</strong>':next?`<span class="dh-focus-label">${next.live?'محاضرتك الآن':'المحاضرة القادمة'}</span><strong>${E(next.course_name)}</strong><span>${E(dayLabel(next.day))} · <bdi>${E(next.time)}</bdi> · القاعة <bdi>${E(next.room||'غير محددة')}</bdi>${next.moved?' · تم نقل القاعة':''}</span>`:`<strong>${M.names(state.user).length?'لا توجد محاضرات قادمة هذا الأسبوع':'ابدأ بربط اسمك الأكاديمي'}</strong><span>${M.names(state.user).length?'أي جدول جديد باسمك يظهر تلقائيًا.':'اختر اسمك المعتمد من صفحة الجداول.'}</span>`}</div>${link}</div>`;
     const options=[['','الأسبوع كاملًا'],...S.days.map((d,i)=>[d,S.labels[i]])].map(([v,l])=>`<option value="${v}"${state.day===v?' selected':''}>${l}</option>`).join('');
     const filtered=stats.own.filter(x=>!state.day||x.day===state.day);

@@ -92,3 +92,9 @@
  #mob-profile-capsule #profile-name-mob{font-size:9px}#mob-profile-capsule #profile-role-mob{font-size:7px}
  .citl-mobile-footer-info{gap:4px}.citl-mobile-footer-info p{font-size:7.5px}
 }
+@media(max-width:640px){html:not(.citl-desktop-request) #dashboard-home .dh-scroll{overscroll-behavior:auto}}
+
+/* Unread state is visible without moving the bell or changing its hit area. */
+.citl-has-unread{animation:citl-unread-breathe 2.8s ease-in-out infinite}
+@keyframes citl-unread-breathe{0%,100%{background-color:rgba(255,255,255,.08);box-shadow:0 0 0 0 rgba(243,166,40,0)}50%{background-color:rgba(243,166,40,.26);box-shadow:0 0 0 3px rgba(243,166,40,.16)}}
+@media(prefers-reduced-motion:reduce){.citl-has-unread{animation:none;box-shadow:0 0 0 2px rgba(243,166,40,.4)}}

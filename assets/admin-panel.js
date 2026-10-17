@@ -183,6 +183,19 @@ async function updateAdminUsersList() {
     const activeUsersList = document.getElementById('active-users-list');
     const countBadge = document.getElementById('users-count-badge');
     const filterDept = document.getElementById('filter-users-dept') ? document.getElementById('filter-users-dept').value : '';
+    let searchBox = document.getElementById('citl-users-search');
+    if (activeUsersList && !searchBox) {
+        searchBox = document.createElement('input');
+        searchBox.id = 'citl-users-search';
+        searchBox.type = 'search';
+        searchBox.placeholder = 'ابحث بالاسم أو البريد أو القسم';
+        searchBox.setAttribute('aria-label', 'بحث في المستخدمين بالاسم أو البريد أو القسم');
+        searchBox.className = 'w-full mb-3 px-4 py-2 rounded-xl border border-gray-200 bg-white text-[#2A3475] font-bold text-sm focus:border-[#F3A628] outline-none';
+        activeUsersList.closest('table')?.before(searchBox);
+        let timer;
+        searchBox.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(updateAdminUsersList, 280); });
+    }
+    const searchText = searchBox?.value.trim().toLocaleLowerCase('ar') || '';
     const deptStats = document.getElementById('department-stats');
 
     if (activeUsersList) {
@@ -220,6 +233,10 @@ async function updateAdminUsersList() {
         if (document.getElementById('stats-total-normal')) document.getElementById('stats-total-normal').textContent = headCountKnown ? totalNormal : '—';
 
         if (filterDept) users = users.filter(u => u.department === filterDept);
+        if (searchText) users = users.filter(u => {
+            const dept = typeof departments !== 'undefined' ? departments[u.department]?.name : '';
+            return [u.full_name, u.email, u.department, dept, u.position].some(value => String(value || '').toLocaleLowerCase('ar').includes(searchText));
+        });
 
         if (countBadge) countBadge.textContent = `${users.length} مستخدم`;
 

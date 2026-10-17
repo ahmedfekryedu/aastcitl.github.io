@@ -29,6 +29,7 @@
       const el = document.getElementById(id); if (!el) continue;
       el.textContent = String(Math.min(count, 99)); el.classList.toggle('hidden', count === 0);
     }
+    document.querySelectorAll('#notif-btn-wrapper .citl-mobile-bell,#notif-btn-wrapper-pc button').forEach((button) => button.classList.toggle('citl-has-unread', count > 0));
   }
 
   function renderNotifications(items) {
@@ -48,12 +49,20 @@
       button.append(title, body, date);
       if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
-        if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
-        try { if (!item.read_at) await invoke('notifications.read', { ids: [item.id] }); await checkUserNotifications(); } catch (error) { window.showNotification?.('تعذر تحديث قراءة الإشعار؛ أعد المحاولة','error'); return; }
-        if(window.CITLOversight?.openRegistrationNotice(item))return;
-        if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}
-        if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) location.href = item.route;
-        else await checkUserNotifications();
+        if(button.disabled)return;
+        button.disabled=true;button.setAttribute('aria-busy','true');
+        const wait=setTimeout(()=>window.showLoader?.('جاري فتح الإشعار...'),180);
+        let navigating=false;
+        try {
+          if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
+          if (!item.read_at) await invoke('notifications.read', { ids: [item.id] });
+          document.getElementById('notif-menu')?.classList.add('hidden');
+          await checkUserNotifications();
+          if(window.CITLOversight?.openRegistrationNotice(item))return;
+          if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}
+          if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) {navigating=true;location.href = item.route;}
+        } catch (error) { window.showNotification?.('تعذر فتح الإشعار؛ أعد المحاولة','error'); }
+        finally {clearTimeout(wait);if(!navigating)window.hideLoader?.();button.disabled=false;button.removeAttribute('aria-busy');}
       });
       list.appendChild(button);
     }
@@ -71,7 +80,7 @@
   }
 
   async function markAllNotificationsRead() {
-    try { await invoke('notifications.read'); await checkUserNotifications(); }
+    try { await invoke('notifications.read'); document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications(); }
     catch (error) { window.showNotification?.(error.message, 'error'); }
   }
 

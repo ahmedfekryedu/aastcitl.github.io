@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta name="citl-release" content="20261015-r6.9.1.2">
+<meta name="citl-release" content="20261018-r6.9.1.5">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
@@ -153,7 +153,29 @@
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261013-r6.8.10">
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261015-r6.9.1.2">
 <script src="/assets/service-connection.js?v=20261015-r6.9.1"></script>
-<script src="/assets/service-availability.js?v=20261015-r6.9.1.2"></script>
+<script src="/assets/service-availability.js?v=20261018-r6.9.1.5"></script>
+<style id="citl-login-loader-style">
+@font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-display:swap}
+html.citl-page-booting{background:#dce2ed;overflow:hidden!important}
+html.citl-page-booting::before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#dce2ed,#c6cede);z-index:-1}
+html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:none!important;user-select:none}
+#global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
+#global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;direction:rtl;font-family:Cairo,CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:rgba(21,28,64,.22)!important}
+#global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:400px;max-width:94vw;display:flex;flex-direction:column;align-items:center;gap:0}
+#global-loader>.relative{transform:none!important;transition:none!important}
+#global-loader.citl-unified-loader img{width:auto;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
+#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
+#global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
+#global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{height:96px;margin-top:-24px}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:-8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
+#global-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px}
+.citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}
+.citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}
+.citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
+@keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}}
+</style>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden opacity-0 transition-opacity duration-500">
 
@@ -423,20 +445,9 @@
         نسخة تجريبية
     </div>
 </div>
-<div id="global-loader" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
+<div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center bg-white/60 backdrop-blur-[5px] transition-opacity duration-300 opacity-0">
     
-    <div class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center border border-gray-100 transform scale-95 transition-transform duration-300 min-w-[80vw] md:min-w-[400px] gap-0">
-        
-        <div class="mb-0 -mt-6 md:-mt-10">
-            <img src="CITL.png" alt="Loading..." class="h-24 md:h-48 w-auto object-contain mix-blend-multiply brightness-110 contrast-110 saturate-110">
-        </div>
-
-        <div class="text-center -mt-2 md:-mt-6">
-            <h3 class="text-[#2A3475] font-black text-lg md:text-2xl tracking-wide leading-tight">جاري تهيئة النظام</h3>
-            <p id="loader-text" class="text-gray-400 text-xs md:text-sm font-bold mt-1 md:mt-2">يتم استدعاء البيانات، يرجى الانتظار...</p>
-        </div>
-
-    </div>
+<div class="relative"><img src="/CITL.png" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
 </div>
     <div id="success-modal" class="fixed inset-0 z-[100] hidden">
         <div class="absolute inset-0 bg-[#2A3475]/80 backdrop-blur-sm transition-opacity"></div>
@@ -522,43 +533,14 @@ autoRedirect();
         // دوال التحكم في شاشة التحميل (كما هي)
         // =======================================================
         window.showLoader = function(text = "جاري المعالجة...") {
-            const loader = document.getElementById('global-loader');
-            const textEl = document.getElementById('loader-text');
-            
-            if(textEl) textEl.textContent = text;
-
-            if(loader) {
-                loader.classList.remove('hidden');
-                loader.classList.add('flex');
-                
-                // تفعيل الأنيميشن
-                setTimeout(() => {
-                    loader.classList.remove('opacity-0');
-                    const inner = loader.querySelector('.relative');
-                    if(inner) {
-                        inner.classList.remove('scale-95');
-                        inner.classList.add('scale-100');
-                    }
-                }, 10);
-            }
-        }
-
+            const loader=document.getElementById('global-loader');
+            document.getElementById('loader-text').textContent=text;
+            loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');
+        };
         window.hideLoader = function() {
-            const loader = document.getElementById('global-loader');
-            if(loader) {
-                loader.classList.add('opacity-0');
-                const inner = loader.querySelector('.relative');
-                if(inner) {
-                    inner.classList.remove('scale-100');
-                    inner.classList.add('scale-95');
-                }
-                
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    loader.classList.remove('flex');
-                }, 300);
-            }
-        }
+            const loader=document.getElementById('global-loader');
+            loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
+        };
 
         // التبديل بين الفورم
         function toggleForms() {

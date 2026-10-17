@@ -52,6 +52,7 @@
   setInterval(refresh,20000);root.addEventListener('focus',refresh);root.addEventListener('online',refresh);document.addEventListener('visibilitychange',refresh);
  }
  root.addEventListener('citl-profile-loaded',()=>{checkPage(false).catch(e=>{if(!snapshot)errorView(e);});});
+ root.addEventListener('pageshow',e=>{if(e.persisted){leaving=false;root.CITLPageBoot?.hide();refresh();}});
  root.addEventListener('storage',e=>{if(e.key==='sb-main-auth'){snapshot=null;checked=0;refresh();}});
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })(window);

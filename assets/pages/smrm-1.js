@@ -285,23 +285,9 @@ async function loadMeetings() {
             const request=++meetingReadSerial,requestedRoom=currentRoomId,requestedUser=currentUser?.id;
             const stale=()=>request!==meetingReadSerial||String(requestedRoom)!==String(currentRoomId)||requestedUser!==currentUser?.id;
             try {
-let query = supabase
-    .from('meetings')
-    .select('*, profiles!user_id(full_name, email)');
-
-if (requestedRoom) {
-    query = query.eq('room_id', requestedRoom);
-}
-
 const weekEndDate=new Date(currentWeekStart);weekEndDate.setDate(weekEndDate.getDate()+6);
-const [privateResult,publicResult]=await Promise.allSettled([query,window.CITLRequests.rpc(window.sb,'citl_visible_meetings',{p_from:window.CITLAcademicBooking.dateKey(currentWeekStart),p_to:window.CITLAcademicBooking.dateKey(weekEndDate),p_room:requestedRoom||null})]);
-const {data:privateRows,error}=privateResult.status==='fulfilled'?privateResult.value:{data:[],error:privateResult.reason};
-const publicRows=publicResult.status==='fulfilled'?publicResult.value:[];
-const data=[...new Map([...(Array.isArray(publicRows)?publicRows:[]),...(privateRows||[])].map(m=>[String(m.id),m])).values()];
- 
-                
+const data=await window.CITLMeetingUI.readCatalog({from:window.CITLAcademicBooking.dateKey(currentWeekStart),to:window.CITLAcademicBooking.dateKey(weekEndDate),roomId:requestedRoom||null});
                 if(stale())return;
-                if(error && publicResult.status==='rejected')throw error;
 
                 meetings = data.map(m => {
                     // التحقق من وجود القسم (كود الأمان القديم)

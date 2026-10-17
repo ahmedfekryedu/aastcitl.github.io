@@ -10,7 +10,7 @@
  function duration(start,end){const n=Math.round(mins(end)-mins(start));if(!Number.isFinite(n)||n<0)return 'غير محددة';const h=Math.floor(n/60),m=n%60;return [h?(h===1?'ساعة':h===2?'ساعتان':h+' ساعات'):'',m?m+' دقيقة':''].filter(Boolean).join(' و')||'0 دقيقة';}
  function normalize(m){return {...m,startTime:clock(m.startTime||m.start_time),endTime:clock(m.endTime||m.end_time),createdAt:m.createdAt||m.created_at,createdBy:m.profiles?.full_name||m.createdBy||'',creatorEmail:m.profiles?.email||m.creatorEmail||null};}
  function kind(m){return m.booking_type==='lecture'?'محاضرة / سكشن':reasons[m.booking_reason]|| (m.booking_type==='other'?'استخدام إداري / آخر':'اجتماع');}
- function details(m){return [['نوع الحجز',kind(m)],['الجهة الحاجزة',department(m.department)],['القاعة',m.rooms?.name||m.room_name|| (typeof rooms!=='undefined'?rooms.find(r=>String(r.id)===String(m.room_id))?.name:null)||'—'],['مقدم الطلب',m.createdBy||'—'],['بريد مقدم الطلب',m.creatorEmail||'—'],['الحالة',labels[m.status]||m.status],['سبب الحجز',reasons[m.booking_reason]||m.booking_reason||'—'],['تفاصيل السبب',m.booking_reason_detail||'—']];}
+ function details(m){return [['نوع الحجز',kind(m)],['الجهة الحاجزة',department(m.department)],['القاعة',m.rooms?.name||m.room_name|| (typeof rooms!=='undefined'?rooms.find(r=>String(r.id)===String(m.room_id))?.name:null)||'—'],['مقدم الطلب',m.createdBy||'—'],['بريد مقدم الطلب',m.creatorEmail||'—'],['الحالة',labels[m.status]||m.status],['سبب الحجز',m.booking_reason_detail||'لم تُضف تفاصيل للسبب']];}
  function list(items){return '<dl class="citl-meeting-fields">'+items.map(([a,b])=>'<div><dt>'+E(a)+'</dt><dd>'+E(b)+'</dd></div>').join('')+'</dl>';}
  function decorateDetails(m,host){host.querySelector('[data-meeting-extra]')?.remove();const section=document.createElement('section');section.dataset.meetingExtra='';section.innerHTML=list(details(m));
   if(m.pending_changes){const p=normalize({...m,...m.pending_changes});section.innerHTML+='<h4 class="citl-meeting-subtitle">التعديل المطلوب — لم يُعتمد بعد</h4>'+list([['العنوان',p.title],['التاريخ',p.date],['التوقيت',p.startTime+' – '+p.endTime],['المدة',duration(p.startTime,p.endTime)],['الجهة',department(p.department)],['نوع الحجز',kind(p)],['الحضور',p.attendees||'—'],['الملاحظات',p.description||'—'],['تفاصيل السبب',p.booking_reason_detail||'—']]);}
@@ -28,6 +28,19 @@
  function addDetailsButton(row,m){if(row.querySelector('[data-meeting-action=viewMeetingFromAdmin]'))return;const cell=row.lastElementChild;if(!cell)return;const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.dataset.meetingAction='viewMeetingFromAdmin';b.textContent='التفاصيل';cell.prepend(b);}
  function rememberAdminEdit(){document.getElementById('add-meeting-modal').style.zIndex='1800';}
  async function afterSave(id){const wasAdmin=document.getElementById('admin-panel-modal')?.classList.contains('show');if(wasAdmin){if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}if(id&&!wasAdmin)await open(id,false);await upcoming(true);}
+ // Same base records as administration; presentation does not depend on optional columns or joins.
+ async function readCatalog({from,to,roomId=null}={}){
+  const own=(async()=>{const rows=[];for(let offset=0;;offset+=500){let q=root.sb.from('meetings').select('*').order('id',{ascending:true}).range(offset,offset+499);if(from)q=q.gte('date',from);if(to)q=q.lte('date',to);if(roomId)q=q.eq('room_id',roomId);const {data,error}=await q;if(error)throw error;rows.push(...(data||[]));if(!data||data.length<500)break;if(offset>=100000)throw Error('عدد الحجوزات يتجاوز حد العرض؛ راجع الإدارة');}return rows;})();
+  const publicRead=from&&to?root.CITLRequests.rpc(root.sb,'citl_visible_meetings',{p_from:from,p_to:to,p_room:roomId}):Promise.resolve([]);
+  const [privateResult,publicResult]=await Promise.allSettled([own,publicRead]);
+  if(privateResult.status==='rejected'&&publicResult.status==='rejected')throw privateResult.reason;
+  // A successful empty catalog must not disguise a failure of the account's own read.
+  if(privateResult.status==='rejected'&&!(Array.isArray(publicResult.value)&&publicResult.value.length))throw privateResult.reason;
+  const publicRows=publicResult.status==='fulfilled'&&Array.isArray(publicResult.value)?publicResult.value:[];
+  const rows=[...new Map([...publicRows,...(privateResult.status==='fulfilled'?privateResult.value:[])].map(m=>[String(m.id),m])).values()];
+  const roomRows=typeof rooms!=='undefined'?rooms:[];
+  return rows.map(m=>({...m,rooms:m.rooms||{name:m.room_name||roomRows.find(r=>String(r.id)===String(m.room_id))?.name||'قاعة'}}));
+ }
  let loading=null,upcomingRows=null,lastLoad=0,upcomingOwner=null,visibleUpcoming=6;
  function renderUpcoming(){const host=document.getElementById('ai-suggestions');if(!host||root.CITLRoomAvailability?.isFree())return;const now=cairo(),rows=(upcomingRows||[]).filter(m=>(m.date>now.date||(m.date===now.date&&mins(m.end_time)>now.minutes)));
   rows.sort((a,b)=>(a.date+' '+a.start_time).localeCompare(b.date+' '+b.start_time));
@@ -40,14 +53,9 @@
   if(upcomingOwner!==owner){upcomingRows=null;lastLoad=0;visibleUpcoming=6;upcomingOwner=owner;}if(upcomingRows)renderUpcoming();if(loading||(!force&&Date.now()-lastLoad<15000))return loading;
   if(!upcomingRows)host.innerHTML=root.CITLLoading?.summary(2)||'';
   loading=(async()=>{try{const now=cairo(),end=new Date(now.date+'T12:00:00Z');end.setUTCDate(end.getUTCDate()+369);
- const [privateResult,publicResult]=await Promise.allSettled([
- root.sb.from('meetings').select('id,title,department,date,start_time,end_time,status,booking_type,booking_reason,course_name,room_id,rooms!room_id(name)').gte('date',now.date).in('status',['confirmed','modification_requested','cancellation_requested','pending']).order('date').order('start_time').limit(100),
- root.CITLRequests.rpc(root.sb,'citl_visible_meetings',{p_from:now.date,p_to:end.toISOString().slice(0,10),p_room:null})]);
- const privateData=privateResult.status==='fulfilled'&&!privateResult.value.error?privateResult.value.data||[]:[];
- const publicData=publicResult.status==='fulfilled'&&Array.isArray(publicResult.value)?publicResult.value:[];
- if(publicResult.status==='rejected' && (privateResult.status==='rejected'||privateResult.value.error))throw (privateResult.reason||privateResult.value.error);
+ const data=await readCatalog({from:now.date,to:end.toISOString().slice(0,10)});
  if(root.currentUser?.id!==owner)return;
- upcomingRows=[...new Map([...publicData,...privateData].filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status)).map(m=>[String(m.id),{...m,rooms:m.rooms||{name:m.room_name}}])).values()];lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
+ upcomingRows=data.filter(m=>['confirmed','modification_requested','cancellation_requested','pending'].includes(m.status));lastLoad=Date.now();host.dataset.upcoming='';renderUpcoming();}catch(error){console.error('CITL upcoming meetings read failed:',error);if(!upcomingRows)host.innerHTML='<div class="citl-admin-empty">تعذر تحميل الحجوزات القادمة. <button type="button" data-retry-bookings class="citl-ac-button secondary">إعادة المحاولة</button></div>';host.querySelector('[data-retry-bookings]')?.addEventListener('click',()=>upcoming(true));}finally{loading=null;}})();return loading;
  }
  function weekPicker(){document.querySelector('.citl-meeting-date-picker')?.remove();const wrapper=document.getElementById('week-dropdown-wrapper');if(wrapper)wrapper.style.removeProperty('display');}
  let locating=false;
@@ -69,5 +77,5 @@
  // Handle historic notification routes too; new clicks pass the exact ID directly.
  let linked=false;function deepLink(){if(linked||!root.currentUser)return;const p=new URLSearchParams(location.search);if(p.get('notification')!=='meeting')return;linked=true;if(p.get('meeting'))open(p.get('meeting'),true);else root.openAdminPanel(canReview()?'meetings':'my-bookings');}
  root.addEventListener('citl-profile-loaded',deepLink);setTimeout(deepLink,0);
- root.CITLMeetingUI=Object.freeze({duration,normalize,decorateDetails,open,addDetailsButton,rememberAdminEdit,afterSave,upcoming,weekPicker,locate,hiddenBookings,scrollToBooking,department,kind,status:s=>labels[s]||s});
+ root.CITLMeetingUI=Object.freeze({readCatalog,duration,normalize,decorateDetails,open,addDetailsButton,rememberAdminEdit,afterSave,upcoming,weekPicker,locate,hiddenBookings,scrollToBooking,department,kind,status:s=>labels[s]||s});
 })(window);

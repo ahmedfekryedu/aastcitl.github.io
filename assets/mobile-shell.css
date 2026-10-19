@@ -142,3 +142,6 @@
 /* Explicit button rendering avoids Safari native white button chrome. */
 #notif-menu button,.citl-mobile-bell{-webkit-appearance:none;appearance:none;color-scheme:light}
 #notif-menu>div:first-child>button{background:transparent;color:inherit}
+
+/* R6.9.2.1: keep the timetable state while its action is in front. */
+#my-schedule-modal.citl-action-suspended{visibility:hidden;pointer-events:none}

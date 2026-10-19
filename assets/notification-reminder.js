@@ -16,3 +16,41 @@
  }
  root.CITLNotificationReminder=Object.freeze({check});root.addEventListener('citl-profile-loaded',()=>void check());document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check();});setInterval(check,60000);void check();
 })(window);
+
+// Pending decisions survive "mark all read". Read-only, server-authorized workflow query.
+(function(root){'use strict';
+ const labels={academic:'اعتماد إجراءات المحاضرات',meeting:'اعتماد طلبات القاعات',registration:'اعتماد تسجيل الأعضاء'};
+ let busy=false,checked=0,owner='',items=[],timer=null,opening=false;
+ const key=kind=>'citl-pending-opened:'+owner+':'+kind;
+ function acknowledged(kind){try{return Date.now()-Number(localStorage.getItem(key(kind))||0)<3600000;}catch(_){return false;}}
+ function visible(e){return !!e&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=='hidden'&&getComputedStyle(e).display!=='none';}
+ function close(){clearTimeout(timer);timer=null;document.getElementById('citl-pending-reminder')?.close();}
+ async function read(){const result=await root.sb.rpc('citl_pending_approval_reminders');if(result.error)throw result.error;return Array.isArray(result.data?.items)?result.data.items:[];}
+ function show(){clearTimeout(timer);timer=null;
+  if(owner!==root.currentUser?.id){close();return;}
+  const kinds=Object.keys(labels).filter(k=>!acknowledged(k)&&items.some(x=>x.kind===k));
+  if(!kinds.length){close();return;}
+  if(document.hidden||document.documentElement.classList.contains('citl-page-booting')||visible(document.getElementById('global-loader'))||[...document.querySelectorAll('dialog[open],.modal,#mobile-menu,#cm-mobile-nav,#notif-menu')].some(visible)){timer=setTimeout(show,1500);return;}
+  const d=document.createElement('dialog');d.id='citl-pending-reminder';d.dir='rtl';d.setAttribute('aria-labelledby','citl-pending-title');
+  d.innerHTML='<div class="citl-overdue-icon" aria-hidden="true">!</div><h2 id="citl-pending-title">طلبات تنتظر إجراءك منذ ساعة</h2><p>قراءة الإشعار لا تُنهي طلب الاعتماد. افتح كل نوع لمراجعة الطلبات المعلقة ضمن صلاحياتك.</p><div data-actions></div><p class="citl-overdue-note">إذا بقي الطلب معلقًا سيظهر التذكير بعد ساعة من فتحه.</p><div role="status"></div>';
+  d.oncancel=e=>e.preventDefault();d.onclose=()=>d.remove();
+  kinds.forEach(kind=>{const b=document.createElement('button');b.type='button';b.dataset.pendingKind=kind;b.textContent=labels[kind]+' ('+items.filter(x=>x.kind===kind).length.toLocaleString('ar-EG')+')';d.querySelector('[data-actions]').append(b);
+   b.onclick=async()=>{if(opening)return;opening=true;b.disabled=true;d.querySelector('[role=status]').textContent='جاري التحقق من حالة الطلبات…';
+    try{const uid=owner;const fresh=await read();if(uid!==root.currentUser?.id){close();return;}items=fresh;const target=items.find(x=>x.kind===kind);
+     if(!target){close();root.showNotification?.('تمت معالجة هذه الطلبات بالفعل.','success');timer=setTimeout(show,100);return;}
+     close();root.showLoader?.('جاري فتح الطلبات المعلقة');
+     let opened;
+     if(kind==='academic'&&typeof root.CITLOversight?.openWorkboard==='function')opened=await root.CITLOversight.openWorkboard({action:target.id});
+     else if(kind==='registration'&&typeof root.CITLOversight?.openApprovals==='function')opened=await root.CITLOversight.openApprovals({request:target.id});
+     else if(kind==='meeting'&&typeof root.CITLMeetingUI?.open==='function')opened=await root.CITLMeetingUI.open(target.id,true);
+     else {try{localStorage.setItem(key(kind),String(Date.now()));}catch(_){}location.assign(target.route);return;}
+     if(opened===false)throw Error('تعذر فتح الطلبات؛ لم يتم تأجيل التذكير.');
+     try{localStorage.setItem(key(kind),String(Date.now()));}catch(_){}timer=setTimeout(show,1500);
+    }catch(error){if(d.isConnected)d.querySelector('[role=status]').textContent=error.message||'تعذر فتح الطلبات؛ أعد المحاولة.';else {root.showNotification?.(error.message,'error');timer=setTimeout(show,1500);}}
+    finally{root.hideLoader?.();opening=false;b.disabled=false;}
+   };
+  });document.body.append(d);d.showModal();
+ }
+ async function check(force=false){const id=root.currentUser?.id;if(!id||!root.sb||root.CITLAuth?.facultyPending(root.currentUser)){items=[];close();return;}if(owner!==id){close();items=[];owner=id;checked=0;}if(busy||opening||document.hidden||(!force&&Date.now()-checked<60000))return;busy=true;checked=Date.now();try{const fresh=await read();if(id!==root.currentUser?.id)return;const changed=JSON.stringify(items)!==JSON.stringify(fresh);items=fresh;if(changed||!document.getElementById('citl-pending-reminder')){close();show();}}catch(_){/* Missing migration or offline read must not block other work. */}finally{busy=false;}}
+ root.CITLPendingApprovalsReminder=Object.freeze({check});root.addEventListener('citl-profile-loaded',()=>void check());document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check();});setInterval(check,60000);void check();
+})(window);

@@ -3,6 +3,7 @@
   let pending, recoveryTimer, recovering = false, verifiedOnce = false;
   let recoveryAttempts = 0;
   let monitoring = false, checkingAccount = false, leaving = false;
+  let refreshing=null;
   const fault = (message, code) => Object.assign(new Error(message), { code });
   const facultyPending = profile => ['pending','rejected'].includes(profile?.faculty_verification_status) || (['faculty','visiting_lecturer'].includes(profile?.account_type) && profile.faculty_verification_status !== 'approved');
   const protectedPage = /^\/(dashboard|smrm|schedules|management|attendance|courses)(\/|$)/.test(location.pathname);
@@ -25,10 +26,14 @@
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
       }
       const { data, error } = result;
-      if (error && result.status === 401) await verifyAuthUser();
-      if (error) throw error;
-      if (!data) throw fault('تعذر العثور على الملف الشخصي؛ تواصل مع المسؤول', 'PROFILE_MISSING');
-      const profile = { ...data, id: current.user.id, email: current.user.email };
+      if (error && result.status === 401) {
+        await verifyAuthUser();
+        const retried=await root.sb.from('profiles').select('*').eq('id',current.user.id).maybeSingle();
+        if(!retried.error&&retried.data){result=retried;}else throw retried.error||fault('الحساب لم يعد متاحًا','PROFILE_MISSING');
+      }
+      if (result.error) throw result.error;
+      if (!result.data) throw fault('تعذر العثور على الملف الشخصي؛ تواصل مع المسؤول', 'PROFILE_MISSING');
+      const profile = { ...result.data, id: current.user.id, email: result.data.email||current.user.email };
       if (protectedPage && facultyPending(profile)) {
         try { localStorage.removeItem('currentUser'); } catch (_) {}
         location.replace('/account/');
@@ -49,7 +54,8 @@
     return pending;
   }
   function redirectIfSignedOut(error) {
-    if (!['AUTH_REQUIRED','PROFILE_MISSING','user_not_found','session_not_found','refresh_token_not_found'].includes(error?.code)) return false;
+    const missing=error?.name==='AuthSessionMissingError'||error?.code==='refresh_token_already_used'||error?.code==='bad_jwt';
+    if (!missing&&!['AUTH_REQUIRED','PROFILE_MISSING','user_not_found','session_not_found','refresh_token_not_found'].includes(error?.code)) return false;
     if (leaving) return true;
     leaving = true;
     clearTimeout(recoveryTimer);
@@ -60,9 +66,16 @@
     return true;
   }
   async function verifyAuthUser() {
-    const result = await root.sb.auth.getUser();
+    let result = await root.sb.auth.getUser();
+    if(result.error&&[401,403].includes(result.error.status)&&!['user_not_found','user_banned'].includes(result.error.code)){
+      refreshing ||= root.sb.auth.refreshSession().finally(()=>{refreshing=null;});
+      const renewed=await refreshing;
+      if(renewed.error){if(renewed.error.status>=500||renewed.error.name==='AuthRetryableFetchError')throw renewed.error;throw fault('يلزم تسجيل الدخول مجددًا','AUTH_REQUIRED');}
+      if(!renewed.data?.session)throw fault('يلزم تسجيل الدخول مجددًا','AUTH_REQUIRED');
+      result=await root.sb.auth.getUser();
+    }
     if (result.error) {
-      if (result.error.status === 401 || ['user_not_found','session_not_found'].includes(result.error.code)) throw fault('يلزم تسجيل الدخول مجددًا', 'AUTH_REQUIRED');
+      if ([401,403].includes(result.error.status) || result.error.name==='AuthSessionMissingError' || ['bad_jwt','user_not_found','session_not_found'].includes(result.error.code)) throw fault('يلزم تسجيل الدخول مجددًا', 'AUTH_REQUIRED');
       throw result.error;
     }
     if (!result.data?.user) throw fault('الحساب لم يعد متاحًا', 'AUTH_REQUIRED');

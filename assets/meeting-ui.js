@@ -15,6 +15,24 @@
  function decorateDetails(m,host){host.querySelector('[data-meeting-extra]')?.remove();const section=document.createElement('section');section.dataset.meetingExtra='';section.innerHTML=list(details(m));
   if(m.pending_changes){const p=normalize({...m,...m.pending_changes});section.innerHTML+='<h4 class="citl-meeting-subtitle">التعديل المطلوب — لم يُعتمد بعد</h4>'+list([['العنوان',p.title],['التاريخ',p.date],['التوقيت',p.startTime+' – '+p.endTime],['المدة',duration(p.startTime,p.endTime)],['الجهة',department(p.department)],['نوع الحجز',kind(p)],['الحضور',p.attendees||'—'],['الملاحظات',p.description||'—'],['تفاصيل السبب',p.booking_reason_detail||'—']]);}
   host.querySelector('.space-y-4')?.before(section);if(!section.isConnected)host.append(section);
+  if(m.booking_type==='lecture'&&!m.academic_schedule_id&&!m.pending_changes&&P.can(root.currentUser,'can_approve')){
+   const correction=document.createElement('button');correction.type='button';correction.className='citl-ac-button secondary';correction.textContent='تصحيح النوع إلى حجز قاعة اجتماع';section.append(correction);
+   correction.onclick=async()=>{if(correction.disabled)return;correction.disabled=true;try{
+    const yes=await root.showConfirmDialog('هل هذا حجز اجتماع سُجل بالخطأ كمحاضرة؟ سيُصحح التصنيف مع الاحتفاظ بالموعد والقاعة والحالة الحالية.',{title:'تصحيح نوع الحجز',confirmText:'تأكيد التصحيح',icon:'fa-exchange-alt',color:'bg-[#2A3475]',iconColor:'text-[#2A3475]',iconBg:'bg-slate-100'});if(!yes)return;
+    root.showLoader?.('جاري تصحيح نوع الحجز');
+    const {data,error}=await root.sb.from('meetings').select('*').eq('id',m.id).single();if(error)throw error;
+    await root.CITLRequests.rpc(root.sb,'citl_correct_meeting_type',{p_id:String(m.id),p_expected:data});
+    await open(m.id,false);await root.updateAdminMeetingsList?.();await upcoming(true);root.showNotification?.('تم تصحيح نوع الحجز مع الحفاظ على موعده واعتماده.','success');
+   }catch(error){root.showNotification?.(error.message,'error');}finally{root.hideLoader?.();correction.disabled=false;}};
+  }
+  if(m.status==='pending'&&P.can(root.currentUser,'can_approve')&&typeof root.approveMeeting==='function'){
+   const actions=document.createElement('div');actions.className='citl-ac-buttons';
+   const approve=document.createElement('button');approve.type='button';approve.className='citl-ac-button';approve.textContent='اعتماد الحجز';actions.append(approve);section.append(actions);
+   approve.onclick=async()=>{if(approve.disabled)return;approve.disabled=true;
+    try{const success=await root.approveMeeting(m.id);if(success){await open(m.id,false);root.checkUserNotifications?.();}}
+    finally{approve.disabled=false;}
+   };
+  }
  }
  function canReview(){return P.full(root.currentUser)||P.can(root.currentUser,'can_approve')||P.can(root.currentUser,'can_delete');}
  let opening=false;
@@ -23,8 +41,8 @@
   let data=privateData;if(!data){try{data=await root.CITLRequests.rpc(root.sb,'citl_visible_meeting',{p_id:String(id)});}catch(e){throw error||e;}}if(!data)throw Error('الحجز غير موجود أو غير متاح لحسابك');
   document.getElementById('notif-menu')?.classList.add('hidden');
   if(management&&(canReview()||data.user_id===root.currentUser?.id)){root.openAdminPanel(canReview()?'meetings':'my-bookings');if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}
-  root.showMeetingDetails(normalize(data));
- }catch(error){root.showNotification?.('تعذر فتح تفاصيل الحجز: '+error.message,'error');}finally{opening=false;}}
+  root.showMeetingDetails(normalize(data));return true;
+ }catch(error){root.showNotification?.('تعذر فتح تفاصيل الحجز: '+error.message,'error');return false;}finally{opening=false;}}
  function addDetailsButton(row,m){if(row.querySelector('[data-meeting-action=viewMeetingFromAdmin]'))return;const cell=row.lastElementChild;if(!cell)return;const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.dataset.meetingAction='viewMeetingFromAdmin';b.textContent='التفاصيل';cell.prepend(b);}
  function rememberAdminEdit(){document.getElementById('add-meeting-modal').style.zIndex='1800';}
  async function afterSave(id){const wasAdmin=document.getElementById('admin-panel-modal')?.classList.contains('show');if(wasAdmin){if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}if(id&&!wasAdmin)await open(id,false);await upcoming(true);}

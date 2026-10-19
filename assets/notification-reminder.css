@@ -1,10 +1,10 @@
-#citl-overdue-reminder{color-scheme:only light;box-sizing:border-box;width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:30px 26px;position:fixed;inset:0;margin:auto;border:1px solid #e1e5ee;border-top:4px solid #f3a628;border-radius:22px;background:#fff!important;color:#2a3475;box-shadow:0 24px 70px #111a4040;text-align:center;font-family:Cairo,sans-serif;overflow:auto;transform:none!important;animation:none!important}
-#citl-overdue-reminder::backdrop{background:#151c4066;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-#citl-overdue-reminder .citl-overdue-icon{width:62px;height:62px;margin:0 auto 16px;border-radius:20px;display:grid;place-items:center;background:#fff4dc;color:#b96b00;font-size:26px;border:1px solid #f3a62855}
-#citl-overdue-reminder h2{font-size:20px;line-height:1.7;font-weight:900;margin:0 0 12px;color:#2a3475}
-#citl-overdue-reminder p{font-size:14px;line-height:1.9;margin:6px 0;color:#45516c}
-#citl-overdue-reminder .citl-overdue-note{font-size:12px;color:#64748b}
-#citl-overdue-reminder button{appearance:none;-webkit-appearance:none;width:100%;margin-top:22px;display:flex;align-items:center;justify-content:center;gap:10px;font:800 14px Cairo,sans-serif;border:1px solid #222b64;border-radius:11px;background:#2a3475;color:white;padding:12px 16px;cursor:pointer}
-#citl-overdue-reminder button:disabled{opacity:.6;cursor:wait}#citl-overdue-reminder [role=status]{font-size:12px;line-height:1.8;margin-top:8px;color:#9f1239}
-@media(max-width:767px){#citl-overdue-reminder{padding:24px 20px}#citl-overdue-reminder h2{font-size:18px}}
-@media print{#citl-overdue-reminder{display:none!important}}
+:is(#citl-overdue-reminder,#citl-pending-reminder){color-scheme:only light;box-sizing:border-box;width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:30px 26px;position:fixed;inset:0;margin:auto;border:1px solid #e1e5ee;border-top:4px solid #f3a628;border-radius:22px;background:#fff!important;color:#2a3475;box-shadow:0 24px 70px #111a4040;text-align:center;font-family:Cairo,sans-serif;overflow:auto;transform:none!important;animation:none!important}
+:is(#citl-overdue-reminder,#citl-pending-reminder)::backdrop{background:#151c4066;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+:is(#citl-overdue-reminder,#citl-pending-reminder) .citl-overdue-icon{width:62px;height:62px;margin:0 auto 16px;border-radius:20px;display:grid;place-items:center;background:#fff4dc;color:#b96b00;font-size:26px;border:1px solid #f3a62855}
+:is(#citl-overdue-reminder,#citl-pending-reminder) h2{font-size:20px;line-height:1.7;font-weight:900;margin:0 0 12px;color:#2a3475}
+:is(#citl-overdue-reminder,#citl-pending-reminder) p{font-size:14px;line-height:1.9;margin:6px 0;color:#45516c}
+:is(#citl-overdue-reminder,#citl-pending-reminder) .citl-overdue-note{font-size:12px;color:#64748b}
+:is(#citl-overdue-reminder,#citl-pending-reminder) button{appearance:none;-webkit-appearance:none;width:100%;margin-top:22px;display:flex;align-items:center;justify-content:center;gap:10px;font:800 14px Cairo,sans-serif;border:1px solid #222b64;border-radius:11px;background:#2a3475;color:white;padding:12px 16px;cursor:pointer}
+:is(#citl-overdue-reminder,#citl-pending-reminder) button:disabled{opacity:.6;cursor:wait}:is(#citl-overdue-reminder,#citl-pending-reminder) [role=status]{font-size:12px;line-height:1.8;margin-top:8px;color:#9f1239}
+@media(max-width:767px){:is(#citl-overdue-reminder,#citl-pending-reminder){padding:24px 20px}:is(#citl-overdue-reminder,#citl-pending-reminder) h2{font-size:18px}}
+@media print{:is(#citl-overdue-reminder,#citl-pending-reminder){display:none!important}}

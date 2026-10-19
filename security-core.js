@@ -56,7 +56,7 @@
       const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&item.body?.length>180?item.body.slice(0,180)+'…':item.body || '';
       const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
       button.append(title, body, date);
-      if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel(item.payload.review)||'';button.append(status);} 
+      if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel?.(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
         if(button.disabled)return;
         button.disabled=true;button.setAttribute('aria-busy','true');
@@ -67,7 +67,7 @@
           if (!item.read_at) await invoke('notifications.read', { ids: [item.id] });
           document.getElementById('notif-menu')?.classList.add('hidden');
           await checkUserNotifications();
-          if(window.CITLOversight?.openRegistrationNotice(item))return;
+          if(window.CITLOversight?.openRegistrationNotice?.(item))return;
           if(await openSpecialNotice(item))return;
           if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}
           if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) {navigating=true;location.href = item.route;}
@@ -90,7 +90,7 @@
     if(!item.route||!window.CITLOversight?.openWorkboard)return false;
     const url=new URL(item.route,location.origin);if(url.origin!==location.origin)return false;
     if(url.searchParams.get('open')==='academic'){await window.CITLOversight.openWorkboard({action:url.searchParams.get('action'),term:url.searchParams.get('term')});return true;}
-    if(url.searchParams.get('open')==='approvals'&&window.CITLOversight.openApprovals){await window.CITLOversight.openApprovals();return true;}
+    if(url.searchParams.get('open')==='approvals'&&window.CITLOversight.openApprovals){await window.CITLOversight.openApprovals({request:url.searchParams.get('request')});return true;}
     return false;
   }
   window.CITLOpenSpecialNotice=openSpecialNotice;
@@ -111,17 +111,31 @@
     catch (error) { window.showNotification?.(error.message, 'error'); }
   }
 
+  function fitNotifications() {
+    const menu=document.getElementById('notif-menu');
+    if(!menu||menu.classList.contains('hidden'))return;
+    // All entry points, including the overdue dialog, use the same visible viewport.
+    if(menu.parentElement!==document.body)document.body.append(menu);
+    const vp=window.visualViewport,w=vp?.width||innerWidth,h=vp?.height||innerHeight,
+      x=vp?.offsetLeft||0,y=vp?.offsetTop||0,pad=10;
+    const anchor=document.getElementById(innerWidth<1024?'notif-btn-wrapper':'notif-btn-wrapper-pc');
+    const rect=anchor?.getBoundingClientRect(),width=Math.min(320,Math.max(1,w-pad*2));
+    const top=Math.max(y+pad,Math.min((rect?.bottom||y+60)+8,y+Math.max(pad,h-180)));
+    Object.assign(menu.style,{position:'fixed',boxSizing:'border-box',width:width+'px',maxWidth:width+'px',
+      left:Math.max(x+pad,Math.min((rect?.right||x+w-pad)-width,x+w-width-pad))+'px',right:'auto',
+      top:top+'px',bottom:'auto',maxHeight:Math.max(1,y+h-top-pad)+'px',overflowY:'auto',transform:'none'});
+  }
+  window.CITLFitNotifications=fitNotifications;
+  window.addEventListener('resize',fitNotifications);
+  window.visualViewport?.addEventListener('resize',fitNotifications);
+  window.visualViewport?.addEventListener('scroll',fitNotifications);
   async function toggleNotifications(options) {
     const menu = document.getElementById('notif-menu'); if (!menu) return;
     const opening = menu.classList.contains('hidden'); menu.classList.toggle('hidden');
     if (opening) {
       notificationMode=options?.overdue===true?'overdue':'unread';notificationPage=0;
-      const anchor = document.getElementById(innerWidth < 1024 ? 'notif-btn-wrapper' : 'notif-btn-wrapper-pc');
-      const rect = anchor?.getBoundingClientRect();
-      menu.style.top = `${Math.max(8,Math.min((rect?.bottom || 70) + 8, innerHeight - 160))}px`;
-      menu.style.maxHeight=`${Math.max(120,innerHeight-parseFloat(menu.style.top)-12)}px`;
-      menu.style[document.dir === 'rtl' ? 'right' : 'left'] = `${Math.max(10, innerWidth - (rect?.right || innerWidth - 10))}px`;
-      const loaded=await checkUserNotifications();
+      fitNotifications();
+      const loaded=await checkUserNotifications();fitNotifications();
       if(options?.overdue===true&&!loaded)throw new Error('تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.');
     }
   }

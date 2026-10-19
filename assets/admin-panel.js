@@ -1921,10 +1921,12 @@ window.approveMeeting = async function(id) {
         // تحديث الواجهة
         showNotification('تم اعتماد الحجز بنجاح ✅');
         refreshAllViews();
+        return true;
 
     } catch(err) {
         console.error(err);
         showNotification(err.message || 'خطأ في الاعتماد', 'error');
+        return false;
     } finally {
         document.body.style.cursor = 'default';
     }

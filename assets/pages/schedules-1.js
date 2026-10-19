@@ -3044,14 +3044,26 @@ function renderActionDetails(actionRow) {
     `;
 }
 
+let scheduleActionOpening=false;
+function presentScheduleActionModal() {
+    const modal=document.getElementById('schedule-action-modal');
+    if(modal.parentElement!==document.body)document.body.append(modal);
+    const parent=document.getElementById('my-schedule-modal');
+    if(parent&&!parent.classList.contains('hidden'))parent.classList.add('citl-action-suspended');
+    modal.classList.remove('hidden');modal.classList.add('flex');
+}
 function closeScheduleActionModal() {
     const modal = document.getElementById('schedule-action-modal');
     if (!modal) return;
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+    document.getElementById('my-schedule-modal')?.classList.remove('citl-action-suspended');
 }
 
 async function openScheduleActionModal(encodedItemJson, selectedDate) {
+    if(scheduleActionOpening)return;
+    scheduleActionOpening=true;
+    window.showLoader?.('جاري تحميل موعد الإجراء');
     try {
         const item = JSON.parse(decodeURIComponent(encodedItemJson));
 
@@ -3149,15 +3161,14 @@ async function openScheduleActionModal(encodedItemJson, selectedDate) {
 
         window.CITLLectureDates.mount(item, dateData);
         const modal = document.getElementById('schedule-action-modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        presentScheduleActionModal();
         const card = modal.querySelector('div.relative');
         if (card) card.scrollTop = 0;
 
     } catch (e) {
         console.error(e);
         showNotification(e.message || 'تعذر فتح نافذة الإجراء', 'error');
-    }
+    } finally {scheduleActionOpening=false;window.hideLoader?.();}
 }
 
 
@@ -3400,8 +3411,7 @@ async function openScheduleReportEditor(actionId) {
         onScheduleActionTypeChange();
 
         const modal = document.getElementById('schedule-action-modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        presentScheduleActionModal();
 
     } catch (err) {
         console.error(err);

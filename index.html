@@ -167,15 +167,15 @@ html.citl-page-booting #global-loader{display:flex!important;visibility:visible!
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 @media(min-width:1024px){html{scrollbar-gutter:stable}}
 html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-ready) #global-loader p{visibility:hidden}
-#global-loader.citl-unified-loader img{width:192px;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
+#global-loader.citl-unified-loader img{width:192px;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:0;flex-shrink:0}
 /* Preserve the same light logo card in WebKit dark mode; do not blend an opaque logo with a darkened compositor layer. */
 #global-loader.citl-unified-loader,#global-loader.citl-unified-loader>.relative{color-scheme:light;color-scheme:only light;forced-color-adjust:none}
 #global-loader.citl-unified-loader>.relative{background:#fff!important;color:#2a3475!important;isolation:isolate;opacity:1!important}
 #global-loader.citl-unified-loader img{mix-blend-mode:normal!important;background:transparent!important;opacity:1!important}
-#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
+#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:12px 0 0;letter-spacing:.025em;line-height:1.25}
 #global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
 #global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
-@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{width:96px;height:96px;margin-top:-24px}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:-8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{width:96px;height:96px;margin-top:0}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
 #global-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px}
 .citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}
 .citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}

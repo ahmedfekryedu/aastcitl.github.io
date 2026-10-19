@@ -17,13 +17,7 @@
  async function notifications(){
   close(false);document.getElementById('profile-info-menu')?.classList.add('hidden');
   const pending=root.toggleNotifications?.();
-  function fit(){const popup=document.getElementById('notif-menu');if(!popup||popup.classList.contains('hidden'))return;
-  if(mobile()){
-   const rect=document.getElementById('notif-btn-wrapper').getBoundingClientRect();
-   popup.style.top=Math.max(8,Math.min(rect.bottom+8,innerHeight-160))+'px';
-   popup.style.right=Math.max(10,Math.min(innerWidth-rect.right,innerWidth-popup.getBoundingClientRect().width-10))+'px';popup.style.left='auto';
-   popup.style.maxHeight=Math.max(120,innerHeight-parseFloat(popup.style.top)-12)+'px';
-  }}fit();await pending;fit();
+  root.CITLFitNotifications?.();await pending;root.CITLFitNotifications?.();
  }
  let confirmingLogout=false;
  document.addEventListener('click',async e=>{

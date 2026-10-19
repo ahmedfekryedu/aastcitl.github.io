@@ -18,15 +18,15 @@ html.citl-page-booting #global-loader{display:flex!important;visibility:visible!
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 @media(min-width:1024px){html{scrollbar-gutter:stable}}
 html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-ready) #global-loader p{visibility:hidden}
-#global-loader.citl-unified-loader img{width:192px;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
+#global-loader.citl-unified-loader img{width:192px;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:0;flex-shrink:0}
 /* Preserve the same light logo card in WebKit dark mode; do not blend an opaque logo with a darkened compositor layer. */
 #global-loader.citl-unified-loader,#global-loader.citl-unified-loader>.relative{color-scheme:light;color-scheme:only light;forced-color-adjust:none}
 #global-loader.citl-unified-loader>.relative{background:#fff!important;color:#2a3475!important;isolation:isolate;opacity:1!important}
 #global-loader.citl-unified-loader img{mix-blend-mode:normal!important;background:transparent!important;opacity:1!important}
-#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
+#global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:12px 0 0;letter-spacing:.025em;line-height:1.25}
 #global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
 #global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
-@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{width:96px;height:96px;margin-top:-24px}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:-8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{padding:24px;width:80vw;max-width:94vw}#global-loader.citl-unified-loader img{width:96px;height:96px;margin-top:0}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:8px}#global-loader.citl-unified-loader p{font-size:12px;margin-top:4px}}
 #global-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px}
 .citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}
 .citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}
@@ -571,9 +571,9 @@ body {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261019-r6.9.2.1" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/site-notice.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="/assets/notification-reminder.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/notification-reminder.css?v=20261019-r6.9.2.1" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 </head>
  <body class="bg-gray-50">
 <script>document.body.prepend(document.getElementById("global-loader"));</script>
@@ -581,7 +581,7 @@ body {
 <script src="/assets/read-timeout.js?v=20261018-r6.9.2"></script>
 <script src="/assets/permissions.js?v=20261018-r6.9.2"></script>
 <script src="/assets/study-settings.js?v=20261018-r6.9.2"></script>
-<script src="/assets/auth-session.js?v=20261018-r6.9.2"></script>
+<script src="/assets/auth-session.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/data-client.js?v=20261018-r6.9.2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="/presence.js?v=20261018-r6.9.2"></script>
@@ -1188,7 +1188,7 @@ body {
             </button></nav></div><div class="citl-drawer-bottom"><button onclick="logout();" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
                 <i class="fas fa-sign-out-alt text-lg"></i>
                 <span>تسجيل الخروج</span>
-            </button><small dir="ltr">Version R6.9.2</small></div></section></div>
+            </button><small dir="ltr">Version R6.9.2.1</small></div></section></div>
 
 <div id="profile-info-menu" class="hidden fixed w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300">
     <div class="metallic-blue-fill p-4 border-b border-[#F3A628] relative overflow-hidden">
@@ -1223,27 +1223,27 @@ body {
 <script src="/assets/tv-admin-ui.js?v=20261018-r6.9.2"></script>
 <script src="/assets/weekly-booking.js?v=20261018-r6.9.2"></script><script src="/assets/pages/smrm-1.js?v=20261018-r6.9.2"></script>
 <script src="/assets/academic-booking.js?v=20261018-r6.9.2"></script>
-<script src="/assets/admin-panel.js?v=20261018-r6.9.2"></script>
+<script src="/assets/admin-panel.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/tv-display-dates.js?v=20261018-r6.9.2"></script><script src="/assets/tv-room-catalog.js?v=20261018-r6.9.2"></script><script src="/assets/video-layout.js?v=20261018-r6.9.2"></script><script src="/assets/tv-video-converter.js?v=20261018-r6.9.2"></script>
 <script src="/assets/tv-media-storage.js?v=20261018-r6.9.2"></script>
 <script src="/assets/tv-media-usage.js?v=20261018-r6.9.2"></script>
 <script src="/assets/tv-admin.js?v=20261018-r6.9.2"></script>
-<script src="/security-core.js?v=20261018-r6.9.2"></script>
+<script src="/security-core.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/admin-permissions-ui.js?v=20261018-r6.9.2"></script>
 <script src="/assets/department-heads.js?v=20261018-r6.9.2"></script>
 <script src="/assets/registration-review-status.js?v=20261018-r6.9.2"></script>
-<script src="/assets/academic-oversight.js?v=20261018-r6.9.2"></script>
+<script src="/assets/academic-oversight.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/admin-access.js?v=20261018-r6.9.2"></script>
 <script src="/assets/admin-announcements.js?v=20261018-r6.9.2"></script>
 <script src="/assets/faculty-identity.js?v=20261018-r6.9.2"></script>
-<script src="/assets/registration-correction.js?v=20261018-r6.9.2"></script>
+<script src="/assets/registration-correction.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/academic-room-reservation.js?v=20261018-r6.9.2"></script>
 <script src="/assets/room-availability.js?v=20261018-r6.9.2"></script>
 <script src="/assets/faculty-registration-census.js?v=20261018-r6.9.2"></script>
-<script src="/assets/meeting-ui.js?v=20261018-r6.9.2"></script>
+<script src="/assets/meeting-ui.js?v=20261019-r6.9.2.1"></script>
 <script src="/assets/service-admin.js?v=20261018-r6.9.2"></script>
-<script src="/assets/mobile-shell.js?v=20261018-r6.9.2"></script>
-<script src="/assets/site-notice.js?v=20261018-r6.9.2" defer></script>
-<script src="/assets/notification-reminder.js?v=20261018-r6.9.2" defer></script>
+<script src="/assets/mobile-shell.js?v=20261019-r6.9.2.1"></script>
+<script src="/assets/site-notice.js?v=20261019-r6.9.2.1" defer></script>
+<script src="/assets/notification-reminder.js?v=20261019-r6.9.2.1" defer></script>
 </body>
 </html>

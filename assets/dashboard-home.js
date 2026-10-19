@@ -47,7 +47,7 @@
     $('dh-title').textContent='جدولي الدراسي';
     $('dh-subtitle').textContent=M.names(state.user).length?`الأسبوع الحالي · ${dateLabel(M.week(now).start)} — ${dateLabel(M.week(now).end)}`:'اربط اسمك الأكاديمي بحسابك ليظهر جدولك هنا';
     const failed=state.errors.some(x=>['schedule','actions'].includes(x));
-    $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('محاضرات الأسبوع',failed?'—':stats.assigned.length,'حسب الجدول الحالي')+metric('ساعات التدريس',failed?'—':stats.hours,'حسب الجدول الحالي')+metric('القاعات',failed?'—':new Set(stats.assigned.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك',true);
+    $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('انتهت اليوم',failed?'—':stats.ownToday.filter(x=>x.end<=now.minutes).length,'حسب توقيت القاهرة')+metric('ساعات التدريس اليوم',failed?'—':stats.todayHours,'محاضرات اليوم')+metric('القاعات',failed?'—':new Set(stats.ownToday.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك اليوم',true);
     const next=stats.next;
     const link=`<a class="dh-button" href="/schedules/?open=my-schedule" aria-label="فتح إجراءات جدولي الدراسي">${M.names(state.user).length?'إجراءات جدولي الدراسي':'ربط اسمي'}</a>`;
     const focus=`<div class="dh-focus"><div class="dh-focus-copy">${failed?'<strong>تعذر تحديث جدولك</strong>':next?`<span class="dh-focus-label">${next.live?'محاضرتك الآن':'المحاضرة القادمة'}</span><strong>${E(next.course_name)}</strong><span>${E(dayLabel(next.day))} · <bdi>${E(next.time)}</bdi> · القاعة <bdi>${E(next.room||'غير محددة')}</bdi>${next.moved?' · تم نقل القاعة':''}</span>`:`<strong>${M.names(state.user).length?'لا توجد محاضرات قادمة هذا الأسبوع':'ابدأ بربط اسمك الأكاديمي'}</strong><span>${M.names(state.user).length?'أي جدول جديد باسمك يظهر تلقائيًا.':'اختر اسمك المعتمد من صفحة الجداول.'}</span>`}</div>${link}</div>`;
@@ -78,7 +78,7 @@
     if(r.meetings){
       const b=M.bookings(state.meetings,state.user,now);
       const nextText=meetingFailed?'تعذر التحديث':b.next?`التالي <bdi>${clock(b.next.start)}</bdi>`:'لا يوجد حجز تالٍ اليوم';
-      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات تحتاج إجراء',meetingFailed?'—':b.requests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
+      administration=summaryCard('متابعة الحجوزات','مؤكدة اليوم',meetingFailed?'—':b.confirmed.length,[metric('حجوزات جارية',meetingFailed?'—':b.live.length),metric('طلبات اليوم تحتاج إجراء',meetingFailed?'—':b.todayRequests.length),metric('تعارضات القاعات',meetingFailed||b.conflicts===null?'—':b.conflicts)],`<span>${nextText}</span><button class="dh-button" data-dh-admin="meetings">مراجعة الحجوزات</button>`,'dh-admin-summary');
     }
     $('dh-workspace').innerHTML=`<div class="dh-summary-grid${r.meetings?' dh-with-admin':''}">${rooms}${lectures}${administration}</div>${r.users&&!r.meetings?'<div class="dh-permission-link"><button class="dh-button" data-dh-admin="users">إدارة المستخدمين</button></div>':''}`;
     $('dh-metrics').innerHTML='';

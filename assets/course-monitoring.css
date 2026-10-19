@@ -16,3 +16,16 @@
 #cm-mobile-content nav{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:20px 16px}#cm-mobile-content nav a,#cm-mobile-content nav button{display:flex;align-items:center;gap:10px;padding:14px 12px;border-radius:12px;font-size:13px;font-weight:700;text-align:right}#cm-mobile-content nav a:not([data-header-home]):hover{background:#f8fafc}#cm-mobile-content nav [hidden]{display:none!important}#cm-mobile-content nav img{display:inline-block}
 #cm-mobile-content>footer{padding:16px;color:#94a3b8;border-top:1px solid #f1f5f9;font-size:10px;text-align:center}
 @keyframes cm-drawer-in{from{transform:translateX(100%)}to{transform:translateX(0)}}@media(prefers-reduced-motion:reduce){#cm-mobile-content{animation:none}}
+
+/* R6.9.2: scoped course administration; no global header/layout changes. */
+.cm-permission-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0;padding:14px;border:1px solid var(--cm-line);border-radius:12px;background:#f8fafc}
+.cm-permission-grid label{align-items:flex-start;line-height:1.8}.cm-permission-grid input{flex:none;margin-top:3px}
+.cm-panel form>.cm-btn{margin-top:12px}.cm-panel form>label{margin:12px 0}.cm-audit-json{white-space:pre-wrap;overflow-wrap:anywhere;font:11px monospace;direction:ltr;max-width:350px}
+.cm-tag.not_started{background:#edf0f3;color:#626a78}.cm-table details>summary{cursor:pointer;color:var(--cm-navy);font-weight:700}.cm-table details .cm-table{min-width:380px}
+.cm-dialog{max-width:94vw}.cm-dialog .cm-body{max-height:78vh;overflow:auto}.cm-dialog>header{position:sticky;top:0;z-index:2}
+.cm-week-row fieldset{grid-template-columns:80px repeat(2,minmax(120px,1fr));align-items:start}.cm-week-row label:has(textarea){grid-column:1/-1}.cm-week-row button{justify-self:start}
+.cm-indicators{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.cm-indicators .cm-btn[aria-pressed=true]{background:var(--cm-navy);color:white}
+@media(max-width:640px){.cm-permission-grid{grid-template-columns:1fr}.cm-week-row fieldset{grid-template-columns:1fr 1fr}.cm-week-row strong,.cm-week-row button{grid-column:1/-1}.cm-indicators .cm-btn{flex:1 1 45%;font-size:11px}.cm-dialog .cm-body{padding:14px}}
+
+.cm-table-empty{text-align:center!important;color:#6c7590;padding:16px!important}
+@media print{body{background:white!important;display:block;min-height:0}.cm-table-empty{padding:8pt!important}}

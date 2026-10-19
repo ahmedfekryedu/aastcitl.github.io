@@ -49,10 +49,10 @@
     let response;
     try {
       response = await fetch(API + path, {method, headers: {Authorization:'Bearer ' + data.session.access_token, ...(body ? {'Content-Type':'application/json'} : {})}, body:body ? JSON.stringify(body) : undefined, cache:'no-store', signal:AbortSignal.timeout(45000)});
-    } catch (_) { throw new Error('تعذر الاتصال بخدمة الميديا؛ تحقق من الشبكة وإعدادات Cloudflare'); }
+    } catch (_) { throw new Error('تعذر الاتصال بنطاق media-api.aastcitl.me؛ تحقق من اتصال الشبكة وDNS وربط نطاق Worker'); }
     if (!response.ok) {
       const result = method === 'HEAD' ? {} : await response.json().catch(() => ({}));
-      throw new Error(result.message || (response.status === 401 ? 'انتهت الجلسة؛ سجّل الدخول مرة أخرى' : 'فشل التحقق من ملف الميديا أو صلاحية الوصول'));
+      throw Object.assign(new Error(result.message || (response.status === 401 ? 'انتهت الجلسة؛ سجّل الدخول مرة أخرى' : 'فشل التحقق من ملف الميديا أو صلاحية الوصول')), {status:response.status});
     }
     return method === 'HEAD' ? response : response.json();
   }
@@ -67,15 +67,17 @@
       if (error) throw new Error('تعذر حذف ملف Supabase القديم: ' + error.message);
     }
   }
-  function putFile(url, file, progress) {
+  function putFile(url, file, progress = () => {}, extraHeaders = {}, signal) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('PUT', url); xhr.timeout = 15 * 60 * 1000;
       xhr.setRequestHeader('Content-Type', file.type);
+      for (const [key,value] of Object.entries(extraHeaders)) xhr.setRequestHeader(key,value);
+      const abort=()=>xhr.abort();if(signal?.aborted)return reject(new Error('تم إلغاء الرفع'));signal?.addEventListener('abort',abort,{once:true});xhr.onloadend=()=>signal?.removeEventListener('abort',abort);
       // No Supabase bearer token or R2 credentials are sent to this request.
       xhr.upload.onprogress = event => { if (event.lengthComputable) progress(Math.round(event.loaded * 100 / event.total)); };
       xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(xhr.status === 403 ? 'انتهى رابط الرفع أو إعدادات R2 غير مطابقة؛ أعد اختيار الرفع' : 'فشل رفع الملف إلى R2؛ لم يُنشر الإعلان'));
-      xhr.onerror = () => reject(new Error('انقطع الاتصال أثناء الرفع؛ لم يُنشر الإعلان'));
+      xhr.onerror = () => reject(Object.assign(new Error('تعذر الاتصال بعنوان التخزين المباشر؛ قد تكون المشكلة في الشبكة أو DNS أو إعدادات CORS'), {network:true}));
       xhr.ontimeout = xhr.onabort = () => reject(new Error('توقف الرفع؛ أعد المحاولة'));
       xhr.send(file);
     });
@@ -100,7 +102,20 @@
     const target = new URL(signed.uploadUrl);
     if (target.protocol !== 'https:' || !/^[a-f0-9]{32}\.r2\.cloudflarestorage\.com$/.test(target.hostname) || signed.publicUrl !== 'https://media.aastcitl.me/' + signed.objectKey) throw new Error('استجابة خدمة الرفع غير صالحة');
     try {
-      await putFile(signed.uploadUrl, file, progress);
+      stage('جاري رفع الملف إلى التخزين…');
+      try { await putFile(signed.uploadUrl, file, progress, {}, signal); }
+      catch (directError) {
+        if (!directError.network || signal?.aborted) throw directError;
+        // A connection can close after R2 has stored the object; verify before retransmitting.
+        let complete=false;
+        try { const head=await api(sb, '/api/media?objectKey='+encodeURIComponent(row.object_key), 'HEAD');complete=Number(head.headers.get('X-Media-Size'))===file.size&&head.headers.get('X-Media-Type')===file.type; } catch (_) {}
+        if(!complete) {
+          if(!signed.relayTicket)throw new Error(file.size>90*1024*1024?'تعذر الاتصال المباشر بـR2. المسار البديل يدعم حتى 90 ميجابايت؛ جرّب شبكة أخرى أو ملفًا أصغر. لم يُنشر الإعلان.':'تعذر الاتصال المباشر بـR2؛ يلزم تحديث Worker لتفعيل مسار الرفع البديل. لم يُنشر الإعلان.');
+          const {data,error}=await sb.auth.getSession();if(error||!data.session?.access_token)throw new Error('انتهت الجلسة؛ سجّل الدخول مجددًا');
+          stage('جاري إعادة الرفع عبر خدمة الميديا…');
+          await putFile(API+'/api/media/upload',file,progress,{'Authorization':'Bearer '+data.session.access_token,'X-Media-Upload-Token':signed.relayTicket},signal);
+        }
+      }
       stage('اكتمل الرفع؛ جاري التحقق من الملف…');
       const verified = await api(sb, '/api/media?objectKey=' + encodeURIComponent(row.object_key), 'HEAD');
       if (Number(verified.headers.get('X-Media-Size')) !== file.size || verified.headers.get('X-Media-Type') !== file.type) throw new Error('الملف المرفوع غير مكتمل؛ لم يتم نشره');

@@ -282,11 +282,11 @@ function refreshAllViews() {
 
 let meetingReadSerial=0;
 async function loadMeetings() {
-            const request=++meetingReadSerial,requestedRoom=currentRoomId,requestedUser=currentUser?.id;
-            const stale=()=>request!==meetingReadSerial||String(requestedRoom)!==String(currentRoomId)||requestedUser!==currentUser?.id;
+            const request=++meetingReadSerial,requestedRoom=currentRoomId,requestedUser=currentUser?.id,requestedWeek=window.CITLAcademicBooking.dateKey(currentWeekStart);
+            const stale=()=>request!==meetingReadSerial||String(requestedRoom)!==String(currentRoomId)||requestedUser!==currentUser?.id||requestedWeek!==window.CITLAcademicBooking.dateKey(currentWeekStart);
             try {
 const weekEndDate=new Date(currentWeekStart);weekEndDate.setDate(weekEndDate.getDate()+6);
-const data=await window.CITLMeetingUI.readCatalog({from:window.CITLAcademicBooking.dateKey(currentWeekStart),to:window.CITLAcademicBooking.dateKey(weekEndDate),roomId:requestedRoom||null});
+const data=await window.CITLMeetingUI.readCatalog({from:requestedWeek,to:window.CITLAcademicBooking.dateKey(weekEndDate),roomId:requestedRoom||null});
                 if(stale())return;
 
                 meetings = data.map(m => {
@@ -524,7 +524,6 @@ async function initializeApp() {
 
         // Initialize calendar
         function initializeCalendar() {
-            currentWeekStart = window.CITLAcademicBooking.weekStart();
             updateWeekDisplay();
             renderCalendar();
         }

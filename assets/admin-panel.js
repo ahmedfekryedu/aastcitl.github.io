@@ -104,7 +104,7 @@ if (tabName === 'news' && typeof loadNewsConfig === 'function') {
 }
 
     if (tabName === 'rooms') { initRoomsTab(); }
-    if (tabName === 'settings') { loadSystemSettings(); }
+    if (tabName === 'settings') { loadSystemSettings(); window.CITLSiteNotice?.mount(); }
     if (tabName === 'reports' && typeof updateAdminReports === 'function') {
         try { updateAdminReports(); } catch (e) { console.error(e); }
     }
@@ -186,7 +186,9 @@ function filterAdminMeetings(type) {
             renderAdminMeetingsTable(filteredMeetings);
         }
 
+let citlUsersRequest=0;
 async function updateAdminUsersList() {
+    const request=++citlUsersRequest;
     if(!window.CITLPermissions.can(currentUser,'can_manage_users'))return;
     window.CITLFacultyAdmin?.load();
     if (typeof updateSidebarProfile === 'function') updateSidebarProfile();
@@ -206,6 +208,8 @@ async function updateAdminUsersList() {
         let timer;
         searchBox.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(updateAdminUsersList, 280); });
     }
+    let sortBox=document.getElementById('citl-users-sort');
+    if(searchBox&&!sortBox){sortBox=document.createElement('select');sortBox.id='citl-users-sort';sortBox.setAttribute('aria-label','ترتيب المستخدمين');sortBox.className=searchBox.className;sortBox.innerHTML='<option value="recent">آخر ظهور أولًا</option><option value="newest">الأحدث تسجيلًا</option><option value="oldest">الأقدم تسجيلًا</option><option value="name">الاسم</option>';searchBox.after(sortBox);sortBox.addEventListener('change',updateAdminUsersList);}
     const searchText = searchBox?.value.trim().toLocaleLowerCase('ar') || '';
     const deptStats = document.getElementById('department-stats');
 
@@ -233,6 +237,9 @@ async function updateAdminUsersList() {
         let headIds = new Set(), headCountKnown = true;
         try { const heads = await window.CITLRequests.rpc(window.sb,'citl_department_permission_holders',{});if(!Array.isArray(heads))throw Error('يلزم تحديث033');headIds=new Set(heads.map(h=>h.profile_id)); }
         catch (_) { headCountKnown=false; }
+        if(request!==citlUsersRequest)return;
+        const order=sortBox?.value||'recent',timestamp=x=>Number.isFinite(Date.parse(x))?Date.parse(x):0;
+        users.sort((a,b)=>order==='name'?String(a.full_name||'').localeCompare(String(b.full_name||''),'ar'):order==='oldest'?timestamp(a.created_at)-timestamp(b.created_at):order==='newest'?timestamp(b.created_at)-timestamp(a.created_at):timestamp(b.last_seen_at)-timestamp(a.last_seen_at));
         const totalAdmins = users.filter(u => window.CITLPermissions.full(u)).length;
         const totalDelegated = users.filter(u => !window.CITLPermissions.full(u) && (window.CITLPermissions.any(u) || headIds.has(u.id))).length;
         const totalNormal = users.length - totalAdmins - totalDelegated;
@@ -374,12 +381,14 @@ async function updateAdminUsersList() {
 </td>
 
 <td class="px-4 py-3 text-center">
-    ${actionBtns}
+    ${actionBtns}${window.CITLPermissions.full(currentUser)&&(!window.CITLPermissions.full(user)||isMe)?'<button type="button" data-user-action="credentials" class="text-xs text-[#2A3475] mt-2" title="البريد وكلمة المرور"><i class="fas fa-key"></i> بيانات الدخول</button>':''}<button type="button" data-user-action="journey" class="text-xs text-[#2A3475] mt-2" title="سجل التنقل والاستخدام"><i class="fas fa-history"></i> سجل النشاط</button>
 </td>
 `;
 
 tr.querySelectorAll('[data-user-action]').forEach(button => {
     button.addEventListener('click', () => {
+        if(button.dataset.userAction==='credentials')return window.CITLRegistrationCorrection?.credentials(user);
+        if(button.dataset.userAction==='journey')return window.CITLUserJourney?.open(user.id,user.full_name||user.email);
         if (button.dataset.userAction === 'edit') return openEditUserInfo(user.id, user.full_name || '', user.department || '', user.position || '', user.mobile || '');
         if (button.dataset.userAction === 'permissions') return openPermissionsModal(user.id, user.full_name || '', encodeURIComponent(JSON.stringify(user.permissions || {})));
         return window.deleteUser(user.id, user.full_name || '');

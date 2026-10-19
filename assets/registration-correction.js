@@ -87,5 +87,19 @@
   }catch(error){list.textContent=error.message;}finally{section.dataset.loading='false';}
  }
  function openAdmin(profileId){const d=dialog(root.CITLPermissions?.full(root.currentUser)?'تصحيح بيانات العضو واعتماد الحساب':'تصحيح بيانات الحساب المرفوض');editor(d.querySelector('[data-content]'),profileId,async()=>{await root.CITLOversight?.loadApprovals();await root.updateAdminUsersList?.();root.checkUserNotifications?.();});}
- root.CITLRegistrationCorrection=Object.freeze({rejectionReason,editor,mount,openAdmin});
+ function credentials(person){
+  if(!root.CITLPermissions.full(root.currentUser))return;
+  const d=dialog('تعديل البريد وكلمة المرور'),host=d.querySelector('[data-content]');
+  host.innerHTML='<form class="citl-correction-form"><strong>'+E(person.full_name||person.email)+'</strong><p>تعديل بيانات الدخول فقط؛ ربط الاسم الأكاديمي والصلاحيات وحالة الاعتماد تظل محفوظة. تحقق من هوية صاحب الحساب قبل التغيير.</p><label>بريد تسجيل الدخول<input name="email" type="email" required dir="ltr" autocomplete="off"></label><label>كلمة مرور جديدة — اختياري<input name="password" type="password" minlength="8" autocomplete="new-password"></label><label>تأكيد كلمة المرور<input name="confirmation" type="password" autocomplete="new-password"></label><p>اترك كلمة المرور فارغة للاحتفاظ بالحالية. لا يمكن عرض كلمة المرور القديمة.</p><label><span><input type="checkbox" name="confirmed" required style="width:auto"> تأكدت من الحساب وبيانات الدخول الجديدة</span></label><button type="submit">حفظ بيانات الدخول</button><p data-status role="status"></p></form>';
+  const f=host.querySelector('form'),status=f.querySelector('[data-status]'),button=f.querySelector('button');f.elements.email.value=person.email||'';const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const hex=[...bytes].map(n=>n.toString(16).padStart(2,'0')).join(''),changeId=[hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');let signature=null;
+  f.onsubmit=async e=>{e.preventDefault();if(button.disabled||!f.reportValidity())return;
+   if(f.elements.password.value!==f.elements.confirmation.value){status.textContent='كلمة المرور وتأكيدها غير متطابقين';return;}
+   const payload={mode:'credentials',change_id:changeId,profile_id:person.id,expected_email:person.email,email:f.elements.email.value.trim(),password:f.elements.password.value};
+   const current=JSON.stringify(payload);if(signature&&signature!==current){status.textContent='حدّث القائمة وأعد فتح النافذة قبل تغيير بيانات المحاولة السابقة.';return;}signature=current;
+   button.disabled=true;status.textContent='جاري حفظ بيانات الدخول…';
+   try{await root.CITLAuth.session();const result=await root.sb.functions.invoke('citl-account-correction',{body:payload});if(result.error){let msg=result.error.message;try{msg=(await result.error.context.json()).message||msg;}catch(_){}throw Error(msg);}if(!result.data?.ok)throw Error(result.data?.message||'لم يتأكد حفظ التغيير');f.elements.password.value='';f.elements.confirmation.value='';host.innerHTML='<p class="citl-correction-success">تم تحديث بيانات الدخول. يمكن للعضو استخدام البريد وكلمة المرور الجديدة إن غيّرتها.</p>';await root.updateAdminUsersList?.();if(person.id===root.currentUser.id)await root.CITLAuth.loadProfile();}
+   catch(error){status.textContent=error.message;button.disabled=false;}
+  };
+ }
+ root.CITLRegistrationCorrection=Object.freeze({rejectionReason,editor,mount,openAdmin,credentials});
 })(window);

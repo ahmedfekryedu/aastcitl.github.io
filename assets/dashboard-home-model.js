@@ -35,7 +35,7 @@
     const own=items.filter(x=>x.own),assigned=own.filter(x=>x.assigned),ownToday=assigned.filter(x=>x.occurs!==false&&x.date===now.date);
     const future=assigned.filter(x=>x.occurs!==false&&x.start!==null&&(x.date>now.date||(x.date===now.date&&x.end>now.minutes)));
     return {today,live,rooms:[...rooms].sort(),available:[...rooms].filter(x=>!busy.has(x)).sort(),own,assigned,ownToday,
-      next:future[0]||null,hours:Math.round(assigned.reduce((sum,x)=>sum+(x.start===null?0:x.end-x.start),0)/60*10)/10};
+      next:future[0]||null,todayHours:Math.round(ownToday.reduce((sum,x)=>sum+(x.start===null?0:x.end-x.start),0)/60*10)/10,hours:Math.round(assigned.reduce((sum,x)=>sum+(x.start===null?0:x.end-x.start),0)/60*10)/10};
   }
   function pending(rows,user){const r=role(user);return rows.filter(x=>(r.approve&&['pending','modification_requested','cancellation_requested','deletion_requested'].includes(x.status))||(r.remove&&['cancellation_requested','deletion_requested'].includes(x.status)));}
   function bookings(rows,user,now=S.cairo()){
@@ -47,7 +47,7 @@
     if(conflicts!==null)for(let i=0;i<confirmed.length;i++)for(let j=i+1;j<confirmed.length;j++){
       const a=confirmed[i],b=confirmed[j];if(a.room_id===b.room_id&&a.start<b.end&&b.start<a.end)conflicts++;
     }
-    return {cancelled:rows.filter(x=>x.status==='cancelled'),confirmed,requests:pending(rows,user),live:valid.filter(x=>x.start<=now.minutes&&x.end>now.minutes),next:valid.filter(x=>x.start>now.minutes).sort((a,b)=>a.start-b.start)[0]||null,conflicts};
+    return {cancelled:rows.filter(x=>x.status==='cancelled'),confirmed,requests:pending(rows,user),todayRequests:pending(rows.filter(x=>x.date===now.date),user),live:valid.filter(x=>x.start<=now.minutes&&x.end>now.minutes),next:valid.filter(x=>x.start>now.minutes).sort((a,b)=>a.start-b.start)[0]||null,conflicts};
   }
   root.CITLDashboardModel=Object.freeze({role,names,week,lectures,statistics,pending,bookings});
 })(window);

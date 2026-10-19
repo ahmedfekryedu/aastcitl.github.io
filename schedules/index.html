@@ -14,11 +14,15 @@ html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:non
 #global-loader.citl-unified-loader{position:fixed;inset:0;z-index:99999;width:100%;height:100%;margin:0!important;padding:16px;box-sizing:border-box;transform:none!important;animation:none!important;transition:none!important;align-items:center;justify-content:center;direction:rtl;font-family:CITLBootCairo,sans-serif;background:rgba(21,28,64,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:rgba(21,28,64,.22)!important}
 #global-loader.citl-unified-loader>.relative{box-sizing:border-box;background:white;padding:40px;border-radius:32px;box-shadow:0 25px 50px #18245026;border:1px solid #f1f5f9;text-align:center;width:400px;max-width:94vw;display:flex;flex-direction:column;align-items:center;gap:0}
-#global-loader>.relative{transform:none!important;animation:none!important;transition:none!important;margin:0!important;flex-shrink:0}
+#global-loader>.relative{position:absolute!important;inset:0!important;width:400px;height:max-content;max-height:calc(100% - 32px);overflow:auto;transform:none!important;animation:none!important;transition:none!important;margin:auto!important;flex-shrink:0}
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 @media(min-width:1024px){html{scrollbar-gutter:stable}}
 html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-ready) #global-loader p{visibility:hidden}
 #global-loader.citl-unified-loader img{width:192px;height:192px;max-width:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.1) contrast(1.1) saturate(1.1);margin-top:-40px}
+/* Preserve the same light logo card in WebKit dark mode; do not blend an opaque logo with a darkened compositor layer. */
+#global-loader.citl-unified-loader,#global-loader.citl-unified-loader>.relative{color-scheme:light;color-scheme:only light;forced-color-adjust:none}
+#global-loader.citl-unified-loader>.relative{background:#fff!important;color:#2a3475!important;isolation:isolate;opacity:1!important}
+#global-loader.citl-unified-loader img{mix-blend-mode:normal!important;background:transparent!important;opacity:1!important}
 #global-loader.citl-unified-loader h3{color:#2a3475;font-size:24px;font-weight:900;margin:-24px 0 0;letter-spacing:.025em;line-height:1.25}
 #global-loader.citl-unified-loader p{color:#9ca3af;font-size:14px;font-weight:700;margin:8px 0 0}
 #global-loader [data-boot-retry]{color:#2a3475;font:inherit;background:#fff;border:1px solid #dce1ef;border-radius:8px;padding:8px;margin-top:12px}
@@ -42,11 +46,11 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
  var releasing=false;function check(){if(ready&&!done&&!releasing&&!d.querySelector('link[data-citl-boot-style][media=print]')&&!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking')){releasing=true;requestAnimationFrame(function(){requestAnimationFrame(function(){releasing=false;if(!html.classList.contains('citl-auth-checking')&&!html.classList.contains('citl-services-checking'))release();});});}}
  d.addEventListener('load',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);d.addEventListener('error',function(e){if(e.target.matches?.('link[data-citl-boot-style]'))setTimeout(check,0);},true);
  var observer=new MutationObserver(check);observer.observe(html,{attributes:true,attributeFilter:['class']});
- function show(text){if(!done)return;box.classList.remove('hidden','opacity-0');box.classList.add('flex');if(text)d.getElementById('loader-text').textContent=text;}
- function hide(){if(!done)return;box.classList.add('hidden','opacity-0');box.classList.remove('flex');}
+ function show(text){if(!done)return;clearTimeout(timer);box.querySelector('button').hidden=true;timer=setTimeout(function(){box.querySelector('button').hidden=false;},25000);box.classList.remove('hidden','opacity-0');box.classList.add('flex');if(text)d.getElementById('loader-text').textContent=text;}
+ function hide(){if(!done)return;clearTimeout(timer);box.querySelector('button').hidden=true;box.classList.add('hidden','opacity-0');box.classList.remove('flex');}
  d.addEventListener('keydown',function(e){if(!done&&e.key==='Tab'){e.preventDefault();if(!box.querySelector('button').hidden)box.querySelector('button').focus();}},true);
  w.CITLPageBoot=Object.freeze({finish:function(){ready=true;check();},failure:release,show:show,hide:hide,isStarting:function(){return !done;}});
- w.addEventListener('citl-profile-loaded',function(){ready=true;check();});
+ w.addEventListener('citl-profile-loaded',check);
  w.addEventListener('pageshow',function(e){if(e.persisted){hide();check();}});
 })(window,document);
 </script>
@@ -72,8 +76,8 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
     <link rel="shortcut icon" type="image/png" href="/CITL_Logo-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/CITL_Logo-192.png">
     <link rel="apple-touch-icon" href="/CITL_Logo-192.png">
-    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
     
     
@@ -510,38 +514,41 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
     padding-left: 38px;
 }
     </style>
-<link rel="stylesheet" href="/assets/interface-controls.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/interface-controls.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
-<script defer src="/assets/interface-controls.js?v=20261018-r6.9.1.8"></script>
+<script defer src="/assets/interface-controls.js?v=20261018-r6.9.2"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/fonts.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<script defer src="/assets/site-updates.js?v=20261018-r6.9.1.8"></script>
-<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/fonts.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<script defer src="/assets/site-updates.js?v=20261018-r6.9.2"></script>
+<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
-<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="/assets/registration-correction.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="../assets/lecture-action-dates.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="/assets/service-availability.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/registration-correction.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="../assets/lecture-action-dates.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/meeting-ui.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/service-availability.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261018-r6.9.1.8" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/site-notice.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/notification-reminder.css?v=20261018-r6.9.2" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 <script>document.body.prepend(document.getElementById("global-loader"));</script>
-<script src="/vendor/supabase-js-2.45.4.min.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/read-timeout.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/permissions.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/auth-session.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/data-client.js?v=20261018-r6.9.1.8"></script>
-<script src="/vendor/qrcode-1.5.4.min.js?v=20261018-r6.9.1.8"></script>
+<script src="/vendor/supabase-js-2.45.4.min.js?v=20261018-r6.9.2"></script>
+<script src="/assets/read-timeout.js?v=20261018-r6.9.2"></script>
+<script src="/assets/permissions.js?v=20261018-r6.9.2"></script>
+<script src="/assets/auth-session.js?v=20261018-r6.9.2"></script>
+<script src="/assets/data-client.js?v=20261018-r6.9.2"></script>
+<script src="/vendor/qrcode-1.5.4.min.js?v=20261018-r6.9.2"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/presence.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/loading-placeholders.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/desktop-mode.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/service-connection.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/service-availability.js?v=20261018-r6.9.1.8"></script>
+<script src="/presence.js?v=20261018-r6.9.2"></script>
+<script defer src="/assets/user-journey.js?v=20261018-r6.9.2"></script>
+<script src="/assets/loading-placeholders.js?v=20261018-r6.9.2"></script>
+<script src="/assets/desktop-mode.js?v=20261018-r6.9.2"></script>
+<script src="/assets/service-connection.js?v=20261018-r6.9.2"></script>
+<script src="/assets/service-availability.js?v=20261018-r6.9.2"></script>
 
 <script>
     
@@ -633,7 +640,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
     </div>
 </div>
 
-<div id="mobile-menu" class="citl-mobile-overlay hidden" hidden><div class="citl-drawer-backdrop" data-mobile-close></div><section id="mobile-menu-content" class="citl-drawer" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية" tabindex="-1"><div class="citl-drawer-head"><div class="citl-drawer-heading"><strong>القائمة الرئيسية</strong><button type="button" data-mobile-close aria-label="إغلاق القائمة">×</button></div><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div></div><div class="citl-drawer-body"><div class="citl-drawer-account"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><div><strong data-mobile-account></strong><small data-mobile-position></small></div></div><p class="citl-drawer-label">صفحات النظام</p><nav class="citl-drawer-primary"><a href="/dashboard/"><i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span></a><a href="/smrm/"><i class="fas fa-building" aria-hidden="true"></i><span>القاعات الدراسية</span></a><a href="/schedules/" aria-current="page"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>الجداول الدراسية</span></a><a href="/courses/"><i class="fas fa-book-open" aria-hidden="true"></i><span>المقررات الدراسية</span></a></nav><hr><p class="citl-drawer-label">الحساب والإدارة</p><nav class="citl-drawer-actions"><button data-schedule-hub onclick="toggleMobileMenu(); openScheduleHub();" class="hidden w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right">                <div class="flex items-center gap-3">
+<div id="mobile-menu" class="citl-mobile-overlay hidden" hidden><div class="citl-drawer-backdrop" data-mobile-close></div><section id="mobile-menu-content" class="citl-drawer" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية" tabindex="-1"><div class="citl-drawer-head"><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div><div class="citl-drawer-heading"><strong>القائمة الرئيسية</strong><button type="button" data-mobile-close aria-label="إغلاق القائمة">×</button></div></div><div class="citl-drawer-body"><div class="citl-drawer-account"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><div><strong data-mobile-account></strong><small data-mobile-position></small></div></div><p class="citl-drawer-label">صفحات النظام</p><nav class="citl-drawer-primary"><a href="/dashboard/"><i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span></a><a href="/smrm/"><i class="fas fa-building" aria-hidden="true"></i><span>القاعات الدراسية</span></a><a href="/schedules/" aria-current="page"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>الجداول الدراسية</span></a><a href="/courses/"><i class="fas fa-book-open" aria-hidden="true"></i><span>المقررات الدراسية</span></a></nav><hr><p class="citl-drawer-label">الحساب والإدارة</p><nav class="citl-drawer-actions"><button data-schedule-hub onclick="toggleMobileMenu(); openScheduleHub();" class="hidden w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors border border-transparent hover:border-gray-100 text-right">                <div class="flex items-center gap-3">
                     <i class="fas fa-chalkboard-user text-lg text-[#2A3475]"></i>
                     <span>الجداول الدراسية</span>
                 </div>
@@ -645,7 +652,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
             </button><a href="/dashboard/?open=control"><i class="fas fa-cogs" aria-hidden="true"></i><span>لوحة التحكم</span></a></nav></div><div class="citl-drawer-bottom"><button onclick="handleLogout()" class="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 font-bold text-sm hover:bg-red-50 transition-colors text-right">
                 <i class="fas fa-sign-out-alt text-lg"></i>
                 <span>تسجيل الخروج</span>
-            </button><small dir="ltr">Version R6.9.1.8</small></div></section></div>
+            </button><small dir="ltr">Version R6.9.2</small></div></section></div>
 
 <main class="flex-1 w-full max-w-[96%] mx-auto px-4 py-6"> <section class="bg-white rounded-xl shadow-lg border border-gray-100 mb-8 relative overflow-visible">
     <div class="p-5 md:p-8">
@@ -1550,22 +1557,24 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
     </div>
 </div>
 
-<script src="/assets/study-model.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/pages/schedules-1.js?v=20261018-r6.9.1.8"></script>
-<script src="/security-core.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/department-heads.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/registration-review-status.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/academic-oversight.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/admin-access.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/admin-announcements.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/faculty-identity.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/registration-correction.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/room-qr-export.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/room-qr.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/booking-reports.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/delegated-lecture-actions.js?v=20261018-r6.9.1.8"></script>
-<script src="/assets/attendance-admin.js?v=20261018-r6.9.1.8"></script>
-<script src="../assets/lecture-action-dates.js?v=20261018-r6.9.1.8"></script>
-<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261018-r6.9.1.8"></script>
+<script src="/assets/study-model.js?v=20261018-r6.9.2"></script>
+<script src="/assets/pages/schedules-1.js?v=20261018-r6.9.2"></script>
+<script src="/security-core.js?v=20261018-r6.9.2"></script>
+<script src="/assets/department-heads.js?v=20261018-r6.9.2"></script>
+<script src="/assets/registration-review-status.js?v=20261018-r6.9.2"></script>
+<script src="/assets/academic-oversight.js?v=20261018-r6.9.2"></script>
+<script src="/assets/admin-access.js?v=20261018-r6.9.2"></script>
+<script src="/assets/admin-announcements.js?v=20261018-r6.9.2"></script>
+<script src="/assets/faculty-identity.js?v=20261018-r6.9.2"></script>
+<script src="/assets/registration-correction.js?v=20261018-r6.9.2"></script>
+<script src="/assets/room-qr-export.js?v=20261018-r6.9.2"></script>
+<script src="/assets/room-qr.js?v=20261018-r6.9.2"></script>
+<script src="/assets/booking-reports.js?v=20261018-r6.9.2"></script>
+<script src="/assets/delegated-lecture-actions.js?v=20261018-r6.9.2"></script>
+<script src="/assets/attendance-admin.js?v=20261018-r6.9.2"></script>
+<script src="../assets/lecture-action-dates.js?v=20261018-r6.9.2"></script>
+<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261018-r6.9.2"></script>
+<script src="/assets/site-notice.js?v=20261018-r6.9.2" defer></script>
+<script src="/assets/notification-reminder.js?v=20261018-r6.9.2" defer></script>
 </body>
 </html>

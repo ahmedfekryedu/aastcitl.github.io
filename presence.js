@@ -103,9 +103,7 @@
     if (!value) return 'لم يُسجّل ظهور بعد';
     const date = new Date(value), age = Date.now() + clockOffset - date.getTime();
     if (!Number.isFinite(age)) return 'غير متاح';
-    if (age < 60000) return 'الآن';
-    if (age < 3600000) return `منذ ${Math.floor(age / 60000)} د`;
-    return date.toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', day: 'numeric', month: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return date.toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', year:'numeric', day: 'numeric', month: 'numeric', hour: 'numeric', minute: '2-digit', second:'2-digit' });
   }
   function dotHtml(lastSeenAt, status) {
     const online = isOnline(lastSeenAt, status);

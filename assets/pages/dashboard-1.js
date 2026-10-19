@@ -589,7 +589,7 @@ async function initializeApp() {
         await loadSystemSettings(); 
 
         // 2. تحميل الحجوزات من السيرفر
-        await loadMeetings();
+        void loadMeetings();
         
         // 3. تشغيل الجدول والواجهة
         initializeCalendar();

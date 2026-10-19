@@ -6,7 +6,7 @@
  const kind=()=>$('schedule-kind').value;
  async function api(action,payload={}){
   const {data,error}=await client.rpc('citl_schedule_admin',{p_action:action,p_payload:payload});
-  if(error){if(['PGRST202','42883'].includes(error.code))throw Error('طبّق تحديثات إدارة الجداول في Supabase ثم حدّث الصفحة');if(/requires a WHERE clause/i.test(error.message||''))throw Error('يلزم تطبيق ملف 202609210004_schedule_delete_archive_fix.sql لإصلاح الحذف وتحديث فترات الإيقاف. لم تُعتمد العملية.');if(error.code==='23503'&&/schedule_report_batch_items/.test(error.message||''))throw Error('يلزم تطبيق ملف 202609210005_schedule_report_history_fix.sql لحفظ التقارير قبل مسح الجدول. لم تُعتمد العملية.');throw Object.assign(Error(error.message||'تعذر حفظ الجدول'),{code:error.code});}return data;
+  if(error){if(['PGRST202','42883'].includes(error.code))throw Error('طبّق تحديثات إدارة الجداول في Supabase ثم حدّث الصفحة');if(/requires a WHERE clause/i.test(error.message||''))throw Error('رفضت قاعدة البيانات أمر تحديث أو حذف بلا شرط. يلزم إصلاح مزامنة المقررات بالتحديث R6.9.2، وليس إعادة تشغيل ملف حذف قديم. لم تُعتمد العملية.');if(error.code==='23503'&&/schedule_report_batch_items/.test(error.message||''))throw Error('يلزم تطبيق ملف 202609210005_schedule_report_history_fix.sql لحفظ التقارير قبل مسح الجدول. لم تُعتمد العملية.');throw Object.assign(Error(error.message||'تعذر حفظ الجدول'),{code:error.code});}return data;
  }
  const el=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
  function download(name,data){const a=el('a','');a.href=URL.createObjectURL(new Blob([data],{type:'application/json;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}

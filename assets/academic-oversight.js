@@ -37,7 +37,7 @@
   catch(_){tab.style.display='none';}
  }
  const work={term:null,department:'',status:'',search:'',action:null,data:null,serial:0,initialized:false};
- function canAcademicActions(){return accessUser===root.currentUser?.id&&!root.CITLAuth.facultyPending?.(root.currentUser)&&!!(access?.full||root.CITLPermissions.can(root.currentUser,'can_view_reports')||access?.heads?.some(h=>h.can_review_academic)||root.currentUser?.faculty_verification_status==='approved');}
+ function canAcademicActions(){return accessUser===root.currentUser?.id&&!root.CITLAuth.facultyPending?.(root.currentUser)&&!!(access?.full||root.CITLPermissions.can(root.currentUser,'can_view_reports')||root.CITLPermissions.can(root.currentUser,'can_monitor_academic_reviews')||access?.heads?.some(h=>h.can_review_academic)||root.currentUser?.faculty_verification_status==='approved');}
  function mountWorkboard(modal,sample){
   if(document.getElementById('admin-academic-actions-tab'))return;
   const tab=sample.cloneNode(true);tab.dataset.tab='academic-actions';tab.removeAttribute('onclick');tab.classList.remove('active');tab.querySelector('span').textContent='متابعة إجراءات المحاضرات';tab.querySelector('i').className='fas fa-tasks';tab.style.display='none';sample.after(tab);tab.onclick=()=>root.switchAdminTab('academic-actions');
@@ -73,7 +73,9 @@
  async function openWorkboard(options={}){
   if(!root.openAdminPanel){location.href='/dashboard/?'+new URLSearchParams({open:'academic',...(options.action?{action:options.action}:{}),...(options.term?{term:options.term}:{})});return;}
   if(options.term!==undefined)work.term=options.term;if(options.action!==undefined)work.action=options.action;
-  root.openAdminPanel('academic-actions');await mountAdmin();if(canAcademicActions())root.switchAdminTab('academic-actions');else root.showNotification?.('لا تملك صلاحية الوصول لهذه المتابعة','error');
+  if(!root.currentUser)await root.CITLAuth.loadProfile();
+  await loadAccess();await mountAdmin();
+  if(canAcademicActions())root.openAdminPanel('academic-actions');else root.showNotification?.('لا تملك صلاحية الوصول لهذه المتابعة','error');
  }
  async function openApprovals(){
   if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
@@ -190,16 +192,18 @@
    const data=await rpc('citl_current_academic_actions');if(serial!==dashboardSerial||!host.isConnected)return;
    host.hidden=!data.allowed;grid.classList.toggle('dh-with-actions',data.allowed);if(host.hidden)return;
    const scope=({college:'الكلية',department:'الجهات التابعة لك',personal:'محاضراتك'})[data.scope]||'';
-   const note=data.term?'الترم الحالي · '+scope:'لا يوجد ترم دراسي حالي';
-   const total=E(data.count),link='<button type="button" class="dh-button" data-workboard aria-label="تفاصيل إجراءات المحاضرات في لوحة التحكم">التفاصيل</button>';
+   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+   const dailyRows=(data.rows||[]).filter(x=>x.date===today);
+   const note=data.term?'اليوم · '+scope:'لا يوجد ترم دراسي حالي';
+   const total=E(dailyRows.filter(x=>x.action_type==='cancel').length),link='<button type="button" class="dh-button" data-workboard aria-label="تفاصيل إجراءات المحاضرات في لوحة التحكم">التفاصيل</button>';
    let markup;
    if(faculty){
-    markup='<div class="dh-metric-label">ملغاة خلال الترم</div><div class="dh-metric-value" data-cancel>'+total+'</div>'+link;
+    markup='<div class="dh-metric-label">ملغاة اليوم</div><div class="dh-metric-value" data-cancel>'+total+'</div>'+link;
     host.title=note;
    }else{
     const metric=(label,value)=>'<div class="dh-metric"><div class="dh-metric-label">'+E(label)+'</div><div class="dh-metric-value">'+E(value)+'</div></div>';
-    const rows=data.rows||[],replaced=rows.filter(x=>['replace','replace_and_move'].includes(x.action_type)).length,moved=rows.filter(x=>['move_room','replace_and_move'].includes(x.action_type)).length,pending=rows.filter(x=>!x.review||['pending','unassigned'].includes(x.review.decision)).length;
-    markup='<div class="dh-summary-head"><h3>إجراءات المحاضرات</h3><div class="dh-metric"><div class="dh-metric-label">ملغاة بالترم</div><div class="dh-metric-value" data-cancel>'+total+'</div></div></div><div class="dh-facts">'+metric('إحلال محاضر',replaced)+metric('تغيير قاعة',moved)+metric('بانتظار المراجعة',pending)+'</div><div class="dh-summary-foot"><span>'+E(note)+'</span>'+link+'</div>';
+    const rows=dailyRows,replaced=rows.filter(x=>['replace','replace_and_move'].includes(x.action_type)).length,moved=rows.filter(x=>['move_room','replace_and_move'].includes(x.action_type)).length,pending=rows.filter(x=>!x.review||['pending','unassigned'].includes(x.review.decision)).length;
+    markup='<div class="dh-summary-head"><h3>إجراءات المحاضرات</h3><div class="dh-metric"><div class="dh-metric-label">ملغاة اليوم</div><div class="dh-metric-value" data-cancel>'+total+'</div></div></div><div class="dh-facts">'+metric('إحلال محاضر',replaced)+metric('تغيير قاعة',moved)+metric('بانتظار المراجعة',pending)+'</div><div class="dh-summary-foot"><span>'+E(note)+'</span>'+link+'</div>';
    }
    if(host._citlMarkup!==markup||!host.querySelector('[data-workboard]')){host.innerHTML=markup;host._citlMarkup=markup;}
    host.querySelector('[data-workboard]').onclick=()=>openWorkboard({action:null});
@@ -249,10 +253,18 @@
   }catch(_){/* A network failure is never treated as a missing instructor name. */}
  }
 
+ let reviewCheckAt=0,reviewCheckUser=null,reviewChecking=false;
+ async function checkLateReviews(){
+  const user=root.currentUser;if(!user||document.hidden||reviewChecking||!root.CITLPermissions.can(user,'can_monitor_academic_reviews'))return;
+  if(reviewCheckUser===user.id&&Date.now()-reviewCheckAt<3600000)return;
+  reviewChecking=true;try{const result=await rpc('citl_lecture_review_alert_sweep');reviewCheckAt=Date.now();reviewCheckUser=user.id;if(result.sent)root.checkUserNotifications?.();}catch(error){console.warn('تعذر تحديث تنبيهات تأخر المراجعة',error.message);}finally{reviewChecking=false;}
+ }
+ setInterval(checkLateReviews,3600000);
+ document.addEventListener('visibilitychange',checkLateReviews);
  let deepLinkHandled=false;
  async function initialize(){
   if(!root.currentUser||root.CITLAuth.facultyPending?.(root.currentUser))return;
-  try{await mountAdmin();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='profile'){deepLinkHandled=true;root.openAdminPanel('profile');}else if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){await openApprovals();deepLinkHandled=true;}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
+  try{await mountAdmin();checkLateReviews();checkScheduleName();if(deepLinkHandled)return;const params=new URLSearchParams(location.search),target=params.get('open');if(target==='profile'){deepLinkHandled=true;root.openAdminPanel('profile');}else if(target==='control'||target==='services'){if(!root.currentUser||(target==='services'&&!root.CITLServiceAdmin))return;deepLinkHandled=true;root.openAdminPanel();if(target==='services'&&root.CITLPermissions.can(root.currentUser,'can_manage_settings')){root.CITLServiceAdmin?.mount();root.switchAdminTab('service-availability');}}else if(target==='activity'){deepLinkHandled=true;await root.CITLAdminAccess?.openHistory();if(params.get('broadcast'))await root.CITLAnnouncements?.open(params.get('broadcast'));}else if(target==='structure'&&root.CITLPermissions.can(root.currentUser,'can_manage_structure')){deepLinkHandled=true;root.openAdminPanel();root.switchAdminTab('directory');const dept=document.getElementById('faculty-directory-active-department');if(dept&&params.get('department')){dept.value=params.get('department');root.handleFacultyDirectoryDepartmentChange?.();}}else if(target==='approvals'){await openApprovals();deepLinkHandled=true;}else if(target==='academic'){deepLinkHandled=true;await openWorkboard({term:params.get('term'),action:params.get('action')});}}catch(error){root.showNotification?.(error.message,'error');}
  }
  root.CITLOversight=Object.freeze({mountAdmin,loadApprovals,openApprovals,openRegistrationNotice,renderStructure,renderDashboard,openReport,openWorkboard,loadWorkboard,canAcademicActions,reviewLabel,checkScheduleName,canReviewRegistration:()=>accessUser===root.currentUser?.id&&access?.registration===true});
  root.addEventListener('citl-profile-loaded',e=>{if(accessUser&&accessUser!==e.detail?.id){access=null;approvalSerial++;dashboardSerial++;work.serial++;work.data=null;work.action=null;work.term=null;work.initialized=false;document.getElementById('citl-ac-work-detail')?.replaceChildren();document.querySelector('#admin-academic-actions-tab [data-rows]')?.replaceChildren();document.getElementById('citl-ac-summary')?.remove();document.getElementById('admin-academic-review-tab')?.querySelector('[data-claims]')?.replaceChildren();}initialize();});

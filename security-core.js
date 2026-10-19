@@ -36,12 +36,17 @@
   for(const id of ['notif-badge','notif-badge-mob']){const badge=document.getElementById(id);if(badge)new MutationObserver(syncUnreadPulse).observe(badge,{attributes:true,attributeFilter:['class'],childList:true,characterData:true,subtree:true});}
   syncUnreadPulse();
 
-  function renderNotifications(items) {
+  let notificationMode='unread',notificationPage=0;
+  function renderNotifications(items, result={}) {
     const list = document.getElementById('notif-list'); if (!list) return;
     list.replaceChildren();
     if (!items.length) {
       const empty = document.createElement('div'); empty.className = 'p-8 text-center text-sm text-gray-500 font-bold';
       empty.textContent = 'لا توجد إشعارات غير مقروءة'; list.appendChild(empty);
+    }
+    if(notificationMode==='overdue'){
+      const info=document.createElement('p');info.className='p-3 text-sm font-bold text-[#2A3475]';info.textContent='إشعارات أقدم من ٢٤ ساعة — الأقدم أولًا';list.append(info);
+      const all=document.createElement('button');all.type='button';all.className='citl-ac-button secondary';all.textContent='عرض جميع الإشعارات';all.onclick=()=>{notificationMode='unread';notificationPage=0;void checkUserNotifications();};list.append(all);
     }
     for (const item of items) {
       const button = document.createElement('button'); button.type = 'button';
@@ -63,6 +68,7 @@
           document.getElementById('notif-menu')?.classList.add('hidden');
           await checkUserNotifications();
           if(window.CITLOversight?.openRegistrationNotice(item))return;
+          if(await openSpecialNotice(item))return;
           if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}
           if (item.route && /^\/[a-z0-9_/?=&.-]*$/i.test(item.route)) {navigating=true;location.href = item.route;}
         } catch (error) { window.showNotification?.('تعذر فتح الإشعار؛ أعد المحاولة','error'); }
@@ -70,17 +76,34 @@
       });
       list.appendChild(button);
     }
+    if(notificationMode==='overdue'&&(notificationPage>0||result.has_more))for(const [step,label] of [[-1,'الصفحة السابقة'],[1,'المزيد من الإشعارات المتأخرة']]){const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.textContent=label;b.disabled=step<0?notificationPage===0:!result.has_more;b.onclick=()=>{notificationPage+=step;void checkUserNotifications();};list.append(b);}
     const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory();};list.append(history);
   }
+
+  async function openSpecialNotice(item){
+    if(item.kind==='lecture_room_reserved'){
+      const p=item.payload||{},d=document.createElement('dialog');d.className='citl-head-dialog citl-ac-dialog';d.dir='rtl';
+      const fields=[['المحاضرة',p.lecture?.course_name],['المحاضر',p.lecture?.instructor],['عنوان الحجز',p.booking_title],['القاعة',p.room_name],['تاريخ الحجز',p.booking_date],['التوقيت',String(p.start_time||'').slice(0,5)+' – '+String(p.end_time||'').slice(0,5)],['مقدم الحجز',p.booked_by],['سبب الحجز',p.reason],['التفاصيل',p.description]];
+      d.innerHTML='<header><strong>'+htmlEscape(item.title)+'</strong><button type="button" aria-label="إغلاق">×</button></header><div class="citl-ac-body"><dl class="citl-claim-details">'+fields.filter(([,v])=>v).map(([k,v])=>'<div><dt>'+htmlEscape(k)+'</dt><dd style="white-space:pre-wrap;overflow-wrap:anywhere">'+htmlEscape(v)+'</dd></div>').join('')+'</dl><p>تفاصيل الحجز وقت إرسال الإشعار. راجع جدول القاعات لمعرفة حالته الحالية.</p></div>';
+      d.querySelector('button').onclick=()=>d.close();d.onclose=()=>d.remove();document.body.append(d);d.showModal();return true;
+    }
+    if(!item.route||!window.CITLOversight?.openWorkboard)return false;
+    const url=new URL(item.route,location.origin);if(url.origin!==location.origin)return false;
+    if(url.searchParams.get('open')==='academic'){await window.CITLOversight.openWorkboard({action:url.searchParams.get('action'),term:url.searchParams.get('term')});return true;}
+    if(url.searchParams.get('open')==='approvals'&&window.CITLOversight.openApprovals){await window.CITLOversight.openApprovals();return true;}
+    return false;
+  }
+  window.CITLOpenSpecialNotice=openSpecialNotice;
 
   let lastRightsNotice = '';
   async function checkUserNotifications() {
     try {
-      await session();const result = await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
-      window.__citlNotifications = items; renderNotifications(items); setBadge(result.total ?? items.length);
+      await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
+      window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
-    } catch (error) { console.error('notifications:', error); }
+      return true;
+    } catch (error) { console.error('notifications:', error);return false; }
   }
 
   async function markAllNotificationsRead() {
@@ -88,16 +111,18 @@
     catch (error) { window.showNotification?.(error.message, 'error'); }
   }
 
-  async function toggleNotifications() {
+  async function toggleNotifications(options) {
     const menu = document.getElementById('notif-menu'); if (!menu) return;
     const opening = menu.classList.contains('hidden'); menu.classList.toggle('hidden');
     if (opening) {
+      notificationMode=options?.overdue===true?'overdue':'unread';notificationPage=0;
       const anchor = document.getElementById(innerWidth < 1024 ? 'notif-btn-wrapper' : 'notif-btn-wrapper-pc');
       const rect = anchor?.getBoundingClientRect();
-      menu.style.top = `${Math.min((rect?.bottom || 70) + 8, innerHeight - 420)}px`;
+      menu.style.top = `${Math.max(8,Math.min((rect?.bottom || 70) + 8, innerHeight - 160))}px`;
+      menu.style.maxHeight=`${Math.max(120,innerHeight-parseFloat(menu.style.top)-12)}px`;
       menu.style[document.dir === 'rtl' ? 'right' : 'left'] = `${Math.max(10, innerWidth - (rect?.right || innerWidth - 10))}px`;
-      await checkUserNotifications();
-
+      const loaded=await checkUserNotifications();
+      if(options?.overdue===true&&!loaded)throw new Error('تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.');
     }
   }
 

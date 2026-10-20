@@ -31,7 +31,7 @@
   }
   function statistics(items,user,now=S.cairo()){
     const active=items.filter(x=>x.occurs!==false&&!x.cancelled),today=active.filter(x=>x.date===now.date),live=today.filter(x=>x.live);
-    const rooms=new Set(active.map(x=>x.room).filter(Boolean)),busy=new Set(live.map(x=>x.room).filter(Boolean));
+    const rooms=new Set(items.filter(x=>x.occurs!==false).map(x=>x.room).filter(Boolean)),busy=new Set(live.map(x=>x.room).filter(Boolean));
     const own=items.filter(x=>x.own),assigned=own.filter(x=>x.assigned),ownToday=assigned.filter(x=>x.occurs!==false&&x.date===now.date);
     const future=assigned.filter(x=>x.occurs!==false&&x.start!==null&&(x.date>now.date||(x.date===now.date&&x.end>now.minutes)));
     return {today,live,rooms:[...rooms].sort(),available:[...rooms].filter(x=>!busy.has(x)).sort(),own,assigned,ownToday,

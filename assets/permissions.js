@@ -11,5 +11,6 @@
   function can(user, capability) {
     return full(user) || (user?.role === 'manager' && keys.includes(capability) && user.permissions?.[capability] === true);
   }
-  root.CITLPermissions = Object.freeze({ full, can, catalog, descriptions, any: user=>full(user)||keys.some(k=>can(user,k)) });
+  const canBookLecture=user=>user?.faculty_verification_status==='approved'&&(['faculty','visiting_lecturer'].includes(user.account_type)||user.is_visiting_lecturer===true);
+  root.CITLPermissions = Object.freeze({ full, can, catalog, descriptions, canBookLecture, any: user=>full(user)||keys.some(k=>can(user,k)) });
 })(window);

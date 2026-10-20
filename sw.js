@@ -1,4 +1,4 @@
-const RELEASE = '20261020-r6.9.2.4';
+const RELEASE = '20261020-r6.9.2.6';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
@@ -117,7 +117,7 @@ self.addEventListener('fetch', (e) => {
         if(response.ok&&(response.headers.get('content-type')||'').includes('text/html')){try{await cache.put(shell,response.clone());}catch(_){/* Cache quota must not discard a successful response. */}}
         return response;
       }).catch(()=>saved||Response.error());
-      if(saved){if(e.waitUntil)e.waitUntil(refresh.then(()=>{}));return saved;}
+      // Prefer the current HTML so newly deployed script versions appear on the first refresh.
       return refresh;
     })());return;
   }

@@ -5,6 +5,7 @@
  const reasons={makeup:'محاضرة تعويضية',revision:'مراجعة قبل الامتحان',extra:'محاضرة إضافية',room_change:'تغيير مؤقت للقاعة',section:'سكشن إضافي',other:'سبب آخر'};
  let active=null;
  async function open(room,date,start,end){
+  if(!root.CITLPermissions?.canBookLecture(root.currentUser))return root.showNotification?.('حجز قاعة لمحاضرة متاح لأعضاء هيئة التدريس المعتمدين فقط','error');
   if(root.CITLServices&&!await root.CITLServices.enter('lecture_booking'))return;
   if(active?.open)return;
   const owner=root.currentUser?.id;if(!owner)return root.showNotification?.('يلزم تسجيل الدخول أولًا','error');

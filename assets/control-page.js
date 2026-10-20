@@ -25,12 +25,13 @@
  const menuAdmin=document.querySelector('#mobile-menu [data-dashboard-account]');if(menuAdmin)menuAdmin.setAttribute('aria-current','page');
  document.title='لوحة التحكم المركزية | CITL';
  let started=false;
- root.addEventListener('citl-dashboard-ready',()=>{
+ root.addEventListener('citl-dashboard-ready',async()=>{
   if(started)return;started=true;
   const params=new URLSearchParams(location.search),tab=params.get('tab')||'users';
-  if(tab==='academic-actions')void root.CITLOversight.openWorkboard({action:params.get('action'),term:params.get('term')});
-  else if(tab==='academic-review')void root.CITLOversight.openApprovals({request:params.get('request')});
-  else root.openAdminPanel(tab);
+  try{if(tab==='academic-actions')await root.CITLOversight.openWorkboard({action:params.get('action'),term:params.get('term')});
+  else if(tab==='academic-review')await root.CITLOversight.openApprovals({request:params.get('request')});
+  else await root.openAdminPanel(tab);
+  }finally{host.setAttribute('aria-busy','false');document.getElementById('citl-control-loading')?.remove();}
   if(params.get('meeting'))void root.CITLMeetingUI?.open(params.get('meeting'),false);
   if(params.get('broadcast'))void root.CITLAnnouncements?.open(params.get('broadcast'));
  });

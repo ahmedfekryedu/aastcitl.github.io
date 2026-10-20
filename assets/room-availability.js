@@ -67,17 +67,17 @@
   if(!rooms.length||!days.length){host.innerHTML='<div class="citl-admin-empty">لا توجد قاعات مفعلة أو فترات دراسية في المدة القادمة المختارة.</div>';assistant();return;}
   // Keep one column per complete lecture block, never split at another room's booking.
   const slots=[...new Map(calendarData.windows.map(w=>[w.start_time+'-'+w.end_time,{start:mins(w.start_time),end:mins(w.end_time),first:w.period_first,last:w.period_last}])).values()].sort((a,b)=>a.start-b.start);
-  host.replaceChildren();for(const room of rooms){
+  host.classList.add('citl-free-cards');host.replaceChildren();for(const room of rooms){
    if(!(room.direct_booking||room.room_id))continue;
    const card=document.createElement('article');card.className='citl-free-room';const title=document.createElement('h4');title.textContent=room.name;card.append(title);
-   const table=document.createElement('table');table.className='citl-free-grid';table.innerHTML='<thead><tr><th>اليوم</th><th>المواعيد المتاحة للحجز</th></tr></thead>';const body=document.createElement('tbody');
+   const body=document.createElement('div');body.className='citl-free-dates';
    for(const date of days){const available=slots.filter(slot=>calendarData.windows.some(w=>w.date===date&&mins(w.start_time)<=slot.start&&mins(w.end_time)>=slot.end)&&calendarData.free.some(w=>w.room_name===room.name&&w.date===date&&mins(w.start_time)<=slot.start&&mins(w.end_time)>=slot.end)&&!calendarData.booked.some(w=>w.room_name===room.name&&w.date===date&&mins(w.start_time)<slot.end&&mins(w.end_time)>slot.start)&&(date!==now.date||slot.start>=now.minutes));
     if(!available.length)continue;
-    const tr=document.createElement('tr'),day=document.createElement('th'),td=document.createElement('td'),buttons=document.createElement('div');day.textContent=dateLabel(date);day.scope='row';buttons.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:8px';
-    for(const slot of available){const button=document.createElement('button');button.type='button';button.className='citl-free-book';button.style.cssText='width:auto;min-width:130px;padding:8px';button.innerHTML='<span>متاحة للحجز</span><bdi>'+time(slot.start)+' – '+time(slot.end)+'</bdi>';button.onclick=()=>bookFree(room,date,time(slot.start),time(slot.end));buttons.append(button);}
-    td.append(buttons);tr.append(day,td);body.append(tr);
+    const tr=document.createElement('section'),day=document.createElement('h5'),buttons=document.createElement('div');tr.className='citl-free-date';day.textContent=dateLabel(date);buttons.className='citl-free-times';
+    for(const slot of available){const button=document.createElement('button');button.type='button';button.className='citl-free-book';button.setAttribute('aria-label',room.name+'، '+dateLabel(date)+'، '+time(slot.start)+' – '+time(slot.end));button.innerHTML='<span>متاحة للحجز</span><bdi>'+time(slot.start)+' – '+time(slot.end)+'</bdi>';button.onclick=()=>bookFree(room,date,time(slot.start),time(slot.end));buttons.append(button);}
+    tr.append(day,buttons);body.append(tr);
    }
-   if(!body.children.length)continue;table.append(body);card.append(table);host.append(card);
+   if(!body.children.length)continue;card.append(body);host.append(card);
   }
   if(!host.children.length)host.innerHTML='<div class="citl-admin-empty">لا توجد مواعيد متاحة للحجز في الفترة المختارة.</div>';
   assistant();

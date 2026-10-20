@@ -20,3 +20,12 @@ html[data-citl-control-page] #admin-panel-btn{display:none!important}
 #citl-control-host .citl-control-layout>div>div:first-child{border-radius:14px;border:1px solid #e2e8f0;align-self:flex-start}
 #citl-control-host .citl-control-layout>div>div:last-child{padding-top:0}
 @media(max-width:767px){#citl-control-host .citl-control-layout>div>div:first-child{width:100%}#citl-control-host .citl-control-layout>div>div:last-child{padding:16px 0 0}}
+
+#citl-control-host[aria-busy=true] #admin-panel-modal{display:none!important}
+#citl-control-loading{display:grid;grid-template-columns:260px 1fr;gap:24px;min-height:65vh;direction:rtl}
+#citl-control-loading aside,#citl-control-loading section{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px}
+#citl-control-loading span{display:block;height:42px;margin-bottom:14px;border-radius:9px;background:linear-gradient(90deg,#e9ecf0,#f5f6f8,#e9ecf0);background-size:200% 100%;animation:citl-control-shimmer 1.6s ease-in-out infinite}
+#citl-control-loading section>div{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}#citl-control-loading section>div span{height:100px}
+@keyframes citl-control-shimmer{to{background-position:-200% 0}}
+@media(max-width:767px){#citl-control-loading{grid-template-columns:1fr;gap:16px}#citl-control-loading aside{display:grid;grid-template-columns:1fr 1fr;gap:8px}#citl-control-loading aside span{margin:0}#citl-control-loading section>div{gap:6px}}
+@media(prefers-reduced-motion:reduce){#citl-control-loading span{animation:none}}

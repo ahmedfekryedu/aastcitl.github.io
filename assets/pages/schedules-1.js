@@ -676,7 +676,6 @@ function openScheduleHub() {
 let citlPersonalScheduleRouteOpened=false;
 window.addEventListener('citl-profile-loaded',event=>{
     if(citlPersonalScheduleRouteOpened||new URLSearchParams(location.search).get('open')!=='my-schedule')return;
-    if(!hasApprovedTeachingIdentity(event.detail))return;
     citlPersonalScheduleRouteOpened=true;
     setTimeout(()=>openMyScheduleModal(),0);
 });
@@ -2325,8 +2324,7 @@ async function openMyScheduleModal() {
     try { user = await window.CITLAuth.loadProfile(); }
     catch (error) { window.CITLAuth.showFailure(error); return; }
     if (!hasApprovedTeachingIdentity(user)) {
-        showNotification('الجدول الشخصي متاح لعضو هيئة التدريس بعد اعتماد ربط حسابه.', 'info');
-        return;
+        try {const assigned=await window.CITLRequests.rpc(window.sb,'citl_personal_lecture_scope',{});if(!assigned.delegated_names?.length){showNotification('لا توجد جداول أو تكليفات معتمدة لهذا الحساب.','info');return;}} catch(error){showNotification('تعذر التحقق من التكليفات: '+error.message,'error');return;}
     }
     const isManagerUser = user && window.CITLPermissions.full(user);
     const modal = document.getElementById('my-schedule-modal');
@@ -2374,22 +2372,8 @@ async function openMyScheduleModal() {
         if(status){status.scrollIntoView({block:'center'});await window.CITLFaculty.renderClaimEditor(status);}
         return;
     }
-    // Keep approved identity through timetable replacement, even when no rows exist yet.
-if (profile && profile.linked_instructors && profile.linked_instructors.length > 0) {
-    user.linked_instructors = profile.linked_instructors;
-    user.account_type = profile.account_type || 'admin';
-    user.schedule_link_required = !!profile.schedule_link_required;
-    user.schedule_link_status = profile.schedule_link_status || 'not_required';
-
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    showMyScheduleView(profile.linked_instructors);
-} else {
-    if (isManagerUser) {
-        showMyScheduleView([]);
-    } else {
-        showSetupView();
-    }
-}
+    // Names and representatives come from verified server assignments, never a new claim.
+await showMyScheduleView([]);
 }
 
 function closeMyScheduleModal() {
@@ -2399,62 +2383,8 @@ function closeMyScheduleModal() {
     }
 
 // 2. دالة عرض شاشة الإعداد (Setup)
-    async function showSetupView() {
-        document.getElementById('my-schedule-setup').classList.remove('hidden');
-        document.getElementById('my-schedule-setup').classList.add('flex');
-        document.getElementById('my-schedule-content').classList.add('hidden');
-        
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        const welcomeMsg = document.getElementById('setup-welcome-msg');
-        if (welcomeMsg && user) {
-            welcomeMsg.textContent = `مرحباً بك، ${user.full_name || 'يا بطل'}! 👋`;
-        }
+    async function showSetupView() { return showMyScheduleView([]); }
 
-        const grid = document.getElementById('instructor-selection-grid');
-        grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div>';
-
-        const { data } = await supabase.from('academic_schedule').select('instructor');
-        
-        if (data) {
-            const uniqueNames = [...new Set(
-                data
-                    .map(i => normalizeInstructorName(i.instructor))
-                    .filter(Boolean)
-                    .filter(name => name !== 'غير محدد')
-            )].sort((a, b) => a.localeCompare(b, 'ar'));
-            grid.innerHTML = '';
-            
-            // استخدام المتغير الموحد
-            selectedInstructors.clear(); 
-            if(user.linked_instructors) user.linked_instructors.forEach(n => selectedInstructors.add(n));
-
-            uniqueNames.forEach(name => {
-                const isSelected = selectedInstructors.has(name);
-                
-                // إنشاء الكارت (نفس تصميم الموبايل الصغير اللي اتفقنا عليه)
-                const btn = document.createElement('button');
-                btn.className = `instructor-card relative w-full rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 md:gap-2 group cursor-pointer h-20 md:h-28 p-2 md:p-3 ${isSelected ? 'border-[#2A3475] bg-[#2A3475]/5' : 'border-gray-100 bg-white hover:border-[#2A3475]/30 shadow-sm'}`;
-                
-                btn.onclick = () => toggleInstructorSelection(name, btn); // تم تصحيح الاستدعاء
-
-                btn.innerHTML = `
-                    <div class="selection-check absolute top-1.5 right-1.5 md:top-2 md:right-2 w-4 h-4 md:w-5 md:h-5 rounded-full border-2 ${isSelected ? 'bg-[#2A3475] border-[#2A3475]' : 'border-gray-200'} flex items-center justify-center transition-colors">
-                        ${isSelected ? '<i class="fas fa-check text-white text-[8px] md:text-[10px]"></i>' : ''}
-                    </div>
-                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gray-50 flex items-center justify-center text-[#2A3475] transition-transform group-hover:scale-110">
-                        <i class="fas fa-user-tie text-xs md:text-lg"></i>
-                    </div>
-                    <span class="font-bold text-[9px] md:text-xs text-gray-700 text-center leading-tight line-clamp-2 w-full px-1">${name}</span>
-                `;
-                grid.appendChild(btn);
-            });
-            updateCountBadge();
-        }
-    }
-
-// ============================================================
-// 1. دالة رسم شبكة الأسماء (نسخة مضغوطة وسريعة جداً) 🚀
-// ============================================================
 function renderInstructorGrid(instructorsList) {
     const grid = document.getElementById('instructor-selection-grid');
     if (!grid) return;
@@ -2665,14 +2595,28 @@ async function clearMyScheduleLink() {
 }
 
 // 5. دالة العرض الرئيسية (التي قمنا بتعديلها)
-    async function showMyScheduleView(names) {
+    async function showMyScheduleView(names, requestedTarget) {
+        const renderTicket=showMyScheduleView.serial=(showMyScheduleView.serial||0)+1;
         // ... (نفس دالة showMyScheduleView اللي بعتهالك في الرد اللي فات، حطها هنا) ...
         // اختصاراً للمساحة مش هكررها تاني، استخدم اللي فاتت، هي سليمة 100%
         // أهم حاجة إنها بتنادي على mobileContainer و desktopBody
         
         // --- سأعيد كتابة الجزء المهم للتأكيد ---
         const verifiedProfile=await window.CITLAuth.loadProfile();
-        let targetNames=window.CITLPermissions.full(verifiedProfile)?(Array.isArray(names)?names:[]):(verifiedProfile.faculty_verification_status==='approved'?(verifiedProfile.linked_instructors||[]):[]);
+        let scope;
+        try { scope=await window.CITLRequests.rpc(window.sb,'citl_personal_lecture_scope',{}); }
+        catch(error){document.getElementById('managed-names-chips')?.replaceChildren();document.getElementById('my-schedule-rows')?.replaceChildren();document.getElementById('mobile-schedule-list')?.replaceChildren();showNotification('تعذر تحميل ارتباطات الجداول المعتمدة: '+error.message,'error');return;}
+        if(renderTicket!==showMyScheduleView.serial)return;
+        const ownNames=scope.own_names||[],delegatedNames=scope.delegated_names||[];
+        const targetNames=[...new Set([...ownNames,...delegatedNames])];
+        if(showMyScheduleView.owner!==verifiedProfile.id){showMyScheduleView.owner=verifiedProfile.id;showMyScheduleView.target=new URLSearchParams(location.search).get('represent')||'';}
+        if(requestedTarget!==undefined)showMyScheduleView.target=requestedTarget;
+        if(!delegatedNames.includes(showMyScheduleView.target))showMyScheduleView.target='';
+        if(!ownNames.length&&!showMyScheduleView.target)showMyScheduleView.target=delegatedNames[0]||'';
+        const shownNames=showMyScheduleView.target?[showMyScheduleView.target]:ownNames;
+
+        const escapeName=window.CITLStudy.escape;
+        const isOwn=name=>ownNames.some(n=>normalizeInstructorName(n)===normalizeInstructorName(name));
         // Never restore another account's names from the old unscoped localStorage cache.
         localStorage.removeItem('my_linked_instructors');
     // 2. التبديل بين الشاشات
@@ -2682,20 +2626,15 @@ async function clearMyScheduleLink() {
     // 3. عرض الأسماء (Chips)
     const chipsContainer = document.getElementById('managed-names-chips');
     if (chipsContainer) {
-        chipsContainer.innerHTML = targetNames.length > 0 
-            ? targetNames.map(name => `<span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#2A3475]/5 text-[#2A3475] text-[11px] font-bold border border-[#2A3475]/10 whitespace-nowrap shadow-sm"><i class="fas fa-user-circle text-xs ml-1.5 opacity-60"></i>${name}</span>`).join('')
-            : '<span class="text-xs text-gray-400 font-bold py-1">لم يتم اختيار أسماء</span>';
+        chipsContainer.innerHTML = targetNames.length ? (ownNames.length?'<button type="button" class="citl-personal-switch '+(!showMyScheduleView.target?'active':'')+'" data-personal-target=""><strong>جدولي الدراسي</strong><small>'+escapeName(ownNames.join(' / '))+'</small></button>':'')+delegatedNames.filter(n=>!isOwn(n)).map(name=>'<button type="button" class="citl-personal-switch '+(showMyScheduleView.target===name?'active':'')+'" data-personal-target="'+escapeName(name)+'"><strong>أنوب عن '+escapeName(name)+'</strong><small>تعيين معتمد من الإدارة</small></button>').join('') : '<span class="text-xs text-gray-400">لا توجد ارتباطات أو تعيينات معتمدة حاليًا. راجع الإدارة.</span>';
+        chipsContainer.querySelectorAll('[data-personal-target]').forEach(button=>button.onclick=()=>showMyScheduleView([],button.dataset.personalTarget));
     }
 
     // 4. إمساك الحاويات
     const clearBtn = document.getElementById('clear-schedule-link-btn');
     const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
     if (clearBtn) {
-        if (current && window.CITLPermissions.full(current)) {
-            clearBtn.classList.remove('hidden');
-        } else {
-            clearBtn.classList.add('hidden');
-        }
+        clearBtn.classList.add('hidden');
     }
     const mobileContainer = document.getElementById('mobile-schedule-list');
     const desktopBody = document.getElementById('my-schedule-rows');
@@ -2714,14 +2653,7 @@ async function clearMyScheduleLink() {
             return;
         }
 
-        const { data, error } = await supabase
-            .from('academic_schedule')
-            .select('*')
-            .in('instructor', [...new Set((await getCurrentScheduleInstructorValues()).filter(n=>targetNames.some(t=>normalizeInstructorName(t)===normalizeInstructorName(n))))])
-            .order('day_of_week', { ascending: true });
-
-        if (error) throw error;
-
+        const data=(scope.rows||[]).filter(r=>shownNames.some(n=>normalizeInstructorName(n)===normalizeInstructorName(r.instructor)));
         // تفريغ الحاويات
         if (mobileContainer) mobileContainer.innerHTML = '';
         if (desktopBody) desktopBody.innerHTML = '';
@@ -2733,11 +2665,14 @@ async function clearMyScheduleLink() {
 
         // ترتيب الأيام
         const dayOrder = { "Saturday": 1, "Sunday": 2, "Monday": 3, "Tuesday": 4, "Wednesday": 5, "Thursday": 6, "Friday": 7 };
-        data.sort((a, b) => (dayOrder[a.day_of_week] || 8) - (dayOrder[b.day_of_week] || 8));
+        data.sort((a,b)=>(Number(isOwn(b.instructor))-Number(isOwn(a.instructor)))||a.instructor.localeCompare(b.instructor,'ar')||(dayOrder[a.day_of_week]||8)-(dayOrder[b.day_of_week]||8));
 // Load this week's actions for shown schedules
 await loadWeekScheduleActions(data.map(x => x.id));
+if(renderTicket!==showMyScheduleView.serial)return;
 
+        let lastInstructor=null;
         data.forEach((item) => {
+if(lastInstructor!==item.instructor){lastInstructor=item.instructor;const heading='<strong>'+escapeName(item.instructor)+'</strong><small>'+(isOwn(item.instructor)?'جدولي المعتمد':'أقوم بأعمال هذا المحاضر — يُسجّل الإجراء باسمي')+'</small>';if(mobileContainer)mobileContainer.insertAdjacentHTML('beforeend','<div class="citl-personal-group">'+heading+'</div>');if(desktopBody)desktopBody.insertAdjacentHTML('beforeend','<tr><td colspan="8" class="citl-personal-group">'+heading+'</td></tr>');}
 const nextDate = (typeof getNextDateForDay === 'function') ? getNextDateForDay(item.day_of_week) : '';
 const actionKey = `${item.id}|${nextDate}`;
 const actionRow = scheduleActionsMap.get(actionKey) || null;

@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
   const S=root.CITLStudy,M=root.CITLDashboardModel,E=S.escape;
-  const state={user:null,rows:[],actions:[],meetings:[],errors:[],ready:false,view:null,day:'',updated:null};
+  const state={user:null,rows:[],actions:[],meetings:[],errors:[],ready:false,view:null,day:'',updated:null,scope:null,scopeTarget:''};
   let pending,started=false,queued,renderKey;
   const $=id=>document.getElementById(id);
   const clock=minutes=>minutes===null?'—':`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;
@@ -37,23 +37,29 @@
   function meetingList(rows,requests=false){
     return `<ul class="dh-list">${rows.map(x=>`<li><div class="dh-time">${E(String(x.start_time||'').slice(0,5))}</div><div class="dh-item-copy"><strong>${E(x.title||'حجز')}</strong><p>${E(dateLabel(x.date))} · ${E(root.getDashboardDepartmentLabel?.(x.department)||'')}</p></div>${requests?'<button class="dh-button" data-dh-admin="meetings">مراجعة</button>':'<span class="dh-badge">مؤكد</span>'}</li>`).join('')}</ul>`;
   }
+  function personalUser(){const names=state.scopeTarget?[state.scopeTarget]:(state.scope?.own_names||M.names(state.user));return {...state.user,linked_instructors:names,linked_instructor:null};}
+  function scopeSwitch(){
+    let host=$('dh-scope-switch');if(!host){host=document.createElement('div');host.id='dh-scope-switch';host.className='dh-scope-switch';$('dh-title').parentElement.append(host);}
+    host.hidden=state.view!=='faculty'||!state.scope?.delegated_names?.length;if(host.hidden){host.replaceChildren();return;}
+    host.innerHTML='<button type="button" class="dh-button '+(!state.scopeTarget?'active':'')+'" data-dh-scope="">جدولي الدراسي</button>'+state.scope.delegated_names.map(n=>'<button type="button" class="dh-button '+(state.scopeTarget===n?'active':'')+'" data-dh-scope="'+E(n)+'">أنوب عن '+E(n)+'</button>').join('');
+  }
   function renderFaculty(items,stats,now){
-    if(state.user.faculty_verification_status!=='approved'){
+    if(state.user.faculty_verification_status!=='approved'&&!state.scope?.delegated_names?.length){
       $('dh-metrics').innerHTML='';
       $('dh-workspace').innerHTML=empty(state.user.faculty_verification_status==='pending'?'ربط الهوية بانتظار اعتماد الإدارة':'الهوية الأكاديمية غير مرتبطة','يمكنك استخدام حسابك، ويظهر جدولك الشخصي بعد اعتماد ربط الاسم.');
       return;
     }
 
-    $('dh-title').textContent='جدولي الدراسي';
-    $('dh-subtitle').textContent=M.names(state.user).length?`الأسبوع الحالي · ${dateLabel(M.week(now).start)} — ${dateLabel(M.week(now).end)}`:'اربط اسمك الأكاديمي بحسابك ليظهر جدولك هنا';
-    const failed=state.errors.some(x=>['schedule','actions'].includes(x));
+    $('dh-title').textContent=state.scopeTarget?'جدول أنوب عنه':'جدولي الدراسي';
+    $('dh-subtitle').textContent=M.names(personalUser()).length?`الأسبوع الحالي · ${dateLabel(M.week(now).start)} — ${dateLabel(M.week(now).end)}`:'اربط اسمك الأكاديمي بحسابك ليظهر جدولك هنا';
+    const failed=state.errors.some(x=>['schedule','actions','personal_scope'].includes(x));
     $('dh-metrics').innerHTML=metric('محاضرات اليوم',failed?'—':stats.ownToday.length,dayLabel(now.day))+metric('انتهت اليوم',failed?'—':stats.ownToday.filter(x=>x.end<=now.minutes).length,'حسب توقيت القاهرة')+metric('ساعات التدريس اليوم',failed?'—':stats.todayHours,'محاضرات اليوم')+metric('القاعات',failed?'—':new Set(stats.ownToday.map(x=>x.room).filter(Boolean)).size,'قاعات محاضراتك اليوم',true);
     const next=stats.next;
-    const link=`<a class="dh-button" href="/schedules/?open=my-schedule" aria-label="فتح إجراءات جدولي الدراسي">${M.names(state.user).length?'إجراءات جدولي الدراسي':'ربط اسمي'}</a>`;
-    const focus=`<div class="dh-focus"><div class="dh-focus-copy">${failed?'<strong>تعذر تحديث جدولك</strong>':next?`<span class="dh-focus-label">${next.live?'محاضرتك الآن':'المحاضرة القادمة'}</span><strong>${E(next.course_name)}</strong><span>${E(dayLabel(next.day))} · <bdi>${E(next.time)}</bdi> · القاعة <bdi>${E(next.room||'غير محددة')}</bdi>${next.moved?' · تم نقل القاعة':''}</span>`:`<strong>${M.names(state.user).length?'لا توجد محاضرات قادمة هذا الأسبوع':'ابدأ بربط اسمك الأكاديمي'}</strong><span>${M.names(state.user).length?'أي جدول جديد باسمك يظهر تلقائيًا.':'اختر اسمك المعتمد من صفحة الجداول.'}</span>`}</div>${link}</div>`;
+    const link=`<a class="dh-button" href="/schedules/?open=my-schedule${state.scopeTarget?'&represent='+encodeURIComponent(state.scopeTarget):''}" aria-label="فتح إجراءات جدولي الدراسي">${M.names(personalUser()).length?'إجراءات جدولي الدراسي':'ربط اسمي'}</a>`;
+    const focus=`<div class="dh-focus"><div class="dh-focus-copy">${failed?'<strong>تعذر تحديث جدولك</strong>':next?`<span class="dh-focus-label">${next.live?'محاضرتك الآن':'المحاضرة القادمة'}</span><strong>${E(next.course_name)}</strong><span>${E(dayLabel(next.day))} · <bdi>${E(next.time)}</bdi> · القاعة <bdi>${E(next.room||'غير محددة')}</bdi>${next.moved?' · تم نقل القاعة':''}</span>`:`<strong>${M.names(personalUser()).length?'لا توجد محاضرات قادمة هذا الأسبوع':'ابدأ بربط اسمك الأكاديمي'}</strong><span>${M.names(personalUser()).length?'أي جدول جديد باسمك يظهر تلقائيًا.':'اختر اسمك المعتمد من صفحة الجداول.'}</span>`}</div>${link}</div>`;
     const options=[['','الأسبوع كاملًا'],...S.days.map((d,i)=>[d,S.labels[i]])].map(([v,l])=>`<option value="${v}"${state.day===v?' selected':''}>${l}</option>`).join('');
     const filtered=stats.own.filter(x=>!state.day||x.day===state.day);
-    const table=filtered.length?`<div class="dh-scroll" tabindex="0" aria-label="جدول محاضرات الأسبوع"><table class="dh-table"><thead><tr><th>اليوم</th><th>المادة</th><th>الوقت</th><th>القاعة</th><th>الحالة</th></tr></thead><tbody>${filtered.map(x=>`<tr class="${x.cancelled?'dh-cancelled':''}"><td class="dh-day"><strong>${E(dayLabel(x.day))}</strong><small>${x.occurs===false?'الجدول الأسبوعي':E(dateLabel(x.date))}</small></td><td class="dh-course"><strong>${E(x.course_name)}</strong><small>${E(x.course_code||'')}${x.replaced?` · ${E(x.effectiveInstructor)}`:''}</small>${x.action?.reason?`<small>${E(x.action.reason)}</small>`:''}</td><td><bdi>${E(x.time)}</bdi></td><td><bdi>${E(x.room||'—')}</bdi></td><td>${badge(x,true)}</td></tr>`).join('')}</tbody></table></div>`:empty(M.names(state.user).length?'لا توجد محاضرات باسمك في هذا العرض':'ابدأ بربط اسمك الأكاديمي',M.names(state.user).length?'قد يكون الجدول قيد التحديث. ارتباط حسابك باسمك محفوظ.':'الربط باسمك المعتمد يتيح عرض جدولك تلقائيًا.');
+    const table=filtered.length?`<div class="dh-scroll" tabindex="0" aria-label="جدول محاضرات الأسبوع"><table class="dh-table"><thead><tr><th>اليوم</th><th>المادة</th><th>الوقت</th><th>القاعة</th><th>الحالة</th></tr></thead><tbody>${filtered.map(x=>`<tr class="${x.cancelled?'dh-cancelled':''}"><td class="dh-day"><strong>${E(dayLabel(x.day))}</strong><small>${x.occurs===false?'الجدول الأسبوعي':E(dateLabel(x.date))}</small></td><td class="dh-course"><strong>${E(x.course_name)}</strong><small>${E(x.course_code||'')}${x.replaced?` · ${E(x.effectiveInstructor)}`:''}</small>${x.action?.reason?`<small>${E(x.action.reason)}</small>`:''}</td><td><bdi>${E(x.time)}</bdi></td><td><bdi>${E(x.room||'—')}</bdi></td><td>${badge(x,true)}</td></tr>`).join('')}</tbody></table></div>`:empty(M.names(personalUser()).length?'لا توجد محاضرات باسمك في هذا العرض':'ابدأ بربط اسمك الأكاديمي',M.names(personalUser()).length?'قد يكون الجدول قيد التحديث. ارتباط حسابك باسمك محفوظ.':'الربط باسمك المعتمد يتيح عرض جدولك تلقائيًا.');
     $('dh-workspace').innerHTML=`<div class="dh-personal">${focus}${panel('تفاصيل الجدول',failed?empty('تعذر تحميل التفاصيل'):table,'',`<select id="dh-day-filter" class="dh-select" aria-label="يوم الجدول">${options}</select>`)}</div>`;
   }
   function summaryCard(title,totalLabel,total,facts,footer,extraClass=''){
@@ -85,18 +91,18 @@
   }
 
   function render(){
-    if(!state.user)return;const now=S.cairo(),r=M.role(state.user);
+    if(!state.user)return;const now=S.cairo(),r=M.role(state.user);r.faculty=r.faculty||!!state.scope?.delegated_names?.length;
     if(!r.faculty&&state.view==='faculty')state.view='overview';
     if(!r.manager&&r.faculty)state.view='faculty';
     if(!state.view)state.view=r.faculty?'faculty':'overview';
     $('dashboard-home').dataset.view=state.view;
     $('dh-metrics').hidden=state.view!=='faculty';
-    const items=M.lectures(state.rows,state.actions,state.user,now),stats=M.statistics(items,state.user,now);
+    const displayUser=state.view==='faculty'?personalUser():state.user;const items=M.lectures(state.view==='faculty'&&state.errors.includes('personal_scope')?[]:state.rows,state.actions,displayUser,now),stats=M.statistics(items,displayUser,now);
     $('dh-role-tabs').hidden=!(r.manager&&r.faculty);
     for(const button of $('dh-role-tabs').querySelectorAll('button'))button.setAttribute('aria-selected',String(button.dataset.dhView===state.view));
     $('dh-errors').hidden=!state.errors.length;
     $('dh-errors').textContent=state.errors.includes('profile')?'تعذر التحقق من حسابك؛ أعد المحاولة.':'تعذر تحديث بعض البيانات. الأرقام غير المتاحة تظهر بشرطة، ويمكنك إعادة المحاولة.';
-    const nextKey=JSON.stringify([state.user.id,r,M.names(state.user),state.view,state.day,stats,state.meetings,state.errors]);
+    const nextKey=JSON.stringify([state.user.id,r,M.names(state.user),state.view,state.day,state.scopeTarget,state.scope,stats,state.meetings,state.errors]);
     if(renderKey!==nextKey||!$('dh-workspace').children.length){
       const actionCard=$('citl-ac-summary');
       if(state.view==='faculty')renderFaculty(items,stats,now);else renderOverview(items,stats,now);
@@ -104,6 +110,7 @@
       if(actionCard&&!actionCard.isConnected&&target)target.insertBefore(actionCard,state.view==='faculty'?null:target.querySelector('.dh-admin-summary'));
       renderKey=nextKey;
     }
+    scopeSwitch();
     $('dh-updated').textContent=state.updated?'آخر تحديث '+new Date(state.updated).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Cairo'}):'جاري التحديث';
     $('dh-loading').hidden=true;$('dh-content').hidden=false;
     root.CITLOversight?.renderDashboard();
@@ -122,14 +129,14 @@
       const oldKey=state.user&&JSON.stringify([state.user.id,M.role(state.user),M.names(state.user)]);
       $('citl-connection-recovery')?.remove();
       const newKey=JSON.stringify([profile.id,M.role(profile),M.names(profile)]);
-      if(oldKey&&oldKey!==newKey){state.view=null;state.meetings=[];state.rows=[];state.actions=[];root.clearDashboardPrivateState?.();$('dh-content').hidden=true;}
+      if(oldKey&&oldKey!==newKey){state.view=null;state.scope=null;state.scopeTarget='';state.meetings=[];state.rows=[];state.actions=[];root.clearDashboardPrivateState?.();$('dh-content').hidden=true;}
       if(!state.ready||oldKey!==newKey){$('dh-loading').innerHTML=root.CITLLoading.summary(M.role(profile).full||M.role(profile).faculty?4:3)+(M.role(profile).faculty?'<table style="width:100%"><tbody>'+root.CITLLoading.table(5)+'</tbody></table>':'');$('dh-loading').hidden=false;}
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
       const jobs=[S.loadAll(root.sb),root.CITLRequests.rpc(root.sb,'citl_calendar_effects',{p_from:week.start,p_to:week.end}),
         r.meetings?readAll('meetings','id,title,date,start_time,end_time,status,department,room_id,booking_type',q=>q.or(`date.eq.${today},status.in.(pending,modification_requested,cancellation_requested,deletion_requested)`)):Promise.resolve([]),
-        root.sb.from('site_settings').select('setting_value').eq('setting_key','news_config').maybeSingle()];
-      const result=await Promise.allSettled(jobs);state.errors=[];
+        root.sb.from('site_settings').select('setting_value').eq('setting_key','news_config').maybeSingle(),root.CITLRequests.rpc(root.sb,'citl_personal_lecture_scope',{})];
+      const result=await Promise.allSettled(jobs);state.errors=[];state.scope=result[4].status==='fulfilled'?result[4].value:null;if(result[4].status==='rejected')state.errors.push('personal_scope');if(!state.scope?.delegated_names?.includes(state.scopeTarget))state.scopeTarget='';
       ['rows','actions','meetings'].forEach((key,i)=>{state[key]=result[i].status==='fulfilled'?result[i].value:[];if(result[i].status==='rejected')state.errors.push(['schedule','actions','meetings'][i]);});
       // A missing action feed must never show an old room or an uncancelled personal lecture as current.
       if(state.errors.includes('actions'))state.rows=[];
@@ -140,16 +147,28 @@
     return pending;
   }
   function requestRefresh(){clearTimeout(queued);queued=setTimeout(refresh,250);}
+  function positionCardDetails(){
+    const view=root.visualViewport,w=view?.width||root.innerWidth,h=view?.height||root.innerHeight,x=view?.offsetLeft||0,y=view?.offsetTop||0;
+    document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{
+      const panel=d.querySelector(':scope > div'),anchor=d.querySelector('summary');if(!panel||!anchor)return;
+      const r=anchor.getBoundingClientRect(),width=Math.max(1,Math.min(320,w-24));
+      Object.assign(panel.style,{position:'fixed',boxSizing:'border-box',width:width+'px',maxWidth:width+'px',maxHeight:Math.max(40,Math.min(220,h-24))+'px',right:'auto',bottom:'auto',zIndex:'1000'});
+      panel.style.left=Math.max(x+12,Math.min(r.right-width,x+w-width-12))+'px';
+      panel.style.top=Math.max(y+12,Math.min(r.bottom+8,y+h-panel.offsetHeight-12))+'px';
+    });
+  }
   function start(){
     if(started)return refresh();started=true;
     document.addEventListener('click',event=>{
       const chosen=event.target.closest?.('.dh-room-details');
       document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==chosen)d.open=false;});
     });
-    document.addEventListener('toggle',event=>{if(event.target.matches?.('#dashboard-home .dh-room-details')&&event.target.open)document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==event.target)d.open=false;});},true);
+    root.addEventListener('resize',positionCardDetails);root.addEventListener('scroll',positionCardDetails,{passive:true});root.visualViewport?.addEventListener('resize',positionCardDetails);root.visualViewport?.addEventListener('scroll',positionCardDetails);
+    document.addEventListener('toggle',event=>{positionCardDetails();if(event.target.matches?.('#dashboard-home .dh-room-details')&&event.target.open)document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==event.target)d.open=false;});},true);
     document.addEventListener('keydown',event=>{if(event.key==='Escape')document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>d.open=false);});
     $('dh-refresh').addEventListener('click',refresh);
     $('dashboard-home').addEventListener('click',event=>{
+      const scope=event.target.closest('[data-dh-scope]');if(scope){state.scopeTarget=scope.dataset.dhScope;render();return;}
       const admin=event.target.closest('[data-dh-admin]');if(admin){openAdmin(admin.dataset.dhAdmin);return;}
       const tab=event.target.closest('[data-dh-view]');if(tab){state.view=tab.dataset.dhView;render();}
     });

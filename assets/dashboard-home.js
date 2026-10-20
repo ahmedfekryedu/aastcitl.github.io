@@ -69,10 +69,10 @@
     const next=stats.today.filter(x=>x.start!==null&&x.start>now.minutes).sort((a,b)=>a.start-b.start)[0];
     const ended=stats.today.filter(x=>x.end!==null&&x.end<=now.minutes).length;
     const upcoming=stats.today.filter(x=>x.start!==null&&x.start>now.minutes).length;
-    const cancelled=items.filter(x=>x.date===now.date&&x.cancelled).length;
+    const cancelledToday=items.filter(x=>x.date===now.date&&x.cancelled),cancelled=cancelledToday.length;
     const roomDetails=failed?'تعذر تحديث القاعات':`<span>الإشغال حسب المحاضرات</span><details class="dh-room-details"><summary>القاعات المتاحة</summary><div>${stats.available.map(x=>`<span><bdi>${E(x)}</bdi></span>`).join('')||'لا توجد قاعات متاحة دراسيًا الآن'}</div></details>`;
     const rooms=summaryCard('إشغال القاعات','إجمالي القاعات',failed?'—':stats.rooms.length,[metric('قاعات بلا محاضرات',failed?'—':available),metric('مشغولة الآن',failed?'—':busy),metric('نسبة الإشغال',failed?'—':usage+'%')],roomDetails);
-    const lectureFooter=failed?'تعذر تحديث المحاضرات':`<span class="dh-next-lecture" title="${E(next?next.course_name+' · '+next.room:'')}">${next?`القادمة <bdi>${clock(next.start)}</bdi> · ${E(next.course_name)}`:stats.live.length?'المحاضرات الحالية مستمرة':'لا توجد محاضرات تالية اليوم'}</span>${cancelled?`<span class="dh-cancel-note">ملغاة اليوم: ${cancelled}</span>`:''}`;
+    const lectureFooter=failed?'تعذر تحديث المحاضرات':`<span class="dh-next-lecture" title="${E(next?next.course_name+' · '+next.room:'')}">${next?`القادمة <bdi>${clock(next.start)}</bdi> · ${E(next.course_name)}`:stats.live.length?'المحاضرات الحالية مستمرة':'لا توجد محاضرات تالية اليوم'}</span><details class="dh-room-details dh-cancelled-details"><summary>المحاضرات الملغاة اليوم (${cancelled})</summary><div>${cancelledToday.length?cancelledToday.map(x=>`<article><strong>${E(x.course_name||'محاضرة')}</strong><small>${E(x.effectiveInstructor||x.instructor||'')} · القاعة <bdi>${E(x.room||'غير محددة')}</bdi></small><small><bdi>${E(x.time)}</bdi> · ${E(dateLabel(x.date))}</small></article>`).join(''):'لا توجد محاضرات ملغاة اليوم'}</div></details>`;
     const lectures=summaryCard('الحركة الدراسية','محاضرات اليوم',failed?'—':stats.today.length,[metric('محاضرات جارية',failed?'—':stats.live.length),metric('انتهت',failed?'—':ended),metric('لم تبدأ',failed?'—':upcoming)],lectureFooter,'dh-lecture-summary');
     let administration='';
     if(r.meetings){

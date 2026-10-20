@@ -48,3 +48,6 @@
 .citl-site-notice.is-overflowing:hover .notice-copy,.citl-site-notice.is-overflowing:focus-within .notice-copy,.citl-site-notice.is-overflowing.is-paused .notice-copy{animation-play-state:paused}
 @keyframes citl-notice-bounce{0%,12%,100%{transform:translateX(0)}50%,62%{transform:translateX(var(--notice-travel,0px))}}
 @media(prefers-reduced-motion:reduce){.citl-site-notice.is-overflowing .notice-copy{animation:none}.citl-site-notice .notice-window,.citl-site-notice:not(.is-scrolling) .notice-window{overflow-x:auto;scrollbar-width:none}}
+
+/* Notices keep moving automatically, including while hovered or focused. */
+.citl-site-notice .notice-copy{animation-play-state:running!important}

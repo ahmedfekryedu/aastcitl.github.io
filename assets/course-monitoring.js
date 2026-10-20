@@ -23,7 +23,18 @@
  function bindForm(form,fn){form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;run(()=>fn(formData(form)));});}
  const accountOptions=()=>Object.fromEntries(context.accounts.map(p=>[p.id,`${p.full_name||p.email} — ${M.dept(p.department)}`]));
  const departmentOptions=()=>Object.fromEntries([...new Set([...(context.accounts||[]).map(p=>p.department),...(context.department_heads||[]).map(p=>p.department),...rows.map(o=>o.department_key),...(context.heads||[])].filter(Boolean))].sort().map(k=>[k,M.dept(k)]));
- async function listCourses(loading=true){const ticket=++serial;workspace=null;if(loading)app.innerHTML=skeleton();const all=[];for(let batch=0;;batch++){const data=await rpc('list',{term_id:term||null,page:batch});if(ticket!==serial)return;all.push(...data.rows);if(all.length>=data.total||!data.rows.length)break;}rows=all;total=all.length;renderList();}
+ async function listCourses(loading=true){
+  const ticket=++serial;workspace=null;if(loading)app.innerHTML=skeleton();const all=[];let shown=false;
+  try{for(let batch=0;;batch++){
+   const data=await rpc('list',{term_id:term||null,page:batch});if(ticket!==serial)return;
+   all.push(...data.rows);rows=all;total=data.total;
+   if(!shown){page=0;renderList();shown=true;root.CITLPageBoot?.finish();}
+   else if(!workspace&&document.getElementById('cm-list-body')&&view!=='admin')renderListBody();
+   const complete=all.length>=data.total||!data.rows.length;
+   status.textContent=complete?'':'تم عرض '+all.length+' من '+data.total+' مقررًا — جاري استكمال بقية النتائج…';
+   if(complete)break;
+  }}catch(error){if(ticket!==serial)return;if(shown){error.partialCourses=true;error.message='تم عرض '+all.length+' مقررًا، وتعذر استكمال البقية. اضغط تحديث لإعادة المحاولة. '+error.message;}throw error;}
+ }
  function visibleRows(){const filter=document.getElementById('cm-filter'),values=filter?formData(filter):{};return rows.filter(o=>(view==='all'||view==='reports'||view==='admin'||o.roles[view])&&(!values.search||[o.course_name,o.course_code,o.coordinator_name].join(' ').toLowerCase().includes(values.search.toLowerCase()))&&(!values.department||o.department_key===values.department)&&(!values.state||o.state===values.state)&&(!values.health||(values.health==='missing'?o.progress.criteria.some(c=>c.status==='not_started'):values.health==='unassigned'?!o.coordinator_id:values.health==='late'?o.progress.overdue>0:values.health==='review'?o.progress.review?.overdue:o.progress.criteria.some(c=>c.due_on&&c.status==='not_due')))&&(!values.criterion||o.progress.criteria.some(c=>String(c.criterion)===values.criterion&&['incomplete','not_started'].includes(c.status))));}
  function renderList(){
  const views={all:'المقررات المتاحة',lecturer:'مقرراتي',coordinator:'المقررات التي أنسقها'};
@@ -36,7 +47,7 @@
  app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*100>=total;
  app.querySelector('[data-action=prev]').onclick=()=>{page--;renderListBody();};app.querySelector('[data-action=next]').onclick=()=>{page++;renderListBody();};renderListBody();
  }
- function renderListBody(){const host=app.querySelector('#cm-list-body'),items=visibleRows();page=Math.min(page,Math.max(0,Math.ceil(items.length/100)-1));app.querySelector('#cm-page-label').textContent='نتائج التصفية: '+items.length+' — صفحة '+(page+1);app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*100>=items.length;
+ function renderListBody(){const host=app.querySelector('#cm-list-body'),items=visibleRows();page=Math.min(page,Math.max(0,Math.ceil(items.length/100)-1));app.querySelector('#cm-page-label').textContent='تم تحميل '+rows.length+' من '+total+' — نتائج التصفية: '+items.length+' — صفحة '+(page+1);app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*100>=items.length;
  if(view==='admin'){renderAdmin(host);renderSupplementAdmin(host);return;}
  host.innerHTML=summary(items)+(view==='reports'?`<div class="cm-panel"><h2>تقارير المتابعة</h2><p class="cm-muted">التقارير تحترم نطاق الحساب والترم المختار، وتشمل كل الصفحات. التقرير الرسمي للمقرر من داخل تفاصيله.</p><div class="cm-toolbar">${btn('تقرير القسم','department-report')}${btn('مقارنة الأقسام','college-report')}${btn('الاستثناءات والمتأخرات','exceptions-report')}${btn('تصدير CSV','csv')}${btn('تقرير نشاط مستخدم','activity-report')}</div></div>`:'')+(items.length?'<div class="cm-grid">'+items.slice(page*100,(page+1)*100).map(o=>{
  const due=o.progress.criteria.filter(c=>c.due_on&&!['complete','not_applicable'].includes(c.status)).sort((a,b)=>a.due_on.localeCompare(b.due_on))[0];
@@ -172,7 +183,7 @@
  d.querySelectorAll('[data-queue]').forEach(b=>b.onclick=()=>{const q=result.queue[+b.dataset.queue],changed=q.review_kind==='group_change',choices=changed?{review:'تظل قيد المراجعة',resolve:'ربط التغيير بسجل المقرر السابق',include:'هذه مجموعة إضافية مستقلة — إنشاء متابعة جديدة',exclude:'خارج نطاق المتابعة'}:{review:'تظل قيد المراجعة',include:'إدراج في المتابعة الرسمية',exclude:'خارج نطاق المتابعة'},edit=dialog('مراجعة مصدر المقرر',`<form>${select('decision','القرار',choices,q.decision)}${changed?select('previous','السجل السابق',Object.fromEntries((q.candidate_offerings||[]).map(o=>[o.id,o.name+' — '+(o.group_key||'بدون مجموعة')])),'','اختر السجل السابق'):''}${textarea('note','مرجع القرار وسببه','',true)}<button class="cm-btn">توثيق القرار</button></form>`);
  bindForm(edit.querySelector('form'),async v=>{if(v.decision==='resolve'){if(!v.previous)throw Error('اختر السجل السابق');const old=await rpc('get',{id:v.previous});await rpc('source.resolve',{id:v.previous,revision:old.offering.revision,note:v.note,data:{term_id:q.term_id,source_key:q.source_key}});}else await rpc('import.review',{note:v.note,data:{term_id:q.term_id,source_key:q.source_key,decision:v.decision}});edit.close();d.close();await listCourses(false);});});});}
 
- async function init(){let authenticated=false;try{await root.CITLAuth.loadProfile();authenticated=true;context=await rpc('context');term=context.terms.find(t=>t.is_active)?.id||context.terms[0]?.id||'';const id=new URLSearchParams(location.search).get('offering');if(id)await openCourse(id);else await listCourses();}catch(e){if(!authenticated)root.CITLAuth.showFailure(e);status.textContent=e.message;app.innerHTML=empty('تعذر تحميل متابعة المقررات. تحقق من الاتصال وتطبيق ملفات SQL الخاصة بالوحدة ثم اضغط تحديث.');}finally{root.CITLPageBoot?.finish();}}
+ async function init(){let authenticated=false;try{await root.CITLAuth.loadProfile();authenticated=true;context=await rpc('context');term=context.terms.find(t=>t.is_active)?.id||context.terms[0]?.id||'';const id=new URLSearchParams(location.search).get('offering');if(id)await openCourse(id);else await listCourses();}catch(e){if(!authenticated)root.CITLAuth.showFailure(e);status.textContent=e.message;if(!e.partialCourses)app.innerHTML=empty('تعذر تحميل متابعة المقررات. تحقق من الاتصال وتطبيق ملفات SQL الخاصة بالوحدة ثم اضغط تحديث.');}finally{root.CITLPageBoot?.finish();}}
  document.getElementById('cm-refresh').onclick=()=>run(async()=>{context=await rpc('context');if(workspace)await openCourse(workspace.offering.id,false);else await listCourses();},'تم تحديث البيانات');
  root.addEventListener('citl-permissions-changed',()=>{if(!busy)init();});
  root.CITLCourseMonitoring=Object.freeze({init});init();

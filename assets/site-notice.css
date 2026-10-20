@@ -27,3 +27,15 @@
 @media(max-width:767px){.citl-site-notice{padding:8px 12px;gap:8px;font-size:11px}#citl-notice-settings{padding:14px}.citl-site-notice strong{max-width:28%}#citl-notice-settings .notice-fields{gap:10px}}
 @media(prefers-reduced-motion:reduce){.citl-site-notice.is-scrolling .notice-copy{animation:none;white-space:pre-wrap;width:auto;min-width:0}}
 @media print{#citl-site-notice{display:none!important}}
+
+/* Mobile notice belongs to the document header, not the scrolling viewport. */
+@media(max-width:767px){
+ #citl-site-notice{position:relative;top:auto;z-index:auto}
+ .citl-site-notice{padding:5px 12px;min-height:32px;font-size:clamp(11px,2.8vw,13px);line-height:22px;gap:8px}
+ .citl-site-notice .notice-copy,.citl-site-notice.is-scrolling .notice-copy{white-space:nowrap;overflow-wrap:normal;width:max-content;min-width:100%}
+ .citl-site-notice:not(.is-scrolling) .notice-window{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .citl-site-notice:not(.is-scrolling) .notice-window::-webkit-scrollbar{display:none}
+ .citl-site-notice button{min-width:24px;width:24px;height:24px}
+}
+
+@media(max-width:767px) and (prefers-reduced-motion:reduce){.citl-site-notice.is-scrolling .notice-window{overflow-x:auto;scrollbar-width:none}}

@@ -386,7 +386,7 @@ function setupRealtimeSubscription() {
             // 4. تحديث القائمة
             checkUserNotifications();
         })
-        .subscribe();
+        .subscribe(status=>window.CITLRealtimeHealth?.track('meetings',status,async()=>{await loadMeetings();await window.CITLMeetingUI?.upcoming(true);}));
 }
 
 // --- 1. دالة البدء والحماية (النسخة الكاملة النهائية) ---

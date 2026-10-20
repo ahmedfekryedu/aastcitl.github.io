@@ -15,9 +15,14 @@
  if(!active)return;
  const panel=document.getElementById('admin-panel-modal'),host=document.getElementById('citl-control-host');
  if(!panel||!host)return;
- host.append(panel);panel.classList.add('citl-control-page-panel');
- const close=document.getElementById('close-admin-panel');
- if(close){const home=document.createElement('a');home.href='/dashboard/';home.className=close.className;home.textContent='←';home.title='العودة للرئيسية';home.setAttribute('aria-label','العودة للرئيسية');close.replaceWith(home);}
+ host.append(panel);panel.classList.remove('modal');panel.classList.add('citl-control-page-panel');
+ const shell=panel.firstElementChild;
+ shell.firstElementChild?.remove();
+ shell.className='citl-control-layout';shell.removeAttribute('style');
+ const home=document.createElement('a');home.href='/dashboard/';home.className='citl-control-home';home.innerHTML='<i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span>';
+ document.getElementById('admin-panel-btn')?.before(home);
+ document.querySelector('#mobile-menu a[href="/dashboard/"]')?.removeAttribute('aria-current');
+ const menuAdmin=document.querySelector('#mobile-menu [data-dashboard-account]');if(menuAdmin)menuAdmin.setAttribute('aria-current','page');
  document.title='لوحة التحكم المركزية | CITL';
  let started=false;
  root.addEventListener('citl-dashboard-ready',()=>{
@@ -34,6 +39,7 @@
   const button=event.target.closest('.admin-tab');if(!button)return;
   const url=new URL(location.href);url.searchParams.set('tab',button.dataset.tab);
   history.replaceState(null,'',url.href);
+  if(innerWidth<768)requestAnimationFrame(()=>document.querySelector('#citl-control-host .admin-tab-content:not(.hidden)')?.scrollIntoView({behavior:'smooth',block:'start'}));
  });
 })(window);
 

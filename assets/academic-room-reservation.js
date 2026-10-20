@@ -28,7 +28,7 @@
    catch(error){if(error.code&&error.code!=='20'&&error.code!=='57014')attempt=null;status.textContent=error.code==='PGRST202'?'يلزم تطبيق تحديث الحجز الدراسي 034.':error.message;}
    finally{saving=false;if(d.isConnected){fieldset.disabled=false;d.querySelector('[data-close]').disabled=false;}}
   };
-  document.body.append(d);d.showModal();await load();
+  document.body.append(d);await load();if(d.isConnected)d.showModal();
  }
  root.CITLAcademicRoomReservation=Object.freeze({open});
 })(window);

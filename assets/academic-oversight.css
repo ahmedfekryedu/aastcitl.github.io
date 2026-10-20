@@ -131,3 +131,16 @@
 .citl-free-times .citl-free-book bdi{font-size:13px;direction:ltr}
 .citl-free-times .citl-free-book:hover{background:#dcf3e5;border-color:#25844d}.citl-free-times .citl-free-book:focus-visible{outline:3px solid #f3a628;outline-offset:2px}
 .citl-action-collapse{display:block;margin:0 0 12px auto}
+/* Compact academic associations and named representatives. */
+#citl-department-members .citl-admin-section-head,#citl-faculty-delegates .citl-admin-section-head{padding:12px 16px}
+#citl-department-members .citl-ac-work-body,#citl-faculty-delegates .citl-ac-work-body{padding:12px 16px}
+#citl-department-members .citl-ac-table th,#citl-department-members .citl-ac-table td{padding:8px 10px}
+#citl-department-members .citl-head-assignment-summary{padding:5px 0;gap:2px}
+#citl-department-members .citl-ac-search{margin:5px 0 8px}
+#citl-department-members .citl-admin-empty{padding:14px;min-height:0}
+#citl-faculty-delegates{margin-top:16px}
+.citl-delegate-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:10px}
+.citl-delegate-fields label{display:grid;gap:6px;font-size:12px;color:#2a3475;min-width:0}
+.citl-delegate-fields input,.citl-delegate-fields select,#citl-faculty-delegates .citl-ac-search{width:100%;min-width:0;box-sizing:border-box;padding:8px;border:1px solid #dce2ed;border-radius:8px;font:12px Cairo,sans-serif;background:#fff;color:#2a3475}
+#citl-faculty-delegates form{margin-bottom:12px}#citl-faculty-delegates .citl-ac-search{display:block;max-width:400px;margin:6px 0}
+@media(max-width:600px){.citl-delegate-fields{grid-template-columns:minmax(0,1fr)}}

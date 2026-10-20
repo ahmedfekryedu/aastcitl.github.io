@@ -100,6 +100,7 @@ function switchAdminTab(tabName) {
     }
 
     if (tabName === 'directory' && typeof loadFacultyDirectoryTab === 'function') {
+        window.CITLFacultyDelegates?.load();
         try {
             loadFacultyDirectoryTab();
         } catch (e) {

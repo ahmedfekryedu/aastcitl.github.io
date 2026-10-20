@@ -1856,7 +1856,7 @@ window.rejectMeeting = async function(id) {
  let meetings = window.CITLAdminMeetings || [];
 
     // التعديل: تغيير نص التنبيه ليكون أكثر دقة
-    const confirmed = await showConfirmDialog('هل تريد رفض هذا الطلب؟\nسيتم إشعار المستخدم بالرفض وبقاء الحجز في سجلاته كمرفوض.');
+    const confirmed = await showConfirmDialog('هل تريد رفض هذا الطلب؟\nسيتم إشعار المستخدم بالرفض وبقاء الحجز في سجلاته كمرفوض.',{title:'رفض طلب الحجز',confirmText:'تأكيد الرفض',icon:'fa-times-circle'});
     if(!confirmed) return;
     
     document.body.style.cursor = 'wait';

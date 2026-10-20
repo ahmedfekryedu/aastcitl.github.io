@@ -12,9 +12,28 @@
  function kind(m){return m.booking_type==='lecture'?'محاضرة / سكشن':reasons[m.booking_reason]|| (m.booking_type==='other'?'استخدام إداري / آخر':'اجتماع');}
  function details(m){return [['نوع الحجز',kind(m)],['الجهة الحاجزة',department(m.department)],['القاعة',m.rooms?.name||m.room_name|| (typeof rooms!=='undefined'?rooms.find(r=>String(r.id)===String(m.room_id))?.name:null)||'—'],['مقدم الطلب',m.createdBy||'—'],['بريد مقدم الطلب',m.creatorEmail||'—'],['الحالة',labels[m.status]||m.status],['سبب الحجز',m.booking_reason_detail||'لم تُضف تفاصيل للسبب']];}
  function list(items){return '<dl class="citl-meeting-fields">'+items.map(([a,b])=>'<div><dt>'+E(a)+'</dt><dd>'+E(b)+'</dd></div>').join('')+'</dl>';}
+ async function occupancy(m,section){
+  const box=document.createElement('div');box.className='citl-booking-occupancy';box.setAttribute('role','status');box.textContent='جاري التحقق من إشغال القاعة في موعد الحجز…';section.prepend(box);
+  const candidate={...m,...(m.pending_changes||{})};
+  try{
+   const [room,lectures,others]=await Promise.all([
+    root.sb.from('rooms').select('id,name,academic_room_name').eq('id',candidate.room_id).single(),
+    root.CITLRequests.rpc(root.sb,'citl_booking_conflicts',{p_room:String(candidate.room_id),p_date:candidate.date,p_start:candidate.start_time||candidate.startTime,p_end:candidate.end_time||candidate.endTime}),
+    readCatalog({from:candidate.date,to:candidate.date,roomId:candidate.room_id})]);
+   if(room.error)throw room.error;if(!Array.isArray(lectures))throw Error('تعذر قراءة الجدول');
+   const booked=others.filter(x=>String(x.id)!==String(m.id)&&String(x.room_id)===String(candidate.room_id)&&['confirmed','modification_requested','cancellation_requested'].includes(x.status)&&mins(x.start_time)<mins(candidate.end_time||candidate.endTime)&&mins(x.end_time)>mins(candidate.start_time||candidate.startTime));
+   if(!box.isConnected)return;
+   const title=document.createElement('strong');title.textContent=lectures.length||booked.length?'الحجز في قاعة مشغولة':room.data?.academic_room_name?'الحجز في قاعة فارغة':'لا يوجد حجز متعارض؛ القاعة غير مرتبطة بجدول دراسي';box.replaceChildren(title);
+   const when=document.createElement('div');when.textContent=candidate.date+' · '+clock(candidate.start_time||candidate.startTime)+' – '+clock(candidate.end_time||candidate.endTime)+(m.pending_changes?' — الموعد المطلوب بعد التعديل':'');box.append(when);
+   for(const row of lectures){const line=document.createElement('div');line.textContent='محاضرة: '+(row.course_name||'—')+' · '+(row.instructor||'المحاضر غير محدد')+' · '+clock(row.start_time)+' – '+clock(row.end_time);box.append(line);}
+   for(const row of booked){const line=document.createElement('div');line.textContent='حجز قائم: '+(row.title||'—')+' · '+(row.profiles?.full_name||row.createdBy||row.booked_by||'صاحب الحجز غير متاح')+' · '+clock(row.start_time)+' – '+clock(row.end_time);box.append(line);}
+   const note=document.createElement('small');note.textContent='الحالة الحالية وقت فتح التفاصيل، وليست لقطة محفوظة عند تقديم الطلب. يظل التحقق النهائي عند الاعتماد.';box.append(note);
+  }catch(error){box.textContent='تعذر التحقق من إشغال القاعة. لا تعتبر القاعة فارغة؛ أعد فتح التفاصيل قبل الاعتماد.';}
+ }
  function decorateDetails(m,host){host.querySelector('[data-meeting-extra]')?.remove();const section=document.createElement('section');section.dataset.meetingExtra='';section.innerHTML=list(details(m));
   if(m.pending_changes){const p=normalize({...m,...m.pending_changes});section.innerHTML+='<h4 class="citl-meeting-subtitle">التعديل المطلوب — لم يُعتمد بعد</h4>'+list([['العنوان',p.title],['التاريخ',p.date],['التوقيت',p.startTime+' – '+p.endTime],['المدة',duration(p.startTime,p.endTime)],['الجهة',department(p.department)],['نوع الحجز',kind(p)],['الحضور',p.attendees||'—'],['الملاحظات',p.description||'—'],['تفاصيل السبب',p.booking_reason_detail||'—']]);}
   host.querySelector('.space-y-4')?.before(section);if(!section.isConnected)host.append(section);
+  if(canReview()||m.user_id===root.currentUser?.id)void occupancy(m,section);
   if(m.booking_type==='lecture'&&!m.academic_schedule_id&&!m.pending_changes&&P.can(root.currentUser,'can_approve')){
    const correction=document.createElement('button');correction.type='button';correction.className='citl-ac-button secondary';correction.textContent='تصحيح النوع إلى حجز قاعة اجتماع';section.append(correction);
    correction.onclick=async()=>{if(correction.disabled)return;correction.disabled=true;try{
@@ -28,8 +47,9 @@
   if(m.status==='pending'&&P.can(root.currentUser,'can_approve')&&typeof root.approveMeeting==='function'){
    const actions=document.createElement('div');actions.className='citl-ac-buttons';
    const approve=document.createElement('button');approve.type='button';approve.className='citl-ac-button';approve.textContent='اعتماد الحجز';actions.append(approve);section.append(actions);
+   const reject=document.createElement('button');reject.type='button';reject.className='citl-ac-button secondary';reject.textContent='رفض الطلب';actions.append(reject);reject.onclick=async()=>{if(reject.disabled)return;reject.disabled=true;document.getElementById('meeting-details-modal')?.classList.remove('show');try{await root.rejectMeeting(m.id);await open(m.id,false);}finally{reject.disabled=false;}};
    approve.onclick=async()=>{if(approve.disabled)return;approve.disabled=true;
-    try{const success=await root.approveMeeting(m.id);if(success){await open(m.id,false);root.checkUserNotifications?.();}}
+    try{document.getElementById('meeting-details-modal')?.classList.remove('show');const success=await root.approveMeeting(m.id);if(success){await open(m.id,false);root.checkUserNotifications?.();}}
     finally{approve.disabled=false;}
    };
   }
@@ -44,7 +64,7 @@
   root.showMeetingDetails(normalize(data));return true;
  }catch(error){root.showNotification?.('تعذر فتح تفاصيل الحجز: '+error.message,'error');return false;}finally{opening=false;}}
  function addDetailsButton(row,m){if(row.querySelector('[data-meeting-action=viewMeetingFromAdmin]'))return;const cell=row.lastElementChild;if(!cell)return;const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.dataset.meetingAction='viewMeetingFromAdmin';b.textContent='التفاصيل';cell.prepend(b);}
- function rememberAdminEdit(){document.getElementById('add-meeting-modal').style.zIndex='1800';}
+ function rememberAdminEdit(){document.getElementById('add-meeting-modal').style.zIndex='1900';}
  async function afterSave(id){const wasAdmin=document.getElementById('admin-panel-modal')?.classList.contains('show');if(wasAdmin){if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}if(id&&!wasAdmin)await open(id,false);await upcoming(true);}
  // Same base records as administration; presentation does not depend on optional columns or joins.
  async function readCatalog({from,to,roomId=null}={}){

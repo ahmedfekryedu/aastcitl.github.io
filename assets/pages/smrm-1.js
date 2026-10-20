@@ -1038,7 +1038,8 @@ function setupEventListeners() {
             window.CITLAcademicBooking.setTiming(selectedMeeting.startTime,duration);
             
             closeModal('meeting-details-modal');
-            document.getElementById('add-meeting-modal').classList.add('show');
+            document.getElementById('add-meeting-modal').style.zIndex='1900';
+    document.getElementById('add-meeting-modal').classList.add('show');
         }
 
         // Close modal
@@ -1536,6 +1537,7 @@ function editMeeting() {
 
     // 8. إغلاق نافذة التفاصيل وفتح نافذة التعديل
     closeModal('meeting-details-modal');
+    document.getElementById('add-meeting-modal').style.zIndex='1900';
     document.getElementById('add-meeting-modal').classList.add('show');
 }
         

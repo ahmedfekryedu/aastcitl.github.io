@@ -14,7 +14,7 @@ html[data-citl-control-page] #dashboard-main{display:none!important}
 
 #citl-control-host .citl-control-layout{display:block;background:transparent;box-shadow:none;border:0;border-radius:0}
 #citl-control-host #admin-panel-modal{box-shadow:none;border:0;border-radius:0}
-.citl-control-home{display:inline-flex;align-items:center;gap:8px;background:#f3a628;color:#172554;font-weight:800;padding:9px 16px;border-radius:10px;white-space:nowrap}
+.citl-control-home{white-space:nowrap;font-size:13px}.citl-control-home i{font-size:inherit}
 html[data-citl-control-page] #admin-panel-btn{display:none!important}
 #citl-control-host .citl-control-layout>div{background:transparent}
 #citl-control-host .citl-control-layout>div>div:first-child{border-radius:14px;border:1px solid #e2e8f0;align-self:flex-start}

@@ -19,7 +19,7 @@
  const shell=panel.firstElementChild;
  shell.firstElementChild?.remove();
  shell.className='citl-control-layout';shell.removeAttribute('style');
- const home=document.createElement('a');home.href='/dashboard/';home.className='citl-control-home';home.innerHTML='<i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span>';
+ const home=document.createElement('a');home.href='/dashboard/';home.className='citl-control-home bg-gradient-to-b from-[#F3A628] to-[#d48a1b] text-[#2A3475] px-4 py-2 rounded-lg font-black hover:brightness-110 shadow-lg border border-white/20 text-[13px]';home.setAttribute('data-header-home','');home.innerHTML='<i class="fas fa-home ml-2" aria-hidden="true"></i> الرئيسية';
  document.getElementById('admin-panel-btn')?.before(home);
  document.querySelector('#mobile-menu a[href="/dashboard/"]')?.removeAttribute('aria-current');
  const menuAdmin=document.querySelector('#mobile-menu [data-dashboard-account]');if(menuAdmin)menuAdmin.setAttribute('aria-current','page');

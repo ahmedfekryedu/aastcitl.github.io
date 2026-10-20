@@ -26,14 +26,14 @@
     <link rel="shortcut icon" type="image/png" href="CITL_Logo-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="CITL_Logo-192.png">
     <link rel="apple-touch-icon" href="CITL_Logo-192.png">
-    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261020-r6.9.2.15">
-    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261020-r6.9.2.15">
+    <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261020-r6.9.2.16">
+    <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261020-r6.9.2.16">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     
     
-    <script src="/vendor/supabase-js-2.45.4.min.js?v=20261020-r6.9.2.15"></script>
-    <script src="/presence.js?v=20261020-r6.9.2.15"></script>
+    <script src="/vendor/supabase-js-2.45.4.min.js?v=20261020-r6.9.2.16"></script>
+    <script src="/presence.js?v=20261020-r6.9.2.16"></script>
 
     <style>
         body {
@@ -143,17 +143,17 @@
 }
 
     </style>
-<link rel="stylesheet" href="/assets/interface-controls.css?v=20261020-r6.9.2.15">
-<script src="/assets/loading-placeholders.js?v=20261020-r6.9.2.15"></script>
-<script defer src="/assets/interface-controls.js?v=20261020-r6.9.2.15"></script>
+<link rel="stylesheet" href="/assets/interface-controls.css?v=20261020-r6.9.2.16">
+<script src="/assets/loading-placeholders.js?v=20261020-r6.9.2.16"></script>
+<script defer src="/assets/interface-controls.js?v=20261020-r6.9.2.16"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/fonts.css?v=20261020-r6.9.2.15">
-<script defer src="/assets/site-updates.js?v=20261020-r6.9.2.15"></script>
-<script src="/assets/desktop-mode.js?v=20261020-r6.9.2.15"></script>
-<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261020-r6.9.2.15">
-<link rel="stylesheet" href="/assets/service-availability.css?v=20261020-r6.9.2.15">
-<script src="/assets/service-connection.js?v=20261020-r6.9.2.15"></script>
-<script src="/assets/service-availability.js?v=20261020-r6.9.2.15"></script>
+<link rel="stylesheet" href="/assets/fonts.css?v=20261020-r6.9.2.16">
+<script defer src="/assets/site-updates.js?v=20261020-r6.9.2.16"></script>
+<script src="/assets/desktop-mode.js?v=20261020-r6.9.2.16"></script>
+<link rel="stylesheet" href="/assets/desktop-mode.css?v=20261020-r6.9.2.16">
+<link rel="stylesheet" href="/assets/service-availability.css?v=20261020-r6.9.2.16">
+<script src="/assets/service-connection.js?v=20261020-r6.9.2.16"></script>
+<script src="/assets/service-availability.js?v=20261020-r6.9.2.16"></script>
 <style id="citl-login-loader-style">
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-style:normal;font-weight:200 1000;font-display:block}
 html.citl-page-booting{background:#dce2ed;overflow:hidden!important}
@@ -182,6 +182,14 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 .citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
 @keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}}
+
+/* Freeze each loading presentation against toolbar/late stylesheet reflow. */
+#global-loader.citl-unified-loader{right:auto!important;bottom:auto!important;left:0!important;top:0!important;width:var(--citl-load-width,100vw)!important;height:var(--citl-load-height,100svh)!important}
+#global-loader.citl-unified-loader>.relative{width:400px!important;height:380px!important;min-height:380px!important;max-width:calc(100% - 32px)!important;padding:32px!important;box-sizing:border-box!important;line-height:1.5!important}
+#global-loader.citl-unified-loader #loader-text{min-height:42px;line-height:1.5;margin:8px 0 0!important}
+#global-loader.citl-unified-loader [data-boot-retry]{position:absolute;bottom:8px;left:16px;right:16px;margin:0;font-size:11px;padding:5px}
+html.citl-page-booting #global-loader.citl-unified-loader{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:80%!important;height:260px!important;min-height:260px!important;padding:24px!important}}
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden opacity-0 transition-opacity duration-500">
@@ -913,6 +921,6 @@ window.addEventListener('appinstalled', () => {
     }
 });
     </script>
-<script src="/registration-secure.js?v=20261020-r6.9.2.15"></script>
+<script src="/registration-secure.js?v=20261020-r6.9.2.16"></script>
 </body>
 </html>

@@ -2263,6 +2263,7 @@ window.renderAdminMeetingsTable = function(list) {
             const deptInfo = departments[m.department] || { name: m.department };
             
             let statusDisplay = '<span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded-full border border-green-100">مؤكد</span>';
+            if(window.CITLMeetingEnded?.(m)) statusDisplay = '<span class="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded-full border border-gray-200">منتهي</span>';
             if(m.status === 'modification_requested') statusDisplay = '<span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full border border-blue-100 animate-pulse">جاري التعديل...</span>';
             if(m.status === 'cancelled') statusDisplay = '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded-full">ملغي</span>';
             if(m.status === 'cancellation_requested') statusDisplay = '<span class="px-2 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded-full border border-red-100 animate-pulse">جاري الحذف...</span>';

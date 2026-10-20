@@ -1,3 +1,11 @@
+// Display-only time status; approval and pending-request state remain unchanged.
+window.CITLMeetingEnded=function(meeting,now=new Date()){
+ if(meeting?.status!=='confirmed')return false;
+ const date=String(meeting.date||'').slice(0,10),end=String(meeting.end_time||meeting.endTime||'').slice(0,5);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(end))return false;
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now).map(p=>[p.type,p.value]));
+ return date+'T'+end<=parts.year+'-'+parts.month+'-'+parts.day+'T'+parts.hour+':'+parts.minute;
+};
 // Dispatch only the established actions; database values never become script source.
 window.CITLBindMeetingActions = function(row, id) {
     const allowed = ['approveModification','rejectModification','confirmDeleteRequest','rejectDeleteRequest','approveMeeting','rejectMeeting','deleteMeetingFromAdmin','editMeetingFromAdmin','viewMeetingFromAdmin'];
@@ -703,7 +711,7 @@ async function renderTodayAgenda() {
                     <div class="text-[9px] text-gray-400 uppercase">Council Chamber</div>
                 </td>
                 <td class="px-6 py-5 text-center">
-                    <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black border border-green-100">مؤكد</span>
+                    <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black border border-green-100">${window.CITLMeetingEnded(m)?'منتهي':'مؤكد'}</span>
                 </td>
             </tr>
         `).join('');
@@ -2075,7 +2083,7 @@ window.editMeetingFromAdmin = function(meetingId) {
 function exportReport() {
  const meetings=window.CITLAdminMeetings||[];
  window.CITLDownloadCSV(['عنوان الاجتماع','الجهة الحاجزة','التاريخ','الوقت','الحالة','الحضور','الملاحظات'],meetings.map(m=>[
- m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime} - ${m.endTime}`,m.status==='confirmed'?'مؤكد':'قيد الانتظار',m.attendees||'لا يوجد',m.description||'لا يوجد']),`تقرير-الحجوزات-${new Date().toISOString().split('T')[0]}`);
+ m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime} - ${m.endTime}`,window.CITLMeetingEnded(m)?'منتهي':m.status==='confirmed'?'مؤكد':'قيد الانتظار',m.attendees||'لا يوجد',m.description||'لا يوجد']),`تقرير-الحجوزات-${new Date().toISOString().split('T')[0]}`);
  showNotification('تم تحميل تقرير الإكسيل بنجاح');
 }
 

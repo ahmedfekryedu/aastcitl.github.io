@@ -56,6 +56,14 @@
       const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&item.body?.length>180?item.body.slice(0,180)+'…':item.body || '';
       const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
       button.append(title, body, date);
+      const summary=item.payload?.booking_summary;
+      if(item.entity_type==='meetings'&&summary){
+        body.replaceChildren();body.className='citl-booking-notice-fields';
+        const kind=summary.booking_type==='lecture'?'محاضرة / سكشن':({meeting:'اجتماع',seminar:'ندوة',event:'فعالية',workshop:'ورشة عمل'}[summary.booking_reason]||'اجتماع');
+        for(const text of ['مقدم الحجز: '+(summary.booked_by||'—'),'القاعة: '+(summary.room_name||'—'),'اليوم: '+(summary.date?new Date(summary.date+'T12:00:00Z').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—'),'الوقت: '+String(summary.start_time||'').slice(0,5)+' – '+String(summary.end_time||'').slice(0,5),'النوع: '+kind]){
+          const line=document.createElement('span');line.textContent=text;body.append(line);
+        }
+      }
       if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel?.(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
         if(button.disabled)return;
@@ -258,7 +266,21 @@
         event: '*', schema: 'public', table: 'citl_notifications', filter: `recipient_id=eq.${current.user.id}`
       }, async (payload) => {
         await checkUserNotifications();
-        if (payload?.eventType === 'INSERT' && !document.getElementById('notif-list')) {
+        if(payload.new?.entity_type==='meetings'){
+          window.dispatchEvent(new Event('citl-meetings-changed'));
+          const n=payload.new,s=n.payload?.booking_summary;
+          const authorized=window.CITLPermissions.full(window.currentUser)||window.CITLPermissions.can(window.currentUser,'can_approve');
+          if(payload.eventType==='INSERT'&&['meeting_request','meeting'].includes(n.kind)&&!document.hidden&&n.recipient_id===current.user.id&&s&&s.booker_id!==current.user.id&&authorized){
+            document.querySelector('.citl-live-booking')?.remove();
+            const alert=document.createElement('aside');alert.className='citl-live-booking';alert.setAttribute('role','status');
+            const title=document.createElement('strong');title.textContent=s.status==='pending'?'تنبيه: طلب حجز قاعة جديد':'تنبيه: تم حجز قاعة الآن';
+            const detail=document.createElement('p');detail.textContent=[s.booked_by,s.room_name,s.date,String(s.start_time||'').slice(0,5)+' – '+String(s.end_time||'').slice(0,5)].filter(Boolean).join(' · ');
+            const open=document.createElement('button');open.type='button';open.textContent='فتح تفاصيل الحجز';open.onclick=async()=>{open.disabled=true;try{await window.CITLMeetingUI?.open(n.entity_id,true);alert.remove();}finally{open.disabled=false;}};
+            const close=document.createElement('button');close.type='button';close.textContent='إغلاق';close.onclick=()=>alert.remove();alert.append(title,detail,open,close);document.body.append(alert);
+            setTimeout(()=>alert.remove(),15000);
+          }
+        }
+        if (payload?.eventType === 'INSERT' && payload.new?.entity_type!=='meetings' && !document.getElementById('notif-list')) {
           window.showNotification?.(payload.new?.title || 'وصلك تنبيه جديد', 'success');
         }
       }).subscribe();

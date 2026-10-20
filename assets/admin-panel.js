@@ -2084,9 +2084,14 @@ window.editMeetingFromAdmin = function(meetingId) {
 
 function exportReport() {
  const meetings=window.CITLAdminMeetings||[];
- window.CITLDownloadCSV(['عنوان الاجتماع','الجهة الحاجزة','التاريخ','الوقت','الحالة','الحضور','الملاحظات'],meetings.map(m=>[
- m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime} - ${m.endTime}`,window.CITLMeetingEnded(m)?'منتهي':m.status==='confirmed'?'مؤكد':'قيد الانتظار',m.attendees||'لا يوجد',m.description||'لا يوجد']),`تقرير-الحجوزات-${new Date().toISOString().split('T')[0]}`);
- showNotification('تم تحميل تقرير الإكسيل بنجاح');
+ if(!meetings.length)return showNotification('لا توجد حجوزات للطباعة','info');
+ const E=window.CITLSecure.htmlEscape;
+ const heads=['عنوان الحجز','الجهة الحاجزة','التاريخ','الوقت','الحالة','الحضور','الملاحظات'];
+ const rows=meetings.map(m=>[m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime||m.start_time} - ${m.endTime||m.end_time}`,window.CITLMeetingEnded(m)?'منتهي':window.CITLMeetingUI?.status(m.status)||m.status,m.attendees||'—',m.description||'—']);
+ const w=window.open('','_blank','width=1200,height=850');
+ if(!w)return showNotification('اسمح بفتح نافذة الطباعة ثم أعد المحاولة','error');
+ w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير حجوزات القاعات</title><link rel="stylesheet" href="'+location.origin+'/assets/fonts.css"><style>body{font-family:Cairo,sans-serif;color:#2a3475;padding:24px}header{border-bottom:3px solid #f3a628;display:flex;align-items:center;gap:16px}img{width:70px}table{width:100%;border-collapse:collapse;margin-top:20px;font-size:11px}th,td{border:1px solid #ccd1df;padding:8px;overflow-wrap:anywhere}th{background:#eef0f8}tr{break-inside:avoid}thead{display:table-header-group}@page{size:A4 landscape;margin:12mm}</style></head><body><header><img src="'+location.origin+'/CITL.png"><h2>تقرير حجوزات القاعات</h2></header><p>تاريخ الطباعة: '+E(new Date().toLocaleString('ar-EG',{timeZone:'Africa/Cairo'}))+' · عدد الحجوزات: '+rows.length+'</p><table><thead><tr>'+heads.map(x=>'<th>'+E(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(x=>'<td>'+E(String(x??''))+'</td>').join('')+'</tr>').join('')+'</tbody></table></body></html>');
+ w.document.close();w.addEventListener('load',async()=>{await w.document.fonts.ready;w.focus();w.print();},{once:true});
 }
 
 async function saveSystemSettings() {

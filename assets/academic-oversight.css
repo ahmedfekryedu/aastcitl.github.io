@@ -97,3 +97,14 @@
 .citl-booking-toggle [data-mode=free][aria-pressed=true] i{background:#ffffff20}
 .citl-booking-toggle .citl-ac-button:focus-visible{outline:3px solid #64748b;outline-offset:3px}
 @media(max-width:640px){.citl-booking-toggle{gap:9px;margin-bottom:16px}.citl-booking-toggle .citl-ac-button{flex-direction:column;gap:7px;padding:12px 7px;font-size:12px;min-height:88px}.citl-booking-toggle .citl-ac-button i{width:30px;height:30px;font-size:16px}}
+
+/* Compact booking choices and recipient-scoped live alerts. */
+.citl-booking-toggle{box-sizing:border-box;padding:12px;background:#fff;border:1px solid #e2e8f0;border-bottom:3px solid #f3a628;border-radius:16px}
+@media(max-width:640px){
+ .citl-booking-toggle{width:100%;gap:8px;padding:9px;margin-bottom:14px}
+ .citl-booking-toggle .citl-ac-button{flex-direction:row;min-height:48px;padding:8px 6px;gap:6px;font-size:11px;white-space:normal}
+ .citl-booking-toggle .citl-ac-button i{width:24px;height:24px;font-size:13px;flex-shrink:0}
+}
+.citl-booking-notice-fields{display:grid;grid-template-columns:1fr;gap:3px;margin-top:7px;font-size:12px;color:#475569;overflow-wrap:anywhere}
+.citl-live-booking{position:fixed;z-index:120000;top:18px;right:18px;width:min(370px,calc(100vw - 36px));box-sizing:border-box;background:#fff7e6;color:#2a3475;border:1px solid #f3a628;border-right:5px solid #f3a628;border-radius:14px;padding:16px;box-shadow:0 10px 32px #17255433;font-family:Cairo,sans-serif;direction:rtl}
+.citl-live-booking p{font-size:12px;margin:7px 0;overflow-wrap:anywhere}.citl-live-booking button{margin:6px 0 0 8px;padding:6px 12px;border-radius:8px;background:#2a3475;color:#fff}

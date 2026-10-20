@@ -89,6 +89,15 @@
   }
 
   async function openSpecialNotice(item){
+    if(item.kind==='room_monitor'){
+      const p=item.payload?.monitor||{};
+      await window.CITLRequests.rpc(window.sb,'citl_room_monitor',{p_date:p.date});
+      const d=document.createElement('dialog');d.className='citl-head-dialog citl-ac-dialog';d.dir='rtl';
+      const fields=[['العنوان',p.title],['القاعة',p.room_name],['اليوم',p.date],['التوقيت',p.time],['مقدم الحجز',p.by],['المحاضر',p.instructor],['الحالة',({pending:'بانتظار الاعتماد',confirmed:'معتمد',cancelled:'ملغي',rejected:'مرفوض',deleted:'محذوف',modification_requested:'طلب تعديل',cancellation_requested:'طلب إلغاء'})[p.status]||p.status],['الإجراء',({cancel:'إلغاء',replace:'إحلال',move_room:'تغيير القاعة',replace_and_move:'إحلال وتغيير قاعة'})[p.action_type]||p.action_type],['القاعة البديلة',p.replacement_room],['المحاضر البديل',p.replacement_instructor],['السبب',p.reason]];
+      d.innerHTML='<header><strong>'+htmlEscape(item.title)+'</strong><button type="button" aria-label="إغلاق">×</button></header><div class="citl-ac-body"><dl class="citl-claim-details">'+fields.filter(([,v])=>v).map(([k,v])=>'<div><dt>'+htmlEscape(k)+'</dt><dd>'+htmlEscape(v)+'</dd></div>').join('')+'</dl><p>تفاصيل وقت التنبيه — للعرض فقط.</p><a class="citl-ac-button" href="/dashboard/control.html?tab=room-monitor&date='+encodeURIComponent(p.date)+'">فتح متابعة هذا اليوم</a></div>';
+      d.querySelector('button').onclick=()=>d.close();d.onclose=()=>d.remove();document.body.append(d);d.showModal();return true;
+    }
+
     if(item.kind==='lecture_room_reserved'){
       const p=item.payload||{},d=document.createElement('dialog');d.className='citl-head-dialog citl-ac-dialog';d.dir='rtl';
       const fields=[['المحاضرة',p.lecture?.course_name],['المحاضر',p.lecture?.instructor],['عنوان الحجز',p.booking_title],['القاعة',p.room_name],['تاريخ الحجز',p.booking_date],['التوقيت',String(p.start_time||'').slice(0,5)+' – '+String(p.end_time||'').slice(0,5)],['مقدم الحجز',p.booked_by],['سبب الحجز',p.reason],['التفاصيل',p.description]];

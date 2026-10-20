@@ -39,3 +39,12 @@
 }
 
 @media(max-width:767px) and (prefers-reduced-motion:reduce){.citl-site-notice.is-scrolling .notice-window{overflow-x:auto;scrollbar-width:none}}
+
+/* Center short notices; reveal long static notices then return to the beginning. */
+.citl-site-notice{font-weight:800}
+.citl-site-notice .notice-copy{white-space:nowrap;overflow-wrap:normal;width:max-content;min-width:100%;text-align:center}
+.citl-site-notice.is-overflowing .notice-copy{animation:citl-notice-bounce var(--notice-bounce-duration,16s) ease-in-out infinite}
+.citl-site-notice:not(.is-scrolling) .notice-window{overflow:hidden}
+.citl-site-notice.is-overflowing:hover .notice-copy,.citl-site-notice.is-overflowing:focus-within .notice-copy,.citl-site-notice.is-overflowing.is-paused .notice-copy{animation-play-state:paused}
+@keyframes citl-notice-bounce{0%,12%,100%{transform:translateX(0)}50%,62%{transform:translateX(var(--notice-travel,0px))}}
+@media(prefers-reduced-motion:reduce){.citl-site-notice.is-overflowing .notice-copy{animation:none}.citl-site-notice .notice-window,.citl-site-notice:not(.is-scrolling) .notice-window{overflow-x:auto;scrollbar-width:none}}

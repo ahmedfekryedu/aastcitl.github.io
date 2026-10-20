@@ -167,7 +167,7 @@
       const result = await invoke('schedule_action.save', { data: { schedule_id: scheduleId, action_date: actionDate,
         action_type: type, reason, replacement_instructor: replacementInstructor || null, replacement_room: replacementRoom || null,
         department_key: current.department || null } });
-      window.closeScheduleActionModal?.(); window.showNotification?.(`تم حفظ الإجراء وإرسال ${result.notified || 0} تنبيه ✅`, 'success');
+      window.closeScheduleActionModal?.(); window.showNotification?.('تم حفظ الإجراء بنجاح ✅', 'success');
       if (current.linked_instructors) await window.showMyScheduleView?.(current.linked_instructors);
       if (document.getElementById('schedule-reports-modal')?.classList.contains('flex')) await window.loadScheduleReports?.();
     } catch (error) { window.showNotification?.(error.message, 'error'); }

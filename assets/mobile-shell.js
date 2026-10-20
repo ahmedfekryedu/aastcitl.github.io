@@ -61,7 +61,7 @@
  document.addEventListener('click',e=>{
   const link=e.target.closest('a[href]');if(!link||e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||link.target&&link.target!=='_self')return;
   const target=new URL(link.href,location.href);
-  if(target.origin===location.origin&&target.pathname!==location.pathname)root.CITLPageBoot?.show('جاري تهيئة النظام');
+  if(target.origin===location.origin&&target.pathname!==location.pathname)root.CITLPageBoot?.navigate('جاري تهيئة النظام');
  });
- root.CITLMobileShell=Object.freeze({toggle,close,notifications,profile:()=>{if(typeof root.openAdminPanel==='function')root.openAdminPanel('profile');else {root.CITLPageBoot?.show('جاري تهيئة النظام');location.href='/dashboard/?open=profile';}}});
+ root.CITLMobileShell=Object.freeze({toggle,close,notifications,profile:()=>{if(typeof root.openAdminPanel==='function')root.openAdminPanel('profile');else {root.CITLPageBoot?.navigate('جاري تهيئة النظام');location.href='/dashboard/?open=profile';}}});
 })(window);

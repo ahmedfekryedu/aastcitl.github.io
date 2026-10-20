@@ -51,6 +51,7 @@
   };
   const oldOpen = root.openAdminPanel;
   if (oldOpen) root.openAdminPanel = function (...args) {
+    if(root.CITLControlPage?.navigate(args[0]))return;
     if (permissions.full(current())) {const result=oldOpen.apply(this,args);refreshTabs();return result;}
     root.updateSidebarProfile?.();
     const modal=document.getElementById('admin-panel-modal');root.CITLFacultyAdmin?.mountCodes(modal,modal?.querySelector('.admin-tab[data-tab=profile]'));

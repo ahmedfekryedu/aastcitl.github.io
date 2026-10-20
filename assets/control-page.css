@@ -1,0 +1,13 @@
+html[data-citl-control-page] #dashboard-main{display:none!important}
+#citl-control-host{width:96%;max-width:1600px;margin:18px auto;flex:1;min-width:0;font-family:Cairo,sans-serif}
+#citl-control-host #admin-panel-modal{position:static!important;display:block!important;inset:auto!important;background:transparent!important;backdrop-filter:none!important;padding:0!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:auto!important}
+#citl-control-host #admin-panel-modal>.modal-content{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0!important;transform:none!important;overflow:visible!important}
+#citl-control-host #admin-panel-modal>.modal-content>div:nth-child(2){overflow:visible!important;min-height:65vh}
+#citl-control-host #admin-panel-modal nav{max-height:none;overflow:visible;white-space:normal}
+#citl-control-host #admin-panel-modal>.modal-content>div:nth-child(2)>div:last-child{min-width:0;overflow:visible!important}
+@media(max-width:767px){
+ #citl-control-host{width:calc(100% - 20px);margin:12px auto}
+ #citl-control-host #admin-panel-modal nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:10px}
+ #citl-control-host .admin-tab{min-width:0!important;white-space:normal;text-align:right}
+ #citl-control-host #admin-panel-modal>.modal-content>div:nth-child(2){display:flex;flex-direction:column}
+}

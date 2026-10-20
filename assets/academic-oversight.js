@@ -71,6 +71,7 @@
   finally{if(serial===work.serial){rows.setAttribute('aria-busy','false');panel.querySelector('[data-refresh]').disabled=false;}}
  }
  async function openWorkboard(options={}){
+  if(root.CITLControlPage?.navigate('academic-actions',options))return;
   if(!root.openAdminPanel){location.href='/dashboard/?'+new URLSearchParams({open:'academic',...(options.action?{action:options.action}:{}),...(options.term?{term:options.term}:{})});return;}
   if(options.term!==undefined)work.term=options.term;if(options.action!==undefined)work.action=options.action;
   if(!root.currentUser)await root.CITLAuth.loadProfile();
@@ -79,6 +80,7 @@
  }
  let requestedApproval=null;
  async function openApprovals(options={}){
+  if(root.CITLControlPage?.navigate('academic-review',options))return;
   requestedApproval=options.request||new URLSearchParams(location.search).get('request');
   if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
   if(!root.currentUser)await root.CITLAuth.loadProfile();

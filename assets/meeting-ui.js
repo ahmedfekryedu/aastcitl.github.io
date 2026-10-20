@@ -60,7 +60,7 @@
   const {data:privateData,error}=await root.sb.from('meetings').select('*, profiles!user_id(full_name,email), rooms!room_id(name)').eq('id',id).maybeSingle();
   let data=privateData;if(!data){try{data=await root.CITLRequests.rpc(root.sb,'citl_visible_meeting',{p_id:String(id)});}catch(e){throw error||e;}}if(!data)throw Error('الحجز غير موجود أو غير متاح لحسابك');
   document.getElementById('notif-menu')?.classList.add('hidden');
-  if(management&&(canReview()||data.user_id===root.currentUser?.id)){root.openAdminPanel(canReview()?'meetings':'my-bookings');if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}
+  if(management&&(canReview()||data.user_id===root.currentUser?.id)){if(root.CITLControlPage?.navigate(canReview()?'meetings':'my-bookings',{meeting:String(id)}))return true;root.openAdminPanel(canReview()?'meetings':'my-bookings');if(canReview())await root.updateAdminMeetingsList?.();else await root.CITLMemberBookings?.load();}
   root.showMeetingDetails(normalize(data));return true;
  }catch(error){root.showNotification?.('تعذر فتح تفاصيل الحجز: '+error.message,'error');return false;}finally{opening=false;}}
  function addDetailsButton(row,m){if(row.querySelector('[data-meeting-action=viewMeetingFromAdmin]'))return;const cell=row.lastElementChild;if(!cell)return;const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.dataset.meetingAction='viewMeetingFromAdmin';b.textContent='التفاصيل';cell.prepend(b);}

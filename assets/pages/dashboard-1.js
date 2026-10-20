@@ -528,7 +528,7 @@ async function initializeApp() {
         }
 
         // ---------------------------------------------------------
-        await window.CITLDashboard.start();
+        if(document.documentElement.dataset.citlControlPage==='true')window.setDashboardProfile?.(currentUser);else await window.CITLDashboard.start();
         if (!currentUser) { 
         window.CITLPageBoot?.finish(); return; }
 
@@ -617,6 +617,7 @@ async function initializeApp() {
         // 🔥🔥🔥 نهاية التعديل: إخفاء اللودر بعد اكتمال التحميل 🔥🔥🔥
         
         window.CITLPageBoot?.finish();
+        window.dispatchEvent(new Event('citl-dashboard-ready'));
 
     } catch (error) {
         if (!currentUser) window.CITLAuth.showFailure(error);

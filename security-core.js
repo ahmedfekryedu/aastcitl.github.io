@@ -103,15 +103,16 @@
   }
   window.CITLOpenSpecialNotice=openSpecialNotice;
 
-  let lastRightsNotice = '';
-  async function checkUserNotifications() {
+  let lastRightsNotice = '',notificationRead=null;
+  function checkUserNotifications(){if(notificationRead)return notificationRead;notificationRead=readUserNotifications().finally(()=>notificationRead=null);return notificationRead;}
+  async function readUserNotifications() {
     try {
       await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
       window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
       return true;
-    } catch (error) { console.error('notifications:', error);return false; }
+    } catch (error) { if(error.code!=='CITL_TIMEOUT')console.error('notifications:', error);return false; }
   }
 
   async function markAllNotificationsRead() {

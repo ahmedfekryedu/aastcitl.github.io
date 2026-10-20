@@ -22,6 +22,7 @@ let scheduleInstructorNames = [];
 let facultyDirectoryEntries = [];
 
 function openAdminPanel(initialTab = 'users') {
+    if(window.CITLControlPage?.navigate(initialTab))return;
     if(typeof initialTab!=='string')initialTab='users';
     updateSidebarProfile();
 

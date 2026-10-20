@@ -1,5 +1,5 @@
 .citl-site-notice{--notice-bg:#facc15;--notice-fg:#111827;display:flex;gap:12px;align-items:center;background:var(--notice-bg);color:var(--notice-fg);padding:8px 24px;font:600 13px/1.8 Cairo,sans-serif;direction:rtl;isolation:isolate;box-sizing:border-box;width:100%;border-bottom:1px solid #00000012}
-#citl-site-notice{position:sticky;top:0;z-index:60}
+#citl-site-notice{position:relative;top:auto;z-index:auto}
 .citl-site-notice strong{display:flex;align-items:center;gap:7px;flex-shrink:0;font-weight:800;max-width:30%;overflow-wrap:anywhere}
 .citl-site-notice .notice-window{flex:1;min-width:0;overflow:hidden}
 .citl-site-notice .notice-copy{display:block;overflow-wrap:anywhere;white-space:pre-wrap}

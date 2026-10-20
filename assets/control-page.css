@@ -29,3 +29,16 @@ html[data-citl-control-page] #admin-panel-btn{display:none!important}
 @keyframes citl-control-shimmer{to{background-position:-200% 0}}
 @media(max-width:767px){#citl-control-loading{grid-template-columns:1fr;gap:16px}#citl-control-loading aside{display:grid;grid-template-columns:1fr 1fr;gap:8px}#citl-control-loading aside span{margin:0}#citl-control-loading section>div{gap:6px}}
 @media(prefers-reduced-motion:reduce){#citl-control-loading span{animation:none}}
+/* Keep long navigation labels readable without changing the shared dashboard header. */
+@media(min-width:768px){
+ #citl-control-host .citl-control-layout>div>div:first-child{width:320px!important;flex:0 0 320px!important}
+ #citl-control-host .admin-tab{gap:10px;padding-inline:12px}
+ #citl-control-host .admin-tab>span{flex:1;min-width:0}
+ #citl-control-loading{grid-template-columns:320px minmax(0,1fr)}
+}
+@media(max-width:767px){
+ #citl-control-host #admin-panel-modal nav{grid-template-columns:minmax(0,1fr)}
+ #citl-control-host .admin-tab{width:100%;gap:10px;padding-block:9px}
+ #citl-control-host .admin-tab>span{flex:1;min-width:0}
+ #citl-control-loading aside{grid-template-columns:minmax(0,1fr)}
+}

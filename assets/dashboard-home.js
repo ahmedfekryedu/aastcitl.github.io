@@ -142,6 +142,12 @@
   function requestRefresh(){clearTimeout(queued);queued=setTimeout(refresh,250);}
   function start(){
     if(started)return refresh();started=true;
+    document.addEventListener('click',event=>{
+      const chosen=event.target.closest?.('.dh-room-details');
+      document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==chosen)d.open=false;});
+    });
+    document.addEventListener('toggle',event=>{if(event.target.matches?.('#dashboard-home .dh-room-details')&&event.target.open)document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==event.target)d.open=false;});},true);
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>d.open=false);});
     $('dh-refresh').addEventListener('click',refresh);
     $('dashboard-home').addEventListener('click',event=>{
       const admin=event.target.closest('[data-dh-admin]');if(admin){openAdmin(admin.dataset.dhAdmin);return;}

@@ -117,8 +117,8 @@
     let box = document.getElementById('citl-connection-recovery');
     if (!box) {
       box = document.createElement('div'); box.id = 'citl-connection-recovery'; box.setAttribute('role', 'alert');
-      box.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999999;background:#fff7ed;color:#7c2d12;border:1px solid #fdba74;border-radius:12px;padding:14px;max-width:90vw;direction:rtl;font:14px sans-serif';
-      const label = document.createElement('span'); label.textContent = 'تعذر الاتصال بخدمة الحساب مؤقتًا. سنعيد المحاولة تلقائيًا. ';
+      box.style.cssText = 'position:fixed;top:16px;inset-inline:16px;margin:auto;z-index:999999;background:#fff;color:#2a3475;border:1px solid #e2e8f0;border-top:3px solid #f3a628;border-radius:14px;padding:16px;width:calc(100% - 32px);max-width:420px;box-sizing:border-box;box-shadow:0 8px 30px #17255422;direction:rtl;font:13px Cairo,sans-serif';
+      const label = document.createElement('span'); label.textContent = navigator.onLine===false?'الاتصال بالإنترنت غير متاح. سنحاول عند عودته.':'لم يكتمل الاتصال بالحساب. بياناتك محفوظة، ونعيد المحاولة تلقائيًا.';label.style.cssText='display:block;line-height:1.9';
       const button = document.createElement('button'); button.type = 'button'; button.textContent = 'إعادة المحاولة';
       button.style.cssText = 'padding:6px 12px;margin:4px;border:1px solid;border-radius:6px;cursor:pointer';
       button.addEventListener('click', () => { recoveryAttempts = 0; recover(); }); box.append(label, button); document.body.appendChild(box);
@@ -132,6 +132,7 @@
   async function recover() {
     if (recovering || !document.getElementById('citl-connection-recovery')) return;
     recovering = true; recoveryAttempts++;
+    const button=document.querySelector('#citl-connection-recovery button');if(button){button.disabled=true;button.textContent='جاري الاتصال…';}
     const wasInitialized = verifiedOnce;
     try {
       const profile = await loadProfile();
@@ -140,9 +141,9 @@
       if (!wasInitialized) location.reload();
       else root.dispatchEvent(new CustomEvent('citl:auth-recovered'));
     } catch (error) { if (!redirectIfSignedOut(error)) scheduleRecovery(); }
-    finally { recovering = false; }
+    finally { recovering = false; if(button){button.disabled=false;button.textContent='إعادة المحاولة';}if(recoveryAttempts>=5){const label=document.querySelector('#citl-connection-recovery span');if(label)label.textContent='لم نتمكن من الاتصال. تحقق من الإنترنت ثم اضغط إعادة المحاولة.';} }
   }
   root.addEventListener('online', () => { recoveryAttempts = 0; recover(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { recoveryAttempts = 0; recover(); } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { if(recoveryAttempts<5)recover(); } });
   root.CITLAuth = Object.freeze({ session, loadProfile, redirectIfSignedOut, showFailure, facultyPending });
 })(window);

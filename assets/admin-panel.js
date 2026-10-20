@@ -1783,6 +1783,7 @@ window.deleteMeetingFromAdmin = async function(id) {
 
                 // حذف محلي وتحديث
                 meetings = meetings.filter(m => String(m.id) !== String(id));
+                window.CITLAdminMeetings = meetings;
                 
                 updateAdminMeetingsList();
                 renderCalendar();
@@ -2082,14 +2083,16 @@ window.editMeetingFromAdmin = function(meetingId) {
             }
         };
 
-function exportReport() {
- const meetings=window.CITLAdminMeetings||[];
- if(!meetings.length)return showNotification('لا توجد حجوزات للطباعة','info');
+async function exportReport() {
+ const w=window.open('','_blank','width=1200,height=850');
+ if(!w)return showNotification('اسمح بفتح نافذة الطباعة ثم أعد المحاولة','error');
+ w.document.body.textContent='جاري إعداد التقرير…';
+ try{await loadAdminMeetingCatalog(true);}catch(error){w.close();return;}
+ const meetings=(window.CITLAdminMeetings||[]).filter(m=>!['rejected','deleted','cancelled'].includes(m.status)&&!m.deleted_at);
+ if(!meetings.length){w.close();return showNotification('لا توجد حجوزات للطباعة','info');}
  const E=window.CITLSecure.htmlEscape;
  const heads=['عنوان الحجز','الجهة الحاجزة','التاريخ','الوقت','الحالة','الحضور','الملاحظات'];
  const rows=meetings.map(m=>[m.title,departments[m.department]?.name||m.department,m.date,`${m.startTime||m.start_time} - ${m.endTime||m.end_time}`,window.CITLMeetingEnded(m)?'منتهي':window.CITLMeetingUI?.status(m.status)||m.status,m.attendees||'—',m.description||'—']);
- const w=window.open('','_blank','width=1200,height=850');
- if(!w)return showNotification('اسمح بفتح نافذة الطباعة ثم أعد المحاولة','error');
  w.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير حجوزات القاعات</title><link rel="stylesheet" href="'+location.origin+'/assets/fonts.css"><style>body{font-family:Cairo,sans-serif;color:#2a3475;padding:24px}header{border-bottom:3px solid #f3a628;display:flex;align-items:center;gap:16px}img{width:70px}table{width:100%;border-collapse:collapse;margin-top:20px;font-size:11px}th,td{border:1px solid #ccd1df;padding:8px;overflow-wrap:anywhere}th{background:#eef0f8}tr{break-inside:avoid}thead{display:table-header-group}@page{size:A4 landscape;margin:12mm}</style></head><body><header><img src="'+location.origin+'/CITL.png"><h2>تقرير حجوزات القاعات</h2></header><p>تاريخ الطباعة: '+E(new Date().toLocaleString('ar-EG',{timeZone:'Africa/Cairo'}))+' · عدد الحجوزات: '+rows.length+'</p><table><thead><tr>'+heads.map(x=>'<th>'+E(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(x=>'<td>'+E(String(x??''))+'</td>').join('')+'</tr>').join('')+'</tbody></table></body></html>');
  w.document.close();w.addEventListener('load',async()=>{await w.document.fonts.ready;w.focus();w.print();},{once:true});
 }
@@ -2127,7 +2130,7 @@ async function saveSystemSettings() {
 // Admin lists are global on both hosts; the booking calendar keeps its selected-room scope.
 window.CITLAdminMeetings = null;
 let adminMeetingRead = null;
-async function loadAdminMeetingCatalog() {
+async function loadAdminMeetingCatalog(strict=false) {
     if (!window.CITLPermissions.full(currentUser) && !window.CITLPermissions.can(currentUser,'can_approve') && !window.CITLPermissions.can(currentUser,'can_delete') && !window.CITLPermissions.can(currentUser,'can_view_reports')) return;
     if (adminMeetingRead) return adminMeetingRead;
     adminMeetingRead = (async()=>{
@@ -2140,7 +2143,7 @@ async function loadAdminMeetingCatalog() {
                 if(offset>=100000)throw new Error('Too many administrative records');
             }
             window.CITLAdminMeetings=all.map(m=>({...m,startTime:(m.start_time||'').slice(0,5),endTime:(m.end_time||'').slice(0,5),createdAt:m.created_at,createdBy:m.profiles?.full_name||departments[m.department]?.name||'',creatorEmail:m.profiles?.email||null,priority:departments[m.department]?.priority||5}));
-        } catch(error) { console.error('Admin meetings read failed:',error);showNotification('تعذر تحديث سجل الحجوزات؛ أعد فتح التبويب للمحاولة', 'error'); }
+        } catch(error) { console.error('Admin meetings read failed:',error);showNotification('تعذر تحديث سجل الحجوزات؛ أعد فتح التبويب للمحاولة', 'error'); if(strict)throw error; }
         finally {adminMeetingRead=null;}
     })();
     return adminMeetingRead;

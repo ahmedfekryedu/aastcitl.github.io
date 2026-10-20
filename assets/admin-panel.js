@@ -892,7 +892,7 @@ function ensureRoomsManagerUI() {
 
                         <div class="flex flex-wrap gap-2">
                             <button type="button" onclick="saveRoom()" class="px-4 py-2 rounded-xl font-black bg-[#2A3475] text-white hover:opacity-90">حفظ</button>
-                            <button type="button" onclick="resetRoomForm()" class="px-4 py-2 rounded-xl font-black bg-gray-100 hover:bg-gray-200">جديد</button>
+                            <button type="button" data-room-create onclick="resetRoomForm()" class="px-4 py-2 rounded-xl font-black bg-gray-100 hover:bg-gray-200">جديد</button>
                             <button type="button" onclick="deleteRoom()" class="px-4 py-2 rounded-xl font-black bg-red-600 text-white hover:opacity-90">حذف</button>
                         </div>
 
@@ -932,6 +932,7 @@ function initRoomsTab(force = false) {
     try {
       if (force || !rooms.length) await loadRooms(force);
       renderRoomsAdminList();
+      document.querySelectorAll('[data-room-create]').forEach(b=>b.hidden=!window.CITLPermissions.full(window.currentUser));
       if (!roomsFormInitialized) { resetRoomForm();roomsFormInitialized=true; }
       retry.textContent='تحديث القاعات';
     } catch (error) {
@@ -991,6 +992,7 @@ function resetRoomForm() {
 }
 
 async function saveRoom() {
+    if (!editingRoomId && !window.CITLPermissions.full(window.currentUser)) return showNotification('إضافة قاعة جديدة للمدير كامل الصلاحيات فقط', 'error');
     const name = document.getElementById('room-edit-name').value.trim();
     const capacity = Number(document.getElementById('room-edit-capacity').value || 0);
     const features = document.getElementById('room-edit-features').value.trim();

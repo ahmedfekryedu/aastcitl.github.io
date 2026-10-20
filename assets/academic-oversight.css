@@ -89,3 +89,11 @@
 .citl-booking-toggle [data-mode=free][aria-pressed=true]{background:#2a3475;color:#fff}
 .citl-booking-toggle [hidden],[data-citl-lecture-only][hidden]{display:none!important}
 @media(max-width:380px){.citl-booking-toggle .citl-ac-button{padding:9px 11px;font-size:12px}}
+
+/* Compact booking cards precede the selected-room summary, directly below the header. */
+.citl-booking-toggle{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:min(100%,850px);margin:0 auto 22px}
+.citl-booking-toggle .citl-ac-button{display:flex;justify-content:center;align-items:center;gap:12px;min-height:70px;padding:16px 20px;border-radius:14px;box-shadow:0 3px 10px #17204a0a;font-weight:800;font-size:15px;transition:box-shadow .18s,background-color .18s}
+.citl-booking-toggle .citl-ac-button i{display:grid;place-items:center;flex-shrink:0;width:35px;height:35px;border-radius:10px;background:#ffffff80;font-size:18px}
+.citl-booking-toggle [data-mode=free][aria-pressed=true] i{background:#ffffff20}
+.citl-booking-toggle .citl-ac-button:focus-visible{outline:3px solid #64748b;outline-offset:3px}
+@media(max-width:640px){.citl-booking-toggle{gap:9px;margin-bottom:16px}.citl-booking-toggle .citl-ac-button{flex-direction:column;gap:7px;padding:12px 7px;font-size:12px;min-height:88px}.citl-booking-toggle .citl-ac-button i{width:30px;height:30px;font-size:16px}}

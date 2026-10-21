@@ -306,40 +306,17 @@ async function updateAdminUsersList() {
                         : 'لم يظهر بعد';
 
                     const actionBtns = (() => {
-                        if (isFounderRow) {
-                            if (isMe) {
-                                return `
-                                    <div class="flex justify-center gap-1">
-                                        <button data-user-action="edit" class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 transition-colors" title="تعديل بياناتي">
-                                            <i class="fas fa-pen text-xs"></i>
-                                        </button>
-                                        <span class="text-[10px] text-gray-400 mx-1 bg-yellow-100 text-yellow-700 px-2 py-1 rounded border border-yellow-200 font-bold">أنت</span>
-                                    </div>
-                                `;
-                            }
-                            return `
-                                <div class="flex justify-center items-center">
-                                    <div class="px-3 py-1 bg-[#F3A628] text-white rounded-full shadow-sm flex items-center gap-2 cursor-help" title="حساب المؤسس">
-                                        <i class="fas fa-shield-alt text-xs"></i>
-                                        <span class="text-[10px] font-bold">المؤسس</span>
-                                    </div>
-                                </div>
-                            `;
-                        }
-
-                        let html = `<div class="flex justify-center gap-1">`;
-                        html += `<button data-user-action="edit" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="تعديل"><i class="fas fa-pen text-xs"></i></button>`;
-
-                        if (!isMe) {
-
-                            if(window.CITLPermissions.full(currentUser))html += `<button data-user-action="permissions" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#2A3475] hover:text-white text-gray-500 transition-colors" title="الصلاحيات"><i class="fas fa-user-cog text-xs"></i></button>`;
-                            html += `<button data-user-action="delete" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="حذف"><i class="fas fa-trash-alt text-xs"></i></button>`;
-                        } else {
-                            html += `<span class="text-[10px] text-gray-400 mx-1 bg-gray-100 px-2 py-1 rounded">أنت</span>`;
-                        }
-
-                        html += `</div>`;
-                        return html;
+                        const button=(action,icon,label)=>`<button type="button" data-user-action="${action}" title="${label}"><i class="fas ${icon}" aria-hidden="true"></i><span>${label}</span></button>`;
+                        const full=window.CITLPermissions.full(currentUser);
+                        let html='<div class="citl-user-actions">';
+                        if(!isFounderRow||isMe)html+=button('edit','fa-pen',isMe?'بياناتي':'تعديل');
+                        if(!isMe&&!isFounderRow&&full)html+=button('permissions','fa-user-cog','الصلاحيات');
+                        if(!isMe&&window.CITLAccountPreview?.allowed()&&(!window.CITLPermissions.full(user)||full))html+=button('preview','fa-eye','معاينة الحساب');
+                        if(full&&(!window.CITLPermissions.full(user)||isMe))html+=button('credentials','fa-key','بيانات الدخول');
+                        html+=button('journey','fa-history','سجل النشاط');
+                        if(!isMe&&!isFounderRow)html+=button('delete','fa-trash-alt','حذف');
+                        if(isMe)html+='<span class="citl-user-self">أنت</span>';
+                        return html+'</div>';
                     })();
 
                     const statusBlock = `
@@ -355,7 +332,8 @@ async function updateAdminUsersList() {
 
                     const tr = document.createElement('tr');
                     tr.dataset.userId = user.id || '';
-                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition-colors';
+                    tr.className = 'citl-user-row border-b border-gray-50 hover:bg-gray-50 transition-colors';
+                    activeUsersList.closest('table')?.classList.add('citl-users-table');
 
                     if (isFounderRow) {
                         tr.className += ' bg-yellow-50/30';
@@ -392,17 +370,18 @@ async function updateAdminUsersList() {
 </td>
 
 <td class="px-4 py-3 text-center">
-    ${actionBtns}${window.CITLPermissions.full(currentUser)&&(!window.CITLPermissions.full(user)||isMe)?'<button type="button" data-user-action="credentials" class="text-xs text-[#2A3475] mt-2" title="البريد وكلمة المرور"><i class="fas fa-key"></i> بيانات الدخول</button>':''}<button type="button" data-user-action="journey" class="text-xs text-[#2A3475] mt-2" title="سجل التنقل والاستخدام"><i class="fas fa-history"></i> سجل النشاط</button>
+    ${actionBtns}
 </td>
 `;
 
 tr.querySelectorAll('[data-user-action]').forEach(button => {
     button.addEventListener('click', () => {
+        if(button.dataset.userAction==='preview')return window.CITLAccountPreview?.open(user);
         if(button.dataset.userAction==='credentials')return window.CITLRegistrationCorrection?.credentials(user);
         if(button.dataset.userAction==='journey')return window.CITLUserJourney?.open(user.id,user.full_name||user.email);
         if (button.dataset.userAction === 'edit') return openEditUserInfo(user.id, user.full_name || '', user.department || '', user.position || '', user.mobile || '');
         if (button.dataset.userAction === 'permissions') return openPermissionsModal(user.id, user.full_name || '', encodeURIComponent(JSON.stringify(user.permissions || {})));
-        return window.deleteUser(user.id, user.full_name || '');
+        if(button.dataset.userAction==='delete')return window.deleteUser(user.id, user.full_name || '');
     });
 });
 activeUsersList.appendChild(tr);

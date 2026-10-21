@@ -18,7 +18,7 @@
   d.querySelector('form').onsubmit=async e=>{e.preventDefault();if(submitting||cooldown)return;submitting=true;const button=d.querySelector('[type=submit]'),label=d.querySelector('[data-status]');button.disabled=true;label.textContent='جاري إرسال رابط الاستعادة…';try{
    const {error}=await sb.auth.resetPasswordForEmail(d.querySelector('input').value.trim(),{redirectTo:location.origin+'/?password-recovery=1'});
    if(error)throw error;
-   label.textContent='إذا كان البريد مرتبطًا بحساب، ستصلك رسالة برابط الاستعادة. راجع البريد غير المرغوب فيه أيضًا.';
+   label.textContent='تم استلام طلب استعادة كلمة المرور. إذا كان البريد مرتبطًا بحساب، ستصلك رسالة برابط الاستعادة. راجع البريد الوارد، وإذا لم تجد الرسالة افتح مجلد البريد العشوائي أو غير المرغوب فيه (Spam / Junk).';
    cooldown=60;timer=setInterval(()=>{cooldown--;button.textContent=cooldown?'إعادة الإرسال بعد '+cooldown+' ثانية':'إرسال رابط الاستعادة';if(!cooldown){clearInterval(timer);button.disabled=false;}},1000);
   }catch(error){label.textContent=error?.status===429?'تم إرسال طلبات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.':'تعذر إرسال الرسالة. تحقق من الاتصال والبريد ثم أعد المحاولة.';}finally{submitting=false;if(!cooldown)button.disabled=false;}};
   d.showModal();

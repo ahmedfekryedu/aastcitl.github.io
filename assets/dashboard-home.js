@@ -97,7 +97,7 @@
     if(!state.view)state.view=r.faculty?'faculty':'overview';
     $('dashboard-home').dataset.view=state.view;
     $('dh-metrics').hidden=state.view!=='faculty';
-    const displayUser=state.view==='faculty'?personalUser():state.user;const items=M.lectures(state.view==='faculty'&&state.errors.includes('personal_scope')?[]:state.rows,state.actions,displayUser,now),stats=M.statistics(items,displayUser,now);
+    const displayUser=state.view==='faculty'?personalUser():state.user;const items=M.lectures(state.view==='faculty'?(state.errors.includes('personal_scope')||state.errors.includes('actions')?[]:(state.scope?.rows||[])):state.rows,state.actions,displayUser,now),stats=M.statistics(items,displayUser,now);
     $('dh-role-tabs').hidden=!(r.manager&&r.faculty);
     for(const button of $('dh-role-tabs').querySelectorAll('button'))button.setAttribute('aria-selected',String(button.dataset.dhView===state.view));
     $('dh-errors').hidden=!state.errors.length;

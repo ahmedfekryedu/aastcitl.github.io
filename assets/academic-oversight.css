@@ -149,3 +149,14 @@
 .citl-personal-group{background:#eef1f8!important;color:#2a3475;padding:10px 12px!important;border-inline-start:3px solid #f3a628;font-size:12px}
 .citl-personal-switch{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:9px 12px;border:1px solid #dfe3ef;background:#fff;color:#2a3475;border-radius:8px;font:700 12px Cairo,sans-serif;cursor:pointer;max-width:100%;overflow-wrap:anywhere;text-align:start}
 .citl-personal-switch small{font-size:10px;font-weight:500}.citl-personal-switch.active{background:#2a3475;color:#fff;border-color:#2a3475;box-shadow:inset 0 -3px #f3a628}
+
+/* Lecture review states retain the CITL palette; text and icons accompany color. */
+.citl-review-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;border:1px solid #dce1ee;background:#f3f5fa;color:#465477;font-size:12px;font-weight:700;line-height:1.7;max-width:100%;white-space:normal}
+.citl-review-badge.approved{background:#eaf7ef;border-color:#b9dfc8;color:#226542}
+.citl-review-badge.pending{background:#fff6e4;border-color:#f1d59d;color:#805812}
+.citl-review-badge.not_approved{background:#fff0ef;border-color:#edc6c2;color:#9a3c36}
+.citl-review-badge i{flex-shrink:0}
+.citl-ac-table tbody td{vertical-align:middle;padding:13px 12px;line-height:1.8}
+.citl-ac-table tbody tr:hover{background:#f8f9fc}
+.citl-ac-table td small{margin-top:4px;line-height:1.7}
+@media(max-width:640px){.citl-ac-table tbody td{padding:10px 8px}.citl-review-badge{padding:6px 8px;font-size:11px}}

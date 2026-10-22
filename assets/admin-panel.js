@@ -306,7 +306,8 @@ async function updateAdminUsersList() {
                         : 'لم يظهر بعد';
 
                     const actionBtns = (() => {
-                        const button=(action,icon,label)=>`<button type="button" data-user-action="${action}" title="${label}"><i class="fas ${icon}" aria-hidden="true"></i><span>${label}</span></button>`;
+                        const icons={edit:'M15 5l4 4M4 20l4-1L20 7a3 3 0 0 0-4-4L4 15v5Z',permissions:'M12 3l8 4v5c0 5-8 9-8 9S4 17 4 12V7l8-4Zm-4 9 3 3 5-6',preview:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0',credentials:'M14 7a5 5 0 1 0 0 6l3 3 3-3-3-3-3-3ZM7 10h.01',journey:'M3 5v5h5M3 10a9 9 0 1 1 0 5M12 7v5l3 2',delete:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7'};
+                        const button=(action,icon,label)=>`<button type="button" data-user-action="${action}" title="${label}" aria-label="${label}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${icons[action]}"></path></svg></button>`;
                         const full=window.CITLPermissions.full(currentUser);
                         let html='<div class="citl-user-actions">';
                         if(!isFounderRow||isMe)html+=button('edit','fa-pen',isMe?'بياناتي':'تعديل');
@@ -342,14 +343,13 @@ async function updateAdminUsersList() {
 
                     tr.innerHTML = `
 <td class="px-4 py-3">
-    <div class="min-w-0">
-        <div class="font-bold text-gray-800 text-sm truncate max-w-[220px] flex items-center gap-2" title="${escapeDirectoryText(user.full_name || '')}">
-            <span data-name-dot class="inline-flex w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-300'}"></span>
-            <span>${escapeDirectoryText(user.full_name || 'مستخدم')}</span>
-            ${isFounderRow ? '<i class="fas fa-crown text-[#F3A628] text-[10px]" title="المؤسس"></i>' : ''}
+    <div class="citl-user-identity">
+        <span class="citl-user-avatar" aria-hidden="true">${escapeDirectoryText((user.full_name || user.email || 'م').trim().slice(0,1))}<span data-name-dot class="citl-user-dot ${isOnline ? 'bg-green-500' : 'bg-gray-300'}"></span></span>
+        <div class="citl-user-copy">
+            <div class="citl-user-name" title="${escapeDirectoryText(user.full_name || '')}">${escapeDirectoryText(user.full_name || 'مستخدم')}${isFounderRow ? ' <i class="fas fa-crown text-[#F3A628]" title="المؤسس"></i>' : ''}</div>
+            <div class="citl-user-email" dir="ltr" title="${escapeDirectoryText(user.email || '')}">${escapeDirectoryText(user.email || '')}</div>
+            ${user.mobile ? '<div class="citl-user-phone"><i class="fas fa-phone-alt" aria-hidden="true"></i> <bdi dir="ltr">'+escapeDirectoryText(user.mobile)+'</bdi></div>' : ''}
         </div>
-        <div class="text-[10px] text-gray-400 truncate max-w-[220px] font-sans">${escapeDirectoryText(user.email || '')}</div>
-        ${mobileDisplay}
     </div>
 </td>
 

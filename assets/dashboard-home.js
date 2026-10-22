@@ -180,5 +180,17 @@
     root.CITLTicker.watch(root.sb,()=> 'news_config');
     return refresh();
   }
-  root.CITLDashboard=Object.freeze({start,refresh,openAdmin});
+  // Snapshot mode reuses the live dashboard renderer without Auth, network or writes.
+  function mountPreview(snapshot){
+    if(started)throw Error('Dashboard already active');
+    state.user=snapshot.profile;state.scope=snapshot.scope;Object.assign(state,snapshot.dashboard||{});state.updated=Date.now();state.ready=true;
+    $('dashboard-home').addEventListener('click',event=>{
+      const scope=event.target.closest('[data-dh-scope]');if(scope){state.scopeTarget=scope.dataset.dhScope;render();return;}
+      const view=event.target.closest('[data-dh-view]');if(view){state.view=view.dataset.dhView;render();}
+    });
+    $('dashboard-home').addEventListener('change',event=>{if(event.target.id==='dh-day-filter'){state.day=event.target.value;render();}});
+    document.addEventListener('toggle',positionCardDetails,true);root.addEventListener('resize',positionCardDetails);root.addEventListener('scroll',positionCardDetails,{passive:true});
+    render();
+  }
+  root.CITLDashboard=Object.freeze({start,refresh,openAdmin,mountPreview});
 })(window);

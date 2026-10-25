@@ -1,5 +1,5 @@
 {
-  "release": "20261025-r6.9.2.39",
+  "release": "20261025-r6.9.2.42",
   "built_at": "2026-10-25",
-  "description": "Complete local release; WhatsApp disabled by default; Meta welcome snapshot pending approval"
+  "description": "Meeting agenda and booking history separation"
 }

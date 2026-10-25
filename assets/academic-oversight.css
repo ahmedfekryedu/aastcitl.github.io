@@ -186,13 +186,16 @@
 
 #citl-faculty-delegates .citl-delegate-feedback{font-size:12px;line-height:1.9;margin:10px 0;color:#475569}#citl-faculty-delegates .citl-delegate-feedback.success{padding:10px 12px;background:#ecfdf5;border:1px solid #bbf7d0;border-radius:9px;color:#166534;font-weight:700}#citl-faculty-delegates .citl-delegate-feedback.error{padding:10px 12px;background:#fff1f2;border:1px solid #fecdd3;border-radius:9px;color:#9f1239}
 
-/* Equal lecture slot cards, chronological rows, shared geometry for free/booked. */
-#citl-free-rooms .citl-free-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-items:stretch}
-#citl-free-rooms .citl-free-times>.citl-free-book,#citl-free-rooms .citl-free-times>.citl-free-reserved{display:grid;grid-template-rows:minmax(44px,auto) minmax(22px,auto) 24px 24px;align-content:start;align-items:center;justify-items:start;gap:5px;width:100%;max-width:none;min-width:0;min-height:158px;margin:0;padding:12px 14px;border-width:1px;border-style:solid;border-radius:12px;text-align:start;box-sizing:border-box;font-family:Cairo,Tahoma,sans-serif;overflow-wrap:anywhere}
-#citl-free-rooms .citl-free-times>*>strong{display:block;font-size:13px;font-weight:800;line-height:1.7}
-#citl-free-rooms .citl-free-times>*>span{display:block;font-size:11px;font-weight:500;line-height:1.8}
-#citl-free-rooms .citl-free-times>*>bdi{display:block;font-size:13px;font-weight:700;direction:ltr;white-space:nowrap;margin:0}
-#citl-free-rooms .citl-free-times>*>small{display:inline-block;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;line-height:1.8}
+
+/* Compact, equal slot tiles. No reserved blank rows or clipped lecture names. */
+#citl-free-rooms .citl-free-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));grid-auto-rows:1fr;gap:8px;align-items:stretch}
+#citl-free-rooms .citl-free-times>.citl-free-book,#citl-free-rooms .citl-free-times>.citl-free-reserved{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:minmax(36px,auto) minmax(17px,auto) 22px;align-content:start;align-items:center;justify-items:start;column-gap:6px;row-gap:3px;width:100%;max-width:none;min-width:0;min-height:100px;height:100%;margin:0;padding:9px 11px;border-width:1px;border-style:solid;border-radius:9px;text-align:start;box-sizing:border-box;font-family:Cairo,Tahoma,sans-serif;overflow-wrap:anywhere}
+#citl-free-rooms .citl-free-times>*>strong{grid-column:1/-1;display:block;font-size:12px;font-weight:800;line-height:1.55;margin:0}
+#citl-free-rooms .citl-free-times>*>span{grid-column:1/-1;display:block;font-size:11px;font-weight:500;line-height:1.5;margin:0}
+#citl-free-rooms .citl-free-times>*>bdi{grid-row:3;grid-column:1;display:block;font-size:11px;font-weight:700;direction:ltr;white-space:nowrap;margin:0}
+#citl-free-rooms .citl-free-times>*>small{grid-row:3;grid-column:2;display:inline-block;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:700;line-height:1.6;white-space:nowrap}
 #citl-free-rooms .citl-free-book>small{background:#d9f1e2;color:#166534}
-@media(max-width:600px){#citl-free-rooms .citl-free-times{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#citl-free-rooms .citl-free-times>.citl-free-book,#citl-free-rooms .citl-free-times>.citl-free-reserved{padding:10px;min-height:158px}#citl-free-rooms .citl-free-times>*>bdi{font-size:11px}}
+@media(max-width:600px){#citl-free-rooms .citl-free-times{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}#citl-free-rooms .citl-free-times>.citl-free-book,#citl-free-rooms .citl-free-times>.citl-free-reserved{padding:8px;column-gap:3px}#citl-free-rooms .citl-free-times>*>bdi{font-size:10px}#citl-free-rooms .citl-free-times>*>small{font-size:9px;padding:1px 3px}}
 @media(max-width:360px){#citl-free-rooms .citl-free-times{grid-template-columns:minmax(0,1fr)}}
+
+#citl-free-rooms .citl-free-times>*>strong{align-self:start}

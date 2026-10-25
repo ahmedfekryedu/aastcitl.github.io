@@ -408,7 +408,7 @@ async function loadNewsConfig() {
 window.loadNewsConfig = loadNewsConfig;
 
 // تشغيل التحميل تلقائياً
-document.addEventListener('DOMContentLoaded', loadNewsConfig);
+// Load admin-only screen configuration when its authorized tab opens, not during every page boot.
 
 
 // ========================================================================
@@ -840,7 +840,8 @@ async function fetchExamsVisitsCount() {
         countEl.textContent = count || 0;
     } catch (err) {
         console.error('خطأ في جلب الزيارات:', err);
-        countEl.textContent = 'خطأ';
+        countEl.textContent = 'غير متاح';
+        countEl.title = 'تعذر تحديث الزيارات؛ أعد فتح هذا القسم للمحاولة مجددًا.';
     }
 }
 

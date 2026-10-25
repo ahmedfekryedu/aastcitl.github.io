@@ -1645,13 +1645,14 @@ function editMeeting() {
         
         // Open dashboard
         function openDashboard() {
-            updateDashboard();
+            if (!window.CITLLeadership?.allowed()) return;
             document.getElementById('dashboard-modal').classList.add('show');
+            updateDashboard();
         }
 
 // Update dashboard (النسخة الذكية المطورة)
         function updateDashboard() {
-            if (window.CITLLeadership) return window.CITLLeadership.load();
+            if (window.CITLLeadership) return document.getElementById('dashboard-modal')?.classList.contains('show') ? window.CITLLeadership.load() : undefined;
             // 1. تحديث الأرقام الرئيسية
             document.getElementById('total-meetings').textContent = meetings.length;
             

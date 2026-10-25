@@ -9,6 +9,7 @@
       if (controller.signal.aborted) throw Object.assign(new Error(notificationRead?'تأخر تحميل الإشعارات. سنحاول مرة أخرى تلقائيًا.':'انتهت مهلة الاتصال. لو كنت بتحفظ تغييرًا، حدّث البيانات للتأكد من نتيجته قبل تكراره.'),{code:'CITL_TIMEOUT'});
       if (error) {const service=/^CITL_SERVICE_MAINTENANCE:([a-z_]+)$/.exec(error.message||'');const label=service&&root.CITLServices?.decision(service[1])?.label;throw Object.assign(new Error(service?(label||'هذه الخدمة')+' قيد التحديث حاليًا':error.message || 'تعذر إتمام العملية'), { code: error.code });}
       if (!data || data.ok === false) throw new Error(data?.error || 'تعذر إتمام العملية');
+      if(['citl_academic_review','citl_room_swap_api','citl_secure_api','citl_admin_correct_registration','citl_registration_review_status'].includes(name)&&args?.p_action&&!/^(read|get|list|overview|notifications\.|.*\.list|.*\.get)/.test(args.p_action))root.dispatchEvent(new Event('citl-workflow-updated'));
       return data;
     } catch(error){if(notificationRead&&controller.signal.aborted)throw Object.assign(new Error('تأخر تحميل الإشعارات. سنحاول مرة أخرى تلقائيًا.'),{code:'CITL_TIMEOUT'});throw error;} finally { clearTimeout(timer); }
   }

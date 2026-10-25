@@ -60,9 +60,19 @@
       if(item.entity_type==='meetings'&&summary){
         body.replaceChildren();body.className='citl-booking-notice-fields';
         const kind=summary.booking_type==='lecture'?'محاضرة / سكشن':({meeting:'اجتماع',seminar:'ندوة',event:'فعالية',workshop:'ورشة عمل'}[summary.booking_reason]||'اجتماع');
-        for(const text of ['مقدم الحجز: '+(summary.booked_by||'—'),'القاعة: '+(summary.room_name||'—'),'اليوم: '+(summary.date?new Date(summary.date+'T12:00:00Z').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—'),'الوقت: '+String(summary.start_time||'').slice(0,5)+' – '+String(summary.end_time||'').slice(0,5),'النوع: '+kind]){
+        for(const text of [...(summary.title?['الموضوع: '+summary.title]:[]),'مقدم الحجز: '+(summary.booked_by||'—'),'القاعة: '+(summary.room_name||'—'),'اليوم: '+(summary.date?new Date(summary.date+'T12:00:00Z').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—'),'الوقت: '+String(summary.start_time||'').slice(0,5)+' – '+String(summary.end_time||'').slice(0,5),'النوع: '+kind,...(summary.rejection_reason?['سبب الرفض: '+summary.rejection_reason]:[])]){
           const line=document.createElement('span');line.textContent=text;body.append(line);
         }
+      }
+      button.classList.add('citl-notice-card');button.dir='rtl';button.dataset.read=item.read_at?'true':'false';
+      title.classList.add('citl-notice-title');date.classList.add('citl-notice-date');
+      const fields=item.payload?.notice_fields,payload=item.payload?.monitor||item.payload||{};
+      if(!(item.entity_type==='meetings'&&summary)){
+        const labels={course:'المحاضرة',instructor:'المحاضر',actor:'منفّذ الإجراء',room:'القاعة',date:'اليوم',time:'التوقيت',replacement_room:'القاعة البديلة',replacement_instructor:'المحاضر البديل',reason:'السبب'};
+        const pairs=fields?Object.entries(labels).filter(([k])=>fields[k]).map(([k,label])=>[label,fields[k]]):[['المحاضرة',payload.course_name],['المحاضر',payload.instructor],['القاعة',payload.room_name],['اليوم',payload.date],['التوقيت',payload.time_slot||payload.time],['الطرف الآخر',payload.target_instructor],['القاعة الأخرى',payload.target_room_name],['منفّذ الإجراء',payload.performed_by||payload.by],['السبب',payload.reason]].filter(([,v])=>v);
+        body.replaceChildren();body.className='citl-notice-fields';if(item.kind==='admin_announcement')body.classList.add('citl-notice-message');
+        if(pairs.length){for(const [label,value] of pairs){const line=document.createElement('div'),key=document.createElement('b'),val=document.createElement('span');key.textContent=label+':';val.textContent=value;line.append(key,val);body.append(line);}}
+        else {const lines=String(item.body||'').split(/\r?\n|\s+—\s+/).filter(Boolean);for(const [i,line] of lines.entries()){const part=document.createElement('div');part.textContent=(item.kind==='faculty_registration'?(['الاسم: ','الاسم الأكاديمي: '][i]||''):'')+line;body.append(part);}}
       }
       if(item.kind==='schedule_action' && item.payload?.review){const status=document.createElement('div');status.className='text-xs text-[#2A3475] mt-2';status.textContent=window.CITLOversight?.reviewLabel?.(item.payload.review)||'';button.append(status);} 
       button.addEventListener('click', async () => {
@@ -244,6 +254,8 @@
 
   window.CITLSecure = { invoke, session, htmlEscape, validateProtectedPage };
   window.checkUserNotifications = checkUserNotifications;
+  let workflowRefreshTimer;
+  window.addEventListener('citl-workflow-updated',()=>{clearTimeout(workflowRefreshTimer);workflowRefreshTimer=setTimeout(async()=>{if(notificationRead)await notificationRead;await checkUserNotifications();window.CITLPendingApprovalsReminder?.check(true);},150);});
   window.markAllNotificationsRead = markAllNotificationsRead;
   window.toggleNotifications = toggleNotifications;
   window.submitScheduleAction = secureScheduleAction;

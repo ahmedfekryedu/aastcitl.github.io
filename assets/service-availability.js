@@ -14,10 +14,24 @@
  }
 
  async function load(force=false){if(inflight)return inflight;if(!force&&snapshot&&Date.now()-checked<15000)return snapshot;
-  inflight=(async()=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{
-   const response=await nativeFetch(root.CITLServiceConnection.url+'/rest/v1/rpc/citl_service_snapshot',{method:'POST',headers:await headers(),body:'{}',signal:controller.signal,cache:'no-store'});
-   if(!response.ok)throw Error('تعذر التحقق من إتاحة الخدمات الآن. أعد المحاولة.');const result=await response.json();if(!Array.isArray(result.services))throw Error('تعذر قراءة إعدادات إتاحة الخدمات. تأكد من تثبيت تحديث قاعدة البيانات.');snapshot=result;checked=Date.now();decorate();return result;
-  }finally{clearTimeout(timer);}})().finally(()=>inflight=null);return inflight;
+  inflight=(async()=>{
+   // Resolve credentials before starting the network deadline; token refresh has its own lifecycle.
+   const requestHeaders=await headers();
+   for(let attempt=0;attempt<2;attempt++){
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
+    try{
+     const response=await nativeFetch(root.CITLServiceConnection.url+'/rest/v1/rpc/citl_service_snapshot',{method:'POST',headers:requestHeaders,body:'{}',signal:controller.signal,cache:'no-store'});
+     if(!response.ok)throw Object.assign(Error('تعذر التحقق من إتاحة الخدمات الآن. أعد المحاولة.'),{status:response.status});
+     const result=await response.json();if(!Array.isArray(result.services))throw Object.assign(Error('تعذر قراءة إعدادات إتاحة الخدمات.'),{status:422});
+     snapshot=result;checked=Date.now();decorate();return result;
+    }catch(error){
+     const transient=controller.signal.aborted||error instanceof TypeError||[502,503,504].includes(error.status);
+     if(attempt===0&&transient&&navigator.onLine!==false)continue;
+     if(controller.signal.aborted)throw Object.assign(Error('تأخر اتصال التحقق بالخدمة. أعد المحاولة؛ لم تتغير بياناتك.'),{code:'CITL_TIMEOUT'});
+     throw error;
+    }finally{clearTimeout(timer);}
+   }
+  })().finally(()=>inflight=null);return inflight;
  }
  function matches(route,url){const path=url.pathname.replace(/index\.html$/,'').replace(/\/?$/,'/');if(path!==route.path)return false;
   return Object.entries(route.query||{}).every(([k,v])=>url.searchParams.get(k)===v)&&Object.entries(route.query_not||{}).every(([k,v])=>url.searchParams.get(k)!==v);

@@ -2691,7 +2691,7 @@ const shownRoom = (actionRow && (actionRow.action_type === 'move_room' || action
 
 const statusLabel = !actionRow
     ? (isActive ? 'نشط' : 'ملغي')
-    : (actionRow.action_type === 'cancel' ? 'ملغي' : 'محول');
+    : ({cancel:'تم الإلغاء',replace:'تم الإحلال',move_room:'تم تغيير القاعة',replace_and_move:'تم الإحلال وتغيير القاعة'}[actionRow.action_type] || 'إجراء مسجل');
 
             
             let displayTime = item.time_slot;
@@ -2711,7 +2711,7 @@ const statusBadge = !actionRow
         : '<span class="text-red-700 bg-red-100 px-2 py-0.5 rounded text-[10px] font-bold">ملغي</span>')
     : (actionRow.action_type === 'cancel'
         ? '<span class="text-red-700 bg-red-100 px-2 py-0.5 rounded text-[10px] font-bold">ملغي</span>'
-        : '<span class="text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-[10px] font-bold">محول</span>');
+        : '<span class="text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-[10px] font-bold">'+statusLabel+'</span>');
 
 
                 const mobileCard = `
@@ -2723,6 +2723,7 @@ const statusBadge = !actionRow
 </div>
                         ${statusBadge}
                     </div>
+                    ${actionRow ? `<p class="text-xs text-gray-500">الإجراء ليوم <bdi>${nextDate}</bdi></p>` : ''}
                     <div class="text-xs text-gray-500 font-bold mb-3 flex items-center gap-1">
                         <i class="fas fa-user-tie text-[10px]"></i> ${shownInstructor}
                     </div>
@@ -2752,7 +2753,7 @@ const statusBadge = !actionRow
         : '<span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-[10px] font-bold whitespace-nowrap">ملغي</span>')
     : (actionRow.action_type === 'cancel'
         ? '<span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-[10px] font-bold whitespace-nowrap">ملغي</span>'
-        : '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold whitespace-nowrap">محول</span>');
+        : '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold whitespace-nowrap">'+statusLabel+'</span>');
 
 
                 const tableRow = `
@@ -2779,6 +2780,7 @@ const statusBadge = !actionRow
                     </td>
 <td class="px-6 py-4 text-center whitespace-nowrap">
     ${statusBadge}
+    ${actionRow ? `<small class="block text-gray-500"><bdi>${nextDate}</bdi></small>` : ''}
 </td>
                     <td class="px-6 py-4 text-center whitespace-nowrap">
                         ${actionBtn}
@@ -3044,7 +3046,7 @@ async function openScheduleActionModal(encodedItemJson, selectedDate) {
                     existingAction
                         ? `
                         <div class="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs space-y-1">
-                            <div class="font-black text-blue-800">تم تسجيل إجراء سابق لهذا الموعد</div>
+                            <div class="font-black text-blue-800">الإجراء المسجل لهذا اليوم — يُعدّل نفس الإجراء ولا يُضاف مرة أخرى</div>
                             <div><b>النوع:</b> ${getActionTypeLabel(existingAction.action_type)}</div>
                             ${existingAction.replacement_instructor ? `<div><b>المحاضر البديل:</b> ${existingAction.replacement_instructor}</div>` : ''}
                             ${existingAction.replacement_room ? `<div><b>القاعة البديلة:</b> ${existingAction.replacement_room}</div>` : ''}
@@ -3095,6 +3097,7 @@ async function openScheduleActionModal(encodedItemJson, selectedDate) {
         }
 
         window.CITLLectureDates.mount(item, dateData);
+        window.CITLRoomSwaps?.mount(item, dateData);
         const modal = document.getElementById('schedule-action-modal');
         presentScheduleActionModal();
         const card = modal.querySelector('div.relative');
@@ -3434,6 +3437,7 @@ function renderScheduleReportsTable(rows) {
 </td>
 <td class="px-3 py-3 whitespace-nowrap font-bold text-[#2A3475]">
     ${escapeHtml(row.position || '—')}
+    ${row.faculty_source_kind === 'actor' ? `<small class="block whitespace-normal">بيانات منفذ الإجراء: ${escapeHtml(row.faculty_source_name)}</small>` : ''}
 </td>
                 <td class="px-3 py-3 whitespace-nowrap font-bold text-blue-700">${escapeHtml(row.replacement_instructor || '—')}</td>
                 <td class="px-3 py-3 whitespace-nowrap font-bold text-gray-700">${escapeHtml(lecture.room_name || '—')}</td>
@@ -3469,16 +3473,18 @@ function getDepartmentDisplayName(key) {
     return departments?.[key]?.name || key || '—';
 }
 
-async function loadFacultyDirectoryLookup() {
+async function loadFacultyDirectoryLookup(required = false) {
     try {
         const { data, error } = await window.supabase
             .from('faculty_directory')
-            .select('full_name, department_key, position')
+            .select('full_name, department_key, position, profile_id, is_active')
             .order('full_name', { ascending: true });
 
         if (error) throw error;
 
         facultyLookupData = (data || []).map(item => ({
+            profile_id: item.profile_id,
+            is_active: item.is_active,
             full_name: normalizeFacultyName(item.full_name),
             department_key: String(item.department_key || '').trim(),
             position: String(item.position || '').trim()
@@ -3498,6 +3504,7 @@ async function loadFacultyDirectoryLookup() {
         facultyLookupData = [];
         facultyDirectoryList = [];
         facultyDirectoryByName = new Map();
+        if (required) throw err;
     }
 }
 
@@ -3692,19 +3699,21 @@ async function loadScheduleReports() {
             });
         }
 
+        // Resolve accounts by ID, never by the display name entered by an administrator.
+        await loadFacultyDirectoryLookup(true);
+        const profileIds = [...new Set([...facultyLookupData.map(f => f.profile_id), ...filteredActions.map(a => a.created_by_user_id)].filter(Boolean))];
+        const reportProfiles = new Map();
+        for (let offset = 0; offset < profileIds.length; offset += 100) {
+            const result = await supabase.from('profiles').select('id, full_name, department, position, faculty_verification_status, account_type').in('id', profileIds.slice(offset, offset + 100));
+            if (result.error) throw result.error;
+            (result.data || []).forEach(p => reportProfiles.set(String(p.id), p));
+        }
 const finalRows = filteredActions.map(a => {
     const lecture = getScheduleReportLecture(a, scheduleMap);
-
-    const facultyMeta = facultyLookupData.find(item =>
-        item.full_name === normalizeFacultyName(lecture?.instructor || '')
-    ) || null;
-
     return {
         ...a,
         schedule: lecture,
-        faculty_meta: facultyMeta,
-        department_key: facultyMeta?.department_key || '',
-        position: facultyMeta?.position || ''
+        ...resolveScheduleReportFaculty(a, lecture, facultyLookupData, reportProfiles)
     };
 });
 
@@ -3742,6 +3751,24 @@ renderScheduleReportsTable(enrichedRows);
 
         showNotification('تعذر تحميل التقرير', 'error');
     }
+}
+
+function resolveScheduleReportFaculty(action, lecture, directory, profiles) {
+    const matches = directory.filter(f => f.is_active !== false && normalizeFacultyName(f.full_name) === normalizeFacultyName(lecture?.instructor));
+    const ownerEntry = matches.find(f => profiles.get(String(f.profile_id))?.faculty_verification_status === 'approved');
+    const owner = ownerEntry && profiles.get(String(ownerEntry.profile_id));
+    const faculty = ownerEntry || matches[0] || null;
+    const actor = profiles.get(String(action.created_by_user_id));
+    // Keep the recorded academic routing. Never substitute an unrelated admin's department.
+    const department = action.academic_department_key || owner?.department || faculty?.department_key || '';
+    const representative = !owner && department && actor?.department === department &&
+        ['faculty', 'visiting_lecturer'].includes(actor.account_type) &&
+        ['approved', 'not_required'].includes(actor.faculty_verification_status) ? actor : null;
+    const account = owner || representative;
+    return {faculty_meta: faculty, department_key: department,
+        position: account?.position || faculty?.position || '',
+        faculty_source_name: account?.full_name || faculty?.full_name || '',
+        faculty_source_kind: representative ? 'actor' : owner ? 'owner' : 'directory'};
 }
 
 function chunkReportRows(arr, size = 16) {
@@ -3789,7 +3816,7 @@ function buildScheduleReportPrintRows(rowsChunk, startSerial = 1) {
                 </td>
 
                 <td class="cell-course">${escapeHtml(lecture.course_name || '—')}</td>
-                <td class="cell-nowrap">${escapeHtml(lecture.course_code || '—')}</td>
+                <td class="cell-code" dir="ltr">${escapeHtml(lecture.course_code || '—')}</td>
 
                 <td class="cell-person">${escapeHtml(lecture.instructor || '—')}</td>
                 <td class="cell-person">${escapeHtml(row.replacement_instructor || '—')}</td>
@@ -3797,6 +3824,7 @@ function buildScheduleReportPrintRows(rowsChunk, startSerial = 1) {
                 <td class="cell-dept">
                     <div class="dept-main">${departmentText}</div>
                     <div class="dept-sub">${positionText}</div>
+                    ${row.faculty_source_kind === 'actor' ? `<div class="dept-sub">بيانات منفذ الإجراء: ${escapeHtml(row.faculty_source_name)}</div>` : ''}
                 </td>
 
                 <td class="cell-nowrap">${escapeHtml(lecture.room_name || '—')}</td>
@@ -3854,6 +3882,8 @@ async function createScheduleReportBatch(rows, outputMode = 'print_or_pdf') {
         replacement_room: row.replacement_room || null,
         department_key: row.department_key || null,
         position: row.position || null,
+        faculty_source_name: row.faculty_source_name || null,
+        faculty_source_kind: row.faculty_source_kind || null,
         schedule: row.schedule || null
     }));
 
@@ -3977,8 +4007,9 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
         }
     }
 
-    const pageSize = 15;
-    const pages = chunkReportRows(scheduleReportsCurrentRows, pageSize);
+    // Let the print engine paginate by content height; reasons must never be clipped.
+    const pageSize = scheduleReportsCurrentRows.length;
+    const pages = [scheduleReportsCurrentRows];
 
     const pagesHtml = pages.map((chunk, index) => {
         const isFirstPage = index === 0;
@@ -4084,20 +4115,20 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                 <div class="table-wrap">
                     <table class="report-table">
                         <colgroup>
-                            <col style="width: 34px;">
-                            <col style="width: 72px;">
-                            <col style="width: 90px;">
-                            <col style="width: 125px;">
-                            <col style="width: 68px;">
-                            <col style="width: 92px;">
-                            <col style="width: 92px;">
-                            <col style="width: 98px;">
-                            <col style="width: 72px;">
-                            <col style="width: 72px;">
-                            <col style="width: 85px;">
-                            <col style="width: 165px;">
-                            <col style="width: 92px;">
-                            <col style="width: 96px;">
+                            <col style="width: 2%;">
+                            <col style="width: 6%;">
+                            <col style="width: 6%;">
+                            <col style="width: 9%;">
+                            <col style="width: 5%;">
+                            <col style="width: 7%;">
+                            <col style="width: 7%;">
+                            <col style="width: 9%;">
+                            <col style="width: 5%;">
+                            <col style="width: 5%;">
+                            <col style="width: 7%;">
+                            <col style="width: 17%;">
+                            <col style="width: 8%;">
+                            <col style="width: 7%;">
                         </colgroup>
                         <thead>
                             <tr>
@@ -4126,7 +4157,7 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                 <div class="page-footer">
                     <div>رقم التقرير: ${reportCode}</div>
                     <div>كلية النقل الدولي واللوجستيات</div>
-                    <div>صفحة ${index + 1} من ${pages.length}</div>
+                    <div>نهاية التقرير</div>
                 </div>
             </section>
         `;
@@ -4168,7 +4199,7 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                 .page {
                     page-break-after: always;
                     break-after: page;
-                    min-height: 100vh;
+                    min-height: 0;
                     padding: 0;
                 }
 
@@ -4411,7 +4442,7 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                 .table-wrap {
                     border: 1px solid #dbe2ea;
                     border-radius: 16px;
-                    overflow: hidden;
+                    overflow: visible;
                     background: #fff;
                 }
 
@@ -4463,7 +4494,7 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                 }
 
                 .cell-nowrap {
-                    white-space: nowrap;
+                    white-space: normal;
                 }
 
                 .cell-time {
@@ -4535,6 +4566,17 @@ async function printScheduleReportsCore(reportCodeFromBatch = null, autoPrint = 
                     page-break-inside: avoid;
                     break-inside: avoid;
                 }
+                .report-table th, .report-table td {
+                    white-space: normal;
+                    overflow-wrap: anywhere;
+                    word-break: normal;
+                    height: auto;
+                    max-height: none;
+                }
+                .report-table thead { display: table-header-group; }
+                .report-table .cell-reason { white-space: pre-wrap; }
+                .report-table .action-chip { white-space: normal; }
+                .report-table td, .report-table th { break-inside: auto; page-break-inside: auto; }
             </style>
         <link rel="stylesheet" href="/assets/fonts.css"></head>
         <body>

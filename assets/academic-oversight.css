@@ -162,3 +162,16 @@
 @media(max-width:640px){.citl-ac-table tbody td{padding:10px 8px}.citl-review-badge{padding:6px 8px;font-size:11px}}
 
 .citl-delegate-courses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:280px;overflow:auto;margin:12px 0;padding:12px;border:1px solid #e1e5ef;border-radius:10px;background:#f8f9fc}.citl-delegate-courses[hidden]{display:none}.citl-delegate-courses label{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e1e5ef;border-radius:8px;padding:10px;font-size:12px}.citl-delegate-courses input{accent-color:#303878}.citl-delegate-courses small{display:block;color:#6b768e}.citl-delegate-courses label:has(input:checked){border-color:#e7a523;background:#fffaf0}@media(max-width:600px){.citl-delegate-courses{grid-template-columns:1fr}}
+
+/* Center the history shortcut within the notification list on all screen sizes. */
+#notif-menu .citl-notification-history{display:flex;align-items:center;justify-content:center;width:fit-content;max-width:100%;margin-inline:auto;text-align:center}
+/* Schedule-action reports share the booking-report controls and table appearance. */
+#schedule-reports-modal .citl-schedule-report-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+#schedule-reports-modal .citl-schedule-report-filters>div{min-width:0}
+#schedule-reports-modal .citl-schedule-report-filters label{min-width:0;color:#2a3475}
+#schedule-reports-modal .citl-schedule-report-filters :is(.report-filter-field,.custom-dropdown-display){min-height:38px;padding:8px 10px;border:1px solid #dce2ed;border-radius:8px;background:#fff;font:12px Cairo,sans-serif;color:#2a3475}
+#schedule-reports-modal .citl-ac-table th{background:#2a3475;color:#fff}
+#schedule-reports-modal .citl-ac-table tbody tr:nth-child(even){background:#f8fafc}
+#schedule-reports-modal #schedule-reports-print-area{overflow:visible;display:block}
+#schedule-reports-modal #schedule-reports-print-area .table-scroll{height:auto;overflow:auto}
+@media(max-width:640px){#schedule-reports-modal .citl-schedule-report-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}

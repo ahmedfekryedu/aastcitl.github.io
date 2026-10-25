@@ -1,1 +1,5 @@
-{"release": "20261022-r6.9.2.37", "built_at": "2026-10-22", "description": "Isolated dashboard preview, password-only verification and compact icon user cards"}
+{
+  "release": "20261025-r6.9.2.38",
+  "built_at": "2026-10-25",
+  "description": "Complete local release; WhatsApp disabled by default; Meta welcome snapshot pending approval"
+}

@@ -25,7 +25,7 @@
         linked_instructor: document.getElementById('reg-linked-instructor')?.value,
       };
       if(!/^[0-9]{11}$/.test(details.mobile||''))throw new Error('رقم الموبايل يجب أن يتكون من 11 رقمًا');
-      if(details.account_type==='faculty'){await loadSignupFacultyNames();if(!isValidAcademicName(details.linked_instructor))throw new Error('اختر اسمًا موجودًا في الجدول الحالي');}
+      if(details.account_type==='faculty'){await loadSignupFacultyNames();if(!isValidAcademicName(details.linked_instructor)){form.citlValidation.show(document.getElementById('reg-linked-instructor'),'اختر اسمًا متاحًا من الجدول الحالي');throw new Error('اختر اسمًا موجودًا في الجدول الحالي');}}
       details.position=String(details.position||'').trim();
       if(!details.position || details.position==='غير محدد')throw new Error('اكتب المسمى الوظيفي الصحيح');
       const accessCode = document.getElementById('reg-access-code')?.value;

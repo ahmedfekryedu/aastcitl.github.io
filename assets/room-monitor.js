@@ -25,27 +25,37 @@
 
  }
  function models(){return data.rooms.map(r=>{
-  const lectures=data.lectures.filter(l=>l.room_name===r.academic_name),bookings=data.bookings.filter(b=>r.id&&b.room_id===r.id),changes=data.actions.filter(a=>a.room_name===r.academic_name||a.replacement_room===r.academic_name);
+  const lectures=data.lectures.filter(l=>l.room_name===r.academic_name),bookings=data.bookings.filter(b=>r.id&&b.room_id===r.id),changes=data.actions.filter(a=>a.is_current!==false&&(normalize(a.room_name)===normalize(r.academic_name||r.name)||(['move_room','replace_and_move'].includes(a.action_type)&&normalize(a.replacement_room)===normalize(r.academic_name||r.name))));
   const occupied=[...lectures,...bookings.filter(b=>['confirmed','modification_requested','cancellation_requested','deletion_requested'].includes(b.status))].map(x=>[mins(x.start_time),mins(x.end_time)]).filter(x=>Number.isFinite(x[0])&&Number.isFinite(x[1])).sort((a,b)=>a[0]-b[0]);
   let cursor=510;const free=[];for(const [start,end]of occupied){if(start>cursor&&cursor<1100)free.push([cursor,Math.min(start,1100)]);cursor=Math.max(cursor,end);}if(cursor<1100)free.push([cursor,1100]);
   const at=mins(host.querySelector('[data-time]').value),busy=occupied.some(([start,end])=>start<=at&&end>at);
-  const search=normalize([r.name,r.academic_name,...lectures.flatMap(l=>[l.course_name,l.instructor]),...bookings.flatMap(b=>[b.title,b.booked_by,department(b.department)]),...changes.flatMap(a=>[a.course_name,a.instructor,a.replacement_instructor,a.replacement_room])].join(' '));
+  const search=normalize([r.name,r.academic_name,...lectures.flatMap(l=>[l.course_name,l.instructor]),...bookings.flatMap(b=>[b.title,b.booked_by,department(b.department)]),...changes.flatMap(a=>[a.course_name,a.instructor,a.replacement_instructor,a.replacement_room,a.performed_by])].join(' '));
   return {...r,key:r.id||r.academic_name,lectures,bookings,changes,free,busy,search};
  });}
+ function actionDirection(a,r){
+  if(a.action_type==='cancel')return 'أُلغيت المحاضرة في هذه القاعة';
+  if(['move_room','replace_and_move'].includes(a.action_type))return normalize(a.replacement_room)===normalize(r.academic_name||r.name)?'نُقلت إلى هذه القاعة من '+(a.room_name||'—'):'نُقلت من هذه القاعة إلى '+(a.replacement_room||'—');
+  return 'إحلال المحاضر في نفس القاعة';
+ }
+ function actionSummary(r){return r.changes.length?'<span class="monitor-change-preview">'+r.changes.map(a=>'<span class="monitor-change-badge '+(a.action_type==='cancel'?'cancel':'')+'">'+E(actions[a.action_type]||a.action_type)+' · '+E(a.course_name||'')+' · <bdi>'+E(a.time_slot||'')+'</bdi></span>').join('')+'</span>':'';}
+ function changeItem(a,r){
+  const field=(label,value)=>value?'<div><dt>'+E(label)+'</dt><dd>'+(label==='الموعد'?'<bdi>'+E(value)+'</bdi>':E(value))+'</dd></div>':'';
+  return '<li class="monitor-action-card '+(a.action_type==='cancel'?'cancel':'')+'"><strong>'+E(actions[a.action_type]||a.action_type)+'</strong><p class="monitor-action-direction">'+E(actionDirection(a,r))+'</p><dl>'+field('المادة',a.course_name)+field('الموعد',a.time_slot)+field('المحاضر الأصلي',a.instructor)+(['replace','replace_and_move'].includes(a.action_type)?field('المحاضر البديل',a.replacement_instructor):'')+field('منفذ الإجراء',a.performed_by)+field('السبب',a.reason)+'</dl><small>التغيير ظاهر في المحاضرات الفعلية وحساب الإشغال؛ مراجعة الإجراء مستقلة عن تنفيذه.</small></li>';
+ }
  function details(r,kind){
   const item=(title,sub,cls='')=>'<li class="'+cls+'"><strong>'+E(title)+'</strong><small>'+E(sub)+'</small></li>',times=x=>'\u2066'+String(x.start_time).slice(0,5)+' – '+String(x.end_time).slice(0,5)+'\u2069';
   const section=(title,items)=>'<section><h4>'+title+'</h4><ul>'+(items.join('')||'<li class="monitor-empty">لا توجد بيانات لهذا اليوم</li>')+'</ul></section>';
   let html='';
-  if(['all','lectures'].includes(kind))html+=section('المحاضرات الفعلية',r.lectures.map(l=>item(l.course_name,l.instructor+' · '+times(l))));
+  if(['all','lectures'].includes(kind))html+=section('المحاضرات الفعلية',r.lectures.map(l=>{const change=r.changes.find(a=>a.schedule_id&&String(a.schedule_id)===String(l.schedule_id));return item(l.course_name,l.instructor+' · '+times(l)+(change?' · '+(actions[change.action_type]||change.action_type):''),change?'changed':'');}));
   if(['all','bookings','lectures'].includes(kind))html+=section(kind==='lectures'?'حجوزات المحاضرات':'الحجوزات',r.bookings.filter(b=>kind==='all'||(kind==='lectures'?b.booking_type==='lecture':b.booking_type!=='lecture')).map(b=>item(b.title,({lecture:'محاضرة / سكشن',meeting:'اجتماع',seminar:'ندوة',event:'فعالية',other:'استخدام آخر'}[b.booking_type]||'حجز قاعة')+' · '+(states[b.status]||b.status)+' · '+times(b)+' · '+(b.booked_by||'')+' · '+department(b.department))));
-  if(['all','changes'].includes(kind))html+=section('إجراءات المحاضرات',r.changes.map(a=>item(actions[a.action_type]||a.action_type,a.course_name+' · '+a.instructor+' · '+a.time_slot+(a.replacement_room?' ← '+a.replacement_room:'')+(a.replacement_instructor?' · '+a.replacement_instructor:'')+(a.reason?' · '+a.reason:''),'changed')));
+  if(r.changes.length)html=section('التغييرات في هذه القاعة',r.changes.map(a=>changeItem(a,r)))+html;
   if(['all','free'].includes(kind))html+='<section><h4>فترات فارغة بين 08:30 و18:20</h4><div class="citl-monitor-free">'+(r.free.map(x=>'<bdi>'+clock(x[0])+' – '+clock(x[1])+'</bdi>').join('')||'لا توجد فترات فارغة')+'</div><p class="monitor-disclaimer">فترات الإشغال للمتابعة فقط، وليست تصريحًا بالحجز.</p></section>';
   return html;
  }
  function draw(){if(!data||!host)return;
   const field=k=>host.querySelector('[data-'+k+']').value,choice=field('room'),kind=field('kind'),state=field('state'),terms=normalize(field('search')).split(' ').filter(Boolean);
   const base=models().filter(r=>(!choice||r.key===choice)&&terms.every(t=>r.search.includes(t)));
-  const rows=base.filter(r=>(!state||(state==='busy'?r.busy:!r.busy))&&(kind==='all'||kind==='free'&&r.free.length||kind==='changes'&&r.changes.length||kind==='lectures'&&(r.lectures.length||r.bookings.some(b=>b.booking_type==='lecture'))||kind==='bookings'&&r.bookings.some(b=>b.booking_type!=='lecture')));
+  const rows=base.filter(r=>(!state||(state==='busy'?r.busy:!r.busy))&&(kind==='all'||kind==='free'&&r.free.length||kind==='changes'&&r.changes.length||kind==='lectures'&&(r.lectures.length||r.changes.length||r.bookings.some(b=>b.booking_type==='lecture'))||kind==='bookings'&&r.bookings.some(b=>b.booking_type!=='lecture')));
   const pages=Math.max(1,Math.ceil(rows.length/pageSize));page=Math.min(page,pages-1);
   const next=JSON.stringify([base,rows,page,expanded,kind,state,field('time')]);if(next===signature)return;signature=next;
   const cards=[['all','قاعات مطابقة',base.length,'fa-door-open'],['busy','مشغولة في '+field('time'),base.filter(r=>r.busy).length,'fa-users'],['free','فارغة في '+field('time'),base.filter(r=>!r.busy).length,'fa-check-circle'],['changes','إجراءات المحاضرات',new Set(base.flatMap(r=>r.changes.map(a=>a.id||JSON.stringify(a)))).size,'fa-exchange-alt']];
@@ -53,7 +63,7 @@
   host.querySelector('[data-summary]').innerHTML=cards.map(([key,label,n,icon])=>'<button type="button" class="monitor-stat '+key+'" data-summary-filter="'+key+'" aria-pressed="'+(selected===key)+'"><i class="fas '+icon+'" aria-hidden="true"></i><span><strong>'+n+'</strong><span>'+E(label)+'</span></span></button>').join('');
   host.querySelectorAll('[data-summary-filter]').forEach(b=>b.onclick=()=>{const key=b.dataset.summaryFilter;host.querySelector('[data-state]').value=['busy','free'].includes(key)?key:'';host.querySelector('[data-kind]').value=key==='changes'?'changes':'all';page=0;expanded='';draw();host.querySelector('[data-cards]').scrollIntoView({block:'nearest'});});
 
-  host.querySelector('[data-cards]').innerHTML=rows.slice(page*pageSize,(page+1)*pageSize).map((r,i)=>'<article><button type="button" class="monitor-room-row" data-expand="'+E(r.key)+'" aria-expanded="'+(expanded===r.key)+'" aria-controls="monitor-detail-'+i+'"><span class="monitor-room-name"><i class="fas fa-door-open" aria-hidden="true"></i><strong>'+E(r.name)+'</strong></span><span class="monitor-state '+(r.busy?'busy':'free')+'">'+(r.busy?'مشغولة':'فارغة')+' · <bdi>'+E(field('time'))+'</bdi></span><span class="monitor-counts">'+r.lectures.length+' محاضرات · '+r.bookings.length+' حجوزات · '+r.changes.length+' إجراءات</span><span class="monitor-expand">'+(expanded===r.key?'إخفاء التفاصيل −':'عرض التفاصيل +')+'</span></button><div id="monitor-detail-'+i+'" class="monitor-details" '+(expanded===r.key?'':'hidden')+'>'+ (expanded===r.key?details(r,kind):'')+'</div></article>').join('')||'<div class="citl-admin-empty">لا توجد نتائج تطابق البحث والفلاتر. جرّب مسح الفلاتر.</div>';
+  host.querySelector('[data-cards]').innerHTML=rows.slice(page*pageSize,(page+1)*pageSize).map((r,i)=>'<article><button type="button" class="monitor-room-row" data-expand="'+E(r.key)+'" aria-expanded="'+(expanded===r.key)+'" aria-controls="monitor-detail-'+i+'"><span class="monitor-room-name"><i class="fas fa-door-open" aria-hidden="true"></i><strong>'+E(r.name)+'</strong></span><span class="monitor-state '+(r.busy?'busy':'free')+'">'+(r.busy?'مشغولة':'فارغة')+' · <bdi>'+E(field('time'))+'</bdi></span><span class="monitor-counts">'+r.lectures.length+' محاضرات · '+r.bookings.length+' حجوزات · '+r.changes.length+' إجراءات</span>'+actionSummary(r)+'<span class="monitor-expand">'+(expanded===r.key?'إخفاء التفاصيل −':'عرض التفاصيل +')+'</span></button><div id="monitor-detail-'+i+'" class="monitor-details" '+(expanded===r.key?'':'hidden')+'>'+ (expanded===r.key?details(r,kind):'')+'</div></article>').join('')||'<div class="citl-admin-empty">لا توجد نتائج تطابق البحث والفلاتر. جرّب مسح الفلاتر.</div>';
   host.querySelector('[data-pages]').innerHTML='<button type="button" class="citl-ac-button secondary" data-prev '+(page===0?'disabled':'')+'>السابق</button><span>صفحة '+(page+1)+' من '+pages+' · '+rows.length+' قاعة</span><button type="button" class="citl-ac-button secondary" data-next '+(page===pages-1?'disabled':'')+'>التالي</button>';
   host.querySelectorAll('[data-expand]').forEach(b=>b.onclick=()=>{const key=b.dataset.expand;expanded=expanded===key?'':key;draw();Array.from(host.querySelectorAll('[data-expand]')).find(el=>el.dataset.expand===key)?.focus({preventScroll:true});});
   for(const [key,step]of [['prev',-1],['next',1]])host.querySelector('[data-'+key+']').onclick=()=>{page+=step;expanded='';draw();host.querySelector('[data-cards]').scrollIntoView({block:'nearest'});};
@@ -63,5 +73,6 @@
   catch(e){if(mine===serial){data=null;signature='';host.querySelector('[data-summary]').replaceChildren();host.querySelector('[data-pages]').replaceChildren();host.querySelector('[data-cards]').replaceChildren();status.textContent='تعذر تأكيد حالة القاعات. '+e.message;}}finally{if(mine===serial)loading=false;}
  }
  root.CITLRoomMonitor=Object.freeze({mount,load});mount();root.addEventListener('citl-profile-loaded',()=>{mount();if(host&&!host.classList.contains('hidden'))void load();});
+ for(const event of ['citl-schedule-update','citl-meetings-changed'])root.addEventListener(event,()=>{if(host&&!host.classList.contains('hidden'))void load();});
  setInterval(()=>{if(host&&!document.hidden&&!host.classList.contains('hidden'))void load(true);},60000);
 })(window);

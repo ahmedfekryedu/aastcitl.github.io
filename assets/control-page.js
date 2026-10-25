@@ -6,7 +6,7 @@
   const url=new URL('/dashboard/control.html',location.origin);
   const previous=new URLSearchParams(location.search),aliases={structure:'directory',services:'service-availability',activity:'activity-history',approvals:'academic-review',academic:'academic-actions',profile:'profile','term-schedules':'term-schedules'};
   url.searchParams.set('tab',(!tab||tab==='users')&&aliases[previous.get('open')]|| (typeof tab==='string'?tab:'users'));
-  for(const key of ['request','action','term','department','broadcast'])if(previous.get(key))url.searchParams.set(key,previous.get(key));
+  for(const key of ['request','action','term','department','broadcast','swap'])if(previous.get(key))url.searchParams.set(key,previous.get(key));
   for(const key of ['request','action','term','meeting'])if(options[key])url.searchParams.set(key,options[key]);
   root.CITLPageBoot?.show('جاري فتح لوحة التحكم');
   location.assign(url.href);return true;
@@ -32,6 +32,7 @@
   else if(tab==='academic-review')await root.CITLOversight.openApprovals({request:params.get('request')});
   else await root.openAdminPanel(tab);
   }finally{host.setAttribute('aria-busy','false');document.getElementById('citl-control-loading')?.remove();}
+  if(params.get('swap'))void root.CITLRoomSwaps?.open(params.get('swap'));
   if(params.get('meeting'))void root.CITLMeetingUI?.open(params.get('meeting'),false);
   if(params.get('broadcast'))void root.CITLAnnouncements?.open(params.get('broadcast'));
  });

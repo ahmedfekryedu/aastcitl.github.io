@@ -85,10 +85,12 @@
       list.appendChild(button);
     }
     if(notificationMode==='overdue'&&(notificationPage>0||result.has_more))for(const [step,label] of [[-1,'الصفحة السابقة'],[1,'المزيد من الإشعارات المتأخرة']]){const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.textContent=label;b.disabled=step<0?notificationPage===0:!result.has_more;b.onclick=()=>{notificationPage+=step;void checkUserNotifications();};list.append(b);}
-    const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory();};list.append(history);
+    const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary citl-notification-history';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory();};list.append(history);
   }
 
   async function openSpecialNotice(item){
+    if(item.kind==='room_swap'){await window.CITLRoomSwaps.open(item.payload?.swap_id||item.entity_id);return true;}
+    if(item.kind==='academic_event'){await window.CITLRoomSwaps.eventNotice(item);return true;}
     if(item.kind==='room_monitor'){
       const p=item.payload?.monitor||{};
       await window.CITLRequests.rpc(window.sb,'citl_room_monitor',{p_date:p.date});

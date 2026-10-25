@@ -1,5 +1,5 @@
 (function(root){'use strict';
- const version='20261022-r6.9.2.37';let source;const scripts=['permissions.js','study-model.js','dashboard-home-model.js','dashboard-home.js'],sheets=['tailwind-3.4.17.min.css','fonts.css','ui-fixes.css','dashboard-home.css','academic-oversight.css','mobile-shell.css'];
+ const version='20261023-r6.9.2.38';let source;const scripts=['permissions.js','study-model.js','dashboard-home-model.js','dashboard-home.js'],sheets=['tailwind-3.4.17.min.css','fonts.css','ui-fixes.css','dashboard-home.css','academic-oversight.css','mobile-shell.css'];
  let logoData;const logo=()=>logoData||(logoData=fetch('/CITL.png').then(r=>{if(!r.ok)throw Error('logo');return r.blob()}).then(blob=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob)})).catch(e=>{logoData=null;throw e}));
  const safeJSON=v=>JSON.stringify(v).replace(/</g,'\\u003c');
  async function template(){if(!source)source=Promise.all(['/dashboard/?preview-template='+version,'/assets/academic-oversight.js?v='+version,...[...scripts,...sheets].map(f=>'/assets/'+f+'?v='+version)].map(url=>fetch(url,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('template');return r.text();}))).catch(e=>{source=null;throw e;});return source;}
@@ -12,7 +12,7 @@
   for(const part of parts){part.querySelectorAll('script,iframe,form,dialog').forEach(x=>x.remove());for(const e of [part,...part.querySelectorAll('*')]){const action=e.getAttribute('onclick')||'';
    if(/notif/i.test(action))e.dataset.previewTab='notifications';else if(/profile/i.test(action))e.dataset.previewTab='profile';else if(/logout/i.test(action))e.dataset.previewExit='true';else if(/MobileMenu/i.test(action))e.dataset.previewMenu='true';else if(/Admin/i.test(action))e.dataset.previewTab='profile';
    for(const a of [...e.attributes])if(a.name.startsWith('on'))e.removeAttribute(a.name);
-   if(e.tagName==='A'){const path=e.getAttribute('href')||'';e.dataset.previewTab=path.includes('schedules')?'schedule':path.includes('smrm')?'bookings':'profile';e.setAttribute('href','#');e.removeAttribute('target');}
+   if(e.tagName==='A'){const path=e.getAttribute('href')||'';e.dataset.previewTab=path.includes('schedules')?'schedules-page':path.includes('smrm')?'rooms-page':'profile';e.setAttribute('href','#');e.removeAttribute('target');}
   }}
   for(const id of ['profile-name','profile-name-mob']){const e=doc.getElementById(id);if(e)e.textContent=snapshot.profile.full_name||snapshot.profile.email;}
   for(const id of ['profile-role','profile-role-mob']){const e=doc.getElementById(id);if(e)e.textContent=snapshot.profile.position||'';}

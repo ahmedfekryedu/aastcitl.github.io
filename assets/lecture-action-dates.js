@@ -14,7 +14,7 @@
   host.hidden=false;host.replaceChildren();
   const heading=document.createElement('strong');heading.textContent='موعد الإجراء — الأسبوع السابق والأربعة أسابيع القادمة';host.append(heading);
   const grid=document.createElement('div');grid.className='citl-action-date-grid';host.append(grid);
-  for(const date of data.dates||[]){const b=document.createElement('button');b.type='button';b.textContent=label(date)+(date<data.today?" — موعد سابق":"");b.setAttribute('aria-pressed',String(date===data.selected));
+  for(const date of data.dates||[]){const b=document.createElement('button');b.type='button';b.textContent=label(date)+(date<new Date(new Date(data.today+'T12:00:00Z').getTime()-7*86400000).toISOString().slice(0,10)?' — إتاحة استثنائية من المدير':'')+(date<data.today?" — موعد سابق":"");b.setAttribute('aria-pressed',String(date===data.selected));
    b.onclick=()=>change(date);grid.append(b);}
   if(!data.dates?.length){const p=document.createElement('p');p.textContent='لا توجد مواعيد متاحة ضمن الأسبوع السابق والأربعة أسابيع القادمة.';host.append(p);}
   if(data.manager){const wrap=document.createElement('label');wrap.textContent='للمدير أو المفوّض: اختر موعدًا آخر من بداية الترم';const input=document.createElement('input');input.type='date';input.min=data.starts_on;if(data.ends_on)input.max=data.ends_on;input.value=data.selected||'';

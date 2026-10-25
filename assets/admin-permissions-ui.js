@@ -4,6 +4,7 @@
   const current = () => root.currentUser;
   const can = capability => permissions.can(current(), capability);
   function tabAllowed(tab) {
+    if (tab === 'whatsapp') return can('can_manage_whatsapp');
     if (tab === 'room-monitor') return can('can_monitor_rooms');
     if (tab === 'service-availability') return can('can_manage_settings');
     if (tab === 'registration-codes') return false;
@@ -27,7 +28,7 @@
   }
   root.addEventListener('citl-profile-loaded',refreshTabs);
   // Order shared static and lazily mounted tabs without changing their permissions.
-  const tabOrder=['users','directory','settings','meetings','rooms','room-monitor','news','term-schedules','announcements','academic-review','academic-actions','activity-history','my-bookings'];
+  const tabOrder=['users','directory','settings','meetings','rooms','room-monitor','news','term-schedules','announcements','whatsapp','academic-review','academic-actions','activity-history','my-bookings'];
   function orderTabs(){
     const parent=document.querySelector('#admin-panel-modal .admin-tab')?.parentElement;if(!parent)return;
     const tabs=[...parent.children].filter(e=>e.classList.contains('admin-tab'));

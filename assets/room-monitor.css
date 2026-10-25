@@ -1,4 +1,13 @@
 #admin-room-monitor-tab{min-width:0;color:#2a3475;font-family:Cairo,sans-serif}
+.monitor-change-preview{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.monitor-change-badge{padding:5px 8px;border:1px solid #ead7ac;border-radius:7px;background:#fff8e8;color:#775416;font-size:11px;line-height:1.8;overflow-wrap:anywhere;text-align:start}
+.monitor-change-badge.cancel{background:#fff1f0;border-color:#f1d1cf;color:#9f3330}
+.monitor-details .monitor-action-card{padding:12px;border:1px solid #dfe4ee;border-inline-start:3px solid #efa722;border-radius:9px;margin-bottom:8px;background:#f9faff}
+.monitor-details .monitor-action-card.cancel{border-inline-start-color:#b94a48;background:#fff9f8}
+.monitor-action-direction{font-size:12px;font-weight:700;line-height:1.9;margin:5px 0;color:#2a3475}
+.monitor-action-card dl{margin:8px 0;display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.monitor-action-card dl>div{min-width:0}.monitor-action-card dl>div:last-child{grid-column:1/-1}
+.monitor-action-card dt{font-size:10px;color:#68748d}.monitor-action-card dd{font-size:12px;line-height:1.8;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 #admin-room-monitor-tab>h2{font-size:20px;font-weight:900;margin:0 0 6px}
 #admin-room-monitor-tab>p{font-size:12px;color:#64748b;margin:8px 0;line-height:1.8}
 .citl-monitor-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0;padding:16px;border:1px solid #e3e7ef;border-radius:12px;background:#f8f9fc}

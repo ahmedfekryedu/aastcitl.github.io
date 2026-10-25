@@ -244,7 +244,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
     // Exact minute boundaries keep 08:30–10:20 lectures out of the 08:00 slot.
     const academic=window.CITLAcademicBooking;
-    const calendarMeetings=meetings.filter(m=>!currentRoomId||String(m.room_id)===String(currentRoomId));
+    const calendarMeetings=meetings.filter(m=>m.booking_type!=='lecture'&&(!currentRoomId||String(m.room_id)===String(currentRoomId)));
     const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,calendarMeetings,!!currentRoom?.academic_room_name);
     const covered=new Map();
     const meetingAt=(date,slot)=>calendarMeetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
@@ -404,7 +404,7 @@ function toArabicNum(str) {
     // 2. التحويل: الآن حتى لو القيمة 0 (رقم)، سيتم تحويلها لنص ثم لـ "٠"
     return str.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
 }
-function renderUpcoming(){const host=document.getElementById('ai-suggestions');if(!host||root.CITLRoomAvailability?.isFree())return;const now=cairo(),rows=(upcomingRows||[]).filter(m=>(m.date>now.date||(m.date===now.date&&mins(m.end_time)>now.minutes)));
+function renderUpcoming(){const host=document.getElementById('ai-suggestions');if(!host||root.CITLRoomAvailability?.isFree())return;const now=cairo(),rows=(upcomingRows||[]).filter(m=>m.booking_type!=='lecture').filter(m=>(m.date>now.date||(m.date===now.date&&mins(m.end_time)>now.minutes)));
   rows.sort((a,b)=>(a.date+' '+a.start_time).localeCompare(b.date+' '+b.start_time));
   const approved=rows.filter(m=>m.status!=='pending').length;
   const text=rows.length?'<div class="citl-upcoming-summary"><span><strong>مواعيد جميع القاعات</strong><small>مرتبة من الأقرب · مواعيد قادمة حتى خارج الجدول المعروض</small></span><span class="citl-upcoming-count"><b>'+approved+'</b> معتمد'+(rows.length-approved?' · '+(rows.length-approved)+' بانتظار الاعتماد':'')+'</span></div><div class="citl-upcoming-meetings">'+rows.slice(0,visibleUpcoming).map((m,i)=>'<article data-status="'+E(m.status)+'"><button type="button" data-open-booking="'+E(m.id)+'"><span class="citl-upcoming-card-top"><small class="citl-upcoming-state">'+E(labels[m.status])+'</small>'+(i===0?'<small class="citl-upcoming-nearest">أقرب موعد</small>':'')+'</span><strong>'+E(m.title)+'</strong><span>'+E(m.rooms?.name||'قاعة')+' · '+E(department(m.department))+'</span><span>'+E(new Date(m.date+'T12:00:00Z').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+'</span><span class="citl-upcoming-time"><bdi>'+E(clock(m.start_time)+' – '+clock(m.end_time))+'</bdi><small>'+E(kind(m))+' · '+E(duration(m.start_time,m.end_time))+'</small></span></button><div class="citl-upcoming-actions"><button type="button" data-detail-booking="'+E(m.id)+'">تفاصيل الحجز</button><button type="button" data-locate-booking="'+E(m.id)+'">عرض في الجدول ←</button></div></article>').join('')+'</div>'+(rows.length>visibleUpcoming?'<button type="button" class="citl-upcoming-more" data-more-bookings>عرض حجوزات أخرى ('+(rows.length-visibleUpcoming)+')</button>':'')+(rows.length===100?'<small class="citl-upcoming-limit">تُعرض أقرب 100 نتيجة. جميع الحجوزات في إدارة الحجوزات.</small>':''):'<div class="citl-admin-empty">لا توجد حجوزات قاعات قادمة متاحة للعرض.</div>';

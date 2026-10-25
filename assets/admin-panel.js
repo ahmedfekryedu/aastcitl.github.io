@@ -1837,10 +1837,12 @@ window.bulkDeleteMeetings = async function() {
 window.rejectMeeting = async function(id) {
  let meetings = window.CITLAdminMeetings || [];
 
-    // التعديل: تغيير نص التنبيه ليكون أكثر دقة
-    const confirmed = await showConfirmDialog('هل تريد رفض هذا الطلب؟\nسيتم إشعار المستخدم بالرفض وبقاء الحجز في سجلاته كمرفوض.',{title:'رفض طلب الحجز',confirmText:'تأكيد الرفض',icon:'fa-times-circle'});
-    if(!confirmed) return;
-    
+    const reason = await new Promise(resolve=>{
+      const d=document.createElement('dialog');d.className='citl-head-dialog citl-ac-dialog';d.dir='rtl';
+      d.innerHTML='<header><strong>سبب رفض الحجز</strong><button type="button" data-close aria-label="إغلاق">×</button></header><form class="citl-ac-body"><label>اكتب السبب ليظهر لصاحب الحجز<textarea required maxlength="2000" rows="4" style="width:100%;margin:12px 0;border:1px solid #d8dce8;border-radius:8px;padding:10px"></textarea></label><button class="citl-ac-button" type="submit">تأكيد الرفض وإرسال السبب</button></form>';
+      let result=null;d.onclose=()=>{d.remove();resolve(result);};d.querySelector('[data-close]').onclick=()=>d.close();d.querySelector('form').onsubmit=e=>{e.preventDefault();const t=d.querySelector('textarea');if(!t.value.trim()){t.setCustomValidity('اكتب سبب الرفض');t.reportValidity();t.oninput=()=>t.setCustomValidity('');return;}result=t.value.trim();d.close();};document.body.append(d);d.showModal();
+    });
+    if(!reason)return;
     document.body.style.cursor = 'wait';
     try {
         // 1. الاحتفاظ بالبيانات قبل التحديث لإرسال الإيميل
@@ -1848,7 +1850,7 @@ window.rejectMeeting = async function(id) {
         
         // 2. تحديث الحالة في قاعدة البيانات إلى 'rejected' بدلاً من الحذف النهائي
         const { error } = await supabase.from('meetings')
-            .update({ status: 'rejected' })
+            .update({ status: 'rejected', rejection_reason: reason })
             .eq('id', id);
             
         if(error) throw error;
@@ -1861,7 +1863,8 @@ window.rejectMeeting = async function(id) {
                 "❌ تم رفض طلب الحجز", 
                 `عفواً، تم رفض طلب حجز القاعة لاجتماع: "${meetingToReject.title}".
                 
-                يرجى مراجعة المواعيد المتاحة والمحاولة مرة أخرى.`
+                سبب الرفض: ${reason}
+يرجى مراجعة المواعيد المتاحة والمحاولة مرة أخرى.`
             );
         }
 
@@ -1872,7 +1875,7 @@ window.rejectMeeting = async function(id) {
 
     } catch(err) {
         console.error(err);
-        showNotification('خطأ في الرفض', 'error');
+        showNotification(err.message||'خطأ في الرفض', 'error');
     } finally {
         document.body.style.cursor = 'default';
     }

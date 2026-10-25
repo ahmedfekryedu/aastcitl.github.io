@@ -616,7 +616,7 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
 
     // Exact minute boundaries keep 08:30–10:20 lectures out of the 08:00 slot.
     const academic=window.CITLAcademicBooking;
-    const calendarMeetings=meetings.filter(m=>!currentRoomId||String(m.room_id)===String(currentRoomId));
+    const calendarMeetings=meetings.filter(m=>m.booking_type!=='lecture'&&(!currentRoomId||String(m.room_id)===String(currentRoomId)));
     const intervals=academic.timeline(currentRoomId,currentWeekStart,timeSlots,calendarMeetings,!!currentRoom?.academic_room_name);
     const covered=new Map();
     const meetingAt=(date,slot)=>calendarMeetings.find(m=>m.date===academic.dateKey(date)&&timeToMinutes(m.startTime)<slot.end&&timeToMinutes(m.endTime)>slot.start&&['confirmed','modification_requested','cancellation_requested'].includes(m.status));
@@ -2232,7 +2232,7 @@ window.renderAdminMeetingsTable = function(list) {
 
             tr.innerHTML = `
                 <td class="px-6 py-4 font-bold text-gray-800">
-                    ${window.CITLSecure.htmlEscape(m.title)}
+                    ${window.CITLSecure.htmlEscape(m.title)}<small class="block text-xs text-slate-500 mt-1">${m.booking_type==='lecture'?'حجز قاعة لمحاضرة':'حجز قاعة اجتماع'}</small>
                     <div class="mt-1">${statusBadge}</div>
                 </td>
                 <td class="px-6 py-4 text-xs text-gray-600">
@@ -2275,7 +2275,7 @@ window.renderAdminMeetingsTable = function(list) {
             tr.className = 'border-b border-gray-50 hover:bg-gray-50';
             tr.innerHTML = `
                 <td class="px-6 py-4"><input type="checkbox" class="meeting-checkbox rounded border-gray-300" value="${m.id}"></td>
-                <td class="px-6 py-4 font-bold text-[#2A3475] text-sm">${window.CITLSecure.htmlEscape(m.title)}</td>
+                <td class="px-6 py-4 font-bold text-[#2A3475] text-sm">${window.CITLSecure.htmlEscape(m.title)}<small class="block text-xs text-slate-500 mt-1">${m.booking_type==='lecture'?'حجز قاعة لمحاضرة':'حجز قاعة اجتماع'}</small></td>
                 <td class="px-6 py-4 text-xs text-gray-600">${window.CITLSecure.htmlEscape(deptInfo.name)}</td>
                 <td class="px-6 py-4 text-xs text-gray-500">
                     <div>${new Date(m.date).toLocaleDateString('ar-EG')}</div>
@@ -3048,7 +3048,7 @@ function checkUserNotifications() {
                 </div>
                 <div class="flex-1 min-w-0 text-right">
                     <p class="text-[12px] font-bold text-gray-800 leading-tight">${config.title}</p>
-                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">${window.CITLSecure.htmlEscape(m.title)}</p>
+                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">${window.CITLSecure.htmlEscape(m.title)}<small class="block text-xs text-slate-500 mt-1">${m.booking_type==='lecture'?'حجز قاعة لمحاضرة':'حجز قاعة اجتماع'}</small></p>
                     <p class="text-[9px] text-gray-400 mt-1 italic">${new Date(m.date).toLocaleDateString('ar-EG')}</p>
                 </div>
             </div>`;

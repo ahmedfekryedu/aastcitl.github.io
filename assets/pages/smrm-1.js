@@ -1549,6 +1549,7 @@ function editMeeting() {
 
 // Update dashboard (النسخة الذكية المطورة)
         function updateDashboard() {
+            if (window.CITLLeadership) return window.CITLLeadership.load();
             const meetingStats=meetings.filter(m=>m.booking_type!=='lecture');
             // 1. تحديث الأرقام الرئيسية
             document.getElementById('total-meetings').textContent = meetingStats.length;

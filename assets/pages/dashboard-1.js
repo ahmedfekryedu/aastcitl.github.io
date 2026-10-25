@@ -1651,6 +1651,7 @@ function editMeeting() {
 
 // Update dashboard (النسخة الذكية المطورة)
         function updateDashboard() {
+            if (window.CITLLeadership) return window.CITLLeadership.load();
             // 1. تحديث الأرقام الرئيسية
             document.getElementById('total-meetings').textContent = meetings.length;
             

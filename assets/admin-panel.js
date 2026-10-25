@@ -165,7 +165,12 @@ async function updateAdminMeetingsList() {
             filterAdminMeetings('all'); // افتراضياً يعرض الكل
         }
 
+let citlBookingPeriod='all';
 function filterAdminMeetings(type) {
+            if(typeof type==='string')citlBookingPeriod=type;else type=citlBookingPeriod;
+            let kind=document.getElementById('citl-admin-booking-kind');
+            if(!kind){const body=document.getElementById('admin-meetings-list'),section=body?.closest('.admin-tab-content');if(section){const bar=document.createElement('div');bar.className='citl-ac-toolbar';bar.innerHTML='<label>عرض الحجوزات حسب المسار<select id="citl-admin-booking-kind"><option value="all">كل الحجوزات</option><option value="meeting">حجز قاعة اجتماع</option><option value="lecture">حجز قاعة لمحاضرة</option></select></label>';section.prepend(bar);kind=bar.querySelector('select');kind.onchange=()=>filterAdminMeetings(citlBookingPeriod);}}
+
             const meetings = window.CITLAdminMeetings || [];
             // 1. تحديث شكل الأزرار
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -194,7 +199,7 @@ function filterAdminMeetings(type) {
             }
 
             // 3. إعادة رسم الجدول بالبيانات المفلترة
-            renderAdminMeetingsTable(filteredMeetings);
+            renderAdminMeetingsTable(filteredMeetings.filter(m=>!kind||kind.value==='all'||(kind.value==='lecture'?m.booking_type==='lecture':m.booking_type!=='lecture')));
         }
 
 let citlUsersRequest=0;
@@ -673,24 +678,25 @@ async function renderTodayAgenda() {
     try {
         const { data: meetings, error: agendaError } = await supabase
             .from('meetings')
-            .select('*')
+            .select('*, rooms!room_id(name)')
             .eq('date', today)
             .eq('status', 'confirmed')
             .order('start_time', { ascending: true });
 
         if (agendaError) throw agendaError;
 
-        if (!meetings || meetings.length === 0) {
+        const agendaMeetings=(meetings||[]).filter(m=>m.booking_type!=='lecture');
+        if (agendaMeetings.length === 0) {
             body.innerHTML = '<tr><td colspan="3" class="text-center py-20 text-gray-400 font-bold">لا توجد اجتماعات مسجلة لليوم</td></tr>';
             return;
         }
 
-        body.innerHTML = meetings.map(m => `
+        body.innerHTML = agendaMeetings.map(m => `
             <tr class="hover:bg-blue-50/30 transition-colors">
-                <td class="px-6 py-5 font-black text-[#2A3475]">${escapeDirectoryText(m.start_time)}</td>
+                <td class="px-6 py-5 font-black text-[#2A3475]"><bdi>${escapeDirectoryText(String(m.start_time||'').slice(0,5))} – ${escapeDirectoryText(String(m.end_time||'').slice(0,5))}</bdi></td>
                 <td class="px-6 py-5">
                     <div class="font-bold text-slate-800">${escapeDirectoryText(m.title || 'اجتماع مجلس')}</div>
-                    <div class="text-[9px] text-gray-400 uppercase">Council Chamber</div>
+                    <div class="text-[9px] text-gray-400 uppercase">${escapeDirectoryText(m.rooms?.name||'قاعة اجتماع')}</div>
                 </td>
                 <td class="px-6 py-5 text-center">
                     <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black border border-green-100">${window.CITLMeetingEnded(m)?'منتهي':'مؤكد'}</span>

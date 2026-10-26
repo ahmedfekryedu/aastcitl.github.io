@@ -1,5 +1,1 @@
-{
-  "release": "20261025-r6.9.2.52",
-  "built_at": "2026-10-25",
-  "description": "Admin recipient setup, welcome approval and delivery-gated activation"
-}
+{"release":"20261026-r7.3-review","built_at":"2026-10-26","description":"R7.3 review build — additive SQL 098 after verified R7.2 prerequisites; staging required; not deployed"}

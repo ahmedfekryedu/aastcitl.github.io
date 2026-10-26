@@ -226,3 +226,15 @@
 #notif-list .citl-notice-card{border:1px solid #e9d9b4;background:#fffaf0;font-family:Cairo,Tahoma,sans-serif}#notif-list .citl-notice-card[data-read="true"]{background:#fff;border-color:#e2e8f0}#notif-list .citl-notice-message{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 /* Compact notification preview; complete content remains in the opened detail. */
 #notif-list .citl-notice-card{padding:8px 10px;margin-bottom:6px}#notif-list .citl-notice-title{margin-bottom:3px;font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#notif-list .citl-notice-preview{display:grid;gap:2px;color:#475569;font:12px/1.5 Cairo,Tahoma,sans-serif}#notif-list .citl-notice-preview>div{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#notif-list .citl-notice-preview-text>div{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}#notif-list .citl-notice-date{margin-top:4px;padding-top:3px;font-size:10px}
+
+/* R7.3 independent correction review. */
+.citl-r73-correction{box-sizing:border-box;width:min(640px,94vw);max-height:90dvh;padding:0;border:1px solid #dce1ed;border-radius:16px;color:#29316f;box-shadow:0 20px 70px #17204730}
+.citl-r73-correction::backdrop{background:#111a3d88}
+.citl-r73-correction[open]{display:flex;flex-direction:column;overflow:hidden}.citl-r73-correction>header{flex-shrink:0}.citl-r73-correction>header h3{margin:0;font-size:15px;line-height:1.7}.citl-r73-correction .citl-ac-body{min-height:0}
+.citl-r73-correction>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:#2a3475;color:white}
+.citl-r73-correction>header button{width:32px;height:32px;border:1px solid #ffffff60;border-radius:8px;background:transparent;color:white;font-size:24px}
+.citl-r73-correction .citl-ac-body{padding:18px;display:grid;gap:12px;overflow:auto}
+.citl-r73-correction .citl-ac-body p{margin:0;line-height:1.7}.citl-r73-correction label{display:block;line-height:1.7;font-weight:600}
+.citl-r73-correction textarea{display:block;box-sizing:border-box;width:100%;margin-top:6px;min-height:88px;border:1px solid #dce1ed;border-radius:9px;padding:10px;font:inherit;resize:vertical}
+.citl-r73-correction input[type=checkbox]{accent-color:#2a3475;vertical-align:middle;margin-inline-end:6px}.citl-r73-correction [data-feedback]{color:#a92b32}
+.citl-review-badge.invalidated{color:#73420c;background:#fff3df;border:1px solid #f0d4a6}

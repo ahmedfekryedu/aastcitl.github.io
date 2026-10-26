@@ -1,9 +1,9 @@
-const RELEASE = '20261025-r6.9.2.52';
+const RELEASE = '20261026-r7.3-review';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
-  '/assets/whatsapp-admin.js', '/assets/whatsapp-admin.css', '/assets/whatsapp-templates.js',
+  '/assets/whatsapp-center-r7.js', '/assets/whatsapp-v2-preview.js', '/assets/whatsapp-admin.js', '/assets/whatsapp-admin.css', '/assets/whatsapp-templates.js',
   '/assets/member-past-dates.js',
   '/assets/registration-validation.js',
   '/assets/admin-member-registration.js', '/assets/lecture-room-swaps.js', '/assets/lecture-room-swaps.css',

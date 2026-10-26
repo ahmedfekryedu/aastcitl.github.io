@@ -3665,6 +3665,7 @@ async function loadScheduleReports() {
         let query = supabase
             .from('schedule_actions')
             .select('*')
+            .is('invalidated_at', null)
             .order('action_date', { ascending: false })
             .order('created_at', { ascending: false });
 

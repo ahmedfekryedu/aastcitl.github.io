@@ -199,7 +199,7 @@
    host.hidden=!data.allowed;grid.classList.toggle('dh-with-actions',data.allowed);if(host.hidden)return;
    const scope=({college:'الكلية',department:'الجهات التابعة لك',personal:'محاضراتك'})[data.scope]||'';
    const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-   const dailyRows=(data.rows||[]).filter(x=>x.date===today);
+   const dailyRows=(data.rows||[]).filter(x=>x.date===today&&!x.invalidated_at&&x.review?.decision!=='invalidated');
    const note=data.term?'اليوم · '+scope:'لا يوجد ترم دراسي حالي';
    const total=E(dailyRows.filter(x=>x.action_type==='cancel').length),link='<button type="button" class="dh-button" data-workboard aria-label="تفاصيل إجراءات المحاضرات في لوحة التحكم">التفاصيل</button>';
    let markup;
@@ -222,7 +222,7 @@
   let data,selectedTerm=options.term||null,selectedType=options.type||'',search='',serial=0;
   body.innerHTML='<div class="citl-ac-toolbar"><label>الترم<select data-term></select></label><label>نوع الإجراء<select data-type><option value="">كل الإجراءات</option>'+Object.entries(types).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></label><label>بحث<input data-search placeholder="المحاضر أو المادة أو القاعة"></label><button type="button" class="'+btn+' secondary" data-refresh>تحديث</button><button type="button" class="'+btn+'" data-print>طباعة</button></div><p data-scope class="citl-ac-muted"></p><div data-rows>'+skeleton()+'</div><p data-status role="status"></p>';
   const $=s=>body.querySelector(s);$('[data-type]').value=selectedType;
-  const filtered=()=>data.rows.filter(x=>(!selectedType||x.action_type===selectedType)&&(!search||[x.instructor,x.course,x.room,x.actor].join(' ').toLowerCase().includes(search.toLowerCase())));
+  const filtered=()=>data.rows.filter(x=>!x.invalidated_at&&x.review?.decision!=='invalidated'&&(!selectedType||x.action_type===selectedType)&&(!search||[x.instructor,x.course,x.room,x.actor].join(' ').toLowerCase().includes(search.toLowerCase())));
   function draw(){
    const rows=filtered();$('[data-rows]').innerHTML=rows.length?'<div class="citl-ac-table-wrap"><table class="citl-ac-table"><thead><tr><th>التاريخ / المحاضرة</th><th>المحاضر / الجهة</th><th>الإجراء</th><th>مراجعة رئيس الجهة</th><th></th></tr></thead><tbody>'+rows.map(x=>'<tr data-action="'+E(x.id)+'"><td><b>'+E(x.date)+'</b><br>'+E(x.course)+'<small>'+E(x.time)+' · '+E(x.room)+'</small></td><td>'+E(x.instructor)+'<small>'+E(label(x.department))+'</small></td><td>'+E(types[x.action_type])+'<small>بواسطة '+E(x.actor||'—')+'</small></td><td>'+reviewBadge(x.review)+'</td><td><button type="button" data-detail="'+E(x.id)+'" class="'+btn+' secondary">تفاصيل</button></td></tr>').join('')+'</tbody></table></div>':'<div class="citl-admin-empty">لا توجد إجراءات في هذا العرض.</div>';
    body.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{d.close();openWorkboard({action:b.dataset.detail,term:selectedTerm});});

@@ -236,7 +236,7 @@
  }
 
  function renderR73Correction(item,body,refresh){
-  if(item.history?.length){const h=document.createElement('details');h.innerHTML='<summary>تاريخ القرارات والتصحيحات</summary><ol>'+item.history.map(x=>'<li><b>'+E(x.actor_name||x.reviewer_name||'')+'</b> — '+E(x.actor_capacity==='full_admin'||x.reviewer_capacity==='full_admin'?'مدير كامل الصلاحيات':'رئيس القسم')+'<div>'+E(x.operation||x.decision)+' · '+E(stamp(x.created_at||x.decision_at))+'</div><p>'+E(x.reason||x.note||'')+'</p></li>').join('')+'</ol>';body.append(h);}
+  if(item.history?.length){const h=document.createElement('details');h.innerHTML='<summary>تاريخ القرارات والتصحيحات</summary><ol>'+item.history.map(x=>'<li><b>'+E(x.actor_name||x.reviewer_name||'')+'</b> — '+E(x.actor_capacity==='full_admin'||x.reviewer_capacity==='full_admin'?'المدير':'رئيس القسم')+'<div>'+E(x.operation||x.decision)+' · '+E(stamp(x.created_at||x.decision_at))+'</div><p>'+E(x.reason||x.note||'')+'</p></li>').join('')+'</ol>';body.append(h);}
   if(!item.can_invalidate)return;
   const button=document.createElement('button');button.type='button';button.className=btn+' danger';button.textContent='إبطال الإجراء وتصحيح حالة المحاضرة';body.append(button);
   button.onclick=async()=>{button.disabled=true;try{const p=await op('citl_academic_admin','preview',{id:item.id,revision:item.revision});const d=makeDialog('مراجعة إبطال الإجراء — عملية مستقلة');d.classList.add('citl-r73-correction');const box=d.querySelector('.citl-ac-body');

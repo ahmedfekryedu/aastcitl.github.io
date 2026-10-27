@@ -53,7 +53,7 @@
       button.className = `w-full text-right p-3 mb-2 rounded-xl border transition ${item.read_at ? 'bg-white border-gray-100' : 'bg-amber-50 border-amber-200'}`;
       if(item.kind==='admin_announcement'){button.classList.add('citl-administrative-notice');const badge=document.createElement('span');badge.className='citl-administrative-label';badge.textContent='إشعار إداري';button.append(badge);}
       const title = document.createElement('div'); title.className = 'text-sm font-black text-[#2A3475]'; title.textContent = item.title;
-      const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&item.body?.length>180?item.body.slice(0,180)+'…':item.body || '';
+      const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير')?.length>180?(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير').slice(0,180)+'…':(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير') || '';
       const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
       button.append(title, body, date);
       const summary=item.payload?.booking_summary,fields=item.payload?.notice_fields,payload=item.payload?.monitor||item.payload||{};
@@ -70,7 +70,7 @@
       }else if(payload.course_name||payload.room_name){
         lines=[payload.course_name||payload.title,payload.instructor||payload.performed_by||payload.by,join(payload.room_name,shortDate(payload.date),payload.time_slot||payload.time)];
       }else{
-        lines=[String(item.body||'').replace(/\s*\n\s*/g,' · ')];
+        lines=[String((item.body||'').replaceAll('مدير كامل الصلاحيات','المدير')||'').replace(/\s*\n\s*/g,' · ')];
       }
       body.replaceChildren();body.className='citl-notice-preview';
       for(const text of lines.filter(Boolean).slice(0,3)){const line=document.createElement('div');line.textContent=text;body.append(line);}

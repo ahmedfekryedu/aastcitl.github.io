@@ -1,5 +1,5 @@
 {
-  "release": "20261027-r7.3.3-review",
+  "release": "20261027-r7.3.3.5-term-qr",
   "built_at": "2026-10-27",
-  "description": "Review only: nine BOOKING-SAFE template contracts; SQL 102 after verified 101 and conditional 099; explicit transport transition, no deployment"
+  "description": "Cumulative R7.3.3.5: notification/workboard/session fixes, room-move consent, pending review history across terms, fixed QR references/recovery and bulk visitors. Review only."
 }

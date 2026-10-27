@@ -17,7 +17,7 @@
     let timeout;
     try {
       return await Promise.race([
-        window.sb.auth.getSession(),
+        (window.CITLAuth?.session?window.CITLAuth.session().then(session=>({data:{session}})):window.sb.auth.getSession().then(result=>{if(result.error)throw result.error;return result;})),
         new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Presence session timeout')), 8000); })
       ]);
     } finally { clearTimeout(timeout); }

@@ -25,7 +25,7 @@
    select.value=snapshot.terms.some(t=>t.id===selected)?selected:initialLoad?(snapshot.terms.find(t=>t.is_active)?.id||snapshot.terms[0]?.id||''):'';
    if(initialLoad){$('schedule-operation').value=select.value?'update':'new';initialLoad=false;}
    if($('schedule-operation').value==='new')select.value='';dates();
-   $('schedule-current').textContent=`الموجود حاليًا: ${snapshot.study.rows.length} حصة دراسية، ${snapshot.exam.rows.length} امتحان. رفع ملف جديد يحدّث جدول النوع المختار، مع حفظ التقارير والحضور السابق.`;
+   $('schedule-current').textContent=`الموجود حاليًا: ${snapshot.study.rows.length} حصة دراسية، ${snapshot.exam.rows.length} امتحان. رفع ملف جديد يحدّث جدول النوع المختار، مع حفظ التقارير والحضور والإجراءات السابقة ومراجعاتها المعلقة.`;
    renderPauses();
    const box=$('schedule-archives');box.replaceChildren();snapshot.archives.forEach(a=>{
     const button=el('button',`${a.kind==='study'?'دراسة':'امتحانات'} — ${a.row_count} صف — ${new Date(a.archived_at).toLocaleString('ar-EG')}`);button.type='button';button.className='secondary';
@@ -76,7 +76,7 @@
   const d=$('schedule-confirm');d.dataset.action=action;
   pendingPayload={kind:kind(),term:term(),rows:rows,revision:snapshot[kind()].revision,confirm:'CONFIRM',pause:{is_active:$('schedule-exam-pause').checked,starts_on:$('schedule-exam-from').value,ends_on:$('schedule-exam-to').value}};
   const change=M.changes(snapshot[kind()].rows,rows,kind(),$('schedule-term').value);
-  $('schedule-confirm-text').textContent=`نشر ${rows.length} صف في ${kind()==='study'?'الجدول الدراسي':'جدول الامتحانات'} للترم «${term().name||'ترم يبدأ '+term().starts_on}». البداية: ${term().starts_on}. ${change.retained} دون تغيير، ${change.added} جديد أو معدل، ${change.removed} صف يُستبدل. تقارير الحضور محفوظة. هل تؤكد نشر المعاينة؟`;
+  $('schedule-confirm-text').textContent=`نشر ${rows.length} صف في ${kind()==='study'?'الجدول الدراسي':'جدول الامتحانات'} للترم «${term().name||'ترم يبدأ '+term().starts_on}». البداية: ${term().starts_on}. ${change.retained} دون تغيير، ${change.added} جديد أو معدل، ${change.removed} صف يُستبدل. الإجراءات والاعتمادات والحضور السابقة محفوظة بهويتها الأصلية؛ الإجراءات لا تنتقل للحصص المعدلة. هل تؤكد نشر المعاينة؟`;
   if(kind()==='exam'&&$('schedule-exam-pause').checked)$('schedule-confirm-text').textContent+=` إيقاف الدراسة من ${$('schedule-exam-from').value} إلى ${$('schedule-exam-to').value}.`;
   d.showModal();
  }

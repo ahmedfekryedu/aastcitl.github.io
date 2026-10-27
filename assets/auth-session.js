@@ -3,16 +3,22 @@
   let pending, recoveryTimer, recovering = false, verifiedOnce = false;
   let recoveryAttempts = 0;
   let monitoring = false, checkingAccount = false, leaving = false;
-  let refreshing=null;
+  let refreshing=null,sessionRead=null;
   const fault = (message, code) => Object.assign(new Error(message), { code });
+  const temporary=error=>root.CITLAuthClient?.transient(error)||error?.status===429||error?.code==='AUTH_RETRY_LATER';
+  const normalize=error=>root.CITLAuthClient?.normalize(error)||error;
   const facultyPending = profile => ['pending','rejected'].includes(profile?.faculty_verification_status) || (['faculty','visiting_lecturer'].includes(profile?.account_type) && profile.faculty_verification_status !== 'approved');
   const protectedPage = /^\/(dashboard|smrm|schedules|management|attendance|courses)(\/|$)/.test(location.pathname);
-  async function session() {
-    if (!root.sb?.auth) throw fault('عميل تسجيل الدخول غير جاهز', 'CLIENT_NOT_READY');
-    const { data, error } = await root.sb.auth.getSession();
-    if (error) throw error;
-    if (!data.session) throw fault('يلزم تسجيل الدخول', 'AUTH_REQUIRED');
-    return data.session;
+  function session() {
+    if(root.CITLAuthClient?.cooldown()>0)return Promise.reject(root.CITLAuthClient.retryError());
+    if(sessionRead)return sessionRead;
+    sessionRead=(async()=>{
+      if (!root.sb?.auth) throw fault('عميل تسجيل الدخول غير جاهز', 'CLIENT_NOT_READY');
+      const { data, error } = await root.sb.auth.getSession();
+      if (error) throw normalize(error);
+      if (!data?.session) {if(root.CITLAuthClient?.cooldown()>0)throw root.CITLAuthClient.retryError();throw fault('يلزم تسجيل الدخول', 'AUTH_REQUIRED');}
+      return data.session;
+    })().finally(()=>{sessionRead=null;});return sessionRead;
   }
   function loadProfile() {
     if (pending) return pending;
@@ -54,6 +60,7 @@
     return pending;
   }
   function redirectIfSignedOut(error) {
+    if(temporary(error)||root.CITLAuthClient?.cooldown()>0)return false;
     const missing=error?.name==='AuthSessionMissingError'||error?.code==='refresh_token_already_used'||error?.code==='bad_jwt';
     if (!missing&&!['AUTH_REQUIRED','PROFILE_MISSING','user_not_found','session_not_found','refresh_token_not_found'].includes(error?.code)) return false;
     if (leaving) return true;
@@ -66,11 +73,13 @@
     return true;
   }
   async function verifyAuthUser() {
+    if(root.CITLAuthClient?.cooldown()>0)throw root.CITLAuthClient.retryError();
     let result = await root.sb.auth.getUser();
+    if(result.error&&temporary(result.error))throw normalize(result.error);
     if(result.error&&[401,403].includes(result.error.status)&&!['user_not_found','user_banned'].includes(result.error.code)){
       refreshing ||= root.sb.auth.refreshSession().finally(()=>{refreshing=null;});
       const renewed=await refreshing;
-      if(renewed.error){if(renewed.error.status>=500||renewed.error.name==='AuthRetryableFetchError')throw renewed.error;throw fault('يلزم تسجيل الدخول مجددًا','AUTH_REQUIRED');}
+      if(renewed.error){if(temporary(renewed.error)||renewed.error.status>=500||renewed.error.name==='AuthRetryableFetchError')throw normalize(renewed.error);throw fault('يلزم تسجيل الدخول مجددًا','AUTH_REQUIRED');}
       if(!renewed.data?.session)throw fault('يلزم تسجيل الدخول مجددًا','AUTH_REQUIRED');
       result=await root.sb.auth.getUser();
     }
@@ -81,7 +90,7 @@
     if (!result.data?.user) throw fault('الحساب لم يعد متاحًا', 'AUTH_REQUIRED');
   }
   async function checkAccount() {
-    if (leaving || checkingAccount || !verifiedOnce || navigator.onLine === false || document.hidden) return;
+    if (leaving || checkingAccount || !verifiedOnce || navigator.onLine === false || document.hidden || root.CITLAuthClient?.cooldown()>0) return;
     checkingAccount = true;
     try {
       const current = await session();
@@ -118,7 +127,7 @@
     if (!box) {
       box = document.createElement('div'); box.id = 'citl-connection-recovery'; box.setAttribute('role', 'alert');
       box.style.cssText = 'position:fixed;top:16px;inset-inline:16px;margin:auto;z-index:999999;background:#fff;color:#2a3475;border:1px solid #e2e8f0;border-top:3px solid #f3a628;border-radius:14px;padding:16px;width:calc(100% - 32px);max-width:420px;box-sizing:border-box;box-shadow:0 8px 30px #17255422;direction:rtl;font:13px Cairo,sans-serif';
-      const label = document.createElement('span'); label.textContent = navigator.onLine===false?'الاتصال بالإنترنت غير متاح. سنحاول عند عودته.':'لم يكتمل الاتصال بالحساب. بياناتك محفوظة، ونعيد المحاولة تلقائيًا.';label.style.cssText='display:block;line-height:1.9';
+      const label = document.createElement('span'); label.textContent = temporary(error)?'تأخر تجديد جلسة الدخول مؤقتًا. سنعيد الاتصال تلقائيًا؛ لا تحتاج تسجيل الخروج.':navigator.onLine===false?'الاتصال بالإنترنت غير متاح. سنحاول عند عودته.':'لم يكتمل الاتصال بالحساب. بياناتك محفوظة، ونعيد المحاولة تلقائيًا.';label.style.cssText='display:block;line-height:1.9';
       const button = document.createElement('button'); button.type = 'button'; button.textContent = 'إعادة المحاولة';
       button.style.cssText = 'padding:6px 12px;margin:4px;border:1px solid;border-radius:6px;cursor:pointer';
       button.addEventListener('click', () => { recoveryAttempts = 0; recover(); }); box.append(label, button); document.body.appendChild(box);
@@ -127,10 +136,11 @@
   }
   function scheduleRecovery() {
     clearTimeout(recoveryTimer);
-    if (recoveryAttempts < 5 && navigator.onLine !== false && document.visibilityState !== 'hidden') recoveryTimer = setTimeout(recover, Math.min(60000, 5000 * (recoveryAttempts + 1)));
+    if (recoveryAttempts < 5 && navigator.onLine !== false && document.visibilityState !== 'hidden') recoveryTimer = setTimeout(recover, Math.max(root.CITLAuthClient?.cooldown()||0,Math.min(60000,5000*(recoveryAttempts+1)))+100);
   }
   async function recover() {
     if (recovering || !document.getElementById('citl-connection-recovery')) return;
+    if(root.CITLAuthClient?.cooldown()>0){scheduleRecovery();return;}
     recovering = true; recoveryAttempts++;
     const button=document.querySelector('#citl-connection-recovery button');if(button){button.disabled=true;button.textContent='جاري الاتصال…';}
     const wasInitialized = verifiedOnce;
@@ -144,6 +154,7 @@
     finally { recovering = false; if(button){button.disabled=false;button.textContent='إعادة المحاولة';}if(recoveryAttempts>=5){const label=document.querySelector('#citl-connection-recovery span');if(label)label.textContent='لم نتمكن من الاتصال. تحقق من الإنترنت ثم اضغط إعادة المحاولة.';} }
   }
   root.addEventListener('online', () => { recoveryAttempts = 0; recover(); });
+  root.addEventListener('citl-auth-backoff',()=>showFailure(root.CITLAuthClient.retryError()));
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { if(recoveryAttempts<5)recover(); } });
   root.CITLAuth = Object.freeze({ session, loadProfile, redirectIfSignedOut, showFailure, facultyPending });
 })(window);

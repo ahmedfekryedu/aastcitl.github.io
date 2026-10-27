@@ -1,4 +1,4 @@
-const RELEASE = '20261027-r7.3.3-review';
+const RELEASE = '20261027-r7.3.3.5-term-qr';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
@@ -28,6 +28,7 @@ const ASSETS_TO_CACHE = [
   '/assets/lecture-action-dates.css',
   '/assets/lecture-action-dates.js',
   '/assets/attendance-admin.js',
+  '/assets/attendance-bulk.js', '/assets/attendance-bulk.css',
   '/assets/registration-correction.css',
   '/assets/registration-correction.js',
   '/assets/room-availability.js',
@@ -74,6 +75,7 @@ const ASSETS_TO_CACHE = [
   '/vendor/qrcode-1.5.4.min.js',
   '/security-core.js',
   '/assets/auth-session.js',
+  '/assets/auth-client.js',
   '/assets/data-client.js',
   '/assets/permissions.js',
   '/assets/read-timeout.js',

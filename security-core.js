@@ -75,7 +75,8 @@
       body.replaceChildren();body.className='citl-notice-preview';
       for(const text of lines.filter(Boolean).slice(0,3)){const line=document.createElement('div');line.textContent=text;body.append(line);}
       if(lines.filter(Boolean).length===1)body.classList.add('citl-notice-preview-text');
-      button.addEventListener('click', async () => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();document.getElementById('notif-menu')?.classList.add('hidden');
         if(button.disabled)return;
         button.disabled=true;button.setAttribute('aria-busy','true');
         const wait=setTimeout(()=>window.showLoader?.('جاري فتح الإشعار...'),180);
@@ -99,6 +100,9 @@
   }
 
   async function openSpecialNotice(item){
+    document.getElementById('notif-menu')?.classList.add('hidden');
+    if(item.kind==='schedule_action'&&window.CITLOversight?.openWorkboard){await window.CITLOversight.openWorkboard({action:item.entity_id||item.payload?.action_id});return true;}
+    if(item.kind==='academic_review_result'&&window.CITLOversight?.openWorkboard){await window.CITLOversight.openWorkboard({action:item.payload?.action_id||item.entity_id});return true;}
     if(item.kind==='room_swap'){await window.CITLRoomSwaps.open(item.payload?.swap_id||item.entity_id);return true;}
     if(item.kind==='academic_event'){await window.CITLRoomSwaps.eventNotice(item);return true;}
     if(item.kind==='room_monitor'){
@@ -128,7 +132,7 @@
   function checkUserNotifications(){if(notificationRead)return notificationRead;notificationRead=readUserNotifications().finally(()=>notificationRead=null);return notificationRead;}
   async function readUserNotifications() {
     try {
-      await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
+      await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at||['schedule_action','meeting_request'].includes(x.kind)||(x.kind==='faculty_registration'&&x.payload?.status==='pending')||(x.kind==='room_swap'&&(x.payload?.status||x.payload?.event?.status)==='pending'));
       window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
@@ -161,12 +165,12 @@
   window.visualViewport?.addEventListener('scroll',fitNotifications);
   async function toggleNotifications(options) {
     const menu = document.getElementById('notif-menu'); if (!menu) return;
-    const opening = menu.classList.contains('hidden'); menu.classList.toggle('hidden');
+    const opening = options?.open===true||menu.classList.contains('hidden'); menu.classList.toggle('hidden',!opening);
     if (opening) {
       notificationMode=options?.overdue===true?'overdue':'unread';notificationPage=0;
       fitNotifications();
       const loaded=await checkUserNotifications();fitNotifications();
-      if(options?.overdue===true&&!loaded)throw new Error('تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.');
+      if((options?.open===true||options?.overdue===true)&&!loaded)throw new Error('تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.');
     }
   }
 
@@ -290,6 +294,8 @@
         event: '*', schema: 'public', table: 'citl_notifications', filter: `recipient_id=eq.${current.user.id}`
       }, async (payload) => {
         await checkUserNotifications();
+        const changedNotice=payload.new,decision=changedNotice?.payload?.review?.decision;
+        if((changedNotice?.kind==='schedule_action'&&['approved','not_approved','invalidated'].includes(decision))||(changedNotice?.kind==='academic_event'&&['lecture.review_decided','lecture.action_invalidated'].includes(changedNotice.payload?.event_type)))window.dispatchEvent(new CustomEvent('citl-academic-review-finalized',{detail:{id:changedNotice.entity_id||changedNotice.payload?.action_id}}));
         if(payload.new?.entity_type==='meetings'){
           window.dispatchEvent(new Event('citl-meetings-changed'));
           const n=payload.new,s=n.payload?.booking_summary;
@@ -299,7 +305,7 @@
             const alert=document.createElement('aside');alert.className='citl-live-booking';alert.setAttribute('role','status');
             const title=document.createElement('strong');title.textContent=s.status==='pending'?'تنبيه: طلب حجز قاعة جديد':'تنبيه: تم حجز قاعة الآن';
             const detail=document.createElement('p');detail.textContent=[s.booked_by,s.room_name,s.date,String(s.start_time||'').slice(0,5)+' – '+String(s.end_time||'').slice(0,5)].filter(Boolean).join(' · ');
-            const open=document.createElement('button');open.type='button';open.textContent='فتح تفاصيل الحجز';open.onclick=async()=>{open.disabled=true;try{await window.CITLMeetingUI?.open(n.entity_id,true);alert.remove();}finally{open.disabled=false;}};
+            const open=document.createElement('button');open.type='button';open.textContent='فتح الإشعارات';open.onclick=async event=>{event.stopPropagation();open.disabled=true;try{await toggleNotifications({open:true});alert.remove();}finally{open.disabled=false;}};
             const close=document.createElement('button');close.type='button';close.textContent='إغلاق';close.onclick=()=>alert.remove();alert.append(title,detail,open,close);document.body.append(alert);
             setTimeout(()=>alert.remove(),15000);
           }

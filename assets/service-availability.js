@@ -2,14 +2,17 @@
  'use strict';
  const protectedPage=/^\/(dashboard|smrm|schedules|management|attendance|courses)(\/|$)/.test(location.pathname);
  const maintenance=/^\/maintenance(?:\/|$)/.test(location.pathname),nativeFetch=root.fetch.bind(root);
- let snapshot=null,inflight=null,checked=0,leaving=false,started=false,serviceAuthClient=null;
+ let snapshot=null,inflight=null,checked=0,leaving=false,started=false;
  const style=document.createElement('style');style.textContent='html.citl-services-checking body>*:not(script):not(#citl-service-recovery):not(#citl-connection-recovery):not(#global-loader){visibility:hidden!important}#citl-service-recovery{position:fixed;inset:20% 5% auto;z-index:99999;background:white;border:1px solid #e1e5ef;border-top:4px solid #f3a628;border-radius:16px;padding:28px;text-align:center;color:#2a3475;font-family:Cairo,sans-serif}#citl-service-recovery button,#citl-service-recovery a{display:inline-block;margin:12px;padding:10px 16px;background:#2a3475;color:white;border:0;border-radius:9px}';document.head.append(style);
  if(protectedPage||/^\/(study|today|tv_display)(\/|$)/.test(location.pathname))document.documentElement.classList.add('citl-services-checking');
  function client(){try{if(root.sb?.auth)return root.sb;if(typeof sb!=='undefined'&&sb?.auth)return sb;if(typeof supabaseClient!=='undefined'&&supabaseClient?.auth)return supabaseClient;}catch(_){}return null;}
- async function headers(){const c=client();let session;if(c){const r=await c.auth.getSession();if(r.error)throw r.error;session=r.data?.session;}
-  if(!session){let saved;try{saved=JSON.parse(localStorage.getItem('sb-main-auth')||'null');}catch(_){}if(saved?.access_token){
-   if(root.supabase?.createClient){serviceAuthClient||=root.supabase.createClient(root.CITLServiceConnection.url,root.CITLServiceConnection.key,{auth:{storageKey:'sb-main-auth',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});const r=await serviceAuthClient.auth.getSession();if(r.error)throw r.error;session=r.data?.session;}else session=saved;
-  }}
+ async function headers(){const c=client();let session;
+  if(root.CITLAuthClient?.cooldown()>0)throw root.CITLAuthClient.retryError();
+  if(c){const r=await c.auth.getSession();if(r.error)throw r.error;session=r.data?.session;}
+  else {let saved;try{saved=JSON.parse(localStorage.getItem('sb-main-auth')||'null');}catch(_){}
+   // Read-only bootstrap may use a still-valid credential. Only the main SDK client renews it.
+   if(saved?.access_token){if(!(saved.expires_at>Date.now()/1000))throw Object.assign(Error('جاري تهيئة جلسة الدخول؛ أعد المحاولة بعد اكتمال تحميل الصفحة.'),{code:'CLIENT_NOT_READY'});session=saved;}
+  }
   return {'Content-Type':'application/json',apikey:root.CITLServiceConnection.key,Authorization:'Bearer '+(session?.access_token||root.CITLServiceConnection.key)};
  }
 
@@ -38,7 +41,7 @@
  }
  function routeService(url=new URL(location.href)){return snapshot?.services.find(s=>s.routes.some(r=>matches(r,url)));}
  function block(key){if(leaving||maintenance)return;leaving=true;try{const service=snapshot?.services?.find(x=>x.key===key);if(service)sessionStorage.setItem('citl-maintenance-service',JSON.stringify({...service,checkedAt:Date.now()}));}catch(_){}root.CITLPageBoot?.navigate('جاري تهيئة النظام');const target='/maintenance/?service='+encodeURIComponent(key);if(routeService()?.key===key)location.replace(target);else location.assign(target);}
- function errorView(error){root.CITLPageBoot?.failure();document.documentElement.classList.add('citl-services-checking');let box=document.getElementById('citl-service-recovery');if(!box){box=document.createElement('section');box.id='citl-service-recovery';box.innerHTML='<h2>تعذر الاتصال بالخدمة</h2><p></p><button>إعادة المحاولة</button><a href="'+(protectedPage?'/dashboard/':'/')+'">العودة للصفحة الرئيسية</a>';document.body.append(box);box.querySelector('button').onclick=()=>checkPage(true).catch(errorView);}box.querySelector('p').textContent=error.message||'تعذر الاتصال؛ أعد المحاولة.';}
+ function errorView(error){if(error?.code==='AUTH_RETRY_LATER'&&root.CITLAuth?.showFailure){root.CITLAuth.showFailure(error);return;}root.CITLPageBoot?.failure();document.documentElement.classList.add('citl-services-checking');let box=document.getElementById('citl-service-recovery');if(!box){box=document.createElement('section');box.id='citl-service-recovery';box.innerHTML='<h2>تعذر الاتصال بالخدمة</h2><p></p><button>إعادة المحاولة</button><a href="'+(protectedPage?'/dashboard/':'/')+'">العودة للصفحة الرئيسية</a>';document.body.append(box);box.querySelector('button').onclick=()=>checkPage(true).catch(errorView);}box.querySelector('p').textContent=error.message||'تعذر الاتصال؛ أعد المحاولة.';}
  async function checkPage(force=false){try{await load(force);}catch(error){if(!protectedPage&&!/^\/(study|today|tv_display)(\/|$)/.test(location.pathname)){document.documentElement.classList.remove('citl-services-checking');return true;}throw error;}const s=routeService();if(s&&!s.allowed){block(s.key);return false;}document.documentElement.classList.remove('citl-services-checking');document.getElementById('citl-service-recovery')?.remove();return true;}
  async function enter(key){try{await load();const s=snapshot.services.find(x=>x.key===key);if(!s)throw Error('خدمة غير معروفة');if(!s.allowed){block(key);return false;}return true;}catch(e){errorView(e);return false;}}
  function maintenanceNotice(){const s=routeService();let notice=document.getElementById('citl-maintenance-notice');if(!s||!s.allowed||s.state!=='maintenance'||maintenance){notice?.remove();return;}

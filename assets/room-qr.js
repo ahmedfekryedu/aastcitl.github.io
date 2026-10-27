@@ -7,13 +7,17 @@
  function shell(){
   const host=document.getElementById('fixed-room-qr');if(!host)return null;if(host.dataset.ready)return host;host.dataset.ready='true';
   const title=node('h4','font-black text-[#2A3475] mb-2','QR القاعات');
-  const info=node('p','text-xs text-gray-500 mb-4','الكود ثابت مع تغيير الترم. تغيير الكود أو حذفه يُبطل النسخ القديمة ويحافظ على القاعة والمنتدبين وسجل الحضور.');
+  const info=node('p','text-xs text-gray-500 mb-4','رمز القاعة مثبت عبر تحديثات الجداول والترمات. لكل رمز مرجع ثابت ونسخة استعادة؛ الإيقاف والتفعيل لا يغيّران الرابط المطبوع.');
   const toolbar=node('div','citl-qr-toolbar'),all=node('label','flex gap-2 items-center text-xs font-bold'),input=node('input');input.type='checkbox';input.dataset.selectAll='';all.append(input,document.createTextNode('تحديد الكل'));toolbar.append(all);
   input.onchange=()=>host.querySelectorAll('[data-select-room]').forEach(c=>{c.checked=input.checked;});
-  for(const [action,label] of [['disable','إيقاف المحدد'],['enable','تفعيل المحدد'],['rotate','تغيير أكواد المحدد'],['delete','حذف أكواد المحدد']]){
+  for(const [action,label] of [['disable','إيقاف المحدد'],['enable','تفعيل المحدد']]){
    const b=node('button',buttonClass,label);b.type='button';b.onclick=()=>change(action,[...host.querySelectorAll('[data-select-room]:checked')].map(c=>c.value));toolbar.append(b);
   }
   const refresh=node('button',buttonClass,'تحديث القاعات');refresh.type='button';refresh.onclick=load;toolbar.append(refresh);
+  const backup=node('button',buttonClass,'نسخة استعادة الرموز');backup.type='button';backup.dataset.qrBackup='';backup.onclick=async()=>{if(loading||mutating||exporting)return;mutating=true;busy(host,true);try{const data=await api('backup'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=node('a');a.href=url;a.download='CITL-FIXED-QR-BACKUP.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);host.querySelector('[data-status]').textContent='تم تنزيل نسخة المراجع والروابط الحالية.';}catch(error){host.querySelector('[data-status]').textContent=error.message;}finally{mutating=false;busy(host,false);}};toolbar.append(backup);
+  const restoreFile=node('input');restoreFile.type='file';restoreFile.accept='.json,application/json';restoreFile.hidden=true;
+  const restore=node('button',buttonClass,'استعادة نسخة معروفة');restore.type='button';restore.onclick=()=>restoreFile.click();
+  restoreFile.onchange=async()=>{const file=restoreFile.files[0];if(!file||loading||mutating||exporting)return;mutating=true;busy(host,true);try{if(file.size>2000000)throw Error('ملف الاستعادة أكبر من الحد المسموح');const saved=JSON.parse(await file.text());if(saved.format!=='CITL-FIXED-QR-1'||!Array.isArray(saved.codes))throw Error('ملف الاستعادة غير صالح');const codes=saved.codes.filter(c=>typeof c.token==='string'&&c.token);if(!codes.length)throw Error('لا توجد روابط محفوظة قابلة للاستعادة في هذا الملف');const confirmFn=root.showConfirmDialog||root.showCustomConfirm||(async message=>confirm(message));if(!await confirmFn('مطابقة واستعادة '+codes.length+' رمز معروف؟ لن تتغير هوية القاعات أو حالات تفعيلها الحالية.'))return;const result=await api('restore',{codes,confirm:'RESTORE_KNOWN_QR'});await render(host,await api('list'));host.querySelector('[data-status]').textContent='تم التحقق واستعادة '+result.restored+' رمزًا بنفس المراجع والروابط.';}catch(error){host.querySelector('[data-status]').textContent=error.message;}finally{mutating=false;restoreFile.value='';busy(host,false);}};toolbar.append(restore,restoreFile);
   for(const [selected,text] of [[false,'تنزيل جميع الأكواد PDF'],[true,'تنزيل المحدد PDF']]){const download=node('button',buttonClass,text);download.type='button';download.dataset.qrPdf=selected?'selected':'all';download.onclick=()=>runExport(()=>root.CITLRoomQrExport.pdf(selected?exportRooms.filter(r=>[...host.querySelectorAll('[data-select-room]:checked')].some(c=>c.value===r.room_name)):exportRooms,(i,total)=>{host.querySelector('[data-status]').textContent='جاري تجهيز PDF: '+i+' / '+total;}));toolbar.append(download);}
   const status=node('p','text-xs mb-3');status.dataset.status='';status.setAttribute('role','status');
   const grid=node('div','citl-qr-grid');grid.dataset.grid='';grid.setAttribute('aria-label','أكواد القاعات');skeleton(grid);
@@ -41,6 +45,7 @@
    const label=node('label','flex gap-2 items-center font-black text-[#2A3475] text-sm'),check=node('input');check.type='checkbox';check.dataset.selectRoom='';check.value=room.room_name;check.checked=selected.has(room.room_name);check.setAttribute('aria-label','تحديد '+room.room_name);
    check.onchange=()=>{const all=host.querySelector('[data-select-all]'),checks=[...host.querySelectorAll('[data-select-room]')];all.checked=checks.every(c=>c.checked);all.indeterminate=!all.checked&&checks.some(c=>c.checked);};
    label.append(check,document.createTextNode(room.room_name+(room.deleted?' — الكود محذوف':room.is_active?'':' — متوقف')));card.append(label);
+   if(room.reference_code){const reference=node('p','text-xs text-gray-500',room.reference_code);reference.dir='ltr';reference.dataset.qrReference='';reference.style.cssText='text-align:center;overflow-wrap:anywhere;margin:6px 0';card.append(reference);}
    const space=node('div','citl-qr-space');card.append(space);
    if(room.url&&!room.deleted){
     const canvas=node('canvas');canvas.setAttribute('aria-label','QR '+room.room_name);space.append(canvas);
@@ -58,7 +63,7 @@
    save.onclick=async()=>{if(mutating||loading)return;mutating=true;busy(host,true);try{await api('assign',{room:room.room_name,visitors:[...choices.querySelectorAll('input:checked')].map(x=>x.value)});feedback.textContent='تم حفظ المنتدبين. رمز القاعة لم يتغير.';}catch(error){feedback.textContent=error.message;}finally{mutating=false;busy(host,false);}};
    details.append(choices,save);card.append(details,feedback);
    const actions=node('div','citl-qr-tools');
-   for(const [action,text] of room.deleted?[['rotate','إنشاء كود جديد']]:[[room.is_active?'disable':'enable',room.is_active?'إيقاف':'تفعيل'],['rotate','تغيير الكود'],['delete','حذف الكود']]){
+   for(const [action,text] of room.deleted?[]:[[room.is_active?'disable':'enable',room.is_active?'إيقاف':'تفعيل']]){
     const b=node('button','',text);b.type='button';if(action==='delete')b.dataset.danger='';b.onclick=()=>change(action,[room.room_name]);actions.append(b);
    }card.append(actions);fragment.append(card);
   }

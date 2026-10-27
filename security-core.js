@@ -85,7 +85,7 @@
         let navigating=false;
         try {
           if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
-          if (!item.read_at) await invoke('notifications.read', { ids: [item.id] });
+          if (!item.read_at) { await invoke('notifications.read', { ids: [item.id] }); if(notificationRead)await notificationRead; }
           document.getElementById('notif-menu')?.classList.add('hidden');
           await checkUserNotifications();
           if(window.CITLOversight?.openRegistrationNotice?.(item))return;
@@ -134,7 +134,7 @@
   function checkUserNotifications(){if(notificationRead)return notificationRead;notificationRead=readUserNotifications().finally(()=>notificationRead=null);return notificationRead;}
   async function readUserNotifications() {
     try {
-      await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at||['schedule_action','meeting_request'].includes(x.kind)||(x.kind==='faculty_registration'&&x.payload?.status==='pending')||(x.kind==='room_swap'&&(x.payload?.status||x.payload?.event?.status)==='pending'));
+      await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
       window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
@@ -143,8 +143,8 @@
   }
 
   async function markAllNotificationsRead() {
-    try { await invoke('notifications.read'); document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications();
-      if(window.__citlNotifications?.some(n=>n.kind==='schedule_action'))window.showNotification?.('تم تحديد الإشعارات كمقروءة. طلبات المراجعة تبقى حتى اعتمادها أو عدم اعتمادها.','success');
+    try { await invoke('notifications.read'); if(notificationRead)await notificationRead; document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications();
+      window.showNotification?.('تم تحديد الكل كمقروء','success');
     }
     catch (error) { window.showNotification?.(error.message, 'error'); }
   }

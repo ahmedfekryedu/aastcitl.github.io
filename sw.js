@@ -1,4 +1,4 @@
-const RELEASE = '20261027-r7.3.3.6-inbox-display';
+const RELEASE = '20261027-r7.3.3.7-unread-inbox';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

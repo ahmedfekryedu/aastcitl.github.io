@@ -1,5 +1,5 @@
 {
-  "release": "20261027-r7.3.3.5-term-qr",
+  "release": "20261027-r7.3.3.6-inbox-display",
   "built_at": "2026-10-27",
-  "description": "Cumulative R7.3.3.5: notification/workboard/session fixes, room-move consent, pending review history across terms, fixed QR references/recovery and bulk visitors. Review only."
+  "description": "R7.3.3.6: consistent legacy/current academic inbox display, explicit pending-review label, all cumulative R7.3.3.5 fixes preserved. Review only."
 }

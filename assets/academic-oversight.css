@@ -226,6 +226,7 @@
 #notif-list .citl-notice-card{border:1px solid #e9d9b4;background:#fffaf0;font-family:Cairo,Tahoma,sans-serif}#notif-list .citl-notice-card[data-read="true"]{background:#fff;border-color:#e2e8f0}#notif-list .citl-notice-message{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 /* Compact notification preview; complete content remains in the opened detail. */
 #notif-list .citl-notice-card{padding:8px 10px;margin-bottom:6px}#notif-list .citl-notice-title{margin-bottom:3px;font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#notif-list .citl-notice-preview{display:grid;gap:2px;color:#475569;font:12px/1.5 Cairo,Tahoma,sans-serif}#notif-list .citl-notice-preview>div{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#notif-list .citl-notice-preview-text>div{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}#notif-list .citl-notice-date{margin-top:4px;padding-top:3px;font-size:10px}
+#notif-list .citl-notice-review-state{display:inline-block;vertical-align:middle;margin-inline-start:6px;padding:0 5px;border-radius:4px;color:#805715;background:#fff2d8;font:600 10px/1.7 Cairo,Tahoma,sans-serif;white-space:nowrap}
 
 /* R7.3 independent correction review. */
 .citl-r73-correction{box-sizing:border-box;width:min(640px,94vw);max-height:90dvh;padding:0;border:1px solid #dce1ed;border-radius:16px;color:#29316f;box-shadow:0 20px 70px #17204730}

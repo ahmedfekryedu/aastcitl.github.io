@@ -53,6 +53,7 @@
       button.className = `w-full text-right p-3 mb-2 rounded-xl border transition ${item.read_at ? 'bg-white border-gray-100' : 'bg-amber-50 border-amber-200'}`;
       if(item.kind==='admin_announcement'){button.classList.add('citl-administrative-notice');const badge=document.createElement('span');badge.className='citl-administrative-label';badge.textContent='إشعار إداري';button.append(badge);}
       const title = document.createElement('div'); title.className = 'text-sm font-black text-[#2A3475]'; title.textContent = item.title;
+      if(item.kind==='schedule_action'){const state=document.createElement('small');state.className='citl-notice-review-state';state.textContent='بانتظار القرار';title.append(state);}
       const body = document.createElement('div'); body.className = 'text-xs text-gray-600 mt-1 leading-5'; body.textContent = item.kind==='admin_announcement'&&(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير')?.length>180?(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير').slice(0,180)+'…':(item.body||'').replaceAll('مدير كامل الصلاحيات','المدير') || '';
       const date = document.createElement('div'); date.className = 'text-[10px] text-gray-400 mt-2'; date.textContent = new Date(item.created_at).toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
       button.append(title, body, date);
@@ -66,7 +67,8 @@
         const kind=summary.booking_type==='lecture'?'محاضرة':({meeting:'اجتماع',seminar:'ندوة',event:'فعالية',workshop:'ورشة عمل'}[summary.booking_reason]||'اجتماع');
         lines=[join(kind,summary.booked_by),summary.room_name,join(shortDate(summary.date),[summary.start_time,summary.end_time].filter(Boolean).map(x=>String(x).slice(0,5)).join(' – '))];
       }else if(fields){
-        lines=[fields.course,fields.instructor||fields.actor,join(fields.room,shortDate(fields.date),fields.time)];
+        lines=[fields.course,fields.instructor||(item.kind==='schedule_action'?'المحاضر غير متاح':fields.actor),join(fields.room,shortDate(fields.date),fields.time)];
+        if(item.kind==='schedule_action'&&!fields.course)lines[0]='بيانات المحاضرة غير متاحة؛ افتح تفاصيل الإجراء';
       }else if(payload.course_name||payload.room_name){
         lines=[payload.course_name||payload.title,payload.instructor||payload.performed_by||payload.by,join(payload.room_name,shortDate(payload.date),payload.time_slot||payload.time)];
       }else{
@@ -141,7 +143,9 @@
   }
 
   async function markAllNotificationsRead() {
-    try { await invoke('notifications.read'); document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications(); }
+    try { await invoke('notifications.read'); document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications();
+      if(window.__citlNotifications?.some(n=>n.kind==='schedule_action'))window.showNotification?.('تم تحديد الإشعارات كمقروءة. طلبات المراجعة تبقى حتى اعتمادها أو عدم اعتمادها.','success');
+    }
     catch (error) { window.showNotification?.(error.message, 'error'); }
   }
 

@@ -139,7 +139,7 @@
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
       return true;
-    } catch (error) { if(error.code!=='CITL_TIMEOUT')console.error('notifications:', error);return false; }
+    } catch (error) { if(error.code!=='CITL_TIMEOUT')console.error('notifications:', error);const list=document.getElementById('notif-list');if(list&&!document.getElementById('notif-menu')?.classList.contains('hidden')){list.querySelector('[data-notification-retry]')?.remove();const retry=document.createElement('button');retry.type='button';retry.dataset.notificationRetry='';retry.className='citl-ac-button secondary';retry.textContent='تعذر تحميل الإشعارات — إعادة المحاولة';retry.onclick=async e=>{e.stopPropagation();retry.disabled=true;try{await checkUserNotifications();}finally{retry.disabled=false;}};list.prepend(retry);}return false; }
   }
 
   async function markAllNotificationsRead() {
@@ -169,12 +169,12 @@
   window.visualViewport?.addEventListener('scroll',fitNotifications);
   async function toggleNotifications(options) {
     const menu = document.getElementById('notif-menu'); if (!menu) return;
-    const opening = options?.open===true||menu.classList.contains('hidden'); menu.classList.toggle('hidden',!opening);
+    const opening = options?.open===true||options?.overdue===true||menu.classList.contains('hidden'); menu.classList.toggle('hidden',!opening);
     if (opening) {
       notificationMode=options?.overdue===true?'overdue':'unread';notificationPage=0;
       fitNotifications();
       const loaded=await checkUserNotifications();fitNotifications();
-      if((options?.open===true||options?.overdue===true)&&!loaded)throw new Error('تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.');
+      if((options?.open===true||options?.overdue===true)&&!loaded)throw new Error(notificationMode==='overdue'?'تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.':'تعذر تحميل الإشعارات؛ أعد المحاولة.');
     }
   }
 

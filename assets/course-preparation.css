@@ -1,0 +1,9 @@
+#cm-main .cm-prep-note{padding:10px 14px;border-inline-start:3px solid #f3a628;background:#fff9ed;border-radius:8px;margin-bottom:12px;font-size:13px}
+#cm-main .cm-table td{padding:8px 10px;vertical-align:top;font-size:13px}
+#cm-main .cm-table strong,#cm-main .cm-table small{display:block;line-height:1.65}
+#cm-main .cm-table small{color:#596278;font-size:11px}
+#cm-main .cm-table .cm-btn{margin:3px;padding:5px 9px;font-size:12px}
+#cm-main .cm-filters{grid-template-columns:minmax(180px,1fr) minmax(180px,2fr);gap:12px}
+.cm-dialog form{display:grid;gap:10px}.cm-dialog form label{display:grid;gap:4px}.cm-dialog form input,.cm-dialog form select,.cm-dialog form textarea{padding:8px;border:1px solid #ccd2e2;border-radius:6px;width:100%}.cm-dialog [role=alert]{color:#a11927}
+@media(max-width:600px){#cm-main .cm-filters{grid-template-columns:1fr}#cm-main .cm-table thead{display:none}#cm-main .cm-table,#cm-main .cm-table tbody,#cm-main .cm-table tr,#cm-main .cm-table td{display:block;width:100%}#cm-main .cm-table tr{border:1px solid #dce0eb;border-radius:8px;margin-bottom:8px;background:#fff}#cm-main .cm-table td{border:0;padding:5px 10px}#cm-main .cm-table .cm-btn{min-height:44px}#cm-main .cm-table-wrap{overflow:visible}}
+@media(max-width:600px){#cm-main .cm-table,#cm-main .cm-table td{min-width:0;white-space:normal;overflow-wrap:anywhere}#cm-main .cm-table-wrap{min-width:0;max-width:100%}}

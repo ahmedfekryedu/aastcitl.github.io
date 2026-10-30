@@ -1,0 +1,3477 @@
+[
+  {
+    "id": "SDG-1-1-3-1",
+    "department": "energy-logistics",
+    "course": "Basics of logistics management",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-3-2",
+    "department": "energy-logistics",
+    "course": "Basics of logistics management",
+    "goal": 11,
+    "goal_text": "Goal\n11: Sustainable cities and communities",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-3-3",
+    "department": "energy-logistics",
+    "course": "Basics of logistics management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-5-1",
+    "department": "energy-logistics",
+    "course": "Logistics operations Management",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-5-2",
+    "department": "energy-logistics",
+    "course": "Logistics operations Management",
+    "goal": 11,
+    "goal_text": "Goal\n11: Sustainable cities and communities",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-5-3",
+    "department": "energy-logistics",
+    "course": "Logistics operations Management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-5-4",
+    "department": "energy-logistics",
+    "course": "Logistics operations Management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-7-1",
+    "department": "energy-logistics",
+    "course": "Cost Accounting",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-8-1",
+    "department": "energy-logistics",
+    "course": "Energy Management system",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "week 3: Energy Sources; Non-renewable and Renewable\nenergy sources.",
+    "weeks": [
+      "3"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 8
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-9-1",
+    "department": "energy-logistics",
+    "course": "Energy Management system",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "week 14: Technology impact on energy industry",
+    "weeks": [
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 9
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-10-1",
+    "department": "energy-logistics",
+    "course": "Energy Management system",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week5: Energy Forms & Energy Storage\nWeek 6: Review of Energy Aspects and Factors",
+    "weeks": [
+      "5",
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 10,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 10
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-12-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas operation management",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "Week 1, 2: Oil and gas origin, exploration, and drilling",
+    "weeks": [
+      "1, 2"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 12,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 12
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-13-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas operation management",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "Week 3: Oil and gas production, transportation, and\nrefinery, part 1.\nWeek 4: Oil and gas production, transportation, and\nrefinery, part 2",
+    "weeks": [
+      "3",
+      "4"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 13,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 13
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-14-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas operation management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 8: Oil and gas facility Integrity and risk\nManagement",
+    "weeks": [
+      "8"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 14,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 14
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-1-1-15-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas operation management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 14: Oil and gas facility Integrity and risk\nManagement",
+    "weeks": [
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 1,
+    "source_row": 15,
+    "source_locations": [
+      {
+        "page": 1,
+        "table": 1,
+        "row": 15
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-1-2-1",
+    "department": "energy-logistics",
+    "course": "Oil & Gas supply chain Management",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "Week 3: Operating and Maintenance Cost Reduction.\nWeek 5: Operational Safety and Environmental Risk\nManagement",
+    "weeks": [
+      "3",
+      "5"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-1-3-1",
+    "department": "energy-logistics",
+    "course": "Oil & Gas supply chain Management",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "Week 3, 4: Engineering and Procurement of Equipment\nand Services at Minimum Total Cost and Risk.",
+    "weeks": [
+      "3, 4"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-1-4-1",
+    "department": "energy-logistics",
+    "course": "Oil & Gas supply chain Management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 13: Evaluation of External Forces Affecting week\n14: Supply Chain Sustainability of Oil & Gas Industry",
+    "weeks": [
+      "13",
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-1-6-1",
+    "department": "energy-logistics",
+    "course": "Energy Marketing",
+    "goal": 4,
+    "goal_text": "Goal 4: Quality education",
+    "topic": "Week 9: Foundations of Renewable Energy Marketing.",
+    "weeks": [
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-1-7-1",
+    "department": "energy-logistics",
+    "course": "Energy Marketing",
+    "goal": 8,
+    "goal_text": "GOAL 8: Decent Work and Economic\nGrowth",
+    "topic": "Week 11: Renewable Energy Special Markets and New\nBusiness Models.",
+    "weeks": [
+      "11"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-2-3-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas health safety management",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "week 3: Risk management techniques used in the oil and\ngas industries - Organization safety documented\nevidence.",
+    "weeks": [
+      "3"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 2,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-2-2-4-1",
+    "department": "energy-logistics",
+    "course": "Oil & gas health safety management",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure Goal",
+    "topic": "Week8: Failure modes and safety critical equipment\ncontrols.",
+    "weeks": [
+      "8"
+    ],
+    "irrelevant": false,
+    "source_page": 2,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 2,
+        "table": 2,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-1",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-2",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 8,
+    "goal_text": "GOAL 8: Decent Work and Economic Growth",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-3",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-4",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-5",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-6",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-7",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-8",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-9",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, justice and strong institutions",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-2-10",
+    "department": "energy-logistics",
+    "course": "Graduation project",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnership for the Goals",
+    "topic": "Graduation project ideas",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-3-1",
+    "department": "energy-logistics",
+    "course": "Risk management in energy projects",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "Week 4: Market Risk Measurement, Management, and\nBest Practices for Energy Firms",
+    "weeks": [
+      "4"
+    ],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-4-1",
+    "department": "energy-logistics",
+    "course": "Risk management in energy projects",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "Week 6, 9: Risk Management in Energy-Focused\nCommodity Futures Investing-case study: Creation and\nTransfer of Price Risk in European Energy Markets.",
+    "weeks": [
+      "6, 9"
+    ],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-5-1",
+    "department": "energy-logistics",
+    "course": "Risk management in energy projects",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 11: The Complexities of Trading Regional\nEmission Markets-Climate Risks and Electric Utilities.",
+    "weeks": [
+      "11"
+    ],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-3-1-6-1",
+    "department": "energy-logistics",
+    "course": "Risk management in energy projects",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 13: Carbon Trading-Risks in Renewable Energy\nProjects and their Mitigation.\nWeek 14: Energy and Environmental Hedge funds",
+    "weeks": [
+      "13",
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 3,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 3,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-1-1",
+    "department": "transport-logistics",
+    "course": "Principles of Transport operation",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 2: The role of transport in supply chains",
+    "weeks": [
+      "2"
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-2-1",
+    "department": "transport-logistics",
+    "course": "Principles of Transport operation",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "Week 4 : The role of transport in the planning\nand implementation of world trade",
+    "weeks": [
+      "4 "
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-3-1",
+    "department": "transport-logistics",
+    "course": "Principles of Transport operation",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 5 :Car transport industry\nWeek 6: Railway industry",
+    "weeks": [
+      "5 ",
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-5-1",
+    "department": "transport-logistics",
+    "course": "Transport Economics",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 9 :Maritime Market Cycle\nWeek 10: Maritime Market Equilibrium",
+    "weeks": [
+      "9 ",
+      "10"
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-6-1",
+    "department": "transport-logistics",
+    "course": "Transport Economics",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 3 :Risk in Maritime Transport",
+    "weeks": [
+      "3 "
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-7-1",
+    "department": "transport-logistics",
+    "course": "Transport Economics",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Week 4 :Ship operation efficiency",
+    "weeks": [
+      "4 "
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-8-1",
+    "department": "transport-logistics",
+    "course": "Cargo Handling Management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 2 :Cargo security and safety when\nhandling",
+    "weeks": [
+      "2 "
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 8
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-4-2-9-1",
+    "department": "transport-logistics",
+    "course": "Cargo Handling Management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 4: Scientific terms for cargo handling\nWeek 8: Stowage the containers inside the yards\nand on board ships\nWeek 14: Handling of dangerous goods",
+    "weeks": [
+      "4",
+      "8",
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 4,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 4,
+        "table": 2,
+        "row": 9
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-2-1",
+    "department": "transport-logistics",
+    "course": "Port and terminal operation management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "week 1: Transport and International Trade and Basic\nconcepts on ports",
+    "weeks": [
+      "1"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-3-1",
+    "department": "transport-logistics",
+    "course": "Port and terminal operation management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 8: yard Operation.\nWeek 11: operation of container terminals.\nWeek 4 :Port logistics activities\nWeek 9: New technology in port management",
+    "weeks": [
+      "8",
+      "11",
+      "4 ",
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-3-2",
+    "department": "transport-logistics",
+    "course": "Port and terminal operation management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 8: yard Operation.\nWeek 11: operation of container terminals.\nWeek 4 :Port logistics activities\nWeek 9: New technology in port management",
+    "weeks": [
+      "8",
+      "11",
+      "4 ",
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-5-1",
+    "department": "transport-logistics",
+    "course": "Inland Transport management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and\nproduction",
+    "topic": "Week 6: The development of a day-to-day truck\ntransport operation circle to distribution centers",
+    "weeks": [
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-6-1",
+    "department": "transport-logistics",
+    "course": "Inland Transport management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 14: Characteristics of railway planning and Fleet\nmanagement of railways transport",
+    "weeks": [
+      "14"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-7-1",
+    "department": "transport-logistics",
+    "course": "Inland Transport management",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Week 9: Means of inland waterways transport and The\nfactors that affect the inland waterways transport\nWeek 10: The factors that affect the total length and\noverall width of the navigational formation",
+    "weeks": [
+      "9",
+      "10"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-8-1",
+    "department": "transport-logistics",
+    "course": "Inland Transport management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 3: Road transport and the types of roads & safe\ndistance between vehicles\nWeek 4: The road capacity calculations and axle loads\nand truck loads\nWeek 5: The dimensions of vehicles and The\noperational circle of fleet trucking management",
+    "weeks": [
+      "3",
+      "4",
+      "5"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 8
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-10-1",
+    "department": "transport-logistics",
+    "course": "Transport modeling",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 12: Transportation and warehouse problem",
+    "weeks": [
+      "12"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 10,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 10
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-11-1",
+    "department": "transport-logistics",
+    "course": "Transport modeling",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "week 4: Features choose the mode of transport and\nways to allocate traffic",
+    "weeks": [
+      "4"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 11,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 11
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-5-1-12-1",
+    "department": "transport-logistics",
+    "course": "Transport modeling",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "week 3: Structure of classic transport model\nweek 5: Maximum flow\nweek 6: Shortest route",
+    "weeks": [
+      "3",
+      "5",
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 5,
+    "source_row": 12,
+    "source_locations": [
+      {
+        "page": 5,
+        "table": 1,
+        "row": 12
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-1-1-1",
+    "department": "transport-logistics",
+    "course": "Airport & Airlines Management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and\nproduction",
+    "topic": "Week 13: Airline services and pricing system",
+    "weeks": [
+      "13"
+    ],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 1,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-1-2-1",
+    "department": "transport-logistics",
+    "course": "Airport & Airlines Management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 6: Airport Operation Management\nWeek 10 :Air carriers, agents and consolidators",
+    "weeks": [
+      "6",
+      "10 "
+    ],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-1-3-1",
+    "department": "transport-logistics",
+    "course": "Airport & Airlines Management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 2: Economical characteristics and Environmental\nissues\nWeek 4: Air Cargo operations\nWeek 11: Airline Management and Air transport\ndocuments",
+    "weeks": [
+      "2",
+      "4",
+      "11"
+    ],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-1",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-2",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 8,
+    "goal_text": "GOAL 8: Decent Work and Economic Growth",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-3",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-4",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-5",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and\nproduction",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-6",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-7",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-8",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-9",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, justice and strong institutions",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-2-10",
+    "department": "transport-logistics",
+    "course": "Graduation project",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnership for the Goals",
+    "topic": "Graduation project ideas.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-3-1",
+    "department": "transport-logistics",
+    "course": "Multimodal Transport management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and\nproduction",
+    "topic": "Week 4 : Impact of Multimodal transport on\nmarketing and distribution\nWeek 5: Some aspects of the overall distribution\nWeek 6: Economic and commercial impacts on\nthe entry into Multimodal Transport Agreement",
+    "weeks": [
+      "4 ",
+      "5",
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-6-2-4-1",
+    "department": "transport-logistics",
+    "course": "Multimodal Transport management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 7: Comments on the Multimodal\nTransport Agreement",
+    "weeks": [
+      "7"
+    ],
+    "irrelevant": false,
+    "source_page": 6,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 6,
+        "table": 2,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-7-1-1-1",
+    "department": "transport-logistics",
+    "course": "Transport fleet management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and\nproduction",
+    "topic": "Week 1: The role of transport in the supply chain\nand economy",
+    "weeks": [
+      "1"
+    ],
+    "irrelevant": false,
+    "source_page": 7,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 7,
+        "table": 1,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-7-1-2-1",
+    "department": "transport-logistics",
+    "course": "Transport fleet management",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 10: Loads scheduling and controlling\nWeek 13: Drivers management",
+    "weeks": [
+      "10",
+      "13"
+    ],
+    "irrelevant": false,
+    "source_page": 7,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 7,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-7-1-3-1",
+    "department": "transport-logistics",
+    "course": "Transport fleet management",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 2: Characteristics of goods impact on\ntransportation methods\nWeek 4: Activities controlled by the fleet\nmanagement system",
+    "weeks": [
+      "2",
+      "4"
+    ],
+    "irrelevant": false,
+    "source_page": 7,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 7,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-2-1",
+    "department": "trade-logistics",
+    "course": "Cost Accounting",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 3: Optimizing the cost of consumption and\nproduction of raw materials, work in process products and\nfinished goods in terms of obtaining a more sustainable\nconsumption and production patterns.",
+    "weeks": [
+      "3"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-3-1",
+    "department": "trade-logistics",
+    "course": "Financial markets & institutions",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, justice and strong institutions",
+    "topic": "Week 1 “Why Study Financial Markets and Institutions?”:\nSocially responsible investments",
+    "weeks": [
+      "1 "
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-4-1",
+    "department": "trade-logistics",
+    "course": "Financial markets & institutions",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnership for the Goals",
+    "topic": "Week 2 “Overview of the Financial System”: Stakeholders\ncollaborative roles to support the adoption of sustainability\npractices.",
+    "weeks": [
+      "2 "
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-5-1",
+    "department": "trade-logistics",
+    "course": "Human Resources Management",
+    "goal": 3,
+    "goal_text": "Goal 3: Good health and well being",
+    "topic": "Week 11: Employee Safety and Health",
+    "weeks": [
+      "11"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-6-1",
+    "department": "trade-logistics",
+    "course": "Human Resources Management",
+    "goal": 4,
+    "goal_text": "Goal 4 : Quality education",
+    "topic": "Week 9: Training and Developing Employees",
+    "weeks": [
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-7-1",
+    "department": "trade-logistics",
+    "course": "Human Resources Management",
+    "goal": 5,
+    "goal_text": "Goal 5: Gender equality",
+    "topic": "Week 5: Managing careers",
+    "weeks": [
+      "5"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-8-1",
+    "department": "trade-logistics",
+    "course": "Human Resources Management",
+    "goal": 6,
+    "goal_text": "Goal 6: Decent work and Economics Growth",
+    "topic": "Week 9: Managing careers",
+    "weeks": [
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 8
+      }
+    ],
+    "flags": [
+      "SOURCE_GOAL_NUMBER_TITLE_CONFLICT"
+    ],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-9-1",
+    "department": "trade-logistics",
+    "course": "Human Resources Management",
+    "goal": 7,
+    "goal_text": "Goal7: Peace, justice and strong instructions.",
+    "topic": "Week 13: Ethics, Justice, and Fair Treatment in HR\nManagement\nEthics, Justice, and Fair Treatment in HR Management",
+    "weeks": [
+      "13"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 9
+      }
+    ],
+    "flags": [
+      "SOURCE_GOAL_NUMBER_TITLE_CONFLICT"
+    ],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-10-1",
+    "department": "trade-logistics",
+    "course": "Feasibility Study",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 1: Industry Analysis",
+    "weeks": [
+      "1"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 10,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 10
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-11-1",
+    "department": "trade-logistics",
+    "course": "Feasibility Study",
+    "goal": 5,
+    "goal_text": "Goal 5: Gender equality",
+    "topic": "Week 5: Company Design",
+    "weeks": [
+      "5"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 11,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 11
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-8-1-11-2",
+    "department": "trade-logistics",
+    "course": "Feasibility Study",
+    "goal": 6,
+    "goal_text": "Goal 6: Decent work and Economics Growth",
+    "topic": "Week 5: Company Design",
+    "weeks": [
+      "5"
+    ],
+    "irrelevant": false,
+    "source_page": 8,
+    "source_row": 11,
+    "source_locations": [
+      {
+        "page": 8,
+        "table": 1,
+        "row": 11
+      }
+    ],
+    "flags": [
+      "SOURCE_GOAL_NUMBER_TITLE_CONFLICT"
+    ],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-9-1-1-1",
+    "department": "trade-logistics",
+    "course": "Feasibility Study",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate Action",
+    "topic": "Week 10: Managing Supply Chain",
+    "weeks": [
+      "10"
+    ],
+    "irrelevant": false,
+    "source_page": 9,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 9,
+        "table": 1,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-9-1-2-1",
+    "department": "trade-logistics",
+    "course": "Quality Management",
+    "goal": 9,
+    "goal_text": "Goal 9: Industry, Innovation & Infrastructure",
+    "topic": "Week 3 “Differing Perspectives on Quality”:\n• Strategic Management Perspective.",
+    "weeks": [
+      "3 "
+    ],
+    "irrelevant": false,
+    "source_page": 9,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 9,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-9-1-3-1",
+    "department": "trade-logistics",
+    "course": "Quality Management",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible Consumption & Production",
+    "topic": "Week 13 “Strategic Quality Planning”:\n• Quality as a strategy from the perspective of generic\nstrategies, and\n• Quality and Sustainability.",
+    "weeks": [
+      "13 "
+    ],
+    "irrelevant": false,
+    "source_page": 9,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 9,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-9-1-4-1",
+    "department": "trade-logistics",
+    "course": "Quality Management",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnerships for the Goals",
+    "topic": "Week 14 “Quality Management System”:\nPrinciples of Quality Management System: Improvement.",
+    "weeks": [
+      "14 "
+    ],
+    "irrelevant": false,
+    "source_page": 9,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 9,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-9-1-5-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 9,
+    "goal_text": "Goal 9: Industry, Innovation and Infrastructure",
+    "topic": "Week 1: Identifying good opportunities and creating,\ncommunicating, and capturing value from those\nopportunities; including innovation in a corporate context.\nThis clarifies the skills to analyze business opportunities,\nand articulate them as a compelling business description,\nand pitch to an audience of investors, customers, or\nbusiness partners. To bring the real world into the\nclassroom, guest entrepreneurs will come to class and share\ntheir experiences.\nWeek 2: Identifying good opportunities and creating,\ncommunicating, and capturing value from those\nopportunities; including innovation in a corporate context.\nThis clarifies the skills to analyze business opportunities,\nand articulate them as a compelling business description,\nand pitch to an audience of investors, customers, or\nbusiness partners. To bring the real world into the\nclassroom, guest entrepreneurs will come to class and share\ntheir experiences.",
+    "weeks": [
+      "1",
+      "2"
+    ],
+    "irrelevant": false,
+    "source_page": 9,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 9,
+        "table": 1,
+        "row": 5
+      },
+      {
+        "page": 9,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-10-1-1-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 8,
+    "goal_text": "Goal 8: Decent work and Economic Growth",
+    "topic": "Week 3: Collaboration, speaking up, and taking-action in\nsupport of decent work and positive economic\ndevelopment. They can do so by seizing and creating\nchances to design, plan, and implement environmentally\nand socially beneficial entrepreneurial enterprises. This\nnecessitates their ability to think in a methodical manner in\norder to create \"pictures\" of the future in which the\necological, social, and economic consequences of their\nindividual short-term decisions are considered on a global\nand long-term scale. It also necessitates the students' ability\nto promote long-term change processes in order to\ncontribute to a society and economy.\nWeek 4: Collaboration, speaking up, and taking-action in\nsupport of decent work and positive economic\ndevelopment. They can do so by seizing and creating\nchances to design, plan, and implement environmentally\nand socially beneficial entrepreneurial enterprises. This\nnecessitates their ability to think in a methodical manner in\norder to create \"pictures\" of the future in which the\necological, social, and economic consequences of their\nindividual short-term decisions are considered on a global\nand long-term scale. It also necessitates the students' ability\nto promote long-term change processes in order to\ncontribute to a society and economy.",
+    "weeks": [
+      "3",
+      "4"
+    ],
+    "irrelevant": false,
+    "source_page": 10,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 10,
+        "table": 1,
+        "row": 1
+      },
+      {
+        "page": 10,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-10-1-3-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable Cities and Communities",
+    "topic": "Week 5: Implement policies for inclusivity, resource\nefficiency, and catastrophe risk reduction across the\norganization. Devise or join an existing sustainable\ncommunity that includes all stakeholders to examine issues,\ndevelop strategies, and take-action to improve\nfunctionality, resiliency, and long-term sustainability.\nWork with local governments to develop ways to reduce\nthe environmental impact of your company's operations.\nChanges should be made to improve your structures' over\ntime.\nWeek 6: Improve the overall infrastructure sustainability of\nyour buildings, and construct new facilities in accordance\nwith sustainable construction standards.\nEncourage employees to take advantage of public\ntransportation. Build facilities near existing public\ntransportation lines and provide bike racks and incentives\nfor using public transit.",
+    "weeks": [
+      "5",
+      "6"
+    ],
+    "irrelevant": false,
+    "source_page": 10,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 10,
+        "table": 1,
+        "row": 3
+      },
+      {
+        "page": 11,
+        "table": 1,
+        "row": 1
+      },
+      {
+        "page": 11,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-11-1-3-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Week 7: Changing the way we manufacture and use things\nand services from the ground up. The Goal recognizes that\nthe production and consumption of goods and services\ndrives economic progress and increased quality of life, but\nthat we must do it with less natural resources and\nconsequent environmental effect throughout the life cycle.",
+    "weeks": [
+      "7"
+    ],
+    "irrelevant": false,
+    "source_page": 11,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 11,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-11-1-4-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Week 8: Developing technologies, business models and\nservices that society can use to achieve low-emission and\nclimate-resilient sustainable development. It also suggests\nways of encouraging, guiding and supporting entrepreneurs\nin their e orts to innovate climate technologies.",
+    "weeks": [
+      "8"
+    ],
+    "irrelevant": false,
+    "source_page": 11,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 11,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-11-1-5-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Week 9: Supporting the incredible natural assets is the\nonly way to ensure long-term ocean resources. At the same\ntime, we want to ensure that fishing villages have a secure\nfuture. prevent and significantly reduce marine pollution of\nall kinds, in particular from land-based activities, including\nmarine debris and nutrient pollution.",
+    "weeks": [
+      "9"
+    ],
+    "irrelevant": false,
+    "source_page": 11,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 11,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-11-1-6-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Week 10: Managing Forest and desertification are two\nissues that need to be addressed. There are now two\ninternational accords in effect that promote the equitable\nuse of resources. There are also financial investments in\nfavor of biodiversity.",
+    "weeks": [
+      "10"
+    ],
+    "irrelevant": false,
+    "source_page": 11,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 11,
+        "table": 1,
+        "row": 6
+      },
+      {
+        "page": 12,
+        "table": 1,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-12-1-2-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, Justice and strong institutions",
+    "topic": "Week 11: Promoting peaceful and inclusive societies for\nsustainable development, provide access to justice for all\nand build effective, accountable and inclusive institutions\nat all levels.",
+    "weeks": [
+      "11"
+    ],
+    "irrelevant": false,
+    "source_page": 12,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 12,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-12-1-3-1",
+    "department": "trade-logistics",
+    "course": "Innovation and Entrepreneurship",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnership for Goals",
+    "topic": "Week 12: Developing global alliances to support and\nbringing together national governments, the international\ncommunity, civil society, the commercial sector, and other\nstakeholders. Despite success in certain areas, there is still\nwork to be done to expedite progress. All parties involved\nwill need to refocus and redouble their efforts in areas\nwhere development has been slow.",
+    "weeks": [
+      "12"
+    ],
+    "irrelevant": false,
+    "source_page": 12,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 12,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-4-1",
+    "department": "supply-chain",
+    "course": "BASICS OF LOGISTICS MANAGEMENT",
+    "goal": 9,
+    "goal_text": "GoaL 9: Industry, Innovation and Infrastructure",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-5-1",
+    "department": "supply-chain",
+    "course": "BASICS OF LOGISTICS MANAGEMENT",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "• Strategic & Financial Logistics.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 13,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-6-1",
+    "department": "supply-chain",
+    "course": "BASICS OF LOGISTICS MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Logistics system & infrastructure / Elements\nof Logistics Systems.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 13,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-8-1",
+    "department": "supply-chain",
+    "course": "LOGISTICS OPERATIONS MANAGEMENT",
+    "goal": 9,
+    "goal_text": "Goal 9: Industry, Innovation and Infrastructure",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 8
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-9-1",
+    "department": "supply-chain",
+    "course": "LOGISTICS OPERATIONS MANAGEMENT",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 9
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-10-1",
+    "department": "supply-chain",
+    "course": "LOGISTICS OPERATIONS MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Customer Service.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 13,
+    "source_row": 10,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 10
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-12-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Development of supply chain systems\n• Designing and restructuring supply chains\naccording to economic challenges\n• Designing supply chains for service delivery",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 13,
+    "source_row": 12,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 12
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-13-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 13,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 13
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-14-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 14,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 14
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-15-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 15,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 15
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-16-1",
+    "department": "supply-chain",
+    "course": "PROCUREMENT MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Purchasing with Right quality\n• Purchasing in Right quantity",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 13,
+    "source_row": 16,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 16
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-17-1",
+    "department": "supply-chain",
+    "course": "PROCUREMENT MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 17,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 17
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-18-1",
+    "department": "supply-chain",
+    "course": "PROCUREMENT MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 18,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 18
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-13-1-19-1",
+    "department": "supply-chain",
+    "course": "PROCUREMENT MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 13,
+    "source_row": 19,
+    "source_locations": [
+      {
+        "page": 13,
+        "table": 1,
+        "row": 19
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-2-1",
+    "department": "supply-chain",
+    "course": "WAREHOUSE & MATERIALS HANDLING MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Planning and designing the warehouse\nlayout\n• Performance measurement.",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-3-1",
+    "department": "supply-chain",
+    "course": "WAREHOUSE & MATERIALS HANDLING MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 3,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 3
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-4-1",
+    "department": "supply-chain",
+    "course": "WAREHOUSE & MATERIALS HANDLING MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-5-1",
+    "department": "supply-chain",
+    "course": "WAREHOUSE & MATERIALS HANDLING MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-6-1",
+    "department": "supply-chain",
+    "course": "PRODUCTION PLANNING MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Competition, strategic planning and\nproduction planning\n• Planning production capacity for products\nand services\n• Production line designing and the internal\nscheduling of operations\n• Planning and measuring operations\n• Production planning",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-7-1",
+    "department": "supply-chain",
+    "course": "PRODUCTION PLANNING MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-8-1",
+    "department": "supply-chain",
+    "course": "PRODUCTION PLANNING MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 8,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 8
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-9-1",
+    "department": "supply-chain",
+    "course": "PRODUCTION PLANNING MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 9
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-11-1",
+    "department": "supply-chain",
+    "course": "INVENTORY MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 11,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 11
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-12-1",
+    "department": "supply-chain",
+    "course": "INVENTORY MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 12,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 12
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-13-1",
+    "department": "supply-chain",
+    "course": "INVENTORY MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 13,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 13
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-14-1",
+    "department": "supply-chain",
+    "course": "INVENTORY MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 14,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 14
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-16-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 8,
+    "goal_text": "Goal 8: Decent Work and Economic Growth",
+    "topic": "• Green SC Planning\nGreen SC Procurement",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 16,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 16
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-17-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 9,
+    "goal_text": "Goal 9: Industry, Innovation and Infrastructure",
+    "topic": "• Course Introduction in Green and SC\nSustainability",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 17,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 17
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-18-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "• Carbon Management",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 18,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 18
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-19-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Green SC Production",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 14,
+    "source_row": 19,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 19
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-14-1-20-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 14,
+    "source_row": 20,
+    "source_locations": [
+      {
+        "page": 14,
+        "table": 1,
+        "row": 20
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-1-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 1,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 1
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-2-1",
+    "department": "supply-chain",
+    "course": "SUSTAINABLE SUPPLY CHAIN MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 2,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 2
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-4-1",
+    "department": "supply-chain",
+    "course": "DISTRIBUTION MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 4,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 4
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-5-1",
+    "department": "supply-chain",
+    "course": "DISTRIBUTION MANAGEMENT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 5,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 5
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-6-1",
+    "department": "supply-chain",
+    "course": "DISTRIBUTION MANAGEMENT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 6,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 6
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-7-1",
+    "department": "supply-chain",
+    "course": "DISTRIBUTION MANAGEMENT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 7,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 7
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-9-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 7,
+    "goal_text": "Goal 7: Affordable and clean energy",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 9,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 9
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-10-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 8,
+    "goal_text": "GOAL 8: Decent Work and Economic Growth",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 10,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 10
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-11-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 9,
+    "goal_text": "GOAL 9: Industry, Innovation and Infrastructure",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 11,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 11
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-12-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 11,
+    "goal_text": "Goal 11: Sustainable cities and communities",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 12,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 12
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-13-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 13,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 13
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-14-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 14,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 14
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-15-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 15,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 15
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-16-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 16,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 16
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-17-1",
+    "department": "supply-chain",
+    "course": "GRADUATION PROJECT",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, justice and strong institutions",
+    "topic": "• Could be applied to any graduation project\ntopics among departments",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 17,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 17
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-18-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN SYSTEM",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 18,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 18
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-19-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN SYSTEM",
+    "goal": 13,
+    "goal_text": "Goal 13: Climate action",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 19,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 19
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-20-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN SYSTEM",
+    "goal": 14,
+    "goal_text": "Goal 14: Life below water",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 20,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 20
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-21-1",
+    "department": "supply-chain",
+    "course": "SUPPLY CHAIN SYSTEM",
+    "goal": 15,
+    "goal_text": "Goal 15: Life on land",
+    "topic": "Irrelevant",
+    "weeks": [],
+    "irrelevant": true,
+    "source_page": 15,
+    "source_row": 21,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 21
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-22-1",
+    "department": "supply-chain",
+    "course": "CUSTOMER RELATIONSHIP MANAGEMENT",
+    "goal": 12,
+    "goal_text": "Goal 12: Responsible consumption and production",
+    "topic": "• Strategy Development Process",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 22,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 22
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-23-1",
+    "department": "supply-chain",
+    "course": "CUSTOMER RELATIONSHIP MANAGEMENT",
+    "goal": 16,
+    "goal_text": "Goal 16: Peace, justice and strong institutions",
+    "topic": "• The Multi-Channel Integration",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 23,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 23
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  },
+  {
+    "id": "SDG-15-1-24-1",
+    "department": "supply-chain",
+    "course": "CUSTOMER RELATIONSHIP MANAGEMENT",
+    "goal": 17,
+    "goal_text": "Goal 17: Partnership for the Goals",
+    "topic": "• The Multi-Channel Integration",
+    "weeks": [],
+    "irrelevant": false,
+    "source_page": 15,
+    "source_row": 24,
+    "source_locations": [
+      {
+        "page": 15,
+        "table": 1,
+        "row": 24
+      }
+    ],
+    "flags": [],
+    "link_status": "requires_explicit_catalog_link",
+    "source_sha256": "484717385cbbef65f451400e8079ae7583a43d302ccf5a5ada5620fa9adef7eb"
+  }
+]

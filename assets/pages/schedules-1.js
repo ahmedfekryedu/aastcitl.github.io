@@ -1350,25 +1350,14 @@ async function amLoadVisitorAttendance() {
     attendanceManagement.reportScans = [];
     amSetStatus('');
     if (!visitor) { amRenderReports(); return; }
-    if (!visitor.profile_id) { amRenderReports(); return amSetStatus('هذا المنتدب غير مربوط بحساب نظام، لذلك لا يمكن أن يكون له تسجيل حضور', 'error'); }
     attendanceManagement.reportLoading = true; amRenderReports();
     try {
-        if(attendanceManagement.departmentOnly){
-            const result=await amRpc('citl_department_attendance',{p_action:'report',p_payload:{term_id:termId,visitor_id:visitor.id}});
-            attendanceManagement.reportScans=result.scans;return;
-        }
-        const pageSize = 1000; const allScans = [];
+        const pageSize = 1000, allScans = [];
         for (let from = 0; ; from += pageSize) {
-            const { data, error } = await window.supabase
-                .from('attendance_scans')
-                .select('id,lecture_date,room_name,scanned_at,inside_campus,lecturer_profile_id,status,recording_source,admin_reason,revision,visiting_lecture_sessions!inner(term_id,course_name,start_time,end_time)')
-                .eq('lecturer_profile_id', visitor.profile_id)
-                .eq('visiting_lecture_sessions.term_id', termId)
-                .order('scanned_at', { ascending: false })
-                .range(from, from + pageSize - 1);
-            if (error) throw error;
-            allScans.push(...(data || []));
-            if (!data || data.length < pageSize) break;
+            const result=await amRpc('citl_attendance_history_report',{p_term:termId,p_visitor:visitor.id,p_offset:from});
+            const data=result.scans||[];allScans.push(...data);
+            if(data.length<pageSize)break;
+            if(allScans.length>=10000)throw Error('التقرير يتجاوز 10000 واقعة؛ استخدم فلاتر سجل الحضور والتقارير من لوحة الإدارة.');
         }
         attendanceManagement.reportScans = allScans;
         amRenderReports();

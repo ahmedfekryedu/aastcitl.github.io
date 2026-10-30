@@ -29,7 +29,7 @@ async function scan(){
     const out=await Promise.race([work(),new Promise((_,reject)=>{
       timer=setTimeout(()=>{controller.abort();reject(Error('انتهت مهلة الاتصال؛ حاول مرة أخرى. لو تم التسجيل ستظهر رسالة بذلك عند إعادة المحاولة.'));},15000);
     })]);
-    if(out)show(`تم تسجيل الحضور بنجاح: ${out.scan.course_name} – ${out.scan.room_name}`,'success');
+    if(out)show(out.already_saved?'الحضور مسجل بالفعل؛ تم حفظ دليل QR دون تكرار الواقعة.':`تم تسجيل الحضور بنجاح: ${out.scan.course_name} – ${out.scan.room_name}`,'success');
   }catch(error){show(error?.message||'تعذر الاتصال؛ حاول مرة أخرى','error');}
   finally{clearTimeout(timer);busy=false;}
 }

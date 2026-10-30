@@ -5,9 +5,11 @@
  const acknowledged=()=>{try{return sessionStorage.getItem(key(owner))==='1';}catch(_){return false;}};
  const visible=e=>!!e&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=='hidden'&&getComputedStyle(e).display!=='none';
  function close(){clearTimeout(timer);timer=null;document.getElementById('citl-overdue-reminder')?.close();}
+ function reviewing(){return visible(document.getElementById('admin-academic-actions-tab'))||visible(document.getElementById('citl-ac-work-detail'));}
+ function pauseForReview(){close();}
  function show(){
   clearTimeout(timer);timer=null;
-  if(owner!==root.currentUser?.id||!available||acknowledged())return close();
+  if(reviewing()||owner!==root.currentUser?.id||!available||acknowledged())return close();
   if(document.getElementById('citl-overdue-reminder'))return;
   if(document.hidden||document.documentElement.classList.contains('citl-page-booting')||visible(document.getElementById('global-loader'))||[...document.querySelectorAll('dialog[open],.modal,#mobile-menu,#cm-mobile-nav,#notif-menu')].some(visible)){timer=setTimeout(show,1500);return;}
   const d=document.createElement('dialog');d.id='citl-overdue-reminder';d.dir='rtl';d.setAttribute('aria-labelledby','citl-overdue-title');
@@ -32,7 +34,7 @@
   const id=root.currentUser?.id;
   if(!id||!root.sb||root.CITLAuth?.facultyPending?.(root.currentUser)){available=false;close();return;}
   if(owner!==id){close();owner=id;checked=0;available=false;}
-  if(acknowledged()){close();return;}
+  if(reviewing()||acknowledged()){close();return;}
   // The canonical inbox includes already-opened requests which still need a decision.
   if(root.__citlNotifications?.length){available=true;show();return;}
   if(busy||opening||document.hidden||(!force&&Date.now()-checked<60000))return;
@@ -44,7 +46,7 @@
    if(available)show();else close();
   }catch(_){/* A read failure must not interrupt another operation. */}finally{busy=false;}
  }
- root.CITLNotificationReminder=Object.freeze({check});root.CITLPendingApprovalsReminder=Object.freeze({check});
+ root.CITLNotificationReminder=Object.freeze({check,pauseForReview});root.CITLPendingApprovalsReminder=Object.freeze({check,pauseForReview});
  root.addEventListener('citl-profile-loaded',()=>void check(true));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check();});
  setInterval(check,60000);void check();

@@ -1,4 +1,4 @@
-const RELEASE = '20261028-r7.3.3.8-wa-ui';
+const RELEASE = '20261030-courses117-attendance-r8-review';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

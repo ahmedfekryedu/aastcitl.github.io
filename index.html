@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta name="referrer" content="no-referrer">
 <meta name="citl-release" content="20261018-r6.9.1.8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -615,7 +616,14 @@ autoRedirect();
 
                 setTimeout(() => {
                     const requested = new URLSearchParams(window.location.search).get('next') || '/dashboard/';
-                    const safeNext = /^\/[a-z0-9_/?=&.%+-]*$/i.test(requested) ? requested : '/dashboard/';
+                    // Keep external QR entry context, but never permit a cross-origin return URL.
+                    let safeNext = '/dashboard/';
+                    try {
+                        const target = new URL(requested, window.location.origin);
+                        let decodedPath = requested.split('?')[0];
+                        for (let i=0;i<3;i++) decodedPath=decodeURIComponent(decodedPath);
+                        if (/^\/[a-z0-9_/?=&.%+-]*$/i.test(requested) && !/^[/\\]{2}/.test(decodedPath) && !decodedPath.includes('\\') && target.origin === window.location.origin) safeNext = requested;
+                    } catch (_) { /* An invalid return path cannot replace the safe default. */ }
                     window.location.href = safeNext;
                 }, 1000);
 

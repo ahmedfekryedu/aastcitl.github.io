@@ -239,3 +239,19 @@
 .citl-r73-correction textarea{display:block;box-sizing:border-box;width:100%;margin-top:6px;min-height:88px;border:1px solid #dce1ed;border-radius:9px;padding:10px;font:inherit;resize:vertical}
 .citl-r73-correction input[type=checkbox]{accent-color:#2a3475;vertical-align:middle;margin-inline-end:6px}.citl-r73-correction [data-feedback]{color:#a92b32}
 .citl-review-badge.invalidated{color:#73420c;background:#fff3df;border:1px solid #f0d4a6}
+
+/* R8: keep review actions visible without horizontal scrolling on a phone. */
+#admin-academic-actions-tab .citl-inline-review{display:block;margin-top:8px;min-height:40px}
+#citl-ac-work-detail{scroll-margin-top:18px}
+@media(max-width:700px){
+ #admin-academic-actions-tab .citl-ac-table-wrap{overflow:visible}
+ #admin-academic-actions-tab .citl-ac-table,#admin-academic-actions-tab .citl-ac-table tbody{display:block;width:100%;min-width:0!important}
+ #admin-academic-actions-tab .citl-ac-table thead{display:none}
+ #admin-academic-actions-tab .citl-ac-table tr{display:grid;grid-template-columns:minmax(0,1fr);border:1px solid #dfe3ee;border-radius:12px;padding:10px;margin:0 0 10px;background:#fff}
+ #admin-academic-actions-tab .citl-ac-table td{display:block;min-width:0!important;width:auto!important;border:0;padding:5px 0;white-space:normal;overflow-wrap:anywhere}
+ #admin-academic-actions-tab .citl-ac-table tr:nth-child(even){background:#f7f8fc}
+ #admin-academic-actions-tab .citl-ac-table td:last-child button{width:100%;min-height:42px}
+ #admin-academic-actions-tab .citl-ac-details{grid-template-columns:1fr!important;min-width:0}
+ #admin-academic-actions-tab .citl-ac-details dd{overflow-wrap:anywhere;margin:0}
+ #admin-academic-actions-tab .citl-ac-timeline{flex-wrap:wrap}
+}

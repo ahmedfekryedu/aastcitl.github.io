@@ -1,0 +1,4 @@
+(function(root){'use strict';
+ root.CITLAttendanceShell={profile(profile){const manager=!!root.CITLPermissions?.full(profile);document.querySelectorAll('[data-attendance-manager]').forEach(n=>n.hidden=!manager);for(const id of ['profile-name','profile-name-mob']){const n=document.getElementById(id);if(n)n.textContent=profile.full_name||'الحساب';}for(const id of ['profile-role','profile-role-mob']){const n=document.getElementById(id);if(n)n.textContent=manager?'إدارة الحضور':'حضور المحاضرات';}},eligible(value){document.querySelectorAll('[data-attendance-self]').forEach(n=>n.hidden=!value);}};
+ document.querySelectorAll('[data-attendance-logout]').forEach(b=>b.addEventListener('click',async()=>{if(b.disabled)return;b.disabled=true;try{const {error}=await root.sb.auth.signOut({scope:'local'});if(error)throw error;location.assign('/');}catch(e){document.getElementById('ar8-status').textContent='تعذر تسجيل الخروج؛ أعد المحاولة.';b.disabled=false;}}));
+})(window);

@@ -1,7 +1,7 @@
 {
-  "release": "20261104-attendance-refinement-review",
+  "release": "20261104-attendance-shell-r2",
   "built_at": "2026-11-04",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "Attendance interface refinement, active-term filters, department/date summary, non-destructive building archive; requires SQL124"
+  "description": "Attendance official shell, central control navigation, current lecture presentation; retains installed SQL124; no new SQL"
 }

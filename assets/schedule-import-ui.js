@@ -31,7 +31,7 @@
     const button=el('button',`${a.kind==='study'?'دراسة':'امتحانات'} — ${a.row_count} صف — ${new Date(a.archived_at).toLocaleString('ar-EG')}`);button.type='button';button.className='secondary';
     button.onclick=async()=>{button.disabled=true;try{download(`CITL-${a.kind}-${a.id}.json`,JSON.stringify(await api('archive',{id:a.id}),null,2));}catch(e){message(e.message,true);}finally{button.disabled=false;}};
     const item=el('div','');item.className='schedule-archive-item';
-    const remove=el('button','حذف النسخة');remove.type='button';remove.className='danger';remove.dataset.archiveId=a.id;
+    const remove=el('button','حذف الأرشيف نهائيًا');remove.type='button';remove.className='danger';remove.dataset.archiveId=a.id;
     remove.setAttribute('aria-label',`حذف نسخة ${a.kind==='study'?'الدراسة':'الامتحانات'} بتاريخ ${new Date(a.archived_at).toLocaleString('ar-EG')}`);
     remove.onclick=()=>confirmArchiveDelete(a);item.append(button,remove);box.append(item);
    });

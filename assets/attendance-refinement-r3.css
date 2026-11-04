@@ -1,0 +1,43 @@
+/* Scoped attendance controls. Shared chrome belongs to mobile-shell.css. */
+.ar8-visitors .ar8-table td:first-child{min-width:36px;width:42px;text-align:center}
+.ar8-visitors .ar8-table td:nth-child(2){font-weight:800;min-width:180px}
+.ar8-visitors .ar8-table td:last-child{white-space:nowrap}
+.ar8-visitors>.ar8-fields{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ar8-check-label{display:flex!important;flex-direction:row!important;align-items:center;gap:8px!important}
+.ar8-main input[type=checkbox],.citl-bulk-dialog input[type=checkbox]{appearance:auto;flex:none;width:18px!important;height:18px!important;min-height:18px!important;padding:0;margin:0;accent-color:#2a3475;cursor:pointer}
+.ar8-visitor-actions{padding:10px;background:#f5f7fb;border:1px solid #e1e6ef;border-radius:10px}
+.ar8-selection-count{font-size:12px;font-weight:700;margin-inline-end:auto}
+.ar8-batch-all{margin:8px 0 12px;font-size:12px}.ar8-batch-all summary,.ar8-unregistered summary{cursor:pointer;font-weight:800;padding:9px;color:#2a3475}
+.ar8-unregistered{border:1px solid #e1e6ef;border-radius:10px;margin:12px 0;background:#fafbfe}.ar8-unregistered .ar8-table-wrap{margin:8px}
+.ar8-individual>label{margin:12px 0}.ar8-individual>button{margin-bottom:8px}
+.ar8-confirm-dialog{width:560px}.ar8-confirm-dialog details{max-height:180px;overflow:auto;padding:8px;border:1px solid #e1e6ef;border-radius:8px;margin-bottom:12px}.ar8-confirm-dialog textarea{margin-bottom:12px}
+.citl-bulk-dialog{width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:18px!important;color:#263250;box-shadow:0 18px 70px #18234c40}
+.citl-bulk-dialog h3{font-size:18px;font-weight:900;margin:0 0 8px}.citl-bulk-dialog>p{font-size:12px;line-height:1.8;margin:8px 0}
+.citl-bulk-dialog>input,.citl-bulk-dialog>select{margin-bottom:8px;min-height:40px}
+.citl-bulk-all{display:flex!important;flex-direction:row!important;align-items:center;gap:8px!important;background:#eff2f8;border-radius:8px;padding:10px;margin:6px 0}
+.citl-bulk-list{max-height:40dvh;overflow:auto;border:1px solid #e1e6ef;border-radius:10px}
+.citl-bulk-list h4{font-weight:800;padding:10px;background:#f4f6fb;font-size:12px}
+.citl-bulk-option{display:grid!important;grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px!important;padding:10px 12px!important;border-bottom:1px solid #e9ecf3}
+.citl-bulk-option input{margin-top:4px!important}.citl-bulk-option span{min-width:0;overflow-wrap:anywhere}.citl-bulk-option strong{display:block;font-size:13px}.citl-bulk-option small{font-size:11px;color:#68768f}
+.citl-bulk-dialog .citl-ac-buttons{position:sticky;bottom:-18px;background:white;padding:12px 0 0;border-top:1px solid #e1e6ef;display:flex;gap:8px}
+.citl-bulk-dialog .citl-ac-buttons button{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:800;flex:1}
+.citl-bulk-dialog .secondary{background:#f4f6fb;color:#2a3475}
+.citl-qr-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}.citl-qr-card{background:#fff;padding:14px;gap:8px}.citl-qr-card h3{margin:0;font-size:18px;font-weight:900}.citl-qr-card>label{justify-content:flex-start;gap:8px}.citl-qr-space{text-align:center;background:#fafbfe;border-radius:8px;padding:8px}.citl-qr-space canvas{margin:auto;max-width:150px!important;height:auto!important}.citl-qr-card .citl-qr-tools{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}.citl-qr-card p{margin:0;font-size:12px}.citl-qr-card .citl-qr-tools button{font-size:12px;padding:7px 4px;min-height:38px}.citl-qr-card>button{font-size:12px}
+@media(max-width:700px){
+ .ar8-visitors>.ar8-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ar8-visitors .ar8-table tbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;background:#f5f7fb;padding:8px}
+ .ar8-visitors .ar8-table tr{display:grid;grid-template-columns:24px minmax(0,1fr);gap:2px 8px;border:1px solid #e1e6ef;border-radius:10px;background:white;padding:10px}
+ .ar8-visitors .ar8-table td{padding:1px!important;min-width:0!important;width:auto}
+ .ar8-visitors .ar8-table td:first-child{grid-column:1;grid-row:1/4;text-align:start;padding-top:4px!important}
+ .ar8-visitors .ar8-table td:not(:first-child){grid-column:2}
+ .ar8-visitors .ar8-table td:before{display:none}.ar8-visitors .ar8-table td:nth-child(2){font-size:13px;line-height:1.6}
+ .ar8-visitors .ar8-table td:nth-child(3){font-size:10px;color:#68768f}.ar8-visitors .ar8-table td:last-child{white-space:normal;display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+ .ar8-visitors .ar8-table td button{margin:0;min-height:34px;font-size:11px;padding:5px 9px}
+ .ar8-visitors .ar8-unregistered .ar8-table tr{display:block}.ar8-visitors .ar8-unregistered .ar8-table td{display:block}
+ .ar8-visitors .ar8-unregistered .ar8-table td:first-child{width:100%;font-weight:800}
+ .ar8-visitor-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ar8-visitor-actions button{padding:8px;font-size:12px}
+ .citl-bulk-dialog{padding:12px!important}.citl-bulk-dialog .citl-ac-buttons{bottom:-12px}.citl-bulk-dialog h3{font-size:16px}.citl-bulk-option{padding:8px!important}
+ .citl-qr-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.citl-qr-card{padding:12px}.citl-qr-space canvas{max-width:135px!important}
+}
+
+#ar8-tabs button{display:flex;align-items:center;justify-content:center;gap:7px}#ar8-tabs i{font-size:12px;flex:none}

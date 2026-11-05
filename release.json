@@ -1,7 +1,7 @@
 {
-  "release": "20261105-attendance-r3",
+  "release": "20261105-attendance-r5",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "Shared mobile drawer and chrome; typed record filters; scoped bulk visitor management; SQL125 required"
+  "description": "Fresh per-term attendance selection, scoped weekly manual attendance, term-separated reports; SQL126 then127"
 }

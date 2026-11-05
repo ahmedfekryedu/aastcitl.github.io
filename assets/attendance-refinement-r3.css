@@ -41,3 +41,34 @@
 }
 
 #ar8-tabs button{display:flex;align-items:center;justify-content:center;gap:7px}#ar8-tabs i{font-size:12px;flex:none}
+/* R4: scoped attendance surfaces; shared site header/footer remain unchanged. */
+#ar8-content{position:relative;min-height:240px}
+#ar8-content.ar8-loading{pointer-events:none;min-height:320px;overflow:hidden}
+#ar8-content.ar8-loading:after{content:"";position:absolute;inset:0;z-index:1100;border:1px solid #e1e5ed;border-radius:14px;background:linear-gradient(100deg,transparent 25%,#ffffff85 45%,transparent 65%) 0 0/250% 100%,repeating-linear-gradient(to bottom,#e7ebf1 0 36px,#f4f6fa 36px 52px);animation:ar8-shimmer 1.5s linear infinite}
+@keyframes ar8-shimmer{to{background-position:250% 0,0 0}}
+@media(prefers-reduced-motion:reduce){#ar8-content.ar8-loading:after{animation:none}}
+.ar8-panel>h2{padding:10px 12px;border-inline-start:3px solid #f3a628;border-bottom:1px solid #e6eaf2;background:#f7f9fd;border-radius:8px;line-height:1.8;overflow-wrap:anywhere}
+dialog:not(.citl-logout-confirm) .ar8-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:-20px -20px 16px;padding:16px 20px;background:linear-gradient(115deg,#202955,#2a3475);border-bottom:3px solid #f3a628;color:white;border-radius:15px 15px 0 0}
+dialog:not(.citl-logout-confirm) .ar8-dialog-header :is(h2,h3){font-size:16px;color:white;line-height:1.8;margin:0}
+dialog:not(.citl-logout-confirm) .ar8-dialog-header button{background:#ffffff13;border-color:#ffffff40;color:white;flex-shrink:0}
+dialog:not(.citl-logout-confirm){box-shadow:0 24px 80px #10204b35}
+.ar8-confirm-dialog>button{display:block;width:100%;margin-top:10px;white-space:normal;line-height:1.7}
+.ar8-delete-warning{padding:12px;border:1px solid #f0c9c8;border-radius:9px;background:#fff6f5;color:#8e2825;line-height:1.8}
+.ar8-main button.ar8-danger,dialog button.ar8-danger{background:#a43432;color:white;border-color:#a43432}
+.ar8-cell-note{display:block;color:#63718a;font-size:11px;line-height:1.8;margin-top:3px}
+.ar8-room-chips{max-width:350px}.ar8-room-chips .ar8-chip{border:1px solid #dce3f4;background:#f1f4fc;white-space:nowrap;font-weight:700}
+.ar8-building-row strong{display:block;color:#2a3475;font-size:14px}
+.ar8-building-row td{padding-top:14px;padding-bottom:14px}
+.ar8-records .ar8-table td strong{color:#263663}.ar8-report-scope{padding:10px 12px;border-inline-start:3px solid #f3a628;border-radius:8px;background:#f2f5fb;font-weight:700;line-height:1.8}
+.ar8-table button{border-radius:8px}.ar8-table td:last-child{min-width:175px}
+.citl-qr-card{box-shadow:0 3px 12px #26366308;border-top:3px solid #2a3475;background:linear-gradient(#f9faff,white 80px)}
+.citl-qr-card h3{margin:0;padding:8px 0;color:#2a3475;border-bottom:1px solid #e1e6ef;font-size:16px}
+.citl-qr-space{text-align:center;padding:10px;border:1px solid #edf0f5;background:white;border-radius:10px}
+@media(max-width:700px){.ar8-page-heading{align-items:flex-start;gap:8px}.ar8-page-heading p{line-height:1.8}.ar8-panel>h2{padding:8px 10px;font-size:14px;line-height:1.8}.ar8-table td:last-child{min-width:0}.ar8-building-row{border-inline-start:3px solid #2a3475;margin:6px 0;border-radius:8px;background:white!important}.ar8-building-row .ar8-room-chips{display:flex;flex-wrap:wrap;gap:3px}.ar8-building-row .ar8-room-chips:before{width:100%}.ar8-building-row .ar8-chip{margin:2px}.ar8-table button{white-space:normal}.ar8-dialog-header{position:sticky;top:-20px;z-index:2}.ar8-confirm-dialog{width:calc(100vw - 24px)}.ar8-confirm-dialog p{font-size:12px;line-height:1.9}.ar8-records .ar8-table tr{padding:12px;border-bottom:2px solid #e2e7f0}.ar8-records .ar8-table td:first-child{display:flex;align-items:center;gap:8px}.ar8-records .ar8-table td:first-child:before{margin:0}}
+@media print{#ar8-content.ar8-loading:after{display:none}.ar8-cell-note{color:#333}.ar8-table td:last-child{min-width:0}}
+.ar8-scan-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;background:#f4f8f6;border:1px solid #dcebe1;border-radius:9px}.ar8-scan-details small{display:block;color:#64776b;margin-bottom:4px}.ar8-scan-details strong{display:block;font-size:12px;line-height:1.8;color:#24563b}
+@media(max-width:700px){.ar8-scan-details{grid-template-columns:1fr 1fr}.ar8-scan-details>div:last-child{grid-column:1/-1}.ar8-self-history .ar8-table tr{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px}.ar8-self-history .ar8-table td{padding:4px;min-width:0}.ar8-self-history .ar8-table td:first-child{grid-column:1/-1;font-weight:700;color:#2a3475}.ar8-self-history .ar8-table td:last-child{min-width:0}}
+@media(max-width:700px){.ar8-table tr.ar8-building-row{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;padding:10px}.ar8-table .ar8-building-row td{width:auto;padding:4px}.ar8-building-row td:nth-child(1),.ar8-building-row td:nth-child(2),.ar8-building-row td:nth-child(3){grid-column:1/-1}.ar8-building-row td:nth-child(1):before,.ar8-building-row td:nth-child(4):before,.ar8-building-row td:nth-child(5):before{display:none}.ar8-building-row td:nth-child(3){display:flex;align-items:center;gap:8px}.ar8-building-row td:nth-child(4) button,.ar8-building-row td:nth-child(5) button{width:100%;margin:0}.citl-bulk-dialog .ar8-dialog-header{margin:-12px -12px 12px;padding:12px;top:-12px}}
+
+/* R5: term review remains compact for large teaching rosters. */
+.ar8-roster-notice details{max-height:240px;overflow:auto;padding:8px 0}.ar8-roster-notice summary{font-weight:800;cursor:pointer}.ar8-week .ar8-panel{margin-block:12px}.ar8-week .ar8-actions{flex-wrap:wrap}

@@ -1,6 +1,7 @@
 .citl-attendance-nav-link{display:flex;align-items:center;gap:10px;text-decoration:none}
 #attendance-dashboard-actions:empty{display:none}
-#admin-panel-modal .citl-attendance-nav-link{width:100%;text-align:right;white-space:normal}
-#admin-panel-modal .citl-attendance-nav-link i{color:#78849b;background:#f3f5f8;padding:10px;border-radius:10px}
+#admin-panel-modal .citl-attendance-nav-link{width:100%;text-align:right;white-space:normal;gap:12px}
+#admin-panel-modal .citl-attendance-nav-link>i{color:#78849b;background:#f3f5f8;padding:10px;border-radius:10px}
+@media(max-width:767px){#admin-panel-modal .citl-attendance-nav-link{gap:8px}}
 .citl-mobile-toolbar>[data-r8-link=self-header-mobile]{background:#ffffff14;color:white;border:1px solid #ffffff35;border-radius:9px;padding:8px 10px;font:700 11px Cairo,sans-serif;flex-basis:100%;justify-content:center}
 .citl-mobile-toolbar:has(>[data-r8-link=self-header-mobile]){flex-wrap:wrap}

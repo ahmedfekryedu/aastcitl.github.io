@@ -28,7 +28,7 @@
   }
   root.addEventListener('citl-profile-loaded',refreshTabs);
   // Order shared static and lazily mounted tabs without changing their permissions.
-  const tabOrder=['users','directory','settings','meetings','rooms','room-monitor','news','term-schedules','announcements','whatsapp','academic-review','academic-actions','activity-history','my-bookings'];
+  const tabOrder=['users','directory','settings','meetings','rooms','news','term-schedules','announcements','whatsapp','academic-review','academic-actions','activity-history','room-monitor','my-bookings'];
   function orderTabs(){
     const parent=document.querySelector('#admin-panel-modal .admin-tab')?.parentElement;if(!parent)return;
     const tabs=[...parent.children].filter(e=>e.classList.contains('admin-tab'));

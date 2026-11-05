@@ -53,7 +53,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
  function navigate(text){html.classList.add('citl-navigation-loading');show(text);}
  function hide(){html.classList.remove('citl-navigation-loading');if(!done)return;clearTimeout(timer);box.querySelector('button').hidden=true;box.classList.add('hidden','opacity-0');box.classList.remove('flex');}
  d.addEventListener('keydown',function(e){if(!done&&e.key==='Tab'){e.preventDefault();if(!box.querySelector('button').hidden)box.querySelector('button').focus();}},true);
- w.CITLPageBoot=Object.freeze({finish:function(){if(finishing)return;finishing=true;var notice=w.CITLSiteNotice?.refresh();var waitTimer;Promise.race([Promise.resolve(notice),new Promise(function(resolve){waitTimer=setTimeout(resolve,3500);})]).catch(function(){}).finally(function(){clearTimeout(waitTimer);ready=true;check();});},failure:release,show:show,navigate:navigate,hide:hide,isStarting:function(){return !done;}});
+ w.CITLPageBoot=Object.freeze({finish:function(){if(finishing)return;finishing=true;Promise.resolve().then(function(){return w.CITLSiteNotice?.refresh();}).catch(function(){});ready=true;check();},failure:release,show:show,navigate:navigate,hide:hide,isStarting:function(){return !done;}});
  w.addEventListener('citl-profile-loaded',check);
  w.addEventListener('pageshow',function(e){if(e.persisted){hide();check();}});
 })(window,document);
@@ -75,7 +75,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 <link rel="stylesheet" href="/assets/notification-reminder.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/lecture-room-swaps.css?v=20261028-r7.3.3.8-wa-ui">
 <link rel="stylesheet" href="/assets/whatsapp-admin.css?v=20261028-r7.3.3.8-wa-ui">
-<link rel="stylesheet" href="/assets/course-design.css?v=review-117-followup"></head><body>
+<link rel="stylesheet" href="/assets/course-design.css?v=20261105-course-display-129"></head><body>
 
 <script src="/assets/desktop-mode.js"></script>
 <script src="/assets/service-connection.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -182,7 +182,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/security-core.js?v=20261030-courses117-attendance-r8-review"></script>
 <script src="/assets/interface-controls.js"></script><script src="/assets/site-updates.js"></script>
-<script src="/assets/course-model.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/course-monitoring.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/course-model.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/course-monitoring.js?v=20261105-course-display-129"></script><script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/site-notice.js?v=20261028-r7.3.3.8-wa-ui" defer></script>
 <script src="/assets/notification-reminder.js?v=20261030-courses117-attendance-r8-review" defer></script>
 <link rel="stylesheet" href="/assets/room-monitor.css?v=20261028-r7.3.3.8-wa-ui">

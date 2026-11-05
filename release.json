@@ -1,7 +1,7 @@
 {
-  "release": "20261105-attendance-desktop",
+  "release": "20261105-course-display-129",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "Desktop-only attendance workspace and aligned control menu; preserves mobile, login transition fix and SQL128."
+  "description": "Course landing progressive rendering, compact cards, verified lecturer-department display (SQL129), menu order; cumulative SQL128/login/desktop fixes; review only"
 }

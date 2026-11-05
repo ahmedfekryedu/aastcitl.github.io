@@ -63,3 +63,25 @@ body.citl-courses{--course-ink:#2a3475;--course-gold:#f3a628;--course-line:#dfe4
 .op-rollout-preview::backdrop{background:#18234b88}.op-rollout-preview h2{font-size:19px;margin:0 0 12px}.op-rollout-preview p,.op-rollout-preview li{font-size:13px;line-height:1.8}.op-rollout-preview details{margin:10px 0}.op-rollout-preview summary{cursor:pointer;font-weight:700;padding:8px;background:#f3f5fa}
 .op-rollout-preview .p2-table{max-height:260px;overflow:auto}.op-rollout-preview table{width:100%;border-collapse:collapse;font-size:12px}.op-rollout-preview th,.op-rollout-preview td{padding:8px;border-bottom:1px solid #dce2ed;text-align:right;overflow-wrap:anywhere}.op-rollout-preview .op-dialog-actions{display:flex;gap:8px;flex-wrap:wrap;position:sticky;bottom:-18px;background:white;padding:12px 0}.op-rollout-preview button{font-family:inherit;padding:10px 14px;border:1px solid #dce2ed;border-radius:8px;background:#f4f6fa;color:#293471;cursor:pointer}.op-rollout-preview button.p2-primary{background:#293471;color:white}
 @media(max-width:600px){.citl-courses #op-rollout-items,.citl-courses #op-pilot-list{grid-template-columns:1fr;max-height:260px}.op-rollout-preview{padding:12px}.op-rollout-preview .op-dialog-actions button{flex:1;min-height:44px}.citl-courses .op-part-row>*{max-width:100%;white-space:normal;overflow-wrap:anywhere}}
+
+/* Scoped landing-page cards: compact presentation, no workflow or mobile shell changes. */
+.citl-courses .cm-department-group{margin:18px 0 24px}
+.citl-courses .cm-department-group>header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-inline-start:3px solid #f3a628;padding:5px 10px;margin-bottom:10px}
+.citl-courses .cm-department-group>header h2{font-size:15px;font-weight:800;margin:0;line-height:1.7}
+.citl-courses .cm-department-group>header span{font-size:11px;color:#68748c}
+.citl-courses .cm-department-group .cm-grid{align-items:start}
+.citl-courses .cm-course-card{gap:8px;padding:13px;border-top-width:2px;border-radius:10px}
+.citl-courses .cm-course-card h2{font-size:15px;line-height:1.55;margin:0!important}
+.citl-courses .cm-card-top,.citl-courses .cm-card-progress{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11px}
+.citl-courses .cm-card-top .cm-tag{font-size:10px;padding:3px 7px}
+.citl-courses .cm-card-coordinator{font-size:11px;line-height:1.6!important;margin:0!important;color:#68748c}
+.citl-courses .cm-card-details{font-size:11px;border-top:1px solid #edf0f5;padding-top:6px}
+.citl-courses .cm-card-details summary{cursor:pointer;color:#34467c;font-weight:700;padding:3px 0}
+.citl-courses .cm-card-details p{font-size:11px;overflow-wrap:anywhere}
+.citl-courses .cm-course-card .cm-warning{padding:7px;font-size:11px;margin:0;line-height:1.6}
+.citl-courses .cm-course-card>.cm-btn{width:100%;min-height:34px;padding:5px 10px;font-size:11px;margin-top:0}
+@media(min-width:1280px){.citl-courses .cm-department-group .cm-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:768px) and (max-width:1279px){.citl-courses .cm-department-group .cm-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:767px){.citl-courses .cm-department-group>header h2{font-size:13px}.citl-courses .cm-department-group .cm-grid{grid-template-columns:1fr}.citl-courses .cm-course-card{padding:12px}}
+
+.citl-courses .cm-card-progress small{font-size:11px;line-height:1.7}

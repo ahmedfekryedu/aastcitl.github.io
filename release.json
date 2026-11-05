@@ -1,7 +1,7 @@
 {
-  "release": "20261105-attendance-r5-refinement",
+  "release": "20261105-login-transition-fix",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "Preserves R5 hotfix1; location permission guidance, compact attendance layouts, independent term selection, optimized manual attendance; requires SQL128 only after127"
+  "description": "Preserves SQL128 attendance refinement and hotfix1; branded bounded session check without login form flash."
 }

@@ -2,8 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta name="referrer" content="no-referrer">
-<meta name="citl-release" content="20261105-attendance-r5-hotfix1">
+<meta name="citl-release" content="20261105-login-transition-fix">
     <meta charset="UTF-8">
+    <script>document.documentElement.classList.add('citl-login-checking');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
     <meta name="description" content="CITL Smart System — التحكم وإدارة الجداول الدراسية والقاعات، تنظيم الحجوزات، متابعة الحضور والانصراف، وإدارة شاشات الإعلانات.">
@@ -158,6 +159,11 @@
 <script src="/assets/service-connection.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/service-availability.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <style id="citl-login-loader-style">
+/* Hide the public form until the bounded session check completes, never the whole body. */
+html.citl-login-checking body>*:not(script):not(#global-loader){visibility:hidden!important;pointer-events:none!important}
+html.citl-login-checking{overflow:hidden;background:#303c60}
+html.citl-login-checking #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+html.citl-login-checking #global-loader h3,html.citl-login-checking #global-loader p{visibility:visible!important}
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-style:normal;font-weight:200 1000;font-display:block}
 html.citl-page-booting{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;min-height:100%;overflow:hidden!important}
 html.citl-page-booting body{background:#303c60!important}
@@ -491,8 +497,8 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
         </div>
     </div>
 <script>
-// Public login must remain visible even when SDK initialization/refresh never settles.
-// This does not reveal protected dashboard content or discard stored credentials.
+// Keep the branded loader during session checking, with a bounded recovery path.
+// No protected content is revealed and no stored credentials are discarded.
 (function(root){
     let timer,waiting=true;
     function notice(message,retry){
@@ -507,9 +513,11 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
         }
         box.querySelector('span').textContent=message;box.querySelector('button').hidden=!retry;
     }
-    function finish(){waiting=false;clearTimeout(timer);document.body.classList.remove('opacity-0');document.getElementById('citl-login-status')?.remove();}
-    function fail(){waiting=false;clearTimeout(timer);document.body.classList.remove('opacity-0');notice('لم يكتمل التحقق من جلسة الدخول. بياناتك محفوظة؛ أعد المحاولة.',true);}
-    root.CITLLoginEntry={finish,fail,wait:async task=>{let deadline;try{return await Promise.race([Promise.resolve().then(task),new Promise((_,reject)=>{deadline=setTimeout(()=>reject(new Error('LOGIN_ENTRY_TIMEOUT')),8000);})]);}finally{clearTimeout(deadline);}}};
+    function reveal(){document.documentElement.classList.remove('citl-login-checking');document.body.classList.remove('opacity-0');const loader=document.getElementById('global-loader');loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');}
+    function finish(){waiting=false;clearTimeout(timer);reveal();document.getElementById('citl-login-status')?.remove();}
+    function fail(){waiting=false;clearTimeout(timer);reveal();notice('لم يكتمل التحقق من جلسة الدخول. بياناتك محفوظة؛ أعد المحاولة.',true);}
+    function redirecting(){if(!waiting)return false;document.getElementById('loader-text').textContent='جاري فتح النظام…';return true;}
+    root.CITLLoginEntry={finish,fail,redirecting,wait:async task=>{let deadline;try{if(!waiting)throw new Error('LOGIN_ENTRY_TIMEOUT');const value=await Promise.race([Promise.resolve().then(task),new Promise((_,reject)=>{deadline=setTimeout(()=>reject(new Error('LOGIN_ENTRY_TIMEOUT')),8000);})]);if(!waiting)throw new Error('LOGIN_ENTRY_TIMEOUT');return value;}finally{clearTimeout(deadline);}}};
     notice('جارٍ التحقق من جلسة الدخول…',false);
     timer=setTimeout(()=>{if(waiting)fail();},9000);
 })(window);
@@ -552,14 +560,12 @@ async function autoRedirect() {
             return true;
         });
         // Navigation is outside the timed operation: a late response cannot redirect after timeout.
-        window.CITLLoginEntry.finish();
         if (redirect) {
-            // لو مسجل: حوله فوراً والصفحة لسه مخفية
-            window.showLoader?.('جاري فتح النظام…');
+            // Keep the login form hidden throughout navigation; watchdog remains active.
+            if(!window.CITLLoginEntry.redirecting())return;
             window.location.href = '/dashboard/'; 
         } else {
-            // لو مش مسجل: أظهر الصفحة الآن بنعومة
-            document.body.classList.remove('opacity-0');
+            window.CITLLoginEntry.finish();
         }
     } catch (error) {
         console.error("خطأ في التحقق التلقائي:", error);

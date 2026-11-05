@@ -1,4 +1,4 @@
-const RELEASE = '20261105-attendance-r5-refinement';
+const RELEASE = '20261105-login-transition-fix';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

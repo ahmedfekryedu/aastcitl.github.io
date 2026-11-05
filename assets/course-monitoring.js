@@ -2,7 +2,7 @@
  'use strict';
  const M=root.CITLCoursesModel,E=M.escape,app=document.getElementById('cm-app'),status=document.getElementById('cm-status');
  let context,term='',rows=[],total=0,page=0,workspace=null,tab='overview',view='all',busy=false,serial=0;
- let displayEndpointMissing=false;
+ let displayEndpointMissing=false,filterState={},listTimer;
  const rpc=(action,payload={})=>root.CITLRequests.rpc(root.sb,'citl_course_api',{p_action:action,p_payload:payload});
  // Backward-compatible reading only: missing SQL129 never changes existing permissions.
  async function displayList(payload){
@@ -12,7 +12,7 @@
  }
  const teacherDepartments=o=>Array.isArray(o.teacher_departments)?o.teacher_departments.filter(d=>typeof d==='string'&&d.trim()):[];
  const teacherLabel=o=>teacherDepartments(o).map(M.dept).join('، ')||'قسم المحاضرين غير مؤكد';
- const teacherOptions=()=>Object.fromEntries([...new Set(rows.flatMap(teacherDepartments))].sort().map(k=>[k,M.dept(k)]).concat([['__unconfirmed','قسم المحاضرين غير مؤكد']]));
+ const teacherOptions=()=>Object.fromEntries([...new Set(['transport-logistics','trade-logistics','supply-chain','energy-logistics',...rows.flatMap(teacherDepartments)])].sort().map(k=>[k,M.dept(k)]).concat([['__unconfirmed','قسم المحاضرين غير مؤكد']]));
  function updateTeacherFilter(){const el=document.querySelector('#cm-filter [name=teacher_department]');if(!el)return;const value=el.value;el.innerHTML=options(teacherOptions(),value,'كل أقسام المحاضرين');}
  const evidence=(action,data={})=>root.CITLRequests.rpc(root.sb,'citl_course_evidence_api',{p_action:action,p_id:workspace.offering.id,p_data:data});
  const btn=(text,action,secondary=true)=>`<button type="button" class="cm-btn${secondary?' secondary':''}" data-action="${action}">${E(text)}</button>`;
@@ -28,35 +28,36 @@
  const countText=p=>p.due?`<bdi>${p.complete} / ${p.due} = ${p.percent}%</bdi>`:'لا توجد بنود مستحقة حاليًا';
  const summary=data=>{const done=data.reduce((n,o)=>n+o.progress.complete,0),due=data.reduce((n,o)=>n+o.progress.due,0);return `<div class="cm-summary"><div>المقررات المعروضة<strong>${data.length}</strong></div><div>استيفاء المستحق<strong>${due?Math.round(done*100/due)+'%':'—'}</strong><small><bdi>${done} / ${due}</bdi></small></div><div>بنود متأخرة<strong>${data.reduce((n,o)=>n+o.progress.overdue,0)}</strong></div><div>بانتظار المراجعة<strong>${data.filter(o=>['SUBMITTED_TO_DEPARTMENT','DEPARTMENT_APPROVED'].includes(o.state)).length}</strong></div></div>`;};
  function dialog(title,html){const d=document.createElement('dialog');d.className='cm-dialog';d.innerHTML='<header><strong>'+E(title)+'</strong><button data-close aria-label="إغلاق">×</button></header><div class="cm-body">'+html+'</div>';document.body.append(d);d.onclick=e=>{if((e.target===d||e.target.closest('[data-close]'))&&!busy)d.close();};d.addEventListener('close',()=>d.remove());d.addEventListener('cancel',e=>{if(busy)e.preventDefault();});d.showModal();return d;}
- async function run(fn,success='تم الحفظ'){if(busy)return;busy=true;status.textContent='جاري تنفيذ الطلب…';app.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true);try{await fn();status.textContent=success;}catch(e){status.textContent=(e.message||'تعذر الاتصال')+' — إذا انقطع الاتصال أثناء الحفظ حدّث البيانات للتأكد من النتيجة قبل التكرار.';}finally{busy=false;app.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=false);}}
+ async function run(fn,success='تم الحفظ'){if(busy)return;busy=true;status.textContent='جاري تنفيذ الطلب…';app.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true);try{const result=await fn();if(result!==false)status.textContent=success;}catch(e){status.textContent=(e.message||'تعذر الاتصال')+' — إذا انقطع الاتصال أثناء الحفظ حدّث البيانات للتأكد من النتيجة قبل التكرار.';}finally{busy=false;app.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=false);}}
  async function save(action,payload){await rpc(action,{id:workspace.offering.id,revision:workspace.offering.revision,...payload});await openCourse(workspace.offering.id,false);}
  function formData(form){return Object.fromEntries(new FormData(form));}
  function bindForm(form,fn){form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;run(()=>fn(formData(form)));});}
  const accountOptions=()=>Object.fromEntries(context.accounts.map(p=>[p.id,`${p.full_name||p.email} — ${M.dept(p.department)}`]));
  const departmentOptions=()=>Object.fromEntries([...new Set([...(context.accounts||[]).map(p=>p.department),...(context.department_heads||[]).map(p=>p.department),...rows.map(o=>o.department_key),...(context.heads||[])].filter(Boolean))].sort().map(k=>[k,M.dept(k)]));
  async function listCourses(loading=true){
-  const ticket=++serial;workspace=null;rows=[];total=0;if(loading)app.innerHTML=empty('تظهر المقررات تباعًا فور وصولها.');const all=[];let shown=false;
-  try{for(let batch=0;;batch++){
-   const data=await displayList({term_id:term||null,page:batch});if(ticket!==serial)return;
-   all.push(...data.rows);rows=all;total=data.total;
-   if(!shown){page=0;renderList();shown=true;root.CITLPageBoot?.finish();}
-   else if(!workspace&&document.getElementById('cm-list-body')){updateTeacherFilter();if(view!=='admin')renderListBody();}
-   const complete=all.length>=data.total||!data.rows.length;
-   status.textContent=complete?(displayEndpointMissing?'تصنيف المحاضرين يحتاج تحديث القراءة SQL 129.':''):'تم عرض '+all.length+' من '+data.total+' مقررًا — جاري استكمال بقية النتائج…';
-   if(complete)break;
-  }}catch(error){if(ticket!==serial)return;if(shown){error.partialCourses=true;error.message='تم عرض '+all.length+' مقررًا، وتعذر استكمال البقية. اضغط تحديث لإعادة المحاولة. '+error.message;}throw error;}
+  const ticket=++serial;workspace=null;const oldFilter=document.getElementById('cm-filter');if(oldFilter)filterState=formData(oldFilter);rows=[];
+  if(!document.getElementById('cm-list-body')){renderList();}const body=document.getElementById('cm-list-body');body.innerHTML=skeleton();body.setAttribute('aria-busy','true');
+  app.querySelectorAll('[data-action=prev],[data-action=next]').forEach(b=>b.disabled=true);status.textContent='';
+  try{
+   const result=await root.CITLRequests.rpc(root.sb,'citl_course_display_page',{p_payload:{...filterState,term_id:term||null,page,view}});
+   if(ticket!==serial)return;if(result.display_version!==130)throw new Error('يلزم تحديث قراءة المقررات SQL 130');
+   rows=result.rows;total=result.total;
+   if(page>0&&page*25>=total){page=0;return listCourses();}
+   updateTeacherFilter();renderListBody();root.CITLPageBoot?.finish();return true;
+  }catch(error){if(ticket!==serial)return;total=0;rows=[];body.innerHTML='<div class="cm-empty" role="alert">تعذر جلب هذه الصفحة. <button type="button" class="cm-btn secondary" data-retry-list>إعادة المحاولة</button></div>';body.querySelector('[data-retry-list]').onclick=()=>listCourses();app.querySelector('#cm-page-label').textContent='لم تُعرض نتائج غير مؤكدة';status.textContent=error.code==='PGRST202'?'يلزم تثبيت تحديث SQL 130 قبل استخدام القائمة الجديدة.':error.code==='57014'?'استغرق الاستعلام وقتًا أطول من المسموح. أعد المحاولة؛ التفاصيل الفنية محفوظة في Network.':error.message;return false;
+  }finally{if(ticket===serial)body.removeAttribute('aria-busy');}
  }
- function visibleRows(){const filter=document.getElementById('cm-filter'),values=filter?formData(filter):{};return rows.filter(o=>(view==='all'||view==='reports'||view==='admin'||o.roles[view])&&(!values.search||[o.course_name,o.course_code,o.coordinator_name].join(' ').toLowerCase().includes(values.search.toLowerCase()))&&(!values.department||o.department_key===values.department)&&(!values.teacher_department||(values.teacher_department==='__unconfirmed'?!teacherDepartments(o).length:teacherDepartments(o).includes(values.teacher_department)))&&(!values.state||o.state===values.state)&&(!values.health||(values.health==='missing'?o.progress.criteria.some(c=>c.status==='not_started'):values.health==='unassigned'?!o.coordinator_id:values.health==='late'?o.progress.overdue>0:values.health==='review'?o.progress.review?.overdue:o.progress.criteria.some(c=>c.due_on&&c.status==='not_due')))&&(!values.criterion||o.progress.criteria.some(c=>String(c.criterion)===values.criterion&&['incomplete','not_started'].includes(c.status))));}
+ function visibleRows(){return rows;}
  function renderList(){
  const views={all:'المقررات المتاحة',lecturer:'مقرراتي',coordinator:'المقررات التي أنسقها'};
  if(context.heads.length)views.head='متابعة القسم';if(context.vice)views.vice='متابعة الكلية';if(context.technical)views.admin='إدارة الوحدة';views.reports='التقارير والأرشيف';
  app.innerHTML=`<form id="cm-filter" class="cm-filters">${select('term','الفصل الدراسي',Object.fromEntries(context.terms.map(t=>[t.id,t.name+(t.is_active?' • نشط':' • أرشيف')])),term)}${input('search','المقرر أو الكود أو المنسق','','search')}${select('teacher_department','قسم المحاضرين',teacherOptions(),'','كل أقسام المحاضرين')}${select('department','قسم متابعة المقرر',departmentOptions(),'','جميع جهات المتابعة')}${select('state','حالة المتابعة',M.states,'','جميع الحالات')}${select('health','حالة الاستكمال',{missing:'لم تُدخل بيانات',unassigned:'لم يُعيّن منسق',late:'تأخر الاستيفاء',review:'تأخر المراجعة',upcoming:'بنود مستقبلية'},'','كل حالات الاستكمال')}${select('criterion','بند غير مستوفى',Object.fromEntries(M.criteria.map((x,i)=>[i+1,(i+1)+'. '+x[0]])),'','جميع البنود')}</form>
  <nav class="cm-tabs" aria-label="منظور متابعة المقررات">${Object.entries(views).map(([k,v])=>`<button type="button" data-view="${k}" aria-selected="${view===k}">${v}</button>`).join('')}</nav>
- <section id="cm-list-body"></section><div class="cm-toolbar"><small class="cm-muted">إجمالي المقررات في نطاقك: ${total} — <span id="cm-page-label"></span></small><div>${btn('السابق','prev')}${btn('التالي','next')}</div></div>`;
- const f=app.querySelector('#cm-filter');f.elements.term.onchange=()=>run(async()=>{term=f.elements.term.value;page=0;await listCourses();},'تم تحديث الترم');f.onsubmit=e=>e.preventDefault();['search','teacher_department','department','state','criterion','health'].forEach(n=>f.elements[n].addEventListener('input',()=>{page=0;renderListBody();}));
- app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;page=0;app.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-selected',x===b));renderListBody();});
- app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*100>=total;
- app.querySelector('[data-action=prev]').onclick=()=>{page--;renderListBody();};app.querySelector('[data-action=next]').onclick=()=>{page++;renderListBody();};renderListBody();
+ <section id="cm-list-body"></section><div class="cm-toolbar"><small class="cm-muted"><span id="cm-page-label"></span></small><div>${btn('الصفحة السابقة','prev')}${btn('الصفحة التالية','next')}</div></div>`;
+ const f=app.querySelector('#cm-filter');f.elements.term.onchange=()=>run(async()=>{term=f.elements.term.value;page=0;return listCourses();},'تم تحديث الترم');for(const [name,value]of Object.entries(filterState)){if(f.elements[name]&&name!=='term')f.elements[name].value=value;}f.onsubmit=e=>e.preventDefault();['search','teacher_department','department','state','criterion','health'].forEach(n=>f.elements[n].addEventListener('input',()=>{page=0;clearTimeout(listTimer);listTimer=setTimeout(()=>listCourses(),n==='search'?300:0);}));
+ app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;page=0;app.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-selected',x===b));listCourses();});
+ app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*25>=total;
+ app.querySelector('[data-action=prev]').onclick=()=>{page--;listCourses();};app.querySelector('[data-action=next]').onclick=()=>{page++;listCourses();};renderListBody();
  }
  function courseCard(o){
   const due=o.progress.criteria.filter(c=>c.due_on&&!['complete','not_applicable'].includes(c.status)).sort((a,b)=>a.due_on.localeCompare(b.due_on))[0];
@@ -68,9 +69,9 @@
   const groups=new Map();for(const o of items){const key=[...teacherDepartments(o)].sort().join('|')||'__unconfirmed';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);}
   return [...groups].sort(([a],[b])=>a==='__unconfirmed'?1:b==='__unconfirmed'?-1:a.localeCompare(b)).map(([key,list])=>`<section class="cm-department-group"><header><h2>${key==='__unconfirmed'?'قسم المحاضرين يحتاج تأكيدًا':(teacherDepartments(list[0]).length>1?'مشترك بين: ':'')+E(teacherLabel(list[0]))}</h2><span>${list.length} مقرر في هذه الصفحة</span></header><div class="cm-grid">${list.map(courseCard).join('')}</div></section>`).join('');
  }
- function renderListBody(){const host=app.querySelector('#cm-list-body'),items=visibleRows();page=Math.min(page,Math.max(0,Math.ceil(items.length/100)-1));app.querySelector('#cm-page-label').textContent='تم تحميل '+rows.length+' من '+total+' — نتائج التصفية: '+items.length+' — صفحة '+(page+1);app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*100>=items.length;
+ function renderListBody(){const host=app.querySelector('#cm-list-body'),items=visibleRows();app.querySelector('#cm-page-label').textContent='صفحة '+(page+1)+' من '+Math.max(1,Math.ceil(total/25))+' · '+total+' مقرر مطابق · '+items.length+' في هذه الصفحة';app.querySelector('[data-action=prev]').disabled=page===0;app.querySelector('[data-action=next]').disabled=(page+1)*25>=total;
  if(view==='admin'){renderAdmin(host);renderSupplementAdmin(host);return;}
- host.innerHTML=summary(items)+(view==='reports'?`<div class="cm-panel"><h2>تقارير المتابعة</h2><p class="cm-muted">التقارير تحترم نطاق الحساب والترم المختار، وتشمل كل الصفحات. التقرير الرسمي للمقرر من داخل تفاصيله.</p><div class="cm-toolbar">${btn('تقرير القسم','department-report')}${btn('مقارنة الأقسام','college-report')}${btn('الاستثناءات والمتأخرات','exceptions-report')}${btn('تصدير CSV','csv')}${btn('تقرير نشاط مستخدم','activity-report')}</div></div>`:'')+courseGroups(items.slice(page*100,(page+1)*100));
+ host.innerHTML='<p class="cm-page-summary-label">ملخص الصفحة الحالية — البحث والتصفية يشملان جميع المقررات المتاحة لحسابك</p>'+summary(items)+(view==='reports'?`<div class="cm-panel"><h2>تقارير المتابعة</h2><p class="cm-muted">التقارير تحترم نطاق الحساب والترم المختار، وتشمل كل الصفحات. التقرير الرسمي للمقرر من داخل تفاصيله.</p><div class="cm-toolbar">${btn('تقرير القسم','department-report')}${btn('مقارنة الأقسام','college-report')}${btn('الاستثناءات والمتأخرات','exceptions-report')}${btn('تصدير CSV','csv')}${btn('تقرير نشاط مستخدم','activity-report')}</div></div>`:'')+courseGroups(items);
  host.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>run(()=>openCourse(b.dataset.open),'تم فتح المقرر'));
  host.querySelectorAll('[data-action$="report"],[data-action=csv]').forEach(b=>b.onclick=()=>run(()=>b.dataset.action==='activity-report'?activityReportForm():listReport(b.dataset.action),'تم تجهيز التقرير'));
  }
@@ -78,7 +79,7 @@
  function renderWorkspace(){const w=workspace,o=w.offering;
  const tabs={overview:'نظرة عامة',readiness:'الجاهزية',weekly:'المتابعة الأسبوعية',activities:'الأنشطة التعليمية',assessments:'التقييمات والدرجات',quality:'الجودة والأدلة',review:'المراجعات والإجراءات'};
  app.innerHTML=`<div class="cm-toolbar">${btn('قائمة المقررات','back')}<div>${badge(o.state)} ${btn('تقرير المقرر / طباعة','course-report')}</div></div><section class="cm-panel"><div class="cm-toolbar"><div><h2>${E(o.course_name)}</h2><p class="cm-muted"><bdi>${E(o.course_code||'كود يحتاج مراجعة')}</bdi> · ${E(o.term_snapshot.name)} · ${E(M.dept(o.department_key))}</p></div><strong>${countText(w.progress)}</strong></div><progress class="cm-progress" max="100" value="${w.progress.percent||0}"></progress>${o.state==='ARCHIVED'?'<p class="cm-warning">ترم مؤرشف — البيانات محفوظة للمراجعة والطباعة. الحالة عند الأرشفة: '+E(M.states[o.archived_from]||o.archived_from)+'</p>':''}${o.needs_review?'<p class="cm-warning">'+E(o.needs_review)+'</p>':''}</section><nav class="cm-tabs" aria-label="تفاصيل المقرر">${Object.entries(tabs).map(([k,v])=>`<button data-tab="${k}" aria-selected="${tab===k}">${v}</button>`).join('')}</nav><section id="cm-work-body"></section>`;
- app.querySelector('[data-action=back]').onclick=()=>run(async()=>{history.replaceState(null,'',location.pathname);await listCourses();},'تم عرض المقررات');
+ app.querySelector('[data-action=back]').onclick=()=>run(async()=>{history.replaceState(null,'',location.pathname);return listCourses();},'تم عرض المقررات');
  app.querySelector('[data-action=course-report]').onclick=()=>courseReport();
  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderWorkspace();});
  const host=app.querySelector('#cm-work-body');
@@ -203,8 +204,8 @@
  d.querySelectorAll('[data-queue]').forEach(b=>b.onclick=()=>{const q=result.queue[+b.dataset.queue],changed=q.review_kind==='group_change',choices=changed?{review:'تظل قيد المراجعة',resolve:'ربط التغيير بسجل المقرر السابق',include:'هذه مجموعة إضافية مستقلة — إنشاء متابعة جديدة',exclude:'خارج نطاق المتابعة'}:{review:'تظل قيد المراجعة',include:'إدراج في المتابعة الرسمية',exclude:'خارج نطاق المتابعة'},edit=dialog('مراجعة مصدر المقرر',`<form>${select('decision','القرار',choices,q.decision)}${changed?select('previous','السجل السابق',Object.fromEntries((q.candidate_offerings||[]).map(o=>[o.id,o.name+' — '+(o.group_key||'بدون مجموعة')])),'','اختر السجل السابق'):''}${textarea('note','مرجع القرار وسببه','',true)}<button class="cm-btn">توثيق القرار</button></form>`);
  bindForm(edit.querySelector('form'),async v=>{if(v.decision==='resolve'){if(!v.previous)throw Error('اختر السجل السابق');const old=await rpc('get',{id:v.previous});await rpc('source.resolve',{id:v.previous,revision:old.offering.revision,note:v.note,data:{term_id:q.term_id,source_key:q.source_key}});}else await rpc('import.review',{note:v.note,data:{term_id:q.term_id,source_key:q.source_key,decision:v.decision}});edit.close();d.close();await listCourses(false);});});});}
 
- async function init(){const generation=++serial;let authenticated=false;rows=[];total=0;app.innerHTML=empty('تظهر مقررات حسابك فور وصول البيانات.');try{await root.CITLAuth.loadProfile();if(generation!==serial)return;authenticated=true;root.CITLPageBoot?.finish();status.textContent='جاري قراءة مقررات حسابك…';const nextContext=await rpc('context');if(generation!==serial)return;context=nextContext;term=context.terms.find(t=>t.is_active)?.id||context.terms[0]?.id||'';const id=new URLSearchParams(location.search).get('offering');if(id)await openCourse(id);else await listCourses();}catch(e){if(!authenticated)root.CITLAuth.showFailure(e);status.textContent=e.message;if(!e.partialCourses)app.innerHTML=empty('تعذر تحميل متابعة المقررات. تحقق من الاتصال وتطبيق ملفات SQL الخاصة بالوحدة ثم اضغط تحديث.');}finally{root.CITLPageBoot?.finish();}}
- document.getElementById('cm-refresh').onclick=()=>run(async()=>{displayEndpointMissing=false;context=await rpc('context');if(workspace)await openCourse(workspace.offering.id,false);else await listCourses();},'تم تحديث البيانات');
+ async function init(){const generation=++serial;let authenticated=false;rows=[];total=0;filterState={};page=0;app.innerHTML=empty('تظهر مقررات حسابك فور وصول البيانات.');try{await root.CITLAuth.loadProfile();if(generation!==serial)return;authenticated=true;root.CITLPageBoot?.finish();status.textContent='جاري قراءة مقررات حسابك…';const nextContext=await rpc('context');if(generation!==serial)return;context=nextContext;term=context.terms.find(t=>t.is_active)?.id||context.terms[0]?.id||'';const id=new URLSearchParams(location.search).get('offering');if(id)await openCourse(id);else await listCourses();}catch(e){if(!authenticated)root.CITLAuth.showFailure(e);status.textContent=e.message;if(!e.partialCourses)app.innerHTML=empty('تعذر تحميل متابعة المقررات. تحقق من الاتصال وتطبيق ملفات SQL الخاصة بالوحدة ثم اضغط تحديث.');}finally{root.CITLPageBoot?.finish();}}
+ document.getElementById('cm-refresh').onclick=()=>run(async()=>{displayEndpointMissing=false;context=await rpc('context');if(workspace)await openCourse(workspace.offering.id,false);else return listCourses();},'تم تحديث البيانات');
  root.addEventListener('citl-permissions-changed',()=>{if(!busy)init();});
  root.CITLCourseMonitoring=Object.freeze({init});init();
 })(window);

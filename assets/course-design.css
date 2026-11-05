@@ -85,3 +85,9 @@ body.citl-courses{--course-ink:#2a3475;--course-gold:#f3a628;--course-line:#dfe4
 @media(max-width:767px){.citl-courses .cm-department-group>header h2{font-size:13px}.citl-courses .cm-department-group .cm-grid{grid-template-columns:1fr}.citl-courses .cm-course-card{padding:12px}}
 
 .citl-courses .cm-card-progress small{font-size:11px;line-height:1.7}
+
+/* Desktop breadth matches attendance; scoped to courses. */
+@media(min-width:1024px){body.citl-courses .cm-main{width:96%;max-width:1600px;padding:18px;margin:22px auto}.citl-courses .cm-department-group .cm-grid{gap:12px;align-items:stretch}.citl-courses .cm-course-card{min-width:0;gap:9px;padding:14px}.citl-courses .cm-course-card h2{min-height:47px}.citl-courses .cm-course-card>.cm-btn{margin-top:auto}.citl-courses .cm-department-group>header{background:#f5f7fb;border-radius:7px;padding:9px 12px;margin-bottom:12px}.citl-courses .cm-department-group{margin:14px 0 22px}}
+.citl-courses .cm-page-summary-label{font-size:11px;color:#657089;margin:12px 0 4px}
+.citl-courses #cm-list-body[aria-busy=true]{min-height:260px}
+.citl-courses .cm-department-group>header h2{overflow-wrap:anywhere}

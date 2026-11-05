@@ -1,4 +1,4 @@
-const RELEASE = '20261105-courses-usability-132';
+const RELEASE = '20261105-courses133-attendance134-review';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

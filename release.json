@@ -1,7 +1,7 @@
 {
-  "release": "20261105-courses-usability-132",
+  "release": "20261105-courses133-attendance134-review",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
-  "status": "review-only; production NO-GO",
-  "description": "Cumulative through 131. Course read performance, all-results page, scoped administration and batch assignment, explanations and report references. SQL132 standalone guarded migration; local acceptance only."
+  "status": "local-tested review; production readiness not established",
+  "description": "Cumulative132 plus locally tested course display optimization133, shared course notification menu, aligned course controls, attendance week optimization134 and schedule-matched home button. Requires read-only preflight and staging review."
 }

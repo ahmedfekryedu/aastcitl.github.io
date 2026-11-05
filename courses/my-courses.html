@@ -170,7 +170,26 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
         </div>
     </div>
 <div class="citl-mobile-footer"><div class="citl-mobile-footer-info"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><p class="citl-mobile-english">College of International Transport &amp; Logistics</p><p>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</p><p>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</p></div></div><div class="citl-mobile-social"><a href="https://www.facebook.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/in/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-linkedin-in"></i></a><a href="https://www.instagram.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-instagram"></i></a><a href="https://x.com/CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[10px] md:text-[13px]"><i class="fab fa-twitter"></i></a><a href="https://www.youtube.com/@CITLAlexandria" target="_blank" class="text-white hover:text-[#F3A628] transition-all text-[12px] md:text-sm"><i class="fab fa-youtube"></i></a><a href="https://www.aast.edu/en/colleges/citl/alex" target="_blank" class="text-[#F3A628] hover:scale-125 transition-all text-[12px] md:text-sm"><i class="fas fa-globe"></i></a></div></div></footer>
-<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="cm-toolbar"><strong>التنبيهات</strong><button onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div>
+<div id="notif-menu" class="hidden fixed w-80 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 z-[10001] overflow-hidden transform transition-all duration-300 ease-in-out">
+    <div class="px-5 py-4 flex justify-between items-center border-b border-gray-50">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-[#F3A628] rounded-full animate-pulse"></span>
+            <h3 class="text-[#2A3475] font-bold text-sm">التنبيهات</h3>
+        </div>
+        <button onclick="toggleNotifications()" class="text-gray-400 hover:text-red-500 transition-colors">
+            <i class="fas fa-times text-xs"></i>
+        </button>
+    </div>
+    
+    <div id="notif-list" class="max-h-[350px] overflow-y-auto custom-scrollbar p-2">
+        </div>
+    
+    <div class="p-3 bg-gray-50/50 border-t border-gray-50 text-center">
+        <button onclick="markAllNotificationsRead()" class="text-[11px] font-medium text-gray-500 hover:text-[#2A3475] transition-colors">
+            تحديد الكل كمقروء
+        </button>
+    </div>
+</div>
 <div id="cm-mobile-nav" class="citl-mobile-overlay hidden" hidden><div class="citl-drawer-backdrop" data-mobile-close></div><section id="cm-mobile-content" class="citl-drawer" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية" tabindex="-1"><div class="citl-drawer-head"><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div><div class="citl-drawer-heading"><strong>القائمة الرئيسية</strong><button type="button" data-mobile-close aria-label="إغلاق القائمة">×</button></div></div><div class="citl-drawer-body"><div class="citl-drawer-account"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><div><strong data-mobile-account></strong><small data-mobile-position></small></div></div><p class="citl-drawer-label">صفحات النظام</p><nav class="citl-drawer-primary"><a href="/dashboard/"><i class="fas fa-home" aria-hidden="true"></i><span>الرئيسية</span></a><a href="/smrm/"><i class="fas fa-building" aria-hidden="true"></i><span>القاعات الدراسية</span></a><a href="/schedules/"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>الجداول الدراسية</span></a><a href="/courses/" aria-current="page"><i class="fas fa-book-open" aria-hidden="true"></i><span>المقررات الدراسية</span></a></nav><hr><p class="citl-drawer-label">الحساب والإدارة</p><nav class="citl-drawer-actions"><a data-citl-mobile-personal data-cm-personal hidden href="/schedules/?open=my-schedule"><i class="fas fa-user-graduate" aria-hidden="true"></i><span>إجراءات جدولي الدراسي</span></a><a href="/dashboard/?open=control"><img src="/assets/control-panel.svg" width="18" height="18" alt=""> لوحة التحكم</a></nav></div><div class="citl-drawer-bottom"><button onclick="window.logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>تسجيل الخروج</span></button><small dir="ltr">Version R6.9.2.38</small></div></section></div>
 <script src="/vendor/supabase-js-2.45.4.min.js"></script>
 <script src="/assets/auth-client.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/read-timeout.js"></script>
@@ -182,7 +201,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/security-core.js?v=20261105-system-fixes-131"></script>
 <script src="/assets/interface-controls.js"></script><script src="/assets/site-updates.js"></script>
-<script src="/assets/course-model.js?v=20261105-courses-usability-132"></script><script src="/assets/course-reference-model.js?v=courses-p1-review-1"></script><link rel="stylesheet" href="/assets/course-analytics-p4.css?v=p5-1"><script src="/assets/course-print-p4.js?v=20261105-courses-usability-132"></script><script src="/assets/course-form-p3.js?v=20261105-courses-usability-132"></script><script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/course-model.js?v=20261105-courses-usability-132"></script><script src="/assets/course-reference-model.js?v=courses-p1-review-1"></script><link rel="stylesheet" href="/assets/course-analytics-p4.css?v=p5-1"><script src="/assets/course-print-p4.js?v=20261105-courses-usability-132"></script><script src="/assets/course-form-p3.js?v=20261105-courses-display-133"></script><script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/site-notice.js?v=20261028-r7.3.3.8-wa-ui" defer></script>
 <script src="/assets/notification-reminder.js?v=20261030-courses117-attendance-r8-review" defer></script>
 <link rel="stylesheet" href="/assets/room-monitor.css?v=20261028-r7.3.3.8-wa-ui">
@@ -192,4 +211,4 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 <script src="/assets/whatsapp-v2-preview.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/whatsapp-center-r7.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/whatsapp-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/course-design.js?v=review-117-followup"></script><link rel="stylesheet" href="/assets/course-usability-132.css?v=20261105-courses-usability-132"></body></html>
+<script src="/assets/course-design.js?v=review-117-followup"></script><link rel="stylesheet" href="/assets/course-usability-132.css?v=20261105-courses-usability-132"><link rel="stylesheet" href="/assets/course-layout-133.css?v=20261105-courses-display-133"></body></html>

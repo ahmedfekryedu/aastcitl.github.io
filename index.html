@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta name="referrer" content="no-referrer">
-<meta name="citl-release" content="20261018-r6.9.1.8">
+<meta name="citl-release" content="20261105-attendance-r5-hotfix1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
@@ -187,7 +187,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden opacity-0 transition-opacity duration-500">
+<body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden transition-opacity duration-500">
 
 <div class="absolute inset-0 z-0">
     <div class="absolute inset-0 bg-cover bg-[position:40%_center] bg-no-repeat opacity-50" style="background-image:url('/CITL-Camp2.jpg')"></div>
@@ -491,6 +491,30 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
         </div>
     </div>
 <script>
+// Public login must remain visible even when SDK initialization/refresh never settles.
+// This does not reveal protected dashboard content or discard stored credentials.
+(function(root){
+    let timer,waiting=true;
+    function notice(message,retry){
+        let box=document.getElementById('citl-login-status');
+        if(!box){
+            box=document.createElement('div');box.id='citl-login-status';box.setAttribute('role','status');
+            box.style.cssText='margin:0 0 12px;padding:10px 12px;background:#f4f6fb;border:1px solid #dce2ef;border-radius:10px;color:#2a3475;font-size:12px;line-height:1.8';
+            const label=document.createElement('span');box.append(label);
+            const button=document.createElement('button');button.id='citl-login-retry';button.type='button';button.textContent='إعادة المحاولة';button.hidden=true;
+            button.style.cssText='margin-inline-start:8px;padding:5px 10px;border:1px solid #2a3475;border-radius:7px;cursor:pointer';button.onclick=()=>location.reload();box.append(button);
+            document.getElementById('loginForm').before(box);
+        }
+        box.querySelector('span').textContent=message;box.querySelector('button').hidden=!retry;
+    }
+    function finish(){waiting=false;clearTimeout(timer);document.body.classList.remove('opacity-0');document.getElementById('citl-login-status')?.remove();}
+    function fail(){waiting=false;clearTimeout(timer);document.body.classList.remove('opacity-0');notice('لم يكتمل التحقق من جلسة الدخول. بياناتك محفوظة؛ أعد المحاولة.',true);}
+    root.CITLLoginEntry={finish,fail,wait:async task=>{let deadline;try{return await Promise.race([Promise.resolve().then(task),new Promise((_,reject)=>{deadline=setTimeout(()=>reject(new Error('LOGIN_ENTRY_TIMEOUT')),8000);})]);}finally{clearTimeout(deadline);}}};
+    notice('جارٍ التحقق من جلسة الدخول…',false);
+    timer=setTimeout(()=>{if(waiting)fail();},9000);
+})(window);
+</script>
+<script>
         // =======================================================
         // 1. إعدادات الاتصال بـ Supabase (النسخة الموحدة)
         // =======================================================
@@ -517,13 +541,19 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 // --- كود الدخول التلقائي الذكي (نسخة منع الوميض) ---
 async function autoRedirect() {
     try {
-        if(window.CITLPasswordRecovery.isRecovery){document.body.classList.remove('opacity-0');return;}
+        if(window.CITLPasswordRecovery.isRecovery){window.CITLLoginEntry.finish();return;}
         // The maintenance return path must remain the real landing/login page.
-        if(new URLSearchParams(location.search).get('service-home')==='1'){document.body.classList.remove('opacity-0');return;}
-        const { data: { session } } = await sb.auth.getSession();
-        
-        if (session && localStorage.getItem('currentUser')) {
-            if(window.CITLServices){await window.CITLServices.load();if(window.CITLServices.decision('dashboard')?.allowed===false){document.body.classList.remove('opacity-0');return;}}
+        if(new URLSearchParams(location.search).get('service-home')==='1'){window.CITLLoginEntry.finish();return;}
+        const redirect = await window.CITLLoginEntry.wait(async()=>{
+            const {data,error}=await sb.auth.getSession();
+            if(error)throw error;
+            if(!data?.session||!localStorage.getItem('currentUser'))return false;
+            if(window.CITLServices){await window.CITLServices.load();if(window.CITLServices.decision('dashboard')?.allowed===false)return false;}
+            return true;
+        });
+        // Navigation is outside the timed operation: a late response cannot redirect after timeout.
+        window.CITLLoginEntry.finish();
+        if (redirect) {
             // لو مسجل: حوله فوراً والصفحة لسه مخفية
             window.showLoader?.('جاري فتح النظام…');
             window.location.href = '/dashboard/'; 
@@ -534,7 +564,7 @@ async function autoRedirect() {
     } catch (error) {
         console.error("خطأ في التحقق التلقائي:", error);
         // في حالة الخطأ أظهر الصفحة عشان السيستم ميعلقش
-        document.body.classList.remove('opacity-0');
+        window.CITLLoginEntry.fail();
     }
 }
 

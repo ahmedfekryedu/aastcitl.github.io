@@ -1,7 +1,7 @@
 {
-  "release": "20261105-system-fixes-131",
+  "release": "20261105-courses-usability-132",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "Cumulative through SQL130. Shared location permissions, attendance header, booking approval dialog, read-all transition, dashboard cards, audited account-preview entry, explicit meeting-room catalog (SQL131). Local review only."
+  "description": "Cumulative through 131. Course read performance, all-results page, scoped administration and batch assignment, explanations and report references. SQL132 standalone guarded migration; local acceptance only."
 }

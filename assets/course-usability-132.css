@@ -1,0 +1,37 @@
+/* Course module only. Oversight, attendance, bookings and shared header are unchanged. */
+.citl-courses .cm-main{width:96%;max-width:1600px;padding:22px;margin:24px auto;box-sizing:border-box}
+.citl-courses .cm-title{padding:18px 20px!important;border:1px solid #e1e6f0;border-right:4px solid #f3a628;border-radius:12px;background:#f7f9fd;gap:18px;align-items:center;line-height:1.8}
+.citl-courses .cm-title>div{min-width:0}.citl-courses .cm-title p{margin:6px 0 0}.citl-courses .cm-title button{flex-shrink:0}
+.citl-courses #cm-app :is(h2,h3){line-height:1.8;margin:18px 0 10px;padding-inline:3px}
+.citl-courses #cm-app :is(.cm-panel,.p3-review-section){padding:18px;border-radius:12px;border:1px solid #dfe5f0;margin-block:16px;background:#fff}
+.citl-courses :is(#cm-app,dialog) fieldset{min-width:0;border:0;margin:0;padding:0}
+.citl-courses :is(#cm-app,dialog) form{min-width:0}.citl-courses :is(#cm-app,dialog) label{display:flex;flex-direction:column;gap:6px;line-height:1.8}
+.citl-courses :is(#cm-app,dialog) label:has(input[type=checkbox]),.citl-courses :is(#cm-app,dialog) label:has(input[type=radio]){flex-direction:row;align-items:center;gap:8px}
+.citl-courses :is(#cm-app,dialog) :is(input,select,textarea){box-sizing:border-box;max-width:100%;font-family:Cairo,sans-serif}
+.citl-courses :is(#cm-app,dialog) select{min-height:40px;padding:8px 12px;background:#fff;color:#2a3475;border:1px solid #ccd5e5;border-radius:8px}
+.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters){display:flex;flex-wrap:wrap;gap:12px;padding:16px!important;align-items:flex-end;background:#f6f8fc;border:1px solid #e1e6ef;border-radius:12px}
+.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters)>:is(label,select,input){flex:1 1 190px;min-width:150px}.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters)>h2{flex-basis:100%;margin:0!important}
+.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters) label>:is(input,select){width:100%}
+.citl-courses :is(.cm-toolbar,.p2-actions,.p3-actions){display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-start;padding-block:10px}
+.citl-courses .cm-toolbar>div{display:flex;flex-wrap:wrap;gap:8px}.citl-courses #cm-app button{margin:0;min-height:38px;white-space:normal}
+.citl-courses :is(.cm-table-wrap,.p2-table,.p4-table){overflow:auto;max-width:100%;border:1px solid #dfe5ee;border-radius:10px;margin-block:14px}
+.citl-courses :is(#cm-app,dialog) table{width:100%;border-collapse:collapse;line-height:1.9;font-size:12px;table-layout:auto}.citl-courses :is(#cm-app,dialog) th{background:#eef2f9;color:#2a3475;text-align:right;padding:12px;border-bottom:2px solid #dbe2f0}
+.citl-courses :is(#cm-app,dialog) td{padding:12px;vertical-align:top;border-bottom:1px solid #e3e8f1;overflow-wrap:anywhere}.citl-courses :is(#cm-app,dialog) td>strong,.citl-courses :is(#cm-app,dialog) td>small{display:block;margin-block:3px}
+.citl-courses :is(.cm-dialog,.p2-dialog,.p3-dialog){padding:0!important;border:1px solid #d5ddec;border-radius:14px;background:#fff;color:#273463;width:min(1000px,94vw);max-width:94vw;max-height:90dvh;overflow:auto;box-shadow:0 20px 70px #15204d40;box-sizing:border-box}
+.citl-courses :is(.cm-dialog,.p2-dialog,.p3-dialog)>:is(header,h2,h3){margin:0!important;padding:15px 20px!important;background:#2a3475;color:white!important;border:0;border-bottom:3px solid #f3a628;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.citl-courses :is(.cm-dialog,.p2-dialog,.p3-dialog)>:is(.cm-body,form,section,p,div:not(.cm-body)){padding:18px}.citl-courses :is(.cm-dialog,.p2-dialog,.p3-dialog) form{display:grid;gap:12px}.citl-courses dialog header button{color:#fff;background:transparent;border:1px solid #ffffff55;border-radius:7px;min-width:36px}
+.citl-courses .cm-grid{grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px}.citl-courses .cm-card{padding:16px;border:1px solid #dfe5ef;border-radius:12px;box-shadow:0 3px 12px #24347706}
+.citl-courses .cm-card h2{font-size:14px!important;min-height:0}.citl-courses .cm-card .cm-warning{display:block;margin:7px 0;font-size:11px;background:#fff7e6;border:1px solid #f3dfb8;padding:9px;border-radius:7px}
+.citl-courses .cm-department-group>header{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 15px;background:#edf1f8;border-radius:10px;margin-block:18px 12px;border-right:3px solid #f3a628}.citl-courses .cm-department-group h2{margin:0!important;font-size:15px!important}
+.cu-help{margin:10px 0;padding:12px 15px;border-right:3px solid #f3a628;border-radius:8px;background:#f6f8fc;color:#536381;font-size:12px;line-height:1.9}
+.cu-glossary{border:1px solid #dfe5ef;border-radius:9px;padding:10px 14px;margin-bottom:15px;font-size:12px;line-height:1.9}.cu-glossary summary{font-weight:800;color:#2a3475;cursor:pointer}.cu-glossary dl{display:grid;grid-template-columns:170px 1fr;gap:8px 14px}.cu-glossary dt{font-weight:800}.cu-glossary dd{margin:0}
+.cu-loading{display:flex;align-items:center;flex-wrap:wrap;gap:16px;border:1px solid #dfe5ef;background:#f7f9fd;border-radius:12px;padding:25px;margin:15px 0;color:#2a3475}.cu-loading p{margin:5px 0}.cu-loading small{color:#6a7890}.cu-loading progress{width:100%;height:8px;accent-color:#2a3475}.cu-spinner{width:30px;height:30px;border:3px solid #dfe5ee;border-top-color:#f3a628;border-radius:50%;animation:cu-spin .9s linear infinite;flex-shrink:0}@keyframes cu-spin{to{transform:rotate(360deg)}}
+.citl-courses .ca-assignment{display:grid;grid-template-columns:minmax(200px,2fr) repeat(3,minmax(150px,1fr)) auto;align-items:end;gap:12px;padding:16px;background:#f8fafd;border:1px solid #dfe5ee;border-radius:12px;margin-block:10px}
+.citl-courses .ca-assignment small{display:block}.cu-selection-bar{position:sticky;bottom:8px;background:#2a3475;color:#fff;padding:12px;border-radius:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;z-index:3}
+@media(max-width:767px){.citl-courses .cm-main{width:calc(100% - 20px);padding:12px}.citl-courses .cm-title{padding:14px!important}.citl-courses .cm-title h1{font-size:17px}.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters){gap:10px;padding:12px!important}.citl-courses :is(.cm-filters,.p2-toolbar,.p4-filters,.op-filters)>:is(label,select,input){flex-basis:100%;min-width:0}.citl-courses .ca-assignment{grid-template-columns:1fr}.cu-glossary dl{grid-template-columns:1fr;gap:4px}.cu-glossary dd{margin-bottom:8px}.citl-courses .cm-grid{grid-template-columns:1fr}.citl-courses .cm-department-group>header{align-items:flex-start;flex-direction:column}.citl-courses .course-card-table>tbody>tr{grid-template-columns:1fr!important}.citl-courses .cm-table-wrap{overflow:auto}}
+@media(prefers-reduced-motion:reduce){.cu-spinner{animation:none}}
+.citl-courses [hidden]{display:none!important}
+
+@media print{#cm-print .cu-print-header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #f3a628;padding:10px 0}#cm-print .cu-print-header img{width:60px;height:60px;object-fit:contain}#cm-print h3{margin-top:18px;padding:8px;border-right:4px solid #f3a628;background:#eef2f8}#cm-print footer{border-top:1px solid #dfe5ef;padding:10px;margin-top:20px}}
+
+.cu-field-help{font-size:11px;line-height:1.7;color:#65738e;font-weight:400}.citl-courses dialog select+small{margin-top:2px}

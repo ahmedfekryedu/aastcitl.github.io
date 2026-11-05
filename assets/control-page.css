@@ -42,3 +42,9 @@ html[data-citl-control-page] #admin-panel-btn{display:none!important}
  #citl-control-host .admin-tab>span{flex:1;min-width:0}
  #citl-control-loading aside{grid-template-columns:minmax(0,1fr)}
 }
+/* Desktop alignment only; preserve the existing mobile menu and link semantics. */
+@media screen and (min-width:1024px){
+ #citl-control-host nav :is(.admin-tab,[data-r8-link="admin-control"]){display:flex;flex-direction:row;align-items:center;justify-content:flex-start;text-align:right;gap:12px;padding-inline:12px;width:100%;direction:rtl}
+ #citl-control-host nav :is(.admin-tab,[data-r8-link="admin-control"])>div:first-child{flex:0 0 32px;width:32px;height:32px;margin:0}
+ #citl-control-host nav :is(.admin-tab,[data-r8-link="admin-control"])>span{flex:1;min-width:0;margin:0;text-align:right}
+}

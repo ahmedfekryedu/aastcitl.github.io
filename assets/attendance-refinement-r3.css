@@ -101,3 +101,19 @@ dialog:not(.citl-logout-confirm){box-shadow:0 24px 80px #10204b35}
 @media(max-width:350px){.ar8-metrics{grid-template-columns:1fr}.ar8-stat>span{font-size:12px}}
 @media(max-width:700px){#ar8-tabs button:only-child{flex:1}.ar8-main .ar8-actions>button:last-child:nth-child(odd){grid-column:1/-1}.ar8-manual .ar8-fields>label:nth-child(4){grid-column:1/-1}}
 @media print{.ar8-location-notice{display:none}.ar8-metrics{display:grid;grid-template-columns:repeat(3,1fr)}}
+/* Desktop attendance workspace; mobile, self attendance and print remain unchanged. */
+@media screen and (min-width:1024px){
+ body[data-attendance-mode="admin"] .ar8-main{width:96%;max-width:1600px;padding:0;margin:22px auto}
+ body[data-attendance-mode="admin"] .ar8-page-heading{padding-bottom:18px}
+ body[data-attendance-mode="admin"] .ar8-page-heading h2{font-size:25px}
+ body[data-attendance-mode="admin"] #ar8-tabs{padding:8px;gap:8px;margin-bottom:20px}
+ body[data-attendance-mode="admin"] #ar8-tabs button{min-height:46px;font-size:14px;padding:11px 16px}
+ body[data-attendance-mode="admin"] #ar8-content>.ar8-panel{padding:24px}
+ body[data-attendance-mode="admin"] .ar8-panel>h2{padding:12px 16px;font-size:18px}
+ body[data-attendance-mode="admin"] .ar8-panel:has(>.ar8-metrics)>.ar8-fields{grid-template-columns:1.25fr 1fr 1fr auto;gap:16px;align-items:end;margin:20px 0}
+ body[data-attendance-mode="admin"] .ar8-panel:has(>.ar8-metrics)>.ar8-fields :is(input,select,button){min-height:44px}
+ body[data-attendance-mode="admin"] .ar8-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;border:0;border-radius:0;background:transparent;overflow:visible;margin:20px 0 0}
+ body[data-attendance-mode="admin"] .ar8-stat{min-height:112px;padding:22px;border:1px solid #dfe4ef;border-top:3px solid #2a3475;border-radius:12px;background:linear-gradient(135deg,#fff,#f7f9fd);box-shadow:0 3px 12px #26366306;gap:16px}
+ body[data-attendance-mode="admin"] .ar8-stat>span{font-size:14px;line-height:1.8}
+ body[data-attendance-mode="admin"] .ar8-stat .ar8-metric{font-size:34px;font-weight:800}
+}

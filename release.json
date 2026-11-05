@@ -1,7 +1,7 @@
 {
-  "release": "20261105-attendance-r5-hotfix1",
+  "release": "20261105-attendance-r5-refinement",
   "built_at": "2026-11-05",
   "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
   "status": "review-only; production NO-GO",
-  "description": "R5 preserved; fix attendance tab observer loop and bounded visible public login initialization; no additional SQL"
+  "description": "Preserves R5 hotfix1; location permission guidance, compact attendance layouts, independent term selection, optimized manual attendance; requires SQL128 only after127"
 }

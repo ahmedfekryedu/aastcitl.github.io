@@ -1,8 +1,9 @@
-const RELEASE = '20261105-attendance-r5-hotfix1';
+const RELEASE = '20261105-attendance-r5-refinement';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/assets/attendance-location.js',
   '/assets/attendance-manual.js',
   '/assets/whatsapp-center-r7.js', '/assets/whatsapp-v2-preview.js', '/assets/whatsapp-admin.js', '/assets/whatsapp-admin.css', '/assets/whatsapp-templates.js',
   '/assets/member-past-dates.js',

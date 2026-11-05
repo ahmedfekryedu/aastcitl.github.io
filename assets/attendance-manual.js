@@ -3,7 +3,7 @@ root.CITLAttendanceManual=async function(ui){
  const {rpc,clear,panel,el,select,field,button,table,cell,labelRow,departmentName,confirmRemoval,requestReason,status}=ui;
  const turn=clear(),data=await rpc('citl_attendance_manual',{p_action:'snapshot'});
  if(!ui.current(turn))return;
- const p=panel(data.manager?'التحضير اليدوي للمحاضرات':'التحضير اليدوي — أعضاء قسمي');
+ const p=panel(data.manager?'التحضير اليدوي للمحاضرات':'التحضير اليدوي — أعضاء قسمي');p.classList.add('ar8-manual');
  p.append(el('p','التسجيل الإداري للمحاضرات الحالية والسابقة داخل الترم المحدد. الإضافة تظهر في التقارير، والحذف يزيل واقعة الحضور وأدلتها مع إبقاء أثر الإجراء في سجل التدقيق.','ar8-muted'));
  const filters=el('div',null,'ar8-fields');p.append(filters);
  const term=select(filters,'الترم','term',data.terms.map(t=>[t.id,t.name+(t.is_active?' — الحالي':' — سابق')]));
@@ -14,13 +14,13 @@ root.CITLAttendanceManual=async function(ui){
  const saturday=new Date(today+'T12:00:00Z');saturday.setUTCDate(saturday.getUTCDate()-(saturday.getUTCDay()+1)%7);
  const week=field(filters,'بداية الأسبوع','week','date',saturday.toISOString().slice(0,10));week.max=today;
  const content=el('div',null,'ar8-week'),tools=el('div',null,'ar8-actions');p.append(tools,content);let ticket=0;
- function names(){const previous=visitor.value;visitor.replaceChildren();for(const v of data.visitors.filter(v=>v.term_id===term.value&&(!department.value||v.department===department.value)))visitor.add(new Option(v.name+(v.active?'':' — موقوف'),v.id));if([...visitor.options].some(o=>o.value===previous))visitor.value=previous;}
+ function names(){const previous=visitor.value;visitor.replaceChildren();visitor.add(new Option('اختر عضو هيئة التدريس',''));for(const v of data.visitors.filter(v=>v.term_id===term.value&&(!department.value||v.department===department.value)))visitor.add(new Option(v.name+(v.active?'':' — موقوف'),v.id));if([...visitor.options].some(o=>o.value===previous))visitor.value=previous;}
  function payload(){return {term_id:term.value,visitor_id:visitor.value};}
  async function remove(scan,after){if(!await confirmRemoval('حذف حضور المحاضرة','سيُحذف حضور '+scan.lecture_date+' وأدلته من التقارير. لا يتغير الجدول أو تكليف المحاضر.'))return;await rpc('citl_attendance_manual',{p_action:'delete',p_payload:{...payload(),scan_id:scan.scan_id||scan.id,revision:scan.revision,confirmation:'delete_permanently'}});await after();status.textContent='تم حذف الحضور من التقارير.';}
- async function draw(){const request=++ticket;content.replaceChildren();if(!visitor.value){content.append(el('p','لا توجد تكليفات في هذا الترم والقسم.','ar8-muted'));return;}
+ async function draw(){const request=++ticket;content.replaceChildren();if(!visitor.value){content.append(el('p',visitor.options.length>1?'اختر عضو هيئة التدريس لعرض محاضراته.':'لا توجد تكليفات في هذا الترم والقسم.','ar8-muted'));return;}
   const selected=data.visitors.find(v=>v.id===visitor.value&&v.term_id===term.value),t=data.terms.find(t=>t.id===term.value);
   if(!selected.active||!t.source_available){content.append(el('p',!selected.active?'التكليف موقوف؛ يمكن مراجعة سجلاته السابقة دون تسجيل حضور جديد.':'مصدر جدول هذا الترم غير متاح. السجلات السابقة محفوظة، ولا تُنشأ محاضرات من بيانات غير مؤكدة.','ar8-warning'));return;}
-  const result=await rpc('citl_attendance_manual',{p_action:'week',p_payload:{...payload(),week:week.value}});if(request!==ticket||!ui.current(turn))return;
+  content.append(el('p','جارٍ تحميل محاضرات الأسبوع…','ar8-inline-loading'));const result=await rpc('citl_attendance_manual',{p_action:'week',p_payload:{...payload(),week:week.value}});if(request!==ticket||!ui.current(turn))return;
   content.replaceChildren();content.append(el('p',result.note,'ar8-muted'));let count=0;
   for(const day of result.days){if(!day.sessions.length)continue;const section=panel(day.date,content),body=table(section,['المحاضرة / المحاضر','التوقيت والقاعة','الحضور','الإجراء']);
    for(const s of day.sessions){count++;const row=el('tr');const name=cell(row,'');name.append(el('strong',s.course_name),el('span',s.instructor,'ar8-cell-note'));cell(row,s.start_time.slice(0,5)+' – '+s.end_time.slice(0,5)+' · '+s.room_name);cell(row,s.status==='present'?'تم الحضور':s.status==='rejected'?'ملغى إداريًا':'لم يسجل حضور');const action=cell(row,'');

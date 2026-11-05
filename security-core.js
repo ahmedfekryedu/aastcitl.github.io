@@ -50,6 +50,7 @@
     }
     for (const item of items) {
       const button = document.createElement('button'); button.type = 'button';
+      button.dataset.notificationId=String(item.id);
       button.className = `w-full text-right p-3 mb-2 rounded-xl border transition ${item.read_at ? 'bg-white border-gray-100' : 'bg-amber-50 border-amber-200'}`;
       if(item.kind==='admin_announcement'){button.classList.add('citl-administrative-notice');const badge=document.createElement('span');badge.className='citl-administrative-label';badge.textContent='إشعار إداري';button.append(badge);}
       const title = document.createElement('div'); title.className = 'text-sm font-black text-[#2A3475]'; title.textContent = item.title;
@@ -135,6 +136,7 @@
   async function readUserNotifications() {
     try {
       await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
+      if(markingAllNotifications)return true;
       window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
@@ -142,11 +144,24 @@
     } catch (error) { if(error.code!=='CITL_TIMEOUT')console.error('notifications:', error);const list=document.getElementById('notif-list');if(list&&!document.getElementById('notif-menu')?.classList.contains('hidden')){list.querySelector('[data-notification-retry]')?.remove();const retry=document.createElement('button');retry.type='button';retry.dataset.notificationRetry='';retry.className='citl-ac-button secondary';retry.textContent='تعذر تحميل الإشعارات — إعادة المحاولة';retry.onclick=async e=>{e.stopPropagation();retry.disabled=true;try{await checkUserNotifications();}finally{retry.disabled=false;}};list.prepend(retry);}return false; }
   }
 
+  let markingAllNotifications=false;
   async function markAllNotificationsRead() {
-    try { await invoke('notifications.read'); if(notificationRead)await notificationRead; document.getElementById('notif-menu')?.classList.add('hidden'); await checkUserNotifications();
-      window.showNotification?.('تم تحديد الكل كمقروء','success');
-    }
-    catch (error) { window.showNotification?.(error.message, 'error'); }
+    if(markingAllNotifications)return;markingAllNotifications=true;
+    const menu=document.getElementById('notif-menu');
+    if(menu){menu.setAttribute('aria-busy','true');menu.inert=true;}
+    try {
+      if(notificationRead)await notificationRead;
+      await invoke('notifications.read');
+      if(menu&&!menu.classList.contains('hidden')){
+        const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        const animations=[...menu.querySelectorAll('[data-notification-id]')].map(n=>n.animate?.([{backgroundColor:'#fffbeb',borderColor:'#fde68a'},{backgroundColor:'#ffffff',borderColor:'#f1f5f9'}],{duration:reduced?0:180,fill:'forwards'})).filter(Boolean);
+        await Promise.all(animations.map(a=>a.finished.catch(()=>{})));
+        const fade=menu.animate?.([{opacity:1},{opacity:0}],{duration:reduced?0:90});if(fade)await fade.finished.catch(()=>{});
+        menu.classList.add('hidden');animations.forEach(a=>a.cancel());
+      }
+      window.showNotification?.('تمت قراءة الجميع','success');
+    }catch(error){window.showNotification?.(error.message,'error');}
+    finally{if(menu){menu.inert=false;menu.removeAttribute('aria-busy');}markingAllNotifications=false;await checkUserNotifications();}
   }
 
   function fitNotifications() {

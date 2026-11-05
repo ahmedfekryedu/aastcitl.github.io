@@ -713,7 +713,7 @@ let editingRoomId = null;
 
 const ROOM_STORAGE_KEY = 'selected_room_id';
 
-let roomsLoadPending = null;
+let roomsLoadPending = null, academicOnlyRooms = [];
 async function loadRooms(force = false) {
     if (roomsLoadPending) {
         if (!force) return roomsLoadPending;
@@ -724,7 +724,10 @@ async function loadRooms(force = false) {
         const { data, error } = await supabase.from('rooms').select('*').order('created_at', { ascending: true });
         if (error) throw error;
         if (!Array.isArray(data)) throw new Error('تعذر قراءة قائمة القاعات');
-        rooms = data;
+        // SQL131 is authoritative. The legacy marker fallback avoids exposing academic links before rollout.
+        const enabled=r=>typeof r.meeting_booking_enabled==='boolean'?r.meeting_booking_enabled:!(String(r.features||'').trim()==='قاعة من الجدول الدراسي'&&String(r.academic_room_name||'').trim());
+        academicOnlyRooms=data.filter(r=>!enabled(r));
+        rooms = data.filter(enabled);
         return rooms;
     })().finally(() => { roomsLoadPending = null; });
     return roomsLoadPending;
@@ -811,6 +814,7 @@ function closeRoomPicker() {
 }
 
 async function selectRoom(roomId) {
+    if(!rooms.some(r=>String(r.id)===String(roomId))) {showNotification('القاعة غير متاحة في قائمة حجز الاجتماعات؛ راجع الإدارة.','error');return;}
     currentRoomId = roomId;
     localStorage.setItem(ROOM_STORAGE_KEY, roomId);
 
@@ -958,6 +962,21 @@ function renderRoomsAdminList() {
         </button>
     `).join('');
     el.querySelectorAll('[data-edit-room-id]').forEach(button => button.addEventListener('click', () => pickRoomForEdit(button.dataset.editRoomId)));
+    if(academicOnlyRooms.length&&window.CITLPermissions.full(window.currentUser)){
+      const section=document.createElement('details');section.className='border rounded-xl p-3';
+      const title=document.createElement('summary');title.className='font-bold text-[#2A3475]';title.textContent='قاعات مرتبطة بالحجوزات الدراسية فقط ('+academicOnlyRooms.length+')';section.append(title);
+      const note=document.createElement('p');note.className='text-xs text-gray-600 py-2';note.textContent='سجلات ربط داخلية تحفظ المحاضرات السابقة، وليست قاعات اجتماعات مضافة تلقائيًا. الإتاحة هنا قرار إداري مستقل.';section.append(note);
+      for(const room of academicOnlyRooms){const row=document.createElement('div');row.className='flex flex-wrap items-center justify-between gap-2 border-t py-2';const name=document.createElement('strong');name.textContent=room.name;const add=document.createElement('button');add.type='button';add.className='citl-ac-button secondary';add.textContent='إتاحة لحجز الاجتماعات';
+        add.onclick=async()=>{if(add.disabled)return;add.disabled=true;try{
+          if(typeof room.meeting_booking_enabled!=='boolean')throw Error('يلزم تطبيق SQL 131 قبل إتاحة القاعة.');
+          if(!await window.showConfirmDialog('إضافة '+room.name+' إلى قاعات حجز الاجتماعات؟ تبقى حجوزات المحاضرات وسجلاتها محفوظة.'))return;
+          const {data,error}=await supabase.from('rooms').update({meeting_booking_enabled:true}).eq('id',room.id).eq('meeting_booking_enabled',false).select('id');if(error)throw error;if(!data?.length)throw Error('تغيرت القاعة؛ حدّث القائمة.');
+          await loadRooms(true);renderRoomsAdminList();showNotification('تمت إتاحة القاعة لحجز الاجتماعات.','success');
+        }catch(e){showNotification(e.message,'error');}finally{add.disabled=false;}};
+        row.append(name,add);section.append(row);
+      }el.append(section);
+    }
+
 }
 
 function pickRoomForEdit(id) {
@@ -989,6 +1008,7 @@ async function saveRoom() {
     const academic_room_name = academicSelect.value || null;
 
     if (!name) return showNotification('اكتب اسم القاعة', 'error');
+    if(!editingRoomId&&academicOnlyRooms.some(r=>r.name.trim().toLowerCase()===name.toLowerCase()||(academic_room_name&&r.academic_room_name===academic_room_name)))return showNotification('القاعة لها ربط دراسي محفوظ؛ استخدم «إتاحة لحجز الاجتماعات» من قسم القاعات الدراسية بدل إنشاء نسخة مكررة.','error');
 
     if (editingRoomId) {
         const { error } = await supabase.from('rooms')
@@ -998,7 +1018,7 @@ async function saveRoom() {
         if (error) return showNotification('فشل التعديل', 'error');
     } else {
         const { error } = await supabase.from('rooms')
-            .insert([{ name, capacity, features, academic_room_name }]);
+            .insert([{ name, capacity, features, academic_room_name, meeting_booking_enabled: true }]);
 
         if (error) return showNotification('فشل الإضافة', 'error');
     }

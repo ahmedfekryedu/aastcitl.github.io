@@ -49,7 +49,7 @@
    const approve=document.createElement('button');approve.type='button';approve.className='citl-ac-button';approve.textContent='اعتماد الحجز';actions.append(approve);section.append(actions);
    const reject=document.createElement('button');reject.type='button';reject.className='citl-ac-button secondary';reject.textContent='رفض الطلب';actions.append(reject);reject.onclick=async()=>{if(reject.disabled)return;reject.disabled=true;document.getElementById('meeting-details-modal')?.classList.remove('show');try{await root.rejectMeeting(m.id);await open(m.id,false);}finally{reject.disabled=false;}};
    approve.onclick=async()=>{if(approve.disabled)return;approve.disabled=true;
-    try{document.getElementById('meeting-details-modal')?.classList.remove('show');const success=await root.approveMeeting(m.id);if(success){await open(m.id,false);root.checkUserNotifications?.();}}
+    try{document.getElementById('meeting-details-modal')?.classList.remove('show');const success=await root.approveMeeting(m.id);if(success){void root.checkUserNotifications?.();}else{document.getElementById('meeting-details-modal')?.classList.add('show');}}
     finally{approve.disabled=false;}
    };
   }

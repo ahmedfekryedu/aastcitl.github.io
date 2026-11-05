@@ -196,7 +196,7 @@
   if(host.parentElement!==grid)grid.insertBefore(host,faculty?null:grid.querySelector('.dh-admin-summary'));
   grid.classList.add('dh-with-actions');host.setAttribute('aria-busy','true');
   const context=JSON.stringify([root.currentUser?.id,root.currentUser?.role,root.currentUser?.permissions,root.currentUser?.faculty_verification_status,access,faculty]);
-  if(host.dataset.context!==context||!host.children.length){host.dataset.context=context;host.hidden=false;host.innerHTML='<div class="dh-action-loading" role="status" aria-label="جاري تحميل إجراءات المحاضرات"><span class="citl-skeleton-line"></span><span class="citl-skeleton-line"></span></div>';}
+  if(host.dataset.context!==context||!host.children.length){host.dataset.context=context;host.hidden=false;host.innerHTML=faculty?'<div class="dh-metric-label">ملغاة اليوم</div><div class="dh-metric-value">—</div>':'<div class="dh-summary-head"><h3>إجراءات المحاضرات</h3><div class="dh-metric"><div class="dh-metric-label">ملغاة اليوم</div><div class="dh-metric-value">—</div></div></div><div class="dh-facts">'+['إحلال محاضر','تغيير قاعة','بانتظار المراجعة'].map(t=>'<div class="dh-metric"><div class="dh-metric-label">'+t+'</div><div class="dh-metric-value">—</div></div>').join('')+'</div><div class="dh-summary-foot" role="status">جارٍ تحديث الإجراءات…</div>';}
   const serial=++dashboardSerial;
   try{
    const data=await rpc('citl_current_academic_actions');if(serial!==dashboardSerial||!host.isConnected)return;

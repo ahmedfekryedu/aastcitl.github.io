@@ -25,3 +25,24 @@
 .citl-courses #cm-app .p2-toolbar .cu-field-help{line-height:1.7;min-height:20px}
 @media(min-width:601px) and (max-width:1000px){.citl-courses #cm-app .p2-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.citl-courses #cm-app .p2-toolbar{grid-template-columns:minmax(0,1fr)}}
+
+/* Closed-scope usability correction: existing course pages only. */
+.citl-courses .course-global-nav{display:flex;align-items:stretch;gap:8px;position:relative;z-index:20}
+.citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details{flex:1 1 200px;min-width:0}
+.citl-courses .course-global-nav>a,.citl-courses .course-global-nav summary{display:block;padding:11px 12px;font-weight:800;cursor:pointer;color:#2a3475;border-radius:8px;background:#fff;border:1px solid #dfe4ee;line-height:1.8;text-align:right}
+.citl-courses .course-global-nav>details{position:relative}.citl-courses .course-global-nav details[open]>summary{background:#2a3475;color:white;border-color:#2a3475}
+.citl-courses .course-global-nav details>div{position:absolute;inset-inline:0;top:calc(100% + 5px);padding:8px;background:white;border:1px solid #dfe4ee;border-radius:10px;box-shadow:0 10px 24px #23366b20;min-width:230px}
+.citl-courses .course-global-nav details a,.citl-courses .course-global-nav details small{display:block;padding:10px;border-bottom:1px solid #edf0f5;line-height:1.8}
+.citl-courses #cm-app .p2-nav{display:flex;flex-wrap:wrap;gap:8px;grid-template-columns:none}
+.citl-courses #cm-app .p2-nav button,.citl-courses #cm-app .p2-nav .cu-task-link{width:auto;flex:1 1 190px;min-height:44px}
+.citl-courses #cm-app .p2-nav .cu-task-link{display:flex;align-items:center;justify-content:center;padding:8px 12px;border:1px solid #dfe4ee;border-radius:8px;background:#fff;font-size:12px;text-decoration:none;color:#2a3475}
+.citl-courses .cu-setup-guide{padding:14px 18px;border:1px solid #dfe4ee;border-right:3px solid #f3a628;border-radius:10px;margin:12px 0;background:#f7f9fc}
+.citl-courses .cu-setup-guide summary{font-weight:800;cursor:pointer}.citl-courses .cu-setup-guide ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;padding:12px 22px;margin:0}.citl-courses .cu-setup-guide a{color:#2a3475;font-size:13px}.citl-courses .cu-setup-guide p{font-size:12px;color:#657089;margin:6px 0}
+@media(max-width:600px){.citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details{flex-basis:100%}.citl-courses .course-global-nav details>div{position:static;min-width:0;box-shadow:none;margin-top:6px}.citl-courses #cm-app .p2-nav button,.citl-courses #cm-app .p2-nav .cu-task-link{flex-basis:calc(50% - 8px);font-size:11px}.citl-courses .cu-setup-guide ol{grid-template-columns:1fr}.citl-courses .course-global-nav summary{font-size:12px}}
+
+/* Keep the existing filters accessible without pushing mobile tasks far below the fold. */
+.citl-courses .cu-list-filters{margin:12px 0;border:1px solid #dfe4ee;border-radius:10px;background:#f7f9fc}
+.citl-courses .cu-list-filters>summary{padding:12px 14px;cursor:pointer;font-weight:800;color:#2a3475;font-size:12px}
+.citl-courses #cm-app .cu-list-filters .p2-toolbar{margin:0;border:0;border-top:1px solid #dfe4ee;border-radius:0 0 10px 10px}
+.citl-courses #cm-app .cu-list-filters .p2-toolbar>h2{display:none}
+@media(max-width:600px){.citl-courses .course-global-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.citl-courses .course-global-nav>a{grid-column:1/-1}.citl-courses .course-global-nav summary{padding:9px 7px;font-size:11px}.citl-courses .course-global-nav>details[open]{grid-column:1/-1}.citl-courses .course-global-nav>a{padding:9px;font-size:12px}.citl-courses .cu-list-filters>summary{padding:10px 12px}}

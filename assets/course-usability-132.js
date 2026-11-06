@@ -1,9 +1,9 @@
 (function(root){'use strict';
 const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const departments={'transport-logistics':'قسم إدارة لوجستيات النقل','trade-logistics':'قسم إدارة لوجستيات التجارة الدولية','supply-chain':'قسم إدارة لوجستيات سلاسل الإمداد','energy-logistics':'قسم إدارة لوجستيات الطاقة والبترول'};
-function loading(done=0,total=0){return `<section class="cu-loading" role="status" aria-live="polite"><span class="cu-spinner" aria-hidden="true"></span><div><strong>جارٍ تجهيز قائمة المقررات</strong><p>${total?`تمت قراءة ${done} من ${total} مقررًا`:'نراجع صلاحيات حسابك وبيانات الفصل الدراسي…'}</p><small>ستظهر النتائج في صفحة واحدة. يمكنك تغيير القسم بعد اكتمال التحميل.</small></div>${total?`<progress max="${total}" value="${done}" aria-label="تقدم تحميل المقررات"></progress>`:''}</section>`;}
+function loading(done=0,total=0){return `<section class="cu-loading" role="status" aria-live="polite"><span class="cu-spinner" aria-hidden="true"></span><div><strong>جارٍ تجهيز قائمة المقررات</strong><p>${total?`تمت قراءة ${done} من ${total} مقررًا`:'نراجع صلاحيات حسابك وبيانات الفصل الدراسي…'}</p><small>تظهر النتائج المتاحة تباعًا. لا تُحسب القائمة مكتملة قبل انتهاء التحميل.</small></div>${total?`<progress max="${total}" value="${done}" aria-label="تقدم تحميل المقررات"></progress>`:''}</section>`;}
 const help={
- '/courses/':'ابدأ باختيار الفصل والقسم. القائمة تجمع المقررات المتاحة لحسابك؛ فتح مقرر يعرض فريقه والمعايير وسجل العمل.',
+ '/courses/':'المتابعة التشغيلية والأسبوعية محفوظة هنا. نسبها ومراجعاتها مستقلة عن تقرير الاستيفاء الرسمي Q1–43؛ تصل إلى النموذج الرسمي من «مهامي ومقرراتي».',
  '/courses/my-courses.html':'مقرراتي: المواد التي تدرّسها وتستوفيها بنفسك. بقية التبويبات تعرض تكليفات التنسيق والمراجعة فقط؛ صلاحية الإدارة لا تمنح استيفاءً أو اعتمادًا أكاديميًا تلقائيًا.',
  '/courses/operations.html':'اختيار التنسيق يرتب قائمة عمل المنسق، ولا يعيّنه مسؤولًا بمجرده. مسؤول القسم يعتمد التكليف، وإزالة الاختيار لا تلغي تكليفًا قائمًا.',
  '/courses/academic-assignments.html':'حدد من يستوفي لكل محاضر: بنفسه، بديل معتمد من نفس القسم، أو إيقاف المهمة. اسم المحاضر الأصلي وتاريخه يبقيان محفوظين.',

@@ -1,7 +1,7 @@
 {
-  "release": "20261105-courses133-attendance134-review",
-  "built_at": "2026-11-05",
-  "base": "CITL-COURSES117-ATTENDANCE-R8-REVIEW-20261030",
-  "status": "local-tested review; production readiness not established",
-  "description": "Cumulative132 plus locally tested course display optimization133, shared course notification menu, aligned course controls, attendance week optimization134 and schedule-matched home button. Requires read-only preflight and staging review."
+  "release": "20261107-courses-linkage135-review",
+  "built_at": "2026-11-07",
+  "base": "CITL-SYSTEM133134-USABILITY-COMPLETE-20261106",
+  "status": "local-tested review; production NO-GO pending schema match and staging",
+  "description": "Term-scoped course identity, exact timetable teaching links, independent academic roles, approved manual completion and department references. Requires reviewed SQL135; does not prepare existing term automatically."
 }

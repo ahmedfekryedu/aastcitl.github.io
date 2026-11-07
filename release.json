@@ -1,7 +1,7 @@
 {
-  "release": "20261107-courses-linkage135-review",
+  "release": "20261107-courses136-loading-review",
   "built_at": "2026-11-07",
-  "base": "CITL-SYSTEM133134-USABILITY-COMPLETE-20261106",
+  "base": "CITL-COURSES135-LINKAGE-REVIEW-20261107",
   "status": "local-tested review; production NO-GO pending schema match and staging",
-  "description": "Term-scoped course identity, exact timetable teaching links, independent academic roles, approved manual completion and department references. Requires reviewed SQL135; does not prepare existing term automatically."
+  "description": "Preserves SQL135 linkage; optional compact offerings read contract136 and continuous course landing loader. Requires SQL136 fingerprint review; no production deployment performed."
 }

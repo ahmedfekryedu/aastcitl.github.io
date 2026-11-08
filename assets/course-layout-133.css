@@ -46,3 +46,7 @@
 .citl-courses #cm-app .cu-list-filters .p2-toolbar{margin:0;border:0;border-top:1px solid #dfe4ee;border-radius:0 0 10px 10px}
 .citl-courses #cm-app .cu-list-filters .p2-toolbar>h2{display:none}
 @media(max-width:600px){.citl-courses .course-global-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.citl-courses .course-global-nav>a{grid-column:1/-1}.citl-courses .course-global-nav summary{padding:9px 7px;font-size:11px}.citl-courses .course-global-nav>details[open]{grid-column:1/-1}.citl-courses .course-global-nav>a{padding:9px;font-size:12px}.citl-courses .cu-list-filters>summary{padding:10px 12px}}
+
+/* CITL137: identical sizing for the personal task link and its adjacent menus. */
+.citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details>summary{box-sizing:border-box;display:flex;align-items:center;min-height:48px;font-family:Cairo,sans-serif;font-size:14px;font-weight:800;line-height:1.8;padding:11px 12px}
+@media(max-width:600px){.citl-courses .course-global-nav>a{grid-column:auto}.citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details>summary{font-size:12px;min-height:48px;padding:9px 7px;justify-content:center;text-align:center}}

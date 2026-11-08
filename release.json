@@ -1,7 +1,7 @@
 {
-  "release": "20261107-courses136-loading-review",
-  "built_at": "2026-11-07",
+  "release": "20261108-courses137-read-performance-review",
+  "built_at": "2026-11-08",
   "base": "CITL-COURSES135-LINKAGE-REVIEW-20261107",
-  "status": "local-tested review; production NO-GO pending schema match and staging",
-  "description": "Preserves SQL135 linkage; optional compact offerings read contract136 and continuous course landing loader. Requires SQL136 fingerprint review; no production deployment performed."
+  "status": "review-only; requires SQL137 matching preflight",
+  "description": "Courses read paths, full department display names and coordinator navigation; preserves non-course modules"
 }

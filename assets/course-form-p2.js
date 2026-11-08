@@ -1,7 +1,7 @@
 (function(root){'use strict';
  const app=document.getElementById('cm-app'),status=document.getElementById('cm-status');
  const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const dep={'supply-chain':'اللوجستيات وسلاسل الإمداد','transport-logistics':'لوجستيات النقل','trade-logistics':'لوجستيات التجارة الدولية','energy-logistics':'لوجستيات الطاقة والبترول'};
+ const dep={'supply-chain':'قسم إدارة لوجستيات سلاسل الإمداد','transport-logistics':'قسم إدارة لوجستيات النقل','trade-logistics':'قسم إدارة لوجستيات التجارة الدولية','energy-logistics':'قسم إدارة لوجستيات الطاقة والبترول'};
  const owner={lecturer:'عضو التدريس',coordinator:'منسق المقرر',head:'رئيس القسم',signature:'حدث اعتماد',system:'بيانات النظام'};
  const state={LECTURER_DRAFT:'مسودة عضو التدريس',LECTURER_SUBMITTED:'بانتظار منسق المقرر',DEPARTMENT_REVIEW:'مراجعة رئيس القسم'};
  let ctx,term='',data=null,dirty={},timer,saving=null,screen='mine',request=0;

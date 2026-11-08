@@ -1,6 +1,6 @@
 (function(root){'use strict';
  const app=document.getElementById('cm-app'),status=document.getElementById('cm-status'),E=root.CITLCoursesModel.escape;
- const departments={'supply-chain':'سلاسل الإمداد','transport-logistics':'لوجستيات النقل','trade-logistics':'التجارة الدولية','energy-logistics':'الطاقة والبترول'};
+ const departments={'supply-chain':'قسم إدارة لوجستيات سلاسل الإمداد','transport-logistics':'قسم إدارة لوجستيات النقل','trade-logistics':'قسم إدارة لوجستيات التجارة الدولية','energy-logistics':'قسم إدارة لوجستيات الطاقة والبترول'};
  const roles={senior_coordinator:'كبير المنسقين',group_lead:'رئيس مجموعة',coordinator:'منسق مقرر',assistant_coordinator:'منسق مساعد'};
  let context,term='',items=[],ticket=0,department='',selected=new Set();
  const rpc=(action,payload={})=>root.CITLRequests.rpc(root.sb,'citl_course_preparation_api',{p_action:action,p_payload:{term_id:term,...payload}});

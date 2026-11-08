@@ -1,7 +1,7 @@
 (function(root){'use strict';
  const app=document.getElementById('cm-app'),status=document.getElementById('cm-status');
  const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const deps={'supply-chain':'إدارة اللوجستيات وسلاسل الإمداد','transport-logistics':'إدارة لوجستيات النقل','trade-logistics':'إدارة لوجستيات التجارة الدولية','energy-logistics':'إدارة لوجستيات الطاقة والبترول'};
+ const deps={'supply-chain':'قسم إدارة لوجستيات سلاسل الإمداد','transport-logistics':'قسم إدارة لوجستيات النقل','trade-logistics':'قسم إدارة لوجستيات التجارة الدولية','energy-logistics':'قسم إدارة لوجستيات الطاقة والبترول'};
  const states={NOT_STARTED:'لم يبدأ',LECTURER_DRAFT:'استيفاء المحاضر',LECTURER_SUBMITTED:'مراجعة المنسق',RETURNED_TO_LECTURER:'مرتجع للمحاضر',RETURNED_TO_COORDINATOR:'مرتجع للمنسق',SENIOR_REVIEW:'كبير المنسقين',RETURNED_TO_SENIOR:'مرتجع لكبير المنسقين',DEPARTMENT_REVIEW:'رئيس القسم',DEPARTMENT_APPROVED:'معتمد نهائيًا',ARCHIVED:'معتمد مؤرشف'};
  let context,result,filters={offset:0,limit:25},sequence=0;
  const rpc=(name,p)=>root.CITLRequests.rpc(root.sb,name,p),query=p=>rpc('citl_course_analytics_api',{p_payload:p});

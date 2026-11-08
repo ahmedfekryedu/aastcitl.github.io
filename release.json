@@ -1,7 +1,7 @@
 {
-  "release": "20261108-ui137-r2-attendance138-review",
-  "built_at": "2026-11-08",
-  "base": "CITL-COURSES137-COMPLETE-REVIEW-20261108",
-  "status": "review-only; course SQL unchanged; attendance138 requires approved preflight and staging",
-  "description": "Scoped courses navigation, assignments and active terms; attendance room linkage, location precheck and camera; recipient bulk selector. No production deployment."
+  "release": "20261109-ui137-r3-attendance138-review",
+  "built_at": "2026-11-09",
+  "base": "CITL-UI137-R2-ATTENDANCE138-COMPLETE-20261108",
+  "status": "review-only; no new SQL; existing 137 and 138 retained",
+  "description": "Registered account names and assignment readback/edit/deactivation, academic structure preview, current-page navigation. No production deployment."
 }

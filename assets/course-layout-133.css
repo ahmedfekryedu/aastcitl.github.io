@@ -83,3 +83,6 @@
 .citl-courses #cm-app .ca-assignment .ca-save small{margin-top:6px}
 @media(max-width:1000px){.citl-courses #cm-app .ca-assignment{grid-template-columns:1fr 1fr}.citl-courses #cm-app .ca-assignment>.ca-course{grid-column:1/-1}.citl-courses #cm-app .ca-assignment>.ca-save{grid-column:auto}}
 @media(max-width:600px){.citl-courses #cm-app .ca-assignment{grid-template-columns:minmax(0,1fr)}.citl-courses #cm-app .ca-assignment>.ca-course{grid-column:auto}}
+
+/* Only the actual routed page is orange, never an arbitrary default or opened menu. */
+.citl-courses .course-global-nav>details:not(.course-current-section)[open]>summary{background:#fff;color:#2a3475;border-color:#aebbd4}

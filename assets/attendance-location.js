@@ -24,14 +24,24 @@ root.CITLAttendanceLocation=function({host,el,button,dialog,purpose='attendance'
   d.append(el('p',building?'الفحص يحدد مركز الخريطة فقط؛ لا يحفظ حدودًا أو يسجل حضورًا.':'المتصفح لا يستطيع تشغيل الموقع نيابةً عنك. الفحص لا يسجل حضورًا؛ التسجيل يتم من زر محاضرتك بعد تحقق النظام. ويمكنك استخدام كاميرا الهاتف لمسح رمز القاعة المطبوع.','ar8-muted'));
   const tools=el('div',null,'ar8-actions');d.append(tools);button('إعادة فحص الموقع',async()=>{try{await measure();intro.textContent=building?'وصل قياس الموقع. أغلق الإرشادات واضغط «موقعي الحالي» للانتقال إلى مكانك.':'وصل قياس الموقع بنجاح. أغلق الإرشادات ثم سجّل حضور محاضرتك.';}catch(_){}},tools);button(building?'العودة للخريطة':'العودة للمحاضرات',()=>d.close(),tools);
  }
- async function measure(){
+ async function measure({maxAccuracy=10,maxAge=15}={}){
   notify('جارٍ طلب قياس حديث من الهاتف…');
   try{
    const p=await new Promise((resolve,reject)=>{
     if(!root.isSecureContext)return reject({code:'insecure'});
     if(!navigator.geolocation)return reject({code:'unsupported'});
-    const timer=setTimeout(()=>reject({code:3}),18000);
-    navigator.geolocation.getCurrentPosition(p=>{clearTimeout(timer);resolve(p);},e=>{clearTimeout(timer);reject(e);},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
+    let watch=null,best=null,done=false;
+    const cleanup=()=>{clearTimeout(timer);if(watch!==null)navigator.geolocation.clearWatch(watch);root.removeEventListener('pagehide',cancel);};
+    const finish=(error,value)=>{if(done)return;done=true;cleanup();error?reject(error):resolve(value);};
+    const cancel=()=>finish({code:2});root.addEventListener('pagehide',cancel,{once:true});
+    const timer=setTimeout(()=>{if(best&&Date.now()-best.timestamp<=maxAge*1000)finish(null,best);else finish({code:3});},16000);
+    const received=p=>{if(done)return;const c=p.coords;if(!Number.isFinite(c.accuracy)||c.accuracy<0.1||Date.now()-p.timestamp>maxAge*1000||p.timestamp>Date.now()+5000)return;
+     if(!best||Date.now()-best.timestamp>maxAge*1000||c.accuracy<best.coords.accuracy)best=p;
+     notify('دقة القياس الحالية نحو '+Math.ceil(c.accuracy)+' متر — جارٍ تحسين القياس…');
+     if(c.accuracy<=maxAccuracy)finish(null,p);
+    };
+    watch=navigator.geolocation.watchPosition(received,e=>{if(e.code===1)finish(e);},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
+    if(done&&watch!==null)navigator.geolocation.clearWatch(watch);
    });
    notify(building?'وصل قياس الموقع؛ حدد حدود المبنى بدقة على الخريطة قبل الحفظ.':'وصل قياس الموقع. يتحقق النظام من حدود المبنى ودقة القياس عند تسجيل الحضور.','ready');
    return {latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy,timestamp:p.timestamp};

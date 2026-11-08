@@ -117,3 +117,13 @@ dialog:not(.citl-logout-confirm){box-shadow:0 24px 80px #10204b35}
  body[data-attendance-mode="admin"] .ar8-stat>span{font-size:14px;line-height:1.8}
  body[data-attendance-mode="admin"] .ar8-stat .ar8-metric{font-size:34px;font-weight:800}
 }
+
+body[data-attendance-mode=self] .ar8-current{border:2px solid #d99a1b;background:linear-gradient(120deg,#fff9e9,#fff);box-shadow:0 3px 12px #15245012}
+body[data-attendance-mode=self] .ar8-lecture[data-phase=upcoming],body[data-attendance-mode=self] .ar8-lecture[data-phase=ended]{background:#f3f5f8;border-color:#dbe0e8;color:#56647b}
+body[data-attendance-mode=self] .ar8-location-feedback{padding:12px 16px;border-radius:9px;background:#eef2f8;border-inline-start:4px solid #7a88a0;line-height:1.7}
+body[data-attendance-mode=self] .ar8-location-feedback[data-state=ready]{background:#e8f6ee;border-color:#20834b;color:#166237}
+body[data-attendance-mode=self] .ar8-location-feedback[data-state=warning]{background:#fff3df;border-color:#df9b25;color:#805217}
+body[data-attendance-mode=self] .ar8-camera{display:block;width:100%;max-height:55vh;object-fit:contain;background:#17213e;border-radius:12px}
+body[data-attendance-mode=self] .ar8-current-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
+body[data-attendance-mode=self] .ar8-lecture .ar8-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}body[data-attendance-mode=self] .ar8-lecture .ar8-actions button{flex:1 1 160px;min-height:44px}
+@media(max-width:600px){body[data-attendance-mode=self] .ar8-lecture .ar8-actions{display:grid;grid-template-columns:1fr 1fr}body[data-attendance-mode=self] .ar8-lecture .ar8-actions button{font-size:13px;padding:10px 8px}body[data-attendance-mode=self] .ar8-lecture{padding:16px}}

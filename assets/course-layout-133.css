@@ -50,3 +50,36 @@
 /* CITL137: identical sizing for the personal task link and its adjacent menus. */
 .citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details>summary{box-sizing:border-box;display:flex;align-items:center;min-height:48px;font-family:Cairo,sans-serif;font-size:14px;font-weight:800;line-height:1.8;padding:11px 12px}
 @media(max-width:600px){.citl-courses .course-global-nav>a{grid-column:auto}.citl-courses .course-global-nav>a,.citl-courses .course-global-nav>details>summary{font-size:12px;min-height:48px;padding:9px 7px;justify-content:center;text-align:center}}
+
+/* UI137-R2: scoped visual refinement; system header/footer unchanged. */
+.citl-courses .course-global-nav>.course-current-section>a,
+.citl-courses .course-global-nav>a.course-current-section,
+.citl-courses .course-global-nav>details.course-current-section>summary{background:#f4a91f;color:#172052;border-color:#e49a13}
+.citl-courses .cm-main{font-size:14px;line-height:1.85}
+.citl-courses .cm-title h1{font-size:23px;line-height:1.6}
+.citl-courses #cm-app :is(input,select,textarea,button,.cm-btn,.p2-primary){font-family:Cairo,sans-serif;font-size:14px;line-height:1.7}
+.citl-courses #cm-app :is(h2,h3){font-size:18px;line-height:1.7}
+.citl-courses #cm-app :is(th,td,label){font-size:14px;line-height:1.8}
+.citl-courses #cm-app :is(small,.cu-field-help,.ca-eligibility){font-size:12px;line-height:1.8}
+.citl-courses #cm-app .op-filters{align-items:start}
+.citl-courses #cm-app .op-filters>label{display:grid;grid-template-rows:24px 44px auto;gap:6px}
+.citl-courses #cm-app .op-filters>button{margin-top:30px;min-height:44px}
+.citl-courses #cm-app .ca-assignment{display:grid;grid-template-columns:minmax(180px,1.3fr) minmax(130px,.8fr) minmax(220px,1.4fr) minmax(120px,.8fr) auto;align-items:start;gap:14px;padding:18px;margin:12px 0;border:1px solid #dce3ef;border-radius:12px;background:#fff}
+.citl-courses #cm-app .ca-assignment label{display:flex;flex-direction:column;gap:6px;min-width:0}
+.citl-courses #cm-app .ca-assignment select{width:100%;min-height:44px}
+.citl-courses #cm-app .ca-assignment>button{margin-top:31px;min-height:44px}
+.citl-courses #cm-app .ca-eligibility,.citl-courses #cm-app .ca-audit-note{color:#5b6882;display:block}
+.citl-courses #cm-app .s135-college{padding:18px;border:1px solid #dce3ef;border-right:3px solid #f4a91f;border-radius:12px;background:#f6f8fc;margin:14px 0}
+.citl-courses dialog.s135-dialog{font:14px/1.85 Cairo,sans-serif}
+.citl-courses dialog.s135-dialog [data-office-progress]{padding-inline-start:22px}
+@media(max-width:1000px){.citl-courses #cm-app .ca-assignment{grid-template-columns:1fr 1fr}.citl-courses #cm-app .ca-assignment>div{grid-column:1/-1}}
+@media(max-width:600px){.citl-courses .cm-title h1{font-size:19px}.citl-courses #cm-app .ca-assignment{grid-template-columns:minmax(0,1fr)}.citl-courses #cm-app .ca-assignment>button,.citl-courses #cm-app .op-filters>button{margin-top:0}.citl-courses #cm-app :is(input,select,textarea){font-size:16px}.citl-courses #cm-app :is(button,.cm-btn,.p2-primary){font-size:13px}.citl-courses #cm-app :is(th,td,label){font-size:13px}}
+
+/* Final assignment alignment: course and save use the same heading row. */
+.citl-courses #cm-app .ca-assignment{grid-template-columns:minmax(190px,1.3fr) minmax(130px,.7fr) minmax(250px,1.5fr) minmax(120px,.6fr);align-items:start}
+.citl-courses #cm-app .ca-assignment .ca-field-title{display:block;min-height:24px;margin-bottom:6px;color:#52627b;font-size:12px}
+.citl-courses #cm-app .ca-assignment .ca-course b{display:block;padding-block:10px;line-height:1.6}
+.citl-courses #cm-app .ca-assignment .ca-save button{width:100%;min-height:44px;margin:0}
+.citl-courses #cm-app .ca-assignment .ca-save small{margin-top:6px}
+@media(max-width:1000px){.citl-courses #cm-app .ca-assignment{grid-template-columns:1fr 1fr}.citl-courses #cm-app .ca-assignment>.ca-course{grid-column:1/-1}.citl-courses #cm-app .ca-assignment>.ca-save{grid-column:auto}}
+@media(max-width:600px){.citl-courses #cm-app .ca-assignment{grid-template-columns:minmax(0,1fr)}.citl-courses #cm-app .ca-assignment>.ca-course{grid-column:auto}}

@@ -1,7 +1,7 @@
 {
-  "release": "20261108-courses137-read-performance-review",
+  "release": "20261108-ui137-r2-attendance138-review",
   "built_at": "2026-11-08",
-  "base": "CITL-COURSES135-LINKAGE-REVIEW-20261107",
-  "status": "review-only; requires SQL137 matching preflight",
-  "description": "Courses read paths, full department display names and coordinator navigation; preserves non-course modules"
+  "base": "CITL-COURSES137-COMPLETE-REVIEW-20261108",
+  "status": "review-only; course SQL unchanged; attendance138 requires approved preflight and staging",
+  "description": "Scoped courses navigation, assignments and active terms; attendance room linkage, location precheck and camera; recipient bulk selector. No production deployment."
 }

@@ -1,7 +1,7 @@
 {
-  "release": "20261109-ui137-r4-attendance138-review",
+  "release": "20261109-ui137-r5-courses139-140-review",
   "built_at": "2026-11-09",
-  "base": "CITL-UI137-R3-ATTENDANCE138-COMPLETE-20261109",
-  "status": "review-only; no new SQL; existing 137 and 138 retained",
-  "description": "Fix registered-name lookup with academic department keys; clarify course coordinator assignment entry and responsibilities. Prior UI137-R3 and Attendance138 retained. No new SQL or production deployment."
+  "base": "CITL-UI137-R4-ATTENDANCE138-COMPLETE-20261109",
+  "status": "review-only; requires SQL139 and SQL140 checks; production not tested",
+  "description": "Scoped course roster inclusion, compact leadership cards, explicit manager empty states, SDG reference library, and read performance fixes. Attendance138 and prior fixes preserved."
 }

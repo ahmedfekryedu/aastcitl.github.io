@@ -1,7 +1,7 @@
 {
-  "release": "20261109-ui137-r3-attendance138-review",
+  "release": "20261109-ui137-r4-attendance138-review",
   "built_at": "2026-11-09",
-  "base": "CITL-UI137-R2-ATTENDANCE138-COMPLETE-20261108",
+  "base": "CITL-UI137-R3-ATTENDANCE138-COMPLETE-20261109",
   "status": "review-only; no new SQL; existing 137 and 138 retained",
-  "description": "Registered account names and assignment readback/edit/deactivation, academic structure preview, current-page navigation. No production deployment."
+  "description": "Fix registered-name lookup with academic department keys; clarify course coordinator assignment entry and responsibilities. Prior UI137-R3 and Attendance138 retained. No new SQL or production deployment."
 }

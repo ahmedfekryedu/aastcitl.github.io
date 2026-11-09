@@ -7,7 +7,7 @@
  let ctx,term='',data=null,dirty={},timer,saving=null,screen='mine',request=0;
  const rpc=(action,payload={})=>root.CITLRequests.rpc(root.sb,'citl_course_form_api',{p_action:action,p_payload:payload});
  const message=s=>{status.textContent=s;};
- function nav(){return `<nav class="p2-nav"><button data-nav="mine">مقرراتي الدراسية</button><button data-nav="assigned">تكليفاتي</button><button data-nav="sdg">مكتبة SDG</button><button data-nav="exceptions">استثناءات المراجع</button><a href="/courses/preparation.html">تجهيز المقررات والتكليفات</a><a href="/courses/">المتابعة الحالية</a></nav>`;}
+ function nav(){return `<nav class="p2-nav"><button data-nav="mine">مقرراتي الدراسية</button><button data-nav="assigned">تكليفاتي</button><button data-nav="sdg">مكتبة SDG</button><button data-nav="exceptions">استثناءات المراجع</button><a href="/courses/preparation.html">تعيين منسقي المقررات</a><a href="/courses/">المتابعة الحالية</a></nav>`;}
  function wireNav(){app.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{if(!await flush())return;data=null;screen=b.dataset.nav;load();});}
  const select=(id,items,value)=>`<select id="${id}">${items.map(([v,l])=>`<option value="${E(v)}" ${v===value?'selected':''}>${E(l)}</option>`).join('')}</select>`;
  async function load(){const token=++request;message('جارٍ تحميل بيانات المقررات…');try{

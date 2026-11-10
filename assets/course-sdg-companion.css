@@ -1,0 +1,34 @@
+[data-sdg-companion]{height:80px}
+.sdgc-float{position:fixed;left:22px;bottom:22px;z-index:9500;display:flex;align-items:center;gap:9px;background:#263571;color:#fff;border:2px solid #eda726;border-radius:30px;padding:12px 18px;font:700 14px Cairo,sans-serif;box-shadow:0 5px 20px #17255730;cursor:pointer}
+.sdgc-float span{color:#ffc663;font-size:22px;line-height:1}
+dialog.sdgc-dialog{position:fixed;inset:16px auto 16px 16px;margin:0;width:min(880px,calc(100vw - 32px));max-width:calc(100vw - 32px);height:calc(100dvh - 32px);max-height:calc(100dvh - 32px);padding:0;border:1px solid #ccd5e8;border-radius:16px;box-shadow:0 15px 70px #17255755;color:#253365;background:#fff;font:14px Cairo,sans-serif;overflow:hidden}
+dialog.sdgc-dialog[open]{display:flex;flex-direction:column}
+.sdgc-dialog::backdrop{background:#17255755}
+.sdgc-dialog *{box-sizing:border-box}
+.sdgc-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:#263571;color:#fff;border-bottom:3px solid #eda726;flex:none}
+.sdgc-header h2{font-size:17px;margin:0}.sdgc-header p{font-size:13px;color:#e0e6fa;margin:5px 0 0}
+.sdgc-dialog button,.sdgc-dialog select{font:inherit;min-height:36px;border:1px solid #ccd5e8;border-radius:8px;padding:5px 10px;background:#fff;color:#263571}
+.sdgc-dialog button{cursor:pointer}.sdgc-dialog button:disabled{opacity:.45;cursor:default}
+.sdgc-dialog button:focus-visible,.sdgc-dialog select:focus-visible,.sdgc-float:focus-visible{outline:3px solid #efa928;outline-offset:2px}
+.sdgc-dialog .sdgc-close{background:transparent;color:white;border-color:#ffffff66;min-width:38px;font-size:23px;flex:none}
+.sdgc-controls{padding:10px 18px;background:#f4f6fb;border-bottom:1px solid #dce3f2;flex:none}
+.sdgc-controls p{font-size:12px;margin:0 0 8px;line-height:1.65}.sdgc-controls label{display:flex;align-items:center;gap:8px;font-weight:700}.sdgc-controls select{min-width:0;max-width:100%;flex:1;background:#fff}.sdgc-controls .sdgc-context{font-size:11px;color:#596582;margin:6px 0}
+.sdgc-pager{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.sdgc-pager label{flex:1}.sdgc-controls a{display:inline-block;font-size:12px;margin-top:8px;text-decoration:underline;color:#263571}
+.sdgc-view{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;background:#e6eaf2;padding:10px;direction:ltr;position:relative}
+.sdgc-page-image{display:block;width:100%;max-width:none;height:auto;background:white;box-shadow:0 1px 5px #26357120}.sdgc-page-image[hidden]{display:none}
+.sdgc-zoomed .sdgc-page-image{width:150%;min-width:1000px}
+.sdgc-status{direction:rtl;text-align:center;color:#38466b}.sdgc-status:empty{display:none}
+.sdgc-text{direction:rtl;background:white;padding:10px;margin-top:10px;border-radius:6px}.sdgc-text pre{white-space:pre-wrap;font:13px/1.7 sans-serif;max-width:100%;overflow-wrap:anywhere}
+.sdgc-footer{padding:10px 18px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #dce3f2;background:#fff;font-size:12px;flex:none}.sdgc-footer button{background:#263571;color:white}
+@media(max-width:600px){.sdgc-float{bottom:max(12px,env(safe-area-inset-bottom));left:12px;padding:9px 13px;font-size:12px}dialog.sdgc-dialog{inset:6px;width:calc(100vw - 12px);max-width:calc(100vw - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:10px}.sdgc-header,.sdgc-controls{padding:10px 12px}.sdgc-header h2{font-size:14px}.sdgc-header p{font-size:12px}.sdgc-controls label{font-size:12px}.sdgc-pager{gap:5px}.sdgc-pager button{padding:4px 7px;font-size:12px}.sdgc-footer{padding:8px 10px;font-size:11px}.sdgc-footer button{font-size:12px}.sdgc-view{padding:5px}}
+@media print{[data-sdg-companion]{display:none!important}}
+/* Keep the companion independent of generic form heading/button rules. */
+.citl-courses #cm-app .sdgc-header h2{color:#fff;margin:0;padding:0;font-size:17px;line-height:1.6}
+.citl-courses #cm-app .sdgc-controls label{flex-direction:row;align-items:center}
+.citl-courses #cm-app .sdgc-dialog .sdgc-close{background:transparent;color:#fff;border-color:#ffffff66;font-size:22px}
+.citl-courses #cm-app .sdgc-float{background:#263571;color:#fff;border:2px solid #eda726;border-radius:30px;padding:12px 18px;font-size:14px;box-shadow:0 5px 20px #17255730}
+.citl-courses #cm-app .sdgc-footer button{background:#263571;color:#fff}
+.citl-courses #cm-app .sdgc-footer button:hover,.citl-courses #cm-app .sdgc-float:hover{background:#344785;color:#fff}
+.citl-courses #cm-app .sdgc-dialog .sdgc-close:hover{background:#ffffff22;color:#fff}
+.citl-courses #cm-app .sdgc-controls label{white-space:nowrap}
+@media(max-width:600px){.citl-courses #cm-app .sdgc-header h2{font-size:14px}.citl-courses #cm-app .sdgc-float{font-size:12px;padding:9px 13px}.citl-courses #cm-app .sdgc-controls>label{flex-direction:column;align-items:stretch}}

@@ -1,0 +1,48 @@
+Semester -4- 
+Related topics 
+ 
+Port and terminal operation 
+management 
+Goal 12: Responsible consumption and production 
+week 1: Transport and International Trade and Basic 
+concepts on ports 
+Goal 13: Climate action 
+Goal 15: Life on land 
+Week 8: yard Operation. 
+Week 11: operation of container terminals. 
+Week 4 :Port logistics activities 
+Week 9: New technology in port management 
+Semester -5- 
+Related topics 
+Inland Transport management 
+Goal 12: Responsible consumption and  
+production   
+Week 6: The development of a day-to-day truck 
+transport operation circle to distribution centers 
+Goal 13: Climate action 
+Week 14: Characteristics of railway planning  and Fleet 
+management of railways transport 
+Goal 14: Life below water 
+Week 9: Means of inland waterways transport and The 
+factors that affect the inland waterways transport 
+Week 10: The factors that affect the total length and 
+overall width of the navigational formation 
+Goal 15: Life on land 
+Week 3: Road transport and the types of roads & safe 
+distance between vehicles 
+Week 4: The road capacity calculations and axle loads 
+and truck loads 
+Week 5: The dimensions of vehicles and The 
+operational circle of fleet trucking management 
+Semester -7- 
+Related topics 
+Transport modeling 
+Goal 12: Responsible consumption and production 
+Week 12:  Transportation and warehouse problem 
+Goal 13: Climate action 
+week 4: Features choose the mode of transport and 
+ways to allocate traffic 
+Goal 15: Life on land 
+week 3: Structure of classic transport model 
+week 5: Maximum flow 
+week 6: Shortest route 

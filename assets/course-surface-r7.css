@@ -1,0 +1,31 @@
+/* Courses only. Visual alignment with management/style.css; no data/permission changes. */
+@media screen {
+ .citl-courses .cm-main{border:1px solid #e4e7ef;border-radius:14px;box-shadow:0 8px 24px #27316c09}
+ .citl-courses #cm-app{font-size:13px;line-height:1.75}
+ .citl-courses :is(.s135-filters,.cm-filters,.p4-filters,.op-filters,.p2-toolbar){background:#f8fafc;border:1px solid #e4e7ef;border-radius:12px;padding:14px;gap:12px;align-items:end}
+ .citl-courses :is(.s135-filters,.cm-filters,.p4-filters,.op-filters) label{font-size:13px;line-height:1.7;font-weight:700;min-width:0;display:grid;gap:6px}
+ .citl-courses :is(#cm-app,.cm-dialog) :is(select,input:not([type=checkbox]):not([type=radio]),textarea){font-family:Cairo,Arial,sans-serif;font-size:13px;border-color:#d7dce8;border-radius:9px;min-height:40px}
+ .citl-courses :is(.s135-actions,.s135-row-actions,.cm-actions,.p2-actions,.p3-actions,.p4-actions,.ca-actions){display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+ .citl-courses #cm-app .s135-row-actions{flex-direction:row;align-items:center;min-width:170px;max-width:280px}
+ .citl-courses #cm-app .s135-row-actions .cm-btn{flex:1 1 115px;margin:0;min-height:36px;padding:7px 10px}
+ .citl-courses :is(.s135-actions,.p2-actions,.p3-actions,.p4-actions,.cm-actions) :is(button,.cm-btn){font:700 12px/1.7 Cairo,Arial,sans-serif;border-radius:9px;padding:8px 12px;margin:0;box-shadow:none}
+ .citl-courses #cm-app :is(.cm-table-wrap,.p2-table,.p4-table){border:1px solid #e4e7ef;border-radius:12px;background:white}
+ .citl-courses #cm-app table{font-size:13px;line-height:1.7;border-collapse:collapse}
+ .citl-courses #cm-app th{background:#f7f8fc;color:#2a3475;font-size:12px;font-weight:800;padding:11px;border-bottom:1px solid #dfe3ef;vertical-align:middle}
+ .citl-courses #cm-app td{padding:11px;border-bottom:1px solid #edf0f5;vertical-align:middle;font-size:13px}
+ .citl-courses #cm-app tbody tr:nth-child(even){background:#fafbfe}
+ .citl-courses #cm-app tbody tr:hover{background:#f0f4fb}
+ .citl-courses #cm-app :is(.s135-tag,.course-badge,.p2-status){border-radius:16px;padding:4px 9px;font-size:11px;line-height:1.6;font-weight:700}
+ .citl-courses #cm-app td :is(small,.cm-muted){font-size:11px;line-height:1.8;color:#687083}
+ .citl-courses #cm-app :is(h2,h3){line-height:1.7}
+ .citl-courses .s135-college-cards>article,.citl-courses .s135-office-grid>article{box-shadow:none;border-color:#e4e7ef;border-radius:12px}
+}
+@media screen and (max-width:767px){
+ .citl-courses :is(.s135-filters,.cm-filters,.p4-filters,.op-filters,.p2-toolbar){padding:10px;gap:10px}
+ .citl-courses #cm-app :is(td,th){font-size:12px;padding:8px;min-width:0}
+ .citl-courses #cm-app .s135-row-actions{max-width:none;min-width:0;width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .citl-courses #cm-app .s135-row-actions .cm-btn{width:100%;min-height:42px;white-space:normal;padding:8px 9px}
+ .citl-courses :is(.s135-actions,.p2-actions,.p3-actions,.p4-actions,.cm-actions) :is(button,.cm-btn){min-height:42px;white-space:normal;max-width:100%}
+ .citl-courses #cm-app table.course-card-table>tbody>tr,.citl-courses #cm-app .s135-table tr{border:1px solid #e4e7ef;box-shadow:none;border-radius:12px;background:#fff}
+ .citl-courses #cm-app table.course-card-table>tbody>tr>td,.citl-courses #cm-app .s135-table tr>td{border-bottom:0}
+}

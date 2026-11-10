@@ -127,3 +127,13 @@ body[data-attendance-mode=self] .ar8-camera{display:block;width:100%;max-height:
 body[data-attendance-mode=self] .ar8-current-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
 body[data-attendance-mode=self] .ar8-lecture .ar8-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}body[data-attendance-mode=self] .ar8-lecture .ar8-actions button{flex:1 1 160px;min-height:44px}
 @media(max-width:600px){body[data-attendance-mode=self] .ar8-lecture .ar8-actions{display:grid;grid-template-columns:1fr 1fr}body[data-attendance-mode=self] .ar8-lecture .ar8-actions button{font-size:13px;padding:10px 8px}body[data-attendance-mode=self] .ar8-lecture{padding:16px}}
+/* Always-visible, distinct measuring/accepted states; actual attendance still requires a click. */
+.ar8-location-live{display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:9px 16px;background:#e5f5ed;color:#11633e;border-top:1px solid #83c8a3;font:700 13px/1.6 Cairo,sans-serif;text-align:center}
+.ar8-location-live[hidden]{display:none}.ar8-location-live[data-state=checking]::before{content:'';width:16px;height:16px;border:2px solid #9fcfb5;border-top-color:#12643e;border-radius:50%;flex:none;animation:ar8-locate-spin 1s linear infinite}
+.ar8-location-live[data-state=ready],.ar8-location-live[data-state=saved]{background:#147849;color:white}.ar8-location-live[data-state=warning]{background:#fff2d9;color:#794f12}
+.ar8-actions button[hidden]{display:none!important}
+.ar8-actions button.ar8-attend-ready{background:#254b9b!important;color:#fff!important;border-color:#254b9b!important;font-weight:800;animation:ar8-ready-glow 1.7s ease-in-out infinite}
+@keyframes ar8-ready-glow{0%,100%{box-shadow:0 0 0 0 #2a68d94d}50%{box-shadow:0 0 0 6px #2a68d916}}
+@keyframes ar8-locate-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.ar8-actions button.ar8-attend-ready,.ar8-location-live[data-state=checking]::before{animation:none}.ar8-actions button.ar8-attend-ready{box-shadow:0 0 0 3px #90b7f4}}
+@media(max-width:600px){.ar8-location-live{font-size:12px;min-height:44px;padding:8px 12px}}

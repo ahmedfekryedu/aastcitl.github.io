@@ -1,7 +1,11 @@
 {
-  "release": "20261110-sdg-companion-review",
+  "release": "20261110-r7-confirmed-attendance",
   "built_at": "2026-11-10",
-  "base": "CITL-UI137-R4-ATTENDANCE138-COMPLETE-20261109",
-  "status": "review-only; requires SQL139 and SQL140 checks; production not tested",
-  "description": "Original SDG PDF companion beside course form; department page navigation; no SQL changes; based on SQL139/140 UI137-R5."
+  "base": "20261110-sdg-companion-review",
+  "status": "review; local tests do not prove production readiness",
+  "requires": [
+    "SQL141",
+    "SQL142"
+  ],
+  "description": "Explicit lecture-bound QR confirmation, GPS 15m evidence, protected-page attendance link, controlled course department release."
 }

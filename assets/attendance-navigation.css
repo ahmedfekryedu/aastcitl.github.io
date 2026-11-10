@@ -5,3 +5,5 @@
 @media(max-width:767px){#admin-panel-modal .citl-attendance-nav-link{gap:8px}}
 .citl-mobile-toolbar>[data-r8-link=self-header-mobile]{background:#ffffff14;color:white;border:1px solid #ffffff35;border-radius:9px;padding:8px 10px;font:700 11px Cairo,sans-serif;flex-basis:100%;justify-content:center}
 .citl-mobile-toolbar:has(>[data-r8-link=self-header-mobile]){flex-wrap:wrap}
+header .citl-attendance-self-desktop{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:#ffffff18;color:#fff;border:1px solid #ffffff28;border-radius:8px;padding:8px 12px;font:700 12px Cairo,sans-serif;text-decoration:none}
+header .citl-attendance-self-desktop i{color:#f3a628}header .citl-attendance-self-desktop:hover{background:#ffffff28}

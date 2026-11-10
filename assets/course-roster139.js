@@ -20,11 +20,21 @@
  }
  function open({rows,department,technical,active,onReference,reload}){
   if(!active)throw Error('اختر الفصل الحالي.');if(!departments[department])throw Error('اختر القسم الذي تريد إضافة المادة إليه أولًا.');if(!ready)throw Error(warning||'حدّث قائمة المواد.');
-  const pool=rows.filter(o=>o.source_active&&((o.department_key===department&&flags.get(o.id)?.enabled===false)||(technical&&!o.department_key&&(!o.source_department||o.source_department===department))));
+  const pool=rows.filter(o=>o.source_active&&((o.department_key===department&&flags.get(o.id)?.enabled===false)||(technical&&!o.department_key&&(!o.source_department||o.source_department===department||o.reference?.released_for_department141===true))));
   const d=dialog('إضافة من جدول الفصل — '+departments[department],`<p>اختر مادة موجودة في جدول الفصل: إعادة مادة مستبعدة، أو إسناد مادة لم يُحسم قسمها بعد. لا نُنشئ مادة جديدة ولا ننسخ تكليفات مادة أخرى.</p><label>بحث المادة أو الكود<input type="search" data-roster-search></label><p>${rows.filter(o=>o.source_active&&o.department_key===department&&flags.get(o.id)?.enabled!==false).length} مادة موجودة بالفعل بقائمة القسم. المواد المرتبطة بقسم آخر لا تُنقل تلقائيًا؛ راجع ربطها بالجدول قبل تعديل نطاقها.</p><div data-roster-pool></div>`);
   const draw=()=>{const q=d.querySelector('[data-roster-search]').value.trim().toLowerCase();const found=pool.filter(o=>(o.course_name+' '+o.course_code).toLowerCase().includes(q));d.querySelector('[data-roster-pool]').innerHTML=found.length?`<div class="cm-table-wrap"><table class="cm-table"><thead><tr><th>المادة</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody>${found.map((o,i)=>`<tr><td data-label="المادة"><strong>${E(o.course_name)}</strong><small>${E(o.course_code)}</small></td><td data-label="الحالة">${o.department_key?'مستبعدة من الاستيفاء':'القسم غير محسوم'}</td><td data-label="الإجراء"><button class="cm-btn" data-roster-pick="${i}">${o.department_key?'إعادة إلى القسم':'تحديد القسم واللائحة'}</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="s135-note">لا توجد مواد مطابقة قابلة للإضافة في القائمة الحالية. إن كانت مادة موجودة بالجدول ولا تظهر هنا أو بقسمها، افتح «معاينة ومزامنة الجدول» وراجع المطابقة؛ لا تُضف نسخة مكررة.</p>';
    d.querySelectorAll('[data-roster-pick]').forEach(b=>b.onclick=()=>{const o=found[Number(b.dataset.rosterPick)];d.close();if(o.department_key)change(o,true,reload).catch(e=>document.getElementById('cm-status').textContent=e.message);else onReference(o);});
   };d.querySelector('[data-roster-search]').oninput=draw;draw();
  }
- root.CITLCourseRoster139={load,open,change,ready:()=>ready,warning:()=>warning,excluded:id=>flags.get(id)?.enabled===false,known:id=>ready&&flags.has(id)};
+ function release(o,tid,reload){
+  if(!ready||!flags.has(o.id))throw Error('حدّث قائمة المواد قبل تغيير القسم.');
+  const f=flags.get(o.id),d=dialog('إتاحة المادة للاختيار في قسم آخر',`<p><strong>${E(o.course_name)}</strong> · ${E(o.course_code)}</p><p>ستُزال من قائمة القسم الحالي وتظهر ضمن «إضافة من جدول الفصل» في الأقسام. أول قسم تُضاف إليه يحجز هذا الطرح؛ لا تُنشأ نسخة مكررة.</p><p>يُنهى تكليف المنسقين والمستوفي الحالي لهذه المادة مع حفظ سجلهم. لا يتغير جدول المحاضر أو محاضراته. يلزم اعتماد القسم واللائحة وتعيين المنسقين من جديد بالقسم الآخر.</p>${o.reports?'<p role="alert">بدأت تقارير لهذه المادة؛ النقل غير متاح حفاظًا على قسمها وتاريخها. يمكنك استخدام الاستبعاد فقط.</p>':'<p role="alert"></p><button type="button" class="cm-btn" data-release-confirm>تأكيد الإتاحة لقسم آخر</button>'}`);
+  const b=d.querySelector('[data-release-confirm]');if(!b)return;
+  let busy=false;d.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
+  b.onclick=async()=>{if(busy)return;busy=true;d.querySelectorAll('button').forEach(x=>x.disabled=true);try{
+   await root.CITLRequests.rpc(root.sb,'citl_course_release141',{p_payload:{term_id:tid,offering_id:o.id,revision:o.revision,department:o.department_key,expected_enabled:f.enabled,expected_updated_at:f.updated_at,confirmation:'RELEASE_DEPARTMENT_KEEP_HISTORY'}});
+   d.close();await reload();
+  }catch(e){d.querySelector('[role=alert]').textContent=/PGRST202|42883|Could not find|does not exist/.test(e.code+' '+e.message)?'خدمة تغيير القسم غير متاحة في هذه النسخة؛ راجع مسؤول النظام. لم تتغير المادة.':e.message;}finally{busy=false;d.querySelectorAll('button').forEach(x=>x.disabled=false);}};
+ }
+ root.CITLCourseRoster139={load,open,change,release,ready:()=>ready,warning:()=>warning,excluded:id=>flags.get(id)?.enabled===false,known:id=>ready&&flags.has(id)};
 })(window);

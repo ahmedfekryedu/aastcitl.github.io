@@ -1,4 +1,4 @@
-const RELEASE = '20261110-r7-confirmed-attendance';
+const RELEASE = '20261111-r8-course-roster';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"

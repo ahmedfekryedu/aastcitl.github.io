@@ -1,11 +1,12 @@
 {
-  "release": "20261110-r7-confirmed-attendance",
-  "built_at": "2026-11-10",
-  "base": "20261110-sdg-companion-review",
+  "release": "20261111-r8-course-roster",
+  "built_at": "2026-11-11",
+  "base": "20261110-r7-confirmed-attendance",
   "status": "review; local tests do not prove production readiness",
   "requires": [
     "SQL141",
-    "SQL142"
+    "SQL142",
+    "SQL143"
   ],
-  "description": "Explicit lecture-bound QR confirmation, GPS 15m evidence, protected-page attendance link, controlled course department release."
+  "description": "Automatic source refresh on current-term course setup, browsable source list, compact responsibility strip; attendance unchanged."
 }

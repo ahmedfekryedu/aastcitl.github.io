@@ -2162,7 +2162,7 @@ async function loadAdminMeetingCatalog(strict=false) {
 
 async function loadSystemSettings() {
             try {
-                const { data, error } = await supabase.from('settings').select('*').single();
+                const { data, error } = await supabase.from('settings').select('start_hour,end_hour').eq('id', 1).maybeSingle();
                 
                 let start = 8;
                 let end = 18;

@@ -255,3 +255,25 @@
  #admin-academic-actions-tab .citl-ac-details dd{overflow-wrap:anywhere;margin:0}
  #admin-academic-actions-tab .citl-ac-timeline{flex-wrap:wrap}
 }
+
+/* Compact account-scoped event history. */
+#admin-activity-history-tab .citl-history-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px;background:#f5f7fb;border:1px solid #e0e5f0;border-radius:12px}
+#admin-activity-history-tab .citl-history-filters label{display:grid;gap:6px;min-width:0;font:700 12px Cairo,sans-serif;color:#2a3475}
+#admin-activity-history-tab .citl-history-filters input,#admin-activity-history-tab .citl-history-filters select{width:100%;min-width:0;min-height:44px;padding:8px;border:1px solid #d6deec;border-radius:8px;background:white;color:#263250;font:400 12px Cairo,sans-serif}
+#admin-activity-history-tab .citl-history-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0;font:600 12px Cairo,sans-serif;color:#64748b}
+#admin-activity-history-tab [data-events]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+#admin-activity-history-tab .citl-event-card{margin:0;padding:14px;background:white;border-radius:12px;gap:10px;min-width:0;border-inline-start:4px solid #d9dfec}
+#admin-activity-history-tab .citl-event-unread{border-inline-start-color:#f3a628;background:#fffdf7}
+#admin-activity-history-tab .citl-event-card>header{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:start;background:transparent;color:#2a3475;padding:0;border:0}
+#admin-activity-history-tab .citl-event-symbol{background:#edf1fa;border-radius:6px;text-align:center;padding:3px;font-size:12px}
+#admin-activity-history-tab .citl-event-read{font-size:10px;background:#edf1fa;border-radius:5px;padding:4px 6px;white-space:nowrap}
+#admin-activity-history-tab .citl-event-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:#64748b}
+#admin-activity-history-tab .citl-event-card>p{font-size:12px;line-height:1.9;white-space:pre-wrap}
+#admin-activity-history-tab .citl-event-card footer{border-top:1px solid #e8edf5;padding-top:10px;background:none}
+#admin-activity-history-tab button{min-height:42px}
+#admin-activity-history-tab summary{cursor:pointer;color:#2a3475;font-weight:700}
+#admin-activity-history-tab .citl-history-more{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;color:#64748b;font-size:11px}
+@media(max-width:850px){#admin-activity-history-tab .citl-history-filters{grid-template-columns:repeat(2,minmax(0,1fr))}#admin-activity-history-tab [data-events]{grid-template-columns:1fr}}
+@media(max-width:500px){#admin-activity-history-tab .citl-history-filters{gap:8px;padding:10px}#admin-activity-history-tab .citl-history-filters label:last-child{grid-column:1/-1}#admin-activity-history-tab .citl-history-summary{align-items:flex-start}#admin-activity-history-tab .citl-event-card{padding:11px}#admin-activity-history-tab .citl-event-card header{grid-template-columns:20px 1fr}#admin-activity-history-tab .citl-event-read{grid-column:2;justify-self:start}#admin-activity-history-tab .citl-event-card footer button{flex:1}}
+
+#admin-activity-history-tab [data-refresh]{flex:0 0 auto;min-width:104px;white-space:nowrap}#admin-activity-history-tab .citl-admin-section-head{flex-wrap:wrap}

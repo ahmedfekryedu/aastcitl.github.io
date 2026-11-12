@@ -1,12 +1,12 @@
 {
-  "release": "20261112-r9-coordinator-gps",
+  "release": "20261112-excel145-notifications146-campus",
   "built_at": "2026-11-12",
-  "base": "20261110-r7-confirmed-attendance",
+  "base": "CITL-COURSES144-EXCEL-EXPORT-COMPLETE-20261112",
   "status": "review; local tests do not prove production readiness",
   "requires": [
-    "SQL141",
-    "SQL142",
-    "SQL143"
+    "SQL144 already installed",
+    "SQL145 for Excel import only",
+    "SQL146 for notification RPC volatility correction"
   ],
-  "description": "SQL144: assign coordinators before reference completion; saved metadata indicators; navigation wording only; GPS 15-second raw-reading acquisition with optional local Kalman stability diagnostics, unchanged server rules"
+  "description": "Reviewed Excel import with preview and guarded commit; mobile attendance in-card location capture; dashboard returns, scoped history filters and manager-only schedule edit UI. No attendance SQL change. Notification SQL146 fixes existing backfill under read-only RPC classification; retry backoff and reminder failure handling. Experimental ribbons removed. Supplied campus photo replaces the previous live image and provides a subdued glass loading backdrop."
 }

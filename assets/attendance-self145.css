@@ -1,0 +1,15 @@
+body[data-attendance-mode="self"] .ar8-current-list{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr))}
+body[data-attendance-mode="self"] .ar8-lecture{padding:18px;border:1px solid #dce3ef;border-radius:16px;box-shadow:0 4px 14px #17255409}
+body[data-attendance-mode="self"] .ar8-current{border-inline-start:5px solid #f3a820;background:linear-gradient(130deg,#fff,#f4f7ff)}
+body[data-attendance-mode="self"] .ar8-lecture h2{font-size:1.12rem;line-height:1.6;margin:0 0 8px}
+body[data-attendance-mode="self"] .ar8-current .ar8-actions{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:14px}
+body[data-attendance-mode="self"] .ar8-current .ar8-actions button{width:100%;min-height:46px;flex:0 0 auto;padding:10px 14px;font-size:.95rem}
+body[data-attendance-mode="self"] .ar8-current .ar8-actions button:first-child{background:#28356a;color:#fff;font-weight:700}
+body[data-attendance-mode="self"] .ar8-location-feedback{margin:0;padding:10px 12px;line-height:1.8;font-size:.9rem;white-space:normal}
+body[data-attendance-mode="self"] .ar8-location-feedback[data-state="checking"]{background:#eef7f4;color:#126448;border-inline-start:3px solid #1f9366}
+body[data-attendance-mode="self"] .ar8-location-feedback[data-state="saved"]{background:#e9f8ee;color:#116837}
+body[data-attendance-mode="self"] .ar8-camera-choice{background:#fff;color:#28356a;border:1px solid #d8dfef}
+body[data-attendance-mode="self"] .ar8-today-list{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))}
+body[data-attendance-mode="self"] .ar8-lecture[data-phase="ended"]{background:#f3f5f8;color:#596579;box-shadow:none}
+body[data-attendance-mode="self"] .ar8-lecture[data-attended="true"]{border-inline-start-color:#168754}
+@media(max-width:600px){body[data-attendance-mode="self"] .ar8-lecture{padding:14px}body[data-attendance-mode="self"] .ar8-self-toolbar{gap:8px}body[data-attendance-mode="self"] .ar8-lecture-meta{display:flex;flex-wrap:wrap;gap:6px}}

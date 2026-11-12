@@ -131,17 +131,41 @@
   }
   window.CITLOpenSpecialNotice=openSpecialNotice;
 
-  let lastRightsNotice = '',notificationRead=null;
-  function checkUserNotifications(){if(notificationRead)return notificationRead;notificationRead=readUserNotifications().finally(()=>notificationRead=null);return notificationRead;}
+  let lastRightsNotice = '',notificationRead=null,notificationRetryAt=0,notificationFailures=0,notificationBlocked=false,notificationErrorKey='',notificationOwner='';
+  function checkUserNotifications(options={}){
+    const owner=window.currentUser?.id||'';
+    if(owner!==notificationOwner){notificationOwner=owner;notificationRetryAt=0;notificationFailures=0;notificationBlocked=false;notificationErrorKey='';window.__citlNotifications=[];window.CITLNotificationState=null;}
+    if(notificationRead)return notificationRead;
+    if(!options.force&&(notificationBlocked||Date.now()<notificationRetryAt))return Promise.resolve(false);
+    notificationRead=readUserNotifications().finally(()=>notificationRead=null);return notificationRead;
+  }
   async function readUserNotifications() {
+    const readingOwner=notificationOwner;
     try {
       await session();const result = notificationMode==='overdue'?await window.CITLRequests.rpc(window.sb,'citl_overdue_notifications',{p_page:notificationPage}):await window.CITLRequests.rpc(window.sb,'citl_notifications_view',{p_mode:'unread',p_page:0}); const items = (result.notifications || []).filter(x=>!x.read_at);
+      if(readingOwner!==(window.currentUser?.id||''))return false;
       if(markingAllNotifications)return true;
-      window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
+      notificationFailures=0;notificationRetryAt=0;notificationBlocked=false;notificationErrorKey='';window.CITLNotificationState={ok:true,owner:notificationOwner};window.__citlNotifications = items; renderNotifications(items,result); setBadge(result.unread_total ?? result.total ?? items.length);window.CITLNotificationReminder?.check();
       const rightsNotice=items.find(n=>['department_head_assignment','account_permissions'].includes(n.kind));
       if(rightsNotice&&lastRightsNotice!==rightsNotice.id){lastRightsNotice=rightsNotice.id;await window.CITLAuth.loadProfile();window.dispatchEvent(new CustomEvent('citl-permissions-changed'));}
       return true;
-    } catch (error) { if(error.code!=='CITL_TIMEOUT')console.error('notifications:', error);const list=document.getElementById('notif-list');if(list&&!document.getElementById('notif-menu')?.classList.contains('hidden')){list.querySelector('[data-notification-retry]')?.remove();const retry=document.createElement('button');retry.type='button';retry.dataset.notificationRetry='';retry.className='citl-ac-button secondary';retry.textContent='تعذر تحميل الإشعارات — إعادة المحاولة';retry.onclick=async e=>{e.stopPropagation();retry.disabled=true;try{await checkUserNotifications();}finally{retry.disabled=false;}};list.prepend(retry);}return false; }
+    } catch (error) {
+      if(readingOwner!==(window.currentUser?.id||''))return false;
+      notificationFailures++;notificationBlocked=['25006','42883','PGRST202'].includes(error.code)||/read-only transaction/.test(error.message||'');
+      notificationRetryAt=Date.now()+Math.min(300000,30000*2**Math.min(notificationFailures-1,4));
+      const key=String(error.code||'')+':'+error.message;if(key!==notificationErrorKey&&error.code!=='CITL_TIMEOUT')console.error('notifications:',error);notificationErrorKey=key;
+      window.__citlNotifications=[];window.CITLNotificationState={ok:false,owner:notificationOwner,code:error.code||'',blocked:notificationBlocked};
+      window.dispatchEvent(new Event('citl-notifications-failed'));
+      const list=document.getElementById('notif-list');
+      if(list){
+        const box=document.createElement('section');box.className='citl-notification-failure';box.setAttribute('role','status');
+        const message=document.createElement('p');message.textContent=notificationBlocked?'تعذر تحميل الإشعارات لأن الخدمة تحتاج تصحيحًا من مسؤول النظام. ليست مشكلة في حسابك.':'تعذر تحميل الإشعارات حاليًا. يمكنك إعادة المحاولة؛ لم تتغير حالة قراءتها.';
+        const retry=document.createElement('button');retry.type='button';retry.dataset.notificationRetry='';retry.className='citl-ac-button secondary';retry.textContent='إعادة تحميل الإشعارات';
+        retry.onclick=async e=>{e.stopPropagation();if(retry.disabled)return;retry.disabled=true;retry.textContent='جارٍ إعادة المحاولة…';retry.setAttribute('aria-busy','true');try{await checkUserNotifications({force:true});}finally{retry.disabled=false;retry.removeAttribute('aria-busy');retry.textContent='إعادة تحميل الإشعارات';}};
+        box.append(message,retry);list.replaceChildren(box);
+      }
+      return false;
+    }
   }
 
   let markingAllNotifications=false;
@@ -188,7 +212,7 @@
     if (opening) {
       notificationMode=options?.overdue===true?'overdue':'unread';notificationPage=0;
       fitNotifications();
-      const loaded=await checkUserNotifications();fitNotifications();
+      const loaded=await checkUserNotifications({force:true});fitNotifications();
       if((options?.open===true||options?.overdue===true)&&!loaded)throw new Error(notificationMode==='overdue'?'تعذر تحميل الإشعارات المتأخرة؛ أعد المحاولة.':'تعذر تحميل الإشعارات؛ أعد المحاولة.');
     }
   }
@@ -288,6 +312,7 @@
   window.deleteScheduleReportAction = secureDeleteScheduleAction;
   const legacySaveAdminChanges = window.saveAdminChanges;
   if (typeof legacySaveAdminChanges === 'function') window.saveAdminChanges = async function (...args) {
+    if(!window.CITLPermissions?.full(window.currentUser))return;
     const result = await legacySaveAdminChanges.apply(this, args);
     try { await invoke('sessions.sync'); } catch (error) { console.info('schedule sync:', error.message); }
     return result;

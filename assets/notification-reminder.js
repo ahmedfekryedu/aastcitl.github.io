@@ -9,7 +9,7 @@
  function pauseForReview(){close();}
  function show(){
   clearTimeout(timer);timer=null;
-  if(reviewing()||owner!==root.currentUser?.id||!available||acknowledged())return close();
+  if(root.CITLNotificationState?.ok===false||reviewing()||owner!==root.currentUser?.id||!available||acknowledged())return close();
   if(document.getElementById('citl-overdue-reminder'))return;
   if(document.hidden||document.documentElement.classList.contains('citl-page-booting')||visible(document.getElementById('global-loader'))||[...document.querySelectorAll('dialog[open],.modal,#mobile-menu,#cm-mobile-nav,#notif-menu')].some(visible)){timer=setTimeout(show,1500);return;}
   const d=document.createElement('dialog');d.id='citl-overdue-reminder';d.dir='rtl';d.setAttribute('aria-labelledby','citl-overdue-title');
@@ -35,6 +35,8 @@
   if(!id||!root.sb||root.CITLAuth?.facultyPending?.(root.currentUser)){available=false;close();return;}
   if(owner!==id){close();owner=id;checked=0;available=false;}
   if(reviewing()||acknowledged()){close();return;}
+  if(root.CITLNotificationState?.ok===false){available=false;close();return;}
+  if(!root.CITLNotificationState&&typeof root.checkUserNotifications==='function'){const ok=await root.checkUserNotifications();if(!ok||id!==root.currentUser?.id){available=false;close();return;}}
   // The canonical inbox includes already-opened requests which still need a decision.
   if(root.__citlNotifications?.length){available=true;show();return;}
   if(busy||opening||document.hidden||(!force&&Date.now()-checked<60000))return;
@@ -46,6 +48,7 @@
    if(available)show();else close();
   }catch(_){/* A read failure must not interrupt another operation. */}finally{busy=false;}
  }
+ root.addEventListener('citl-notifications-failed',()=>{available=false;close();});
  root.CITLNotificationReminder=Object.freeze({check,pauseForReview});root.CITLPendingApprovalsReminder=Object.freeze({check,pauseForReview});
  root.addEventListener('citl-profile-loaded',()=>void check(true));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check();});

@@ -1,4 +1,17 @@
 (function(root){'use strict';
+ function updateReturn(){
+  const path=location.pathname;
+  if(!/^\/(dashboard\/(attendance|control)|courses(?:\/|$)|management(?:\/|$)|schedules(?:\/|$)|smrm(?:\/|$)|attendance(?:\/|$)|today(?:\/|$)|study(?:\/|$)|account(?:\/|$))/.test(path))return;
+  const header=document.querySelector('body>header,.citl-main-header,#cm-header');if(!header)return;
+  let bar=document.querySelector('[data-citl-page-return]');
+  if(!bar){bar=document.createElement('nav');bar.dataset.citlPageReturn='';bar.className='citl-page-return';bar.setAttribute('aria-label','الرجوع');bar.innerHTML='<a><i class="fas fa-arrow-right" aria-hidden="true"></i><span></span></a>';header.after(bar);}
+  const user=root.currentUser,control=path.startsWith('/dashboard/control'),manager=!!root.CITLPermissions?.full(user)||Object.values(user?.permissions||{}).some(v=>v===true)||path.startsWith('/dashboard/attendance');
+  const link=bar.firstElementChild;link.href=manager&&!control?'/dashboard/control.html':'/dashboard/';link.querySelector('span').textContent=manager&&!control?'العودة إلى لوحة التحكم':'العودة إلى الرئيسية';
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',updateReturn,{once:true});else updateReturn();
+ root.addEventListener('citl-profile-loaded',updateReturn);
+})(window);
+(function(root){'use strict';
  const menu=document.getElementById('mobile-menu')||document.getElementById('cm-mobile-nav');
  const panel=menu?.querySelector('.citl-drawer'),trigger=document.querySelector('.citl-mobile-menu-button');
  if(!menu||!panel||!trigger)return;

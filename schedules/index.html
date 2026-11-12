@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CITL first-paint loader: source: tools/page-loader.html; sync with tools/sync-page-loader.py -->
+<link rel="preload" href="/CITL-Camp1.png" as="image">
 <style id="citl-boot-style">
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-style:normal;font-weight:200 1000;font-display:block}
 html.citl-page-booting{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;min-height:100%;overflow:hidden!important}
@@ -32,6 +33,21 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 @media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:132px!important;height:106px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}#global-loader>.relative::after{animation:none}}
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
+
+/* CITL campus backdrop: supplied image, presentation only; no loader lifecycle changes. */
+html.citl-page-booting #global-loader::before,
+html.citl-navigation-loading #global-loader::before,
+#global-loader.citl-unified-loader::before{
+ background:linear-gradient(135deg,rgba(28,42,78,.67),rgba(44,55,85,.57)),url('/CITL-Camp1.png') center 54%/cover no-repeat,#303c60!important;
+ inset:-8px;filter:blur(3px);pointer-events:auto;
+}
+#global-loader.citl-unified-loader>.relative{
+ background:linear-gradient(155deg,rgba(253,252,248,.95),rgba(238,241,248,.92))!important;
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+@media(max-width:767px){
+ html.citl-page-booting #global-loader::before,html.citl-navigation-loading #global-loader::before,#global-loader.citl-unified-loader::before{background-position:62% center!important;}
+}
 </style>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <script>
@@ -526,7 +542,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <script defer src="/assets/site-updates.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261030-courses117-attendance-r8-review" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261112-import145-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/registration-correction.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
@@ -535,7 +551,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261112-notifications146" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/site-notice.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/notification-reminder.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/lecture-room-swaps.css?v=20261028-r7.3.3.8-wa-ui">
@@ -565,15 +581,7 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
         // التحقق الحقيقي من جلسة Supabase يتم بعد تهيئة العميل أدناه.
     </script>
 <header class="citl-main-header metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
-    <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
-
-    <div class="absolute top-[15px] left-[-30px] w-[110px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1 shadow-md border-b-2 border-[#2A3475] tracking-wider">
-
-        نسخة تجريبية
-
-    </div>
-
-</div>
+    
     <div class="w-full max-w-[98%] mx-auto px-3 py-5 md:px-6 md:py-5">
         <div class="hidden lg:flex flex-row items-center justify-between gap-3">
             <div class="flex items-center justify-start gap-4 text-right">
@@ -617,9 +625,9 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
             </div>
         </div>
 
-<div class="citl-mobile-header lg:hidden"><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div><div class="citl-mobile-toolbar"><div class="citl-mobile-controls"><button type="button" class="citl-mobile-menu-button" onclick="toggleMobileMenu()" aria-label="فتح القائمة الرئيسية" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i><span>القائمة</span></button><span id="notif-btn-wrapper"><button type="button" class="citl-mobile-bell" onclick="event.stopPropagation(); window.CITLMobileShell.notifications()" aria-label="الإشعارات" aria-expanded="false" aria-controls="notif-menu"><i class="fas fa-bell" aria-hidden="true"></i><span id="notif-badge-mob" class="hidden">0</span></button></span><div id="mobileEditBtn" onclick="event.stopPropagation(); toggleAdminMode();" class="absolute -top-1.5 -left-1.5 bg-white text-[#2A3475] w-6 h-6 rounded-full flex items-center justify-center text-[10px] border border-gray-200 shadow-md cursor-pointer z-30 transition-all active:scale-125">
+<div class="citl-mobile-header lg:hidden"><div class="citl-mobile-brand"><span class="citl-mobile-logo"><img src="/CITL.png" alt="CITL"></span><div><h1>كلية النقل الدولي واللوجستيات</h1><h2>College of International Transport &amp; Logistics</h2><p>CITL Smart System</p></div></div><div class="citl-mobile-toolbar"><div class="citl-mobile-controls"><button type="button" class="citl-mobile-menu-button" onclick="toggleMobileMenu()" aria-label="فتح القائمة الرئيسية" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i><span>القائمة</span></button><span id="notif-btn-wrapper"><button type="button" class="citl-mobile-bell" onclick="event.stopPropagation(); window.CITLMobileShell.notifications()" aria-label="الإشعارات" aria-expanded="false" aria-controls="notif-menu"><i class="fas fa-bell" aria-hidden="true"></i><span id="notif-badge-mob" class="hidden">0</span></button></span><button type="button" id="mobileEditBtn" hidden role="button" tabindex="0" aria-label="وضع تعديل الجدول للمدير" onclick="event.stopPropagation(); toggleAdminMode();" class="absolute -top-1.5 -left-1.5 bg-white text-[#2A3475] w-6 h-6 rounded-full flex items-center justify-center text-[10px] border border-gray-200 shadow-md cursor-pointer z-30 transition-all active:scale-125">
     <i class="fas fa-edit"></i>
-</div></div><button type="button" id="mob-profile-capsule" class="citl-mobile-profile" onclick="toggleProfileInfoMenu()" aria-label="بيانات الحساب"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><span class="citl-mobile-profile-copy"><span id="profile-name-mob"></span><span id="profile-role-mob"></span></span></button></div></div>
+</button></div><button type="button" id="mob-profile-capsule" class="citl-mobile-profile" onclick="toggleProfileInfoMenu()" aria-label="بيانات الحساب"><span class="citl-mobile-avatar"><i class="fas fa-user" aria-hidden="true"></i></span><span class="citl-mobile-profile-copy"><span id="profile-name-mob"></span><span id="profile-role-mob"></span></span></button></div></div>
 </div>
 </header>
 
@@ -1566,17 +1574,17 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/pages/schedules-1.js?v=20261112-r9-coordinator-gps"></script>
+<script src="/assets/pages/schedules-1.js?v=20261112-import145-ui"></script>
 <script src="/assets/registration-validation.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/admin-member-registration.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/security-core.js?v=20261105-system-fixes-131"></script>
+<script src="/security-core.js?v=20261112-notifications146"></script>
 <script src="/assets/department-heads.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/faculty-delegates.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/registration-review-status.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/member-past-dates.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/academic-oversight.js?v=20261105-system-fixes-131"></script>
-<script src="/assets/admin-access.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/admin-access.js?v=20261112-import145-ui"></script>
 <script src="/assets/admin-announcements.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/faculty-identity.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <link rel="stylesheet" href="/assets/account-preview.css?v=20261028-r7.3.3.8-wa-ui">
@@ -1592,9 +1600,9 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <script src="/assets/delegated-lecture-actions.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/attendance-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="../assets/lecture-action-dates.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<div id="notif-menu" class="hidden fixed w-80 bg-white rounded-2xl shadow-xl z-[10001] overflow-hidden"><div class="flex items-center justify-between p-3 border-b"><strong>التنبيهات</strong><button type="button" onclick="toggleNotifications()" aria-label="إغلاق">×</button></div><div id="notif-list" class="max-h-[350px] overflow-y-auto p-2"></div></div><script src="/assets/mobile-shell.js?v=20261112-import145-ui"></script>
 <script src="/assets/site-notice.js?v=20261028-r7.3.3.8-wa-ui" defer></script>
-<script src="/assets/notification-reminder.js?v=20261030-courses117-attendance-r8-review" defer></script>
+<script src="/assets/notification-reminder.js?v=20261112-notifications146" defer></script>
 <link rel="stylesheet" href="/assets/room-monitor.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/room-monitor.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/control-page.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1603,6 +1611,6 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <script src="/assets/whatsapp-center-r7.js?v=20261108-ui137-r2"></script>
 <script src="/assets/whatsapp-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/attendance-legacy-host.js?v=20261030-courses117-attendance-r8-review"></script>
-<script src="/assets/attendance-r8-navigation.js?v=20261112-r9-coordinator-gps"></script>
+<script src="/assets/attendance-r8-navigation.js?v=20261112-import145-ui"></script>
 </body>
 </html>

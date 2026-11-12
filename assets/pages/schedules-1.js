@@ -122,11 +122,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // إظهار زر الإدارة
         const adminBtn = document.getElementById('admin-toggle-btn');
-        if (window.CITLPermissions.can(user,'can_manage_schedules') && adminBtn) {
+        if (isManagerUser(user) && adminBtn) {
             adminBtn.classList.remove('hidden');
         }
-        document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!window.CITLPermissions.can(user,'can_manage_schedules'));
+        document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!isManagerUser(user));
 
+        applyAdminVisibility(user);
         // تحميل بيانات الصفحة
         if (typeof loadFilterOptions === 'function') await loadFilterOptions();
         if (typeof refreshCache === 'function') await refreshCache();
@@ -651,6 +652,7 @@ function hasApprovedTeachingIdentity(user) {
 }
 function syncScheduleEntryAccess(user) {
     const faculty = hasApprovedTeachingIdentity(user), manager = isManagerUser(user);
+    applyAdminVisibility(user);
     document.querySelectorAll('[data-schedule-hub]').forEach(el => {
         el.classList.toggle('hidden', !faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports'));
         const label = manager ? 'لوحة التحكم' : faculty ? 'إجراءات المحاضرات' : 'إدارة الجداول الدراسية';
@@ -659,7 +661,7 @@ function syncScheduleEntryAccess(user) {
         else for(const node of el.childNodes)if(node.nodeType===Node.TEXT_NODE&&node.textContent.trim())node.textContent=' '+label+' ';
     });
     document.querySelectorAll('[data-personal-schedule-entry]').forEach(el => el.classList.toggle('hidden', !faculty));
-    document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!window.CITLPermissions.can(user,'can_manage_schedules'));
+    document.getElementById('admin-toggle-mob')?.classList.toggle('hidden',!isManagerUser(user));
     const grid = document.getElementById('schedule-entry-tools');
     if (grid) grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))';
     const count = document.getElementById('schedule-entry-count');
@@ -4684,6 +4686,7 @@ function showNotification(message, type = 'success') {
 let isAdminMode = false; 
 
 function toggleAdminMode() {
+    if (!isManagerUser(window.currentUser)) { isAdminMode = false; applyAdminVisibility(window.currentUser); return; }
     isAdminMode = !isAdminMode;
     const btn = document.getElementById('admin-toggle-btn');
     const mobBtn = document.getElementById('mobileEditBtn');
@@ -4764,6 +4767,7 @@ function generateCustomDropdownHTML(id, label, optionsArray, selectedValue) {
 // 2. دالة فتح مودال التعديل (تحافظ على شكل الكمبيوتر وتظبط الموبايل) 💻📱
 // ============================================================
 function openAdminEditModal(id, instructor, course, courseCode, room, time, day) {
+    if (!isManagerUser(window.currentUser)) return;
     const oldModal = document.getElementById('admin-edit-modal');
     if (oldModal) oldModal.remove();
 
@@ -4917,6 +4921,7 @@ function findConflict(currentId, room, time, day) {
 // دالة الحفظ الذكية (مع حل التعارض والإحلال التلقائي) 🧠
 // ============================================================
 async function saveAdminChanges() {
+    if (!isManagerUser(window.currentUser)) return;
     // 1. جلب القيم من الخانات
     const id = document.getElementById('edit-id').value;
     const instructor = document.getElementById('edit-instructor').value;
@@ -5007,6 +5012,7 @@ async function saveAdminChanges() {
 
 // استبدل دالة handleCardClick القديمة بهذه الدالة المحسنة
 function handleCardClick(id) {
+    if (!isManagerUser(window.currentUser)) return;
     // التحقق: هل وضع الأدمن مفعل؟
     if (typeof isAdminMode !== 'undefined' && isAdminMode) {
         // الوضع مفعل: نفتح التعديل فوراً
@@ -5026,6 +5032,7 @@ function handleCardClick(id) {
 
 // 2. تجهيز البيانات (الحل النهائي لمشاكل النصوص)
 function prepareEdit(id) {
+    if (!isManagerUser(window.currentUser)) return;
     // البحث باستخدام == للمرونة بين النصوص والأرقام
     const item = cachedData.find(i => i.id == id);
     
@@ -5143,13 +5150,12 @@ function resetView() {
 // دالة: إظهار الترس للإداريين فقط
 // ============================================================
 function applyAdminVisibility(user) {
-    const adminButton = document.getElementById('admin-toggle-btn');
-    
-    // 🔥 الشرط: إذا كان الزر موجوداً AND المستخدم موجوداً AND دوره هو 'manager'
-    if (adminButton && user && window.CITLPermissions.can(user,'can_manage_schedules')) {
-        // إذا تحقق الشرط، نزيل كلاس الإخفاء
-        adminButton.classList.remove('hidden');
+    const allowed = isManagerUser(user);
+    for (const id of ['admin-toggle-btn','admin-toggle-mob','mobileEditBtn']) {
+        const button = document.getElementById(id);
+        if (button) { button.hidden = !allowed; button.classList.toggle('hidden', !allowed); }
     }
+    if (!allowed) { isAdminMode = false; document.getElementById('admin-edit-modal')?.remove(); }
 }
 
 // دالة فتح/إغلاق القائمة الجانبية بنمط smrm

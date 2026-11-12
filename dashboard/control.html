@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CITL first-paint loader: source: tools/page-loader.html; sync with tools/sync-page-loader.py -->
+<link rel="preload" href="/CITL-Camp1.png" as="image">
 <style id="citl-boot-style">
 @font-face{font-family:CITLBootCairo;src:url('/assets/fonts/cairo-arabic.woff2') format('woff2');font-style:normal;font-weight:200 1000;font-display:block}
 html.citl-page-booting{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;min-height:100%;overflow:hidden!important}
@@ -32,6 +33,21 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 @media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:132px!important;height:106px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}#global-loader>.relative::after{animation:none}}
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
+
+/* CITL campus backdrop: supplied image, presentation only; no loader lifecycle changes. */
+html.citl-page-booting #global-loader::before,
+html.citl-navigation-loading #global-loader::before,
+#global-loader.citl-unified-loader::before{
+ background:linear-gradient(135deg,rgba(28,42,78,.67),rgba(44,55,85,.57)),url('/CITL-Camp1.png') center 54%/cover no-repeat,#303c60!important;
+ inset:-8px;filter:blur(3px);pointer-events:auto;
+}
+#global-loader.citl-unified-loader>.relative{
+ background:linear-gradient(155deg,rgba(253,252,248,.95),rgba(238,241,248,.92))!important;
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+@media(max-width:767px){
+ html.citl-page-booting #global-loader::before,html.citl-navigation-loading #global-loader::before,#global-loader.citl-unified-loader::before{background-position:62% center!important;}
+}
 </style>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <script>
@@ -707,7 +723,7 @@ body {
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 <script defer src="/assets/site-updates.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261030-courses117-attendance-r8-review" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/academic-oversight.css?v=20261112-import145-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 <link rel="stylesheet" href="/assets/desktop-mode.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/tv-media-usage.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
@@ -717,7 +733,7 @@ body {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261112-notifications146" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/site-notice.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/notification-reminder.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/control-page.css?v=20261105-attendance-desktop">
@@ -744,15 +760,7 @@ body {
 <script src="/assets/service-availability.js?v=20261028-r7.3.3.8-wa-ui"></script>
   <div id="dashboard-shell" class="min-h-screen flex flex-col"><!-- Header -->
 <header class="citl-main-header metallic-blue-fill random-slanted-lines shadow-lg border-b-4 border-[#F3A628] sticky top-0 z-50">
-        <div class="absolute top-0 left-0 w-24 h-24 overflow-hidden z-[100] pointer-events-none">
-
-    <div class="absolute top-[15px] left-[-30px] w-[110px] bg-gradient-to-r from-[#F3A628] to-[#d48a1b] text-[#2A3475] text-[9px] md:text-[10px] font-black text-center -rotate-45 py-1 shadow-md border-b-2 border-[#2A3475] tracking-wider">
-
-        نسخة تجريبية
-
-    </div>
-
-</div>
+        
     <div class="w-full max-w-[98%] mx-auto px-3 py-5 md:px-6 md:py-5">
         
         <div class="hidden lg:flex flex-row items-center justify-between gap-3">
@@ -1437,7 +1445,7 @@ body {
 <script src="/assets/dashboard-home-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/pages/dashboard-1.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/academic-booking.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/admin-panel.js?v=20261105-system-fixes-131"></script>
+<script src="/assets/admin-panel.js?v=20261112-notifications146"></script>
 <script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-video-converter.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/tv-media-storage.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/tv-media-usage.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1445,7 +1453,7 @@ body {
 <script src="/assets/registration-validation.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/admin-member-registration.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/security-core.js?v=20261105-system-fixes-131"></script>
+<script src="/security-core.js?v=20261112-notifications146"></script>
 <script src="/assets/admin-permissions-ui.js?v=20261105-course-display-129"></script>
 <script src="/assets/dashboard-home.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/department-heads.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1454,7 +1462,7 @@ body {
 <script src="/assets/member-past-dates.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/academic-oversight.js?v=20261105-system-fixes-131"></script>
 <script src="/assets/delegated-lecture-actions.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/admin-access.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/admin-access.js?v=20261112-import145-ui"></script>
 <script src="/assets/admin-announcements.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/faculty-identity.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <link rel="stylesheet" href="/assets/account-preview.css?v=20261028-r7.3.3.8-wa-ui">
@@ -1468,9 +1476,9 @@ body {
 <script src="/assets/faculty-registration-census.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/meeting-ui.js?v=20261105-system-fixes-131"></script>
 <script src="/assets/service-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/mobile-shell.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/mobile-shell.js?v=20261112-import145-ui"></script>
 <script src="/assets/site-notice.js?v=20261028-r7.3.3.8-wa-ui" defer></script>
-<script src="/assets/notification-reminder.js?v=20261030-courses117-attendance-r8-review" defer></script>
+<script src="/assets/notification-reminder.js?v=20261112-notifications146" defer></script>
 <link rel="stylesheet" href="/assets/room-monitor.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/room-monitor.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/control-page.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1478,6 +1486,6 @@ body {
 <script src="/assets/whatsapp-v2-preview.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/whatsapp-center-r7.js?v=20261108-ui137-r2"></script>
 <script src="/assets/whatsapp-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/attendance-r8-navigation.js?v=20261112-r9-coordinator-gps"></script>
+<script src="/assets/attendance-r8-navigation.js?v=20261112-import145-ui"></script>
 </body>
 </html>

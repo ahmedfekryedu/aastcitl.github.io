@@ -1,8 +1,10 @@
-const RELEASE = '20261112-r9-coordinator-gps';
+const RELEASE = '20261112-excel145-notifications146-campus';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
+  '/CITL-Camp1.png',
+  '/assets/course-excel-import-model.js', '/assets/course-excel-import.js', '/assets/attendance-self145.css',
   '/assets/attendance-location.js',
   '/assets/attendance-gps-stability.js',
   '/vendor/kalman-filter-2.3.0/kalman-filter.min.js',

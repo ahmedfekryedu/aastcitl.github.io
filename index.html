@@ -71,7 +71,8 @@
             transition: all 0.2s;
         }
         .custom-dropdown-display:focus {
-            ring: 2px solid #2A3475;
+            outline: 2px solid #2A3475;
+            outline-offset: 2px;
         }    
 
         /* ========================================= */
@@ -197,7 +198,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 html.citl-page-booting #global-loader::before,
 html.citl-navigation-loading #global-loader::before,
 #global-loader.citl-unified-loader::before{
- background:linear-gradient(135deg,rgba(28,42,78,.67),rgba(44,55,85,.57)),url('/CITL-Camp1.png') center 54%/cover no-repeat,#303c60!important;
+ background:radial-gradient(ellipse at 15% 15%,rgba(82,97,138,.86) 0%,transparent 60%),radial-gradient(ellipse at 90% 85%,rgba(84,81,110,.86) 0%,transparent 55%),linear-gradient(135deg,rgba(40,52,91,.82),rgba(64,50,94,.84)),url('/CITL-Camp1.png') center 54%/cover no-repeat,#303c60!important;
  inset:-8px;filter:blur(3px);pointer-events:auto;
 }
 #global-loader.citl-unified-loader>.relative{
@@ -255,26 +256,45 @@ html.citl-navigation-loading #global-loader::before,
     </div>
 </div>
     
-    <div class="mt-4 md:mt-8 space-y-2 md:space-y-3 w-full max-w-xs">
-        
-        <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
-            <i class="fas fa-chalkboard-teacher text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
-            
-            <div class="text-center md:text-right">
-                <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة الجداول الدراسية</span>
-                <span class="text-gray-300 hidden md:block">عرض، متابعة، وتحديث الجداول الدراسية بسهولة</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
-            <i class="fas fa-door-open text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
-            
-            <div class="text-center md:text-right">
-                <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة القاعات الدراسية</span>
-                <span class="text-gray-300 hidden md:block">تنظيم حجوزات القاعة ومنع التعارض بين المواعيد</span>        
-            </div>
+
+<div class="mt-4 md:mt-8 space-y-2 md:space-y-3 w-full max-w-xs">
+
+    <!-- كارت الجداول الدراسية -->
+    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+        <i class="fas fa-chalkboard-teacher text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
+
+        <div class="text-center md:text-right">
+            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة الجداول الدراسية</span>
+            <span class="text-gray-300 hidden md:block">عرض، متابعة، وتحديث الجداول الدراسية بسهولة</span>
         </div>
     </div>
+
+    <!-- كارت القاعات الدراسية -->
+    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+        <i class="fas fa-door-open text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
+
+        <div class="text-center md:text-right">
+            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة القاعات الدراسية</span>
+            <span class="text-gray-300 hidden md:block">تنظيم حجوزات القاعة ومنع التعارض بين المواعيد</span>
+        </div>
+    </div>
+
+    <!-- إشعار تثبيت التطبيق: تحت آخر كارت -->
+    <p id="installContainer"
+       hidden
+       role="status"
+       aria-live="polite"
+       style="margin:6px auto 0;
+              text-align:center;
+              font-size:10px;
+              line-height:1.5;
+              color:rgba(255,255,255,0.65);
+              pointer-events:none;">
+        يمكنك تثبيت التطبيق من قائمة المتصفح
+    </p>
+
+</div>
+
 </div>
 </div>
 <div class="w-full md:w-1/2 p-4 md:p-12 flex flex-col justify-center bg-white relative overflow-y-auto custom-scrollbar">
@@ -474,10 +494,6 @@ html.citl-navigation-loading #global-loader::before,
         </div>
     </div>
 
-</div>
-<div id="installContainer" hidden role="status" aria-live="polite"
-     style="position:fixed;top:15px;left:15px;z-index:1200;max-width:260px;padding:10px 14px;border-radius:12px;background:#2a3475;color:white;font-size:13px;box-shadow:0 4px 16px #0003;pointer-events:none">
-  يمكنك تثبيت التطبيق من قائمة المتصفح
 </div>
 <div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center  opacity-0">
     

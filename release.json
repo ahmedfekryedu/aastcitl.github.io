@@ -1,6 +1,6 @@
 {
-  "release": "20261111-r8-course-roster",
-  "built_at": "2026-11-11",
+  "release": "20261112-r9-coordinator-gps",
+  "built_at": "2026-11-12",
   "base": "20261110-r7-confirmed-attendance",
   "status": "review; local tests do not prove production readiness",
   "requires": [
@@ -8,5 +8,5 @@
     "SQL142",
     "SQL143"
   ],
-  "description": "Automatic source refresh on current-term course setup, browsable source list, compact responsibility strip; attendance unchanged."
+  "description": "SQL144: assign coordinators before reference completion; saved metadata indicators; navigation wording only; GPS 15-second raw-reading acquisition with optional local Kalman stability diagnostics, unchanged server rules"
 }

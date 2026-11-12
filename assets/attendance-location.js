@@ -37,15 +37,22 @@ root.CITLAttendanceLocation=function({host,el,button,dialog,purpose='attendance'
    const p=await new Promise((resolve,reject)=>{
     if(!root.isSecureContext)return reject({code:'insecure'});
     if(!navigator.geolocation)return reject({code:'unsupported'});
-    let watch=null,best=null,done=false;
+    let watch=null,best=null,done=false,stability=null;
+    const started=performance.now(),deadline=15000;
+    try{stability=root.CITLGPSStability?.create();}catch(_){}
+    const valid=p=>{const c=p?.coords,now=Date.now();return c&&Number.isFinite(c.accuracy)&&c.accuracy>=0.1&&Number.isFinite(c.latitude)&&Math.abs(c.latitude)<=90&&Number.isFinite(c.longitude)&&Math.abs(c.longitude)<=180&&Number.isFinite(p.timestamp)&&now-p.timestamp<=maxAge*1000&&p.timestamp<=now+5000;};
     const cleanup=()=>{clearTimeout(timer);if(watch!==null)navigator.geolocation.clearWatch(watch);root.removeEventListener('pagehide',cancel);if(activeCancel===cancel)activeCancel=null;};
     const finish=(error,value)=>{if(done)return;done=true;cleanup();error?reject(error):resolve(value);};
     const cancel=()=>finish({code:'cancelled'});activeCancel=cancel;root.addEventListener('pagehide',cancel,{once:true});
-    const timer=setTimeout(()=>{if(best&&best.coords.accuracy<=maxAccuracy&&Date.now()-best.timestamp<=maxAge*1000)finish(null,best);else finish({code:best?'accuracy':3});},20000);
-    const received=p=>{if(done)return;const c=p.coords;if(!Number.isFinite(c.accuracy)||c.accuracy<0.1||!Number.isFinite(c.latitude)||Math.abs(c.latitude)>90||!Number.isFinite(c.longitude)||Math.abs(c.longitude)>180||!Number.isFinite(p.timestamp)||Date.now()-p.timestamp>maxAge*1000||p.timestamp>Date.now()+5000)return;
-     if(!best||Date.now()-best.timestamp>maxAge*1000||c.accuracy<best.coords.accuracy)best=p;
-     notify('جارٍ تحديد الموقع — دقة القراءة الحالية '+Math.ceil(c.accuracy)+' متر؛ المطلوب '+maxAccuracy+' متر أو أفضل.','checking');
-     if(c.accuracy<=maxAccuracy)finish(null,p);
+    const timer=setTimeout(()=>finish({code:best?'accuracy':3}),deadline);
+    const received=p=>{if(done)return;if(performance.now()-started>=deadline)return finish({code:best?'accuracy':3});if(!valid(p))return;const c=p.coords;
+     // Retain browser values exactly. Filtered coordinates never enter the verification payload.
+     const raw={coords:{latitude:c.latitude,longitude:c.longitude,accuracy:c.accuracy},timestamp:p.timestamp};
+     if(!best||!valid(best)||c.accuracy<best.coords.accuracy||c.accuracy===best.coords.accuracy&&p.timestamp>best.timestamp)best=raw;
+     if(best.coords.accuracy<=maxAccuracy)return finish(null,best);
+     let analysis;try{analysis=stability?.observe(raw);}catch(_){stability=null;}
+     const hint=analysis?.count>=3?(analysis.state==='variable'?' — الإشارة متذبذبة؛ ننتظر قراءة فعلية أدق.':' — القراءات متقاربة لكن الدقة لم تستوفِ الشرط بعد.') : '';
+     notify('جارٍ تحديد الموقع — دقة القراءة الحالية '+Math.ceil(c.accuracy)+' متر؛ المطلوب '+maxAccuracy+' متر أو أفضل.'+hint,'checking');
     };
     watch=navigator.geolocation.watchPosition(received,e=>{if(e.code===1)finish(e);},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
     if(done&&watch!==null)navigator.geolocation.clearWatch(watch);

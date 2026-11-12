@@ -653,7 +653,7 @@ function syncScheduleEntryAccess(user) {
     const faculty = hasApprovedTeachingIdentity(user), manager = isManagerUser(user);
     document.querySelectorAll('[data-schedule-hub]').forEach(el => {
         el.classList.toggle('hidden', !faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports'));
-        const label = faculty && !manager && !window.CITLPermissions.can(user,'can_view_reports') ? 'إجراءات جدولي الدراسي' : 'إدارة الجداول الدراسية';
+        const label = manager ? 'لوحة التحكم' : faculty ? 'إجراءات المحاضرات' : 'إدارة الجداول الدراسية';
         const span = el.querySelector('span');
         if(span) span.textContent=label;
         else for(const node of el.childNodes)if(node.nodeType===Node.TEXT_NODE&&node.textContent.trim())node.textContent=' '+label+' ';

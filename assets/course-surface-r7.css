@@ -53,3 +53,22 @@
 @media(prefers-reduced-motion:reduce){.s143-loading div{animation:none}}
 
 @media screen{.s143-primary-action{display:block;margin:0 0 7px!important;width:100%;font-size:12px;min-height:36px}.s143-office>summary::-webkit-details-marker{display:none}}
+
+/* 144: saved metadata is distinct from coordinator appointment and final academic approval. */
+.s135 .s144-reference{min-width:160px;max-width:250px;font-size:12px;line-height:1.65;text-align:right}
+.s135 .s144-reference ul{list-style:none;padding:0;margin:8px 0;display:grid;gap:3px}
+.s135 .s144-reference li{display:flex;gap:6px;align-items:baseline;overflow-wrap:anywhere}
+.s135 .s144-reference .complete>span:first-child{color:#18734c;font-weight:900}
+.s135 .s144-reference .missing{color:#7b5b1f}
+.s135 .s144-reference small{line-height:1.6}
+.s135 .s143-row-menu{min-width:175px;border:1px solid #dce2f0;border-radius:9px;background:#f7f9fe;margin-top:8px;overflow:hidden}
+.s135 .s143-row-menu>summary{padding:9px 12px;cursor:pointer;font-weight:800}
+.citl-courses #cm-app .s135-row-actions.s144-actions{padding:10px;display:grid;grid-template-columns:1fr;gap:8px;border-top:1px solid #dce2f0;margin-top:0;max-width:none}
+.s135 .s144-actions .cm-btn{margin:0!important;width:100%;white-space:normal;text-align:center;min-height:38px}
+.s135 .s144-menu-title{font-size:11px;margin:0 0 3px;color:#536187}
+.s135 .s144-caution{border-color:#e5cfac!important;color:#79551d!important}
+.s135 .s143-primary-action{width:100%;min-height:38px}
+.s135-dialog label small{font-size:12px;font-weight:400;line-height:1.7;margin-top:5px}
+@media(max-width:640px){.s135 .s144-reference{max-width:none;min-width:0}.s135 .s144-reference ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.s135 .s143-row-menu{min-width:0;width:100%}}
+
+.s135 .s144-menu-title{grid-column:1/-1;text-align:right}

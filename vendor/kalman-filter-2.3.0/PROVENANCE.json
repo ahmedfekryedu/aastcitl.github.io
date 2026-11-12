@@ -1,0 +1,30 @@
+{
+  "source": "https://github.com/piercus/kalman-filter",
+  "version": "2.3.0",
+  "bundled": [
+    {
+      "name": "kalman-filter",
+      "version": "2.3.0",
+      "license": "MIT"
+    },
+    {
+      "name": "simple-linalg",
+      "version": "1.5.0",
+      "license": "MIT"
+    },
+    {
+      "name": "matrix-inverse",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "@rayyamhk/matrix",
+      "version": "1.0.8",
+      "license": "MIT"
+    }
+  ],
+  "buildTool": "esbuild 0.25.12",
+  "sha256": "6e432f923023de7b1f3f3693d9b66ae012e73cc26ad8e17cac57acada3927a78",
+  "runtimeNetwork": false,
+  "usage": "Optional local stability analysis only; never supplies attendance coordinates or accuracy."
+}

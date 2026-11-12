@@ -1,9 +1,11 @@
-const RELEASE = '20261111-r8-course-roster';
+const RELEASE = '20261112-r9-coordinator-gps';
 const CACHE_NAME = 'citl-smart-interface-' + RELEASE;
 
 // 2. قائمة الملفات المحدثة بالمسارات الجديدة "النظيفة"
 const ASSETS_TO_CACHE = [
   '/assets/attendance-location.js',
+  '/assets/attendance-gps-stability.js',
+  '/vendor/kalman-filter-2.3.0/kalman-filter.min.js',
   '/assets/attendance-manual.js',
   '/assets/whatsapp-center-r7.js', '/assets/whatsapp-v2-preview.js', '/assets/whatsapp-admin.js', '/assets/whatsapp-admin.css', '/assets/whatsapp-templates.js',
   '/assets/member-past-dates.js',

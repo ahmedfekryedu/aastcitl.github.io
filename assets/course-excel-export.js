@@ -6,7 +6,7 @@
  async function open({termId,department}){
   if(!M.departments[department])throw Error('اختر القسم أولًا، ثم افتح تصدير Excel.');
   const dialog=document.createElement('dialog');dialog.className='cm-dialog s135-dialog cx-dialog';
-  dialog.innerHTML=`<header><strong>تصدير Excel لمقررات القسم</strong><button type="button" data-close aria-label="إغلاق">×</button></header><div class="cm-body"><p class="cx-context"></p><p class="cx-note">هذه معاينة للتصدير فقط. اختيار مادة هنا لا ينقلها لقسم آخر، ولا يعيّن منسقًا، ولا يغيّر جدول الفصل.</p><div data-body><div class="s143-loading" role="status"><strong>جارٍ قراءة مواد الفصل والتكليفات…</strong><div></div><div></div></div></div><p data-message role="status" aria-live="polite"></p><footer class="cx-actions"><button type="button" class="cm-btn" data-download disabled>تنزيل Excel</button><button type="button" class="cm-btn secondary" data-close>إغلاق</button></footer></div>`;
+  dialog.innerHTML=`<header><strong>تصدير نموذج التسكين المبسط</strong><button type="button" data-close aria-label="إغلاق">×</button></header><div class="cm-body"><p class="cx-context"></p><p class="cx-note">هذه معاينة للتصدير فقط. اختيار مادة هنا لا ينقلها لقسم آخر، ولا يعيّن منسقًا، ولا يغيّر جدول الفصل.</p><div data-body><div class="s143-loading" role="status"><strong>جارٍ قراءة مواد الفصل والتكليفات…</strong><div></div><div></div></div></div><p data-message role="status" aria-live="polite"></p><footer class="cx-actions"><button type="button" class="cm-btn" data-download disabled>تنزيل نموذج التسكين المبسط</button><button type="button" class="cm-btn secondary" data-close>إغلاق</button></footer></div>`;
   document.body.append(dialog);dialog.querySelector('.cx-context').textContent=M.departments[department];
   dialog.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>dialog.close());dialog.onclose=()=>dialog.remove();dialog.showModal();
   const body=dialog.querySelector('[data-body]'),message=dialog.querySelector('[data-message]'),download=dialog.querySelector('[data-download]');
@@ -30,8 +30,8 @@
      if(fresh.snapshotHash!==model.snapshotHash)throw Error('تغير الجدول أو التكليفات أو الصلاحيات منذ المعاينة. أغلقها وافتحها مرة أخرى؛ لم يُصدَّر ملف قديم.');
      await loadLibrary();const result=await root.CITLCourseExcelWorkbook.create(model,[...selected]);if(!dialog.isConnected)return;
      const url=URL.createObjectURL(new Blob([result.bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=result.filename;a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-     message.textContent='تم تجهيز '+result.rowCount+' مادة في ملف القسم. لم تتغير أي بيانات بالنظام؛ استكمال الملف لا يغيّر النظام إلا بعد معاينة الاستيراد واعتماده.';
-    }catch(e){if(dialog.isConnected)message.textContent=e.message||'تعذر التصدير. أعد فتح المعاينة.';}finally{busy=false;if(dialog.isConnected){body.querySelectorAll('input,select,button').forEach(e=>e.disabled=false);download.textContent='تنزيل Excel';count();}}
+     message.textContent='تم تجهيز '+result.rowCount+' صفًا مبسطًا يشمل '+result.offeringCount+' طرحًا في ملف القسم. لم تتغير أي بيانات بالنظام؛ استكمال الملف لا يغيّر النظام إلا بعد معاينة الاستيراد واعتماده.';
+    }catch(e){if(dialog.isConnected)message.textContent=e.message||'تعذر التصدير. أعد فتح المعاينة.';}finally{busy=false;if(dialog.isConnected){body.querySelectorAll('input,select,button').forEach(e=>e.disabled=false);download.textContent='تنزيل نموذج التسكين المبسط';count();}}
    };
   }catch(e){if(dialog.isConnected){body.textContent='لم نعرض بيانات قديمة أو نتجاوز الصلاحيات.';message.textContent=e.message||'تعذرت قراءة بيانات التصدير؛ أعد فتح المعاينة.';}}
  }

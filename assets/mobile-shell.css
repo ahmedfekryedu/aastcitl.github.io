@@ -173,3 +173,16 @@
 #notif-menu a[href*="history"],#notif-menu [data-history-link]{margin-block:4px!important;min-height:40px}
 
 #notif-menu .citl-notification-history{margin:0!important;min-height:42px!important;padding:8px 10px!important;font:700 12px/1.6 Cairo,sans-serif!important;border:1px solid #dce2ef!important;border-radius:9px!important;background:#fff!important;color:#2a3475!important}
+
+/* Full-width inbox actions; notification cards are unchanged. */
+#notif-menu>div:has(>button[onclick*="markAllNotificationsRead"]){display:grid!important;grid-template-columns:1fr!important;gap:6px!important;padding:10px!important}
+#notif-menu button[onclick*="markAllNotificationsRead"],#notif-menu .citl-notification-history{width:100%!important;min-width:0!important;min-height:44px!important;margin:0!important;box-sizing:border-box!important;justify-content:center!important;font-size:12px!important}
+#dashboard-modal{padding:12px!important;box-sizing:border-box}
+#dashboard-modal>.modal-content{display:flex!important;flex-direction:column!important;max-height:calc(100dvh - 24px)!important;height:min(820px,calc(100dvh - 24px));overflow:hidden!important;margin:auto!important}
+#dashboard-modal>.modal-content>div:first-child{position:relative!important;top:auto!important;flex:0 0 auto!important;z-index:1}
+#dashboard-modal>.modal-content>div:last-child{min-height:0!important;flex:1 1 auto!important;overflow-y:auto!important;max-height:none!important;overscroll-behavior:contain}
+#citl-leadership .lead-skeleton{min-height:240px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#citl-leadership .lead-skeleton i{display:block;border-radius:12px;background:linear-gradient(100deg,#e6ebf3,#f7f9fc,#e6ebf3);background-size:200% 100%;animation:citl-lead-wait 1.4s ease infinite}
+@keyframes citl-lead-wait{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){#citl-leadership .lead-skeleton i{animation:none}}
+@media(max-width:600px){#dashboard-modal{padding:6px!important}#dashboard-modal>.modal-content{width:100%!important;max-height:calc(100dvh - 12px)!important;height:calc(100dvh - 12px)}#dashboard-modal>.modal-content>div:first-child{padding:12px!important}}

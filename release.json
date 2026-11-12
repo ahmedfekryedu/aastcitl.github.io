@@ -1,12 +1,12 @@
 {
-  "release": "20261112-excel145-notifications146-campus",
-  "built_at": "2026-11-12",
+  "release": "20261113-excel-v2-ux",
+  "built_at": "2026-11-13",
   "base": "CITL-COURSES144-EXCEL-EXPORT-COMPLETE-20261112",
-  "status": "review; local tests do not prove production readiness",
+  "status": "review; local acceptance passed; no production deployment performed",
   "requires": [
-    "SQL144 already installed",
-    "SQL145 for Excel import only",
-    "SQL146 for notification RPC volatility correction"
+    "Existing SQL144, SQL145 and SQL147 verified; no new SQL for V2",
+    "Existing notification SQL146 unchanged"
   ],
-  "description": "Reviewed Excel import with preview and guarded commit; mobile attendance in-card location capture; dashboard returns, scoped history filters and manager-only schedule edit UI. No attendance SQL change. Notification SQL146 fixes existing backfill under read-only RPC classification; retry backoff and reminder failure handling. Experimental ribbons removed. Supplied campus photo replaces the previous live image and provides a subdued glass loading backdrop."
+  "description": "Excel V2 simplified academic placement with explicit offering scope, V1 compatibility, preserved source IDs, full selection in bounded batches; requested notification footer and statistics loading presentation polish. Index, loader, GPS/QR, SQL and schedule engines unchanged.",
+  "previous_release": "20261112-excel145-notifications146-campus"
 }

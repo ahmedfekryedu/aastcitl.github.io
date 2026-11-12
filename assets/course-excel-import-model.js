@@ -10,8 +10,9 @@ async function parse(bytes,{ExcelJS=root.ExcelJS,termId,department}={}){
  if(e<0)fail('الملف ليس XLSX صالحًا.');const count=v.getUint16(e+10,true);let off=v.getUint32(e+16,true),total=0;
  if(count>500||count===65535)fail('ملف Excel أكبر من حدود الفحص.');
  for(let i=0;i<count;i++){if(off+46>end||v.getUint32(off,true)!==0x02014b50)fail('أرشيف Excel تالف.');total+=v.getUint32(off+24,true);if(total>40*1024*1024)fail('حجم محتويات Excel أكبر من الحد الآمن.');const len=v.getUint16(off+28,true),name=new TextDecoder().decode(new Uint8Array(v.buffer,v.byteOffset+off+46,len));if(/vbaProject|externalLinks|connections\.xml/i.test(name))fail('ملف يحتوي ماكرو أو ارتباطات خارجية غير مسموحة.');off+=46+len+v.getUint16(off+30,true)+v.getUint16(off+32,true);}
- const wb=new ExcelJS.Workbook();await wb.xlsx.load(bytes);let cells=0;
+ let wb=new ExcelJS.Workbook();await wb.xlsx.load(bytes);let cells=0;
  for(const ws of wb.worksheets){if(ws.rowCount>12000||ws.columnCount>30)fail('عدد الصفوف أو الأعمدة تجاوز الحد الآمن.');ws.eachRow(row=>row.eachCell(c=>{if(++cells>200000)fail('عدد الخلايا أكبر من الحد الآمن.');if(c.value&&typeof c.value==='object')fail('الصيغ والروابط والخلايا المركبة غير مسموحة: '+ws.name+' '+c.address);}));}
+ const V=typeof module==='object'&&module.exports?require('./course-excel-v2.js'):root.CITLCourseExcelV2;const expanded=V?.expand(wb,{ExcelJS});if(expanded)wb=expanded.workbook;
  const tech=wb.getWorksheet('_ربط');if(!tech)fail('اختر ملفًا صادرًا من CITL يحتوي بيانات الربط.');const chunks=new Map();
  tech.eachRow((r,n)=>{if(n===1)return;const k=text(r.getCell(1)),part=Number(r.getCell(3).value);if(!Number.isInteger(part)||part<0||part>1000)fail('بيانات الربط تالفة.');if(!chunks.has(k))chunks.set(k,new Map());if(chunks.get(k).has(part))fail('جزء ربط مكرر.');chunks.get(k).set(part,String(r.getCell(4).value??''));});
  const meta={};for(const [k,parts] of chunks){let s='';for(let n=0;n<parts.size;n++){if(!parts.has(n))fail('جزء ربط مفقود.');s+=parts.get(n);}meta[k]=JSON.parse(s);}
@@ -78,7 +79,7 @@ async function parse(bytes,{ExcelJS=root.ExcelJS,termId,department}={}){
  }
  const seniors=[];for(let n=6;n<=sw.rowCount;n++){const r=sw.getRow(n),who=text(r.getCell(3)),aid=text(r.getCell(5));if(!who)continue;if(text(r.getCell(2))!=='كبير المنسقين')fail('تكليف القسم يجب أن يكون كبير المنسقين.');const id=account(who),old=(meta.seniors||[]).find(a=>a.id===aid);if(aid&&!old)fail('معرف كبير المنسقين غير معروف.');if(!old||old.profile_id!==id)seniors.push({profile_id:id,existing_id:aid||null});}
  if(new Set(seniors.map(s=>s.profile_id)).size!==seniors.length)addConflict('','تكليف كبير منسقين مكرر.');
- return {metadata:meta,rows:changes,seniors,conflicts,total:rows.size,requires_review_authorization:changes.some(r=>r.assignments.some(a=>a.primary)),file_sha256:await M.hash(Array.from(new Uint8Array(bytes.buffer||bytes,bytes.byteOffset||0,bytes.byteLength)))};
+ return {contract:expanded?"V2":"V1",scopes:expanded?.scopes||[],notes:expanded?.notes||[],metadata:meta,rows:changes,seniors,conflicts,total:rows.size,requires_review_authorization:changes.some(r=>r.assignments.some(a=>a.primary)),file_sha256:await M.hash(Array.from(new Uint8Array(bytes.buffer||bytes,bytes.byteOffset||0,bytes.byteLength)))};
 }
 const api={parse};if(typeof module==='object'&&module.exports)module.exports=api;else root.CITLCourseExcelImportModel=api;
 })(typeof window==='object'?window:globalThis);

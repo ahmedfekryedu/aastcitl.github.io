@@ -1,7 +1,7 @@
 /* Locally bundled ExcelJS 4.4.0. Export only: no network, macros, formulas or database writes. */
 (function(root){
  'use strict';
- async function create(model,selected,{ExcelJS=root.ExcelJS,now=new Date()}={}){
+ async function createV1(model,selected,{ExcelJS=root.ExcelJS,now=new Date()}={}){
   const M=typeof module==='object'&&module.exports?require('./course-excel-model.js'):root.CITLCourseExcelModel;
   if(!ExcelJS)throw Error('تعذر تحميل مكتبة Excel المحلية؛ أعد المحاولة.');
   const chosen=new Set(selected),rows=model.rows.filter(r=>chosen.has(r.id));
@@ -81,5 +81,6 @@
   const bytes=await workbook.xlsx.writeBuffer();
   return {bytes,filename:`CITL-${model.department}-${model.term.starts_on||model.term.id}-${ref}.xlsx`,rowCount:rows.length,metadata};
  }
- const api=Object.freeze({create});if(typeof module==='object'&&module.exports)module.exports=api;else root.CITLCourseExcelWorkbook=api;
+ async function create(model,selected,options={}){const legacy=await createV1(model,selected,options);const X=options.ExcelJS||root.ExcelJS,V=typeof module==='object'&&module.exports?require('./course-excel-v2.js'):root.CITLCourseExcelV2;if(!V)throw Error('أعد تحميل الصفحة لتحميل نموذج التسكين المبسط');const w=new X.Workbook();await w.xlsx.load(legacy.bytes);const result=await V.simplify(w,{ExcelJS:X});return {...legacy,bytes:await result.workbook.xlsx.writeBuffer(),metadata:result.metadata,rowCount:result.rowCount,offeringCount:result.offeringCount,filename:legacy.filename.replace('CX1-','CX2-')};}
+ const api=Object.freeze({create,createV1});if(typeof module==='object'&&module.exports)module.exports=api;else root.CITLCourseExcelWorkbook=api;
 })(typeof window==='object'?window:globalThis);

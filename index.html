@@ -160,9 +160,12 @@
 <script src="/assets/service-connection.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/service-availability.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <link rel="preload" href="/CITL-Camp1.png" as="image">
+<link rel="preload" href="/CITL-Camp1-loader.webp" as="image">
 <style id="citl-login-loader-style">
 /* Hide the public form until the bounded session check completes, never the whole body. */
 html.citl-login-checking body>*:not(script):not(#global-loader){visibility:hidden!important;pointer-events:none!important}
+html.citl-login-submitting{background:#303c60!important}
+html.citl-login-submitting body>*:not(script):not(#global-loader){visibility:hidden!important;pointer-events:none!important}
 html.citl-login-checking{overflow:hidden;background:#303c60}
 html.citl-login-checking #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 html.citl-login-checking #global-loader h3,html.citl-login-checking #global-loader p{visibility:visible!important}
@@ -198,8 +201,8 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 html.citl-page-booting #global-loader::before,
 html.citl-navigation-loading #global-loader::before,
 #global-loader.citl-unified-loader::before{
- background:radial-gradient(ellipse at 15% 15%,rgba(82,97,138,.86) 0%,transparent 60%),radial-gradient(ellipse at 90% 85%,rgba(84,81,110,.86) 0%,transparent 55%),linear-gradient(135deg,rgba(40,52,91,.82),rgba(64,50,94,.84)),url('/CITL-Camp1.png') center 54%/cover no-repeat,#303c60!important;
- inset:-8px;filter:blur(3px);pointer-events:auto;
+ background:radial-gradient(ellipse at 15% 15%,rgba(82,97,138,.86) 0%,transparent 60%),radial-gradient(ellipse at 90% 85%,rgba(84,81,110,.86) 0%,transparent 55%),linear-gradient(135deg,rgba(40,52,91,.82),rgba(64,50,94,.84)),url('/CITL-Camp1-loader.webp') center 54%/cover no-repeat,#303c60!important;
+ inset:-18px;filter:blur(2px);pointer-events:auto;
 }
 #global-loader.citl-unified-loader>.relative{
  background:linear-gradient(155deg,rgba(253,252,248,.95),rgba(238,241,248,.92))!important;
@@ -618,12 +621,14 @@ autoRedirect();
         // =======================================================
         document.documentElement.appendChild(document.getElementById('global-loader'));
         window.showLoader = function(text = "جاري المعالجة...") {
+            document.documentElement.classList.add('citl-login-submitting');
             const loader=document.getElementById('global-loader');
             if(loader.classList.contains('hidden')){const m=document.createElement('div');m.style.cssText='position:fixed;width:100vw;height:100svh;visibility:hidden;pointer-events:none';document.documentElement.append(m);const r=m.getBoundingClientRect();m.remove();loader.style.setProperty('--citl-load-width',r.width+'px');loader.style.setProperty('--citl-load-height',r.height+'px');}
             document.getElementById('loader-text').textContent=text;
             loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');
         };
         window.hideLoader = function() {
+            document.documentElement.classList.remove('citl-login-submitting');
             const loader=document.getElementById('global-loader');
             loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
         };

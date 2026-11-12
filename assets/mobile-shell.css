@@ -147,10 +147,10 @@
 #my-schedule-modal.citl-action-suspended{visibility:hidden;pointer-events:none}
 
 /* Read-all is an action, not a low-contrast caption. */
-#notif-menu button[onclick*="markAllNotificationsRead"],.citl-mark-all-read{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:9px 12px!important;border:1px solid #d58c1d!important;border-radius:9px!important;background:#f3a628!important;color:#20295d!important;font:800 12px Cairo,sans-serif!important;white-space:normal;line-height:1.6!important;box-shadow:0 2px 5px #26356b12}
+#notif-menu button[onclick*="markAllNotificationsRead"],.citl-mark-all-read{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:9px 12px!important;border:1px solid #dce2ef!important;border-radius:9px!important;background:#eef2fa!important;color:#20295d!important;font:800 12px Cairo,sans-serif!important;white-space:normal;line-height:1.6!important;box-shadow:none}
 #notif-menu button[onclick*="markAllNotificationsRead"]:before{content:'✓✓';font-weight:900}
 #notif-menu button[onclick*="markAllNotificationsRead"]:focus-visible,.citl-page-return a:focus-visible{outline:3px solid #2a3475;outline-offset:3px}
-#notif-menu button[onclick*="markAllNotificationsRead"]:hover{background:#ffb637!important}
+#notif-menu button[onclick*="markAllNotificationsRead"]:hover{background:#e2e8f5!important}
 .citl-page-return{width:96%;max-width:1600px;margin:12px auto 0;display:flex;justify-content:flex-start;font:700 12px Cairo,sans-serif}
 .citl-page-return a{display:inline-flex;align-items:center;gap:9px;min-height:42px;padding:8px 14px;border:1px solid #d8dfed;border-radius:10px;background:white;color:#2a3475;text-decoration:none}
 .citl-page-return a:hover{background:#eef1fa;border-color:#2a3475}
@@ -161,9 +161,15 @@
 .citl-notification-failure{padding:14px;border:1px solid #ead3ac;border-radius:10px;background:#fffaf0;color:#664916;font:12px Cairo,sans-serif;line-height:1.9}.citl-notification-failure button{margin-top:10px;min-height:44px;width:100%;font-weight:700}.citl-notification-failure button[aria-busy=true]{opacity:.65;cursor:wait}
 
 /* One geometry for page-navigation controls; account/bell/logout controls stay separate. */
-.citl-main-header :is(a[href],#admin-panel-btn,#admin-toggle-btn,[data-schedule-hub],.citl-header-control,button[onclick="openDashboard()"]):not(.hidden):not([hidden]){box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:40px!important;height:40px!important;padding:8px 12px!important;border-width:1px!important;border-style:solid!important;border-radius:9px!important;font:800 12px/1.4 Cairo,sans-serif!important;white-space:nowrap!important;vertical-align:middle;text-decoration:none}
+.citl-main-header :is(a[href],#admin-panel-btn,#admin-toggle-btn,[data-schedule-hub],.citl-header-control,button[onclick="openDashboard()"]):not(.hidden):not([hidden]){box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:40px!important;height:40px!important;padding:8px 12px!important;border-width:1px!important;border-style:solid!important;border-color:transparent!important;border-radius:9px!important;font:800 12px/1.4 Cairo,sans-serif!important;white-space:nowrap!important;vertical-align:middle;text-decoration:none}
 .citl-main-header :is(a[href],#admin-panel-btn,#admin-toggle-btn,[data-schedule-hub],.citl-header-control,button[onclick="openDashboard()"]):not(.hidden):not([hidden])>i{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;font-size:14px!important;line-height:1!important;margin:0!important}
 .citl-main-header :is(a[href],#admin-panel-btn,#admin-toggle-btn,[data-schedule-hub],.citl-header-control,button[onclick="openDashboard()"])>span{font:inherit;line-height:inherit}
 @media(max-width:1023px){.citl-main-header .citl-mobile-toolbar>a[data-r8-link]{height:44px!important;min-height:44px!important}}
 
 .citl-main-header .citl-header-control>img{width:16px!important;height:16px!important;margin:0!important;object-fit:contain;flex:0 0 16px}
+
+/* Keep inbox footer actions compact and equally accessible. */
+#notif-menu>div:has(>button[onclick*="markAllNotificationsRead"]){padding:6px 10px!important;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+#notif-menu a[href*="history"],#notif-menu [data-history-link]{margin-block:4px!important;min-height:40px}
+
+#notif-menu .citl-notification-history{margin:0!important;min-height:42px!important;padding:8px 10px!important;font:700 12px/1.6 Cairo,sans-serif!important;border:1px solid #dce2ef!important;border-radius:9px!important;background:#fff!important;color:#2a3475!important}

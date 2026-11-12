@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl" class="citl-page-booting">
  <head>
+<link rel="preload" href="/CITL-Camp1-loader.webp" as="image" fetchpriority="high">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CITL first-paint loader: source: tools/page-loader.html; sync with tools/sync-page-loader.py -->
@@ -14,11 +15,11 @@ html.citl-page-booting::-webkit-scrollbar-corner{background:#303c60}
 html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:none!important;user-select:none}
 @media(min-width:1024px){html{scrollbar-gutter:stable}}
 #global-loader.citl-unified-loader.hidden{display:none}#global-loader.citl-unified-loader.flex{display:flex}
-#global-loader.citl-unified-loader{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:var(--citl-load-width,100vw)!important;height:var(--citl-load-height,100svh)!important;z-index:99999;margin:0!important;padding:16px;box-sizing:border-box;transform:none!important;animation:none!important;transition:none!important;align-items:center;justify-content:center;direction:rtl;font-family:CITLBootCairo,sans-serif;background:transparent;isolation:isolate;color-scheme:only light;forced-color-adjust:none}
+#global-loader.citl-unified-loader{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:100vw!important;height:100svh!important;z-index:99999;margin:0!important;padding:16px;box-sizing:border-box;transform:none!important;animation:none!important;transition:none!important;align-items:center;justify-content:center;direction:rtl;font-family:CITLBootCairo,sans-serif;background:transparent;isolation:isolate;color-scheme:only light;forced-color-adjust:none}
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 html.citl-page-booting #global-loader::before,html.citl-navigation-loading #global-loader::before{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 #global-loader.citl-unified-loader::before{content:"";position:fixed;inset:-3px;z-index:-1;background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:auto}
-#global-loader.citl-unified-loader>.relative{position:absolute!important;inset:0!important;margin:auto!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;isolation:isolate;color-scheme:only light}
+#global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;isolation:isolate;color-scheme:only light}
 #global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:4px}
 #global-loader>.relative::after{content:'';position:absolute;bottom:16px;right:22px;left:22px;height:3px;border-radius:6px;background:linear-gradient(90deg,#e1e5ef 0 30%,#f3a628 42% 57%,#2a3475 62%,#e1e5ef 74%);background-size:240% 100%;animation:citl-load-track 2s ease-in-out infinite}
 #global-loader.citl-unified-loader img{display:block;width:142px!important;height:114px!important;max-width:100%;object-fit:contain;flex-shrink:0;margin:0!important;background:transparent!important;opacity:1!important;mix-blend-mode:normal!important;filter:url(#citl-loader-logo-alpha)!important}
@@ -593,9 +594,9 @@ body {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 
 
-<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261112-notifications146" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/mobile-shell.css?v=20261112-ui-polish" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <link rel="stylesheet" href="/assets/site-notice.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
-<link rel="stylesheet" href="/assets/notification-reminder.css?v=20261028-r7.3.3.8-wa-ui" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
+<link rel="stylesheet" href="/assets/notification-reminder.css?v=20261112-ui-polish" data-citl-boot-style media="print" onload="this.media='all'" onerror="this.media='all'">
 <script src="/assets/realtime-health.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <link rel="stylesheet" href="/assets/lecture-room-swaps.css?v=20261028-r7.3.3.8-wa-ui">
 <link rel="stylesheet" href="/assets/whatsapp-admin.css?v=20261108-ui137-r2">
@@ -1250,7 +1251,7 @@ body {
 <script src="/assets/registration-validation.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/admin-member-registration.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/security-core.js?v=20261112-notifications146"></script>
+<script src="/security-core.js?v=20261112-ui-polish"></script>
 <script src="/assets/admin-permissions-ui.js?v=20261105-course-display-129"></script>
 <script src="/assets/department-heads.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/faculty-delegates.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1273,7 +1274,7 @@ body {
 <script src="/assets/service-admin.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/mobile-shell.js?v=20261112-import145-ui"></script>
 <script src="/assets/site-notice.js?v=20261028-r7.3.3.8-wa-ui" defer></script>
-<script src="/assets/notification-reminder.js?v=20261112-notifications146" defer></script>
+<script src="/assets/notification-reminder.js?v=20261112-ui-polish" defer></script>
 <link rel="stylesheet" href="/assets/room-monitor.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/room-monitor.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/control-page.js?v=20261028-r7.3.3.8-wa-ui"></script>

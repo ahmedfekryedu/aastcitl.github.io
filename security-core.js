@@ -99,7 +99,7 @@
       list.appendChild(button);
     }
     if(notificationMode==='overdue'&&(notificationPage>0||result.has_more))for(const [step,label] of [[-1,'الصفحة السابقة'],[1,'المزيد من الإشعارات المتأخرة']]){const b=document.createElement('button');b.type='button';b.className='citl-ac-button secondary';b.textContent=label;b.disabled=step<0?notificationPage===0:!result.has_more;b.onclick=()=>{notificationPage+=step;void checkUserNotifications();};list.append(b);}
-    const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary citl-notification-history';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory();};list.append(history);
+    const history=document.createElement('button');history.type='button';history.className='citl-ac-button secondary citl-notification-history';history.textContent='سجل الإشعارات والأحداث';history.onclick=()=>{document.getElementById('notif-menu')?.classList.add('hidden');window.CITLAdminAccess?.openHistory(); };const inbox=document.getElementById('notif-menu');inbox?.querySelectorAll('.citl-notification-history').forEach(e=>e.remove());const footer=inbox?.querySelector('button[onclick*="markAllNotificationsRead"]')?.parentElement;(footer||list).append(history);
   }
 
   async function openSpecialNotice(item){

@@ -46,6 +46,64 @@ function paint(ws,n,editable,multipleOfferings=false){
   {type:'cellIs',operator:'equal',formulae:['"جديدة"'],style:{fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFE4F1E9'},bgColor:{argb:'FFE4F1E9'}},font:{color:{argb:'FF245A3C'},bold:true}}}
  ]});
 }
+function usageGuide(w,meta){
+ const s=w.addWorksheet('دليل الاستخدام والشرح',{views:[{rightToLeft:true,showGridLines:false}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:.25,right:.25,top:.3,bottom:.3,header:.15,footer:.15}}});
+ s.columns=[{width:8},{width:30},{width:28},{width:85}];
+ s.headerFooter={oddFooter:'&Rدليل تسكين المقررات — CITL&C&P / &N'};
+ function row(values,height=38,kind='body'){
+  const r=s.addRow(values);r.height=height;r.eachCell({includeEmpty:true},(c,i)=>{c.font={name:'Arial',size:12,bold:kind!=='body'||i===2,color:{argb:kind==='title'||kind==='head'?'FFFFFFFF':'FF25316A'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:kind==='title'||kind==='head'?'FF25316A':kind==='gold'?'FFE7AA3A':r.number%2?'FFF1F5FA':'FFFFFFFF'}};c.alignment={horizontal:i===1?'center':'right',vertical:'middle',wrapText:true};c.border={bottom:{style:'thin',color:{argb:'FFCCD6E5'}},left:{style:'thin',color:{argb:'FFCCD6E5'}}};});return r;
+ }
+ function band(text,kind='gold',height=30){const r=row([text,'','',''],height,kind);s.mergeCells(r.number,1,r.number,4);if(kind==='title')r.getCell(1).font={name:'Arial',size:17,bold:true,color:{argb:'FFFFFFFF'}};return r;}
+ function page(title){if(s.rowCount){s.getRow(s.rowCount).addPageBreak();}band(title,'title',38);band(meta.departmentLabel+' — '+meta.term.name,'gold',28);}
+ page('دليل الاستخدام والشرح — أعمدة تسكين المقررات');
+ band('املأ الخانات الملوّنة فقط. أسماء المحاضرين من الجدول لا تمنحهم تكليف منسق تلقائيًا.','body',32);
+ const legend=row(['اللون','أزرق فاتح: قراءة فقط','أصفر: إدخال أو اختيار','اختياري: الاسم العربي والمساعد والملاحظات؛ البرتقالي ينبه لنطاق القرار.'],38);legend.getCell(2).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE8EFF7'}};legend.getCell(3).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}};legend.getCell(4).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFCE0B2'}};
+ row(['العمود','العنوان في النموذج','طريقة التعامل','وظيفته ببساطة'],28,'head');
+ const explanations=[
+ ['تلقائي — لا تعدله','رقم لترتيب صفوف المواد، وليس كودًا أكاديميًا.'],
+ ['قراءة فقط','اسم المادة كما ورد في جدول الفصل. لا تستبدله بمادة أخرى.'],
+ ['قراءة فقط','ملخص المجموعات المشمولة بالصف. افتح تفاصيل المجموعات لقراءة كل طرح.'],
+ ['للعلم فقط','أسماء المحاضرين من جدول الفصل؛ المحاضر ليس منسقًا تلقائيًا.'],
+ ['اختر من القائمة','اختر قديمة أو جديدة وفق التصنيف الأكاديمي الصحيح. عند تعديل المرجع استكمل القسم واللائحة واللغة معًا.'],
+ ['اختر من القائمة','اختر لغة تدريس المقرر: عربي أو إنجليزي.'],
+ ['كتابة يدوية','اكتب الكود الرسمي المعتمد إذا توفر؛ رمز المجموعة أو القاعة ليس كود المقرر الرسمي.'],
+ ['اختياري — كتابة يدوية','يُكتب إن توفر، ويجوز تركه فارغًا دون منع الاستيراد.'],
+ ['اختر حسابًا من القائمة','المنسق الأساسي مسؤول عن تنسيق المادة ضمن تكليفه وصلاحياته الفعلية؛ لا تكتب اسمًا بديلًا يدويًا.'],
+ ['اختياري — من القائمة','حساب مساعد عند الحاجة. اختياره لا يمنحه جميع صلاحيات المنسق الأساسي تلقائيًا.'],
+ ['اختياري — كتابة يدوية','توضيح للقسم يظهر أثناء المراجعة؛ لا يستبدل بيانات التسكين.'],
+ ['اختر نطاقًا صريحًا','يحدد هل القرار لِكل الطروحات المشمولة بهذا الصف، أم لطروحات تراجعها منفصلة.']
+ ];
+ explanations.forEach(([how,why],i)=>row([String.fromCharCode(65+i),headers[i],how,why],i===4||i===8?46:38));
+ band('إذا ظهر «القسم المالك»: إدراج مادة لقسم آخر لا ينقل ملكيتها. المستورد الحالي يرفضها في ملف قسم مختلف؛ راجعها مع المسؤول.','body',40);
+ page('نطاق القرار والشيتات والتكليفات');
+ row(['','الاختيار / المهمة','أين تستخدمه؟','شرح ومثال'],28,'head');
+ row(['1',ALL,'صف المادة في تسكين المقررات','مثال: مادة تضم 8 مجموعات في الصف؛ اختيار هذا النطاق صراحة يطبّق بيانات الصف على طروحاته الثمانية فقط، ما لم يمنع النظام تعارضًا.'],56);
+ row(['2',SEPARATE,'ثم شيت تفاصيل المجموعات','مثال: تريد تغيير مجموعة واحدة من الثماني؛ اختر المراجعة المنفصلة ثم عدّل سطرها في التفاصيل فقط، واترك بيانات صف المادة الرئيسي دون تعديل.'],56);
+ band('كل المجموعات المعروضة لا تعني جميع مقررات القسم ولا أي طروحات خارج الملف. عند الشك في تطابق البيانات اختر المراجعة المنفصلة.','body',40);
+ row(['','لماذا قد يكون النطاق فارغًا؟','لا اختيار جماعي تلقائي','متعدد الطروحات يبقى بلا قرار حتى تختار عند تعديل بياناته. للطرح الواحد يضع النموذج نطاقه مسبقًا غالبًا؛ إن مُسح فاختره قبل تعديل البيانات.'],48);
+ row(['','تفاصيل المجموعات','لتعديل طرح بعينه','صفِّ القائمة باسم المادة، ثم راجع رموز المجموعة وأسماء محاضريها. كل سطر طرح مستقل؛ لا تحذف الصفوف ولا تغيّر أعمدة الجدول المقروءة.'],48);
+ row(['','المنسق الأساسي','العمود I','حساب واحد أساسي لكل طرح. تغيير الأساسي الحالي أو إنهاء تكليفه قد يحتاج إجراءً مستقلًا في الموقع يحفظ مسار الاعتماد.'],44);
+ row(['','المنسق المساعد','العمود J أو تكليفات إضافية','يساعد في التنسيق وفق تكليفه. لا يُفترض أنه الأساسي أو مخوّل بالاعتماد لمجرد إضافته.'],40);
+ row(['','رئيس المجموعة','تكليفات إضافية','اختر المجموعة المقصودة ثم دور رئيس مجموعة والحساب المعتمد. لا يتغير رئيس القسم بهذا الاختيار.'],40);
+ row(['','كبير المنسقين','تكليفات إضافية','تكليف على مستوى القسم: اختر كبير المنسقين واترك خانة المادة فارغة. يراجع المرحلة المخصصة له وفق الصلاحيات؛ ليس بديلًا لرئيس القسم.'],44);
+ row(['','متى أستخدم تكليفات إضافية؟','حسابات وأدوار موجودة','لإضافة منسق مقرر أو مساعد أو رئيس مجموعة لطرح محدد، أو كبير منسقين للقسم. لا تكرر نفس التكليف، ولا تستخدم مسح الخلية لإنهائه.'],48);
+ page('خطوات العمل وعلاقة التسكين بالاستيفاء');
+ row(['الخطوة','الإجراء','','ما الذي تفعله؟'],28,'head');
+ const steps=[['التنزيل والمراجعة','1–2','نزّل الملف بعد اختيار الفصل والقسم والمواد. راجع أسماء المواد والمحاضرين والمجموعات.'],['التعبئة والنطاق','3–4','استكمل الخانات الملوّنة فقط. حدد نطاق القرار صراحة للمواد متعددة الطروحات.'],['الحسابات والحفظ','5–6','اختر المنسقين من الحسابات المتاحة. احفظ بصيغة XLSX دون حذف الشيتات أو تغيير الأعمدة.'],['الرفع والاعتماد','7–8','ارفع الملف للموقع. راجع التغييرات والتعارضات قبل الاعتماد؛ رفع الملف لا يعني اعتماده تلقائيًا.']];
+ for(const [title,n,text]of steps)row([n,title,'',text],44);
+ band('Excel لتسكين المقررات وتكليف المنسقين، وليس لتعبئة معايير الاستيفاء. الاستيفاء يتم داخل الموقع.','gold',38);
+ row(['','الأسئلة','من يستكملها؟','العلاقة بالمسؤوليات الفعلية'],28,'head');
+ row(['','Q1–7','بيانات النظام','تُعرض تلقائيًا وفق بيانات النظام والجدول والتكليفات.']);
+ row(['','Q8–36','عضو هيئة التدريس','يستكملها المحاضر أو المكلف بالاستيفاء وفق التكليف والصلاحيات القائمة.']);
+ row(['','Q37–40','منسق المقرر','يكمل الجزء المخصص للتنسيق؛ التدريس وحده لا يمنح صلاحيات المنسق.']);
+ row(['','Q41','رئيس القسم','يسجل ملاحظاته في المرحلة المخصصة له.']);
+ row(['','Q42–43','التوقيعات والاعتمادات','توقيع منسق المقرر ثم رئيس القسم عبر إجراءات الاعتماد داخل الموقع، وليس داخل Excel.']);
+ band('Q26: التنمية المستدامة تُستوفى داخل الموقع فقط. المرجع مساعد للقراءة؛ لا يكتب إجابتك ولا يثبت التطبيق تلقائيًا.','body',40);
+ s.eachRow(r=>{r.height=Math.round(r.height*.9);});
+ s.pageSetup.printArea='A1:D'+s.rowCount;
+ return s;
+}
+
 async function simplify(w,{ExcelJS:X=root.ExcelJS}={}){
  const meta=readMeta(w);if(meta.version!==V1)fail('هذا التحويل لملف V1 فقط');
  // Registered account identity stays hidden; visible labels do not contain UUIDs or staff numbers.
@@ -61,7 +119,7 @@ async function simplify(w,{ExcelJS:X=root.ExcelJS}={}){
  const extra=styleSheet(out,'تكليفات إضافية',['المجموعة / المادة','الدور','الحساب المعتمد','ملاحظات'],meta);extra.getCell('A3').value='اختر المجموعة والدور والحساب المعتمد من القوائم. لا تكتب أسماء حسابات بديلة يدويًا.';extra.getCell('A4').value='للإضافة فقط: اختر مجموعة محددة. لكبير المنسقين اترك المادة فارغة. لا يؤدي مسح الخانة إلى إنهاء تكليف.';extra.getColumn(1).width=48;extra.getColumn(3).width=40;
  for(const [col,list] of [['A','V2Targets'],['B','V2Roles'],['C','V2Accounts']])extra.dataValidations.add(col+'6:'+col+'1005',{type:'list',allowBlank:true,formulae:[list],showErrorMessage:true,errorStyle:'stop',error:'اختر من القائمة'});paint(extra,6,[1,2,3,4]);
  let col=0;for(const [key,vals]of Object.entries(listDefs)){col++;vals.forEach((v,i)=>lists.getCell(i+1,col).value=v);const letter=lists.getColumn(col).letter;out.definedNames.add("'_قوائم'!$"+letter+'$1:$'+letter+'$'+Math.max(1,vals.length),key);}
- meta.v2_owner=owner;meta.v2_targets=listDefs.V2Targets;writeMeta(out,meta);return {workbook:out,metadata:meta,rowCount:gs.length,offeringCount:meta.offerings.length};
+ meta.v2_owner=owner;meta.v2_targets=listDefs.V2Targets;writeMeta(out,meta);usageGuide(out,meta);return {workbook:out,metadata:meta,rowCount:gs.length,offeringCount:meta.offerings.length};
 }
 function expand(w,{ExcelJS:X=root.ExcelJS}={}){
  const meta=readMeta(w);if(meta.version!==V2)return null;if(!Array.isArray(meta.v1_sheets)||!Array.isArray(meta.offerings)||meta.offerings.length>1000)fail('ربط V2 غير صالح');

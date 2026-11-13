@@ -184,7 +184,7 @@ html.citl-page-booting #global-loader::before,html.citl-navigation-loading #glob
 #global-loader.citl-unified-loader::before{content:"";position:fixed;inset:-3px;z-index:-1;background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:auto}
 #global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;isolation:isolate;color-scheme:only light}
 #global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:4px}
-#global-loader>.relative::after{content:'';position:absolute;bottom:16px;right:22px;left:22px;height:3px;border-radius:6px;background:linear-gradient(90deg,#e1e5ef 0 30%,#f3a628 42% 57%,#2a3475 62%,#e1e5ef 74%);background-size:240% 100%;animation:citl-load-track 2s ease-in-out infinite}
+#global-loader>.relative::after{content:'';position:absolute;bottom:16px;right:22px;left:22px;height:3px;border-radius:6px;background:linear-gradient(270deg,#B95C14 0%,#F29A23 55%,#FFC65D 85%,#FFE2A0 100%) right center/var(--citl-loader-progress,0%) 100% no-repeat,#e1e5ef;animation:none}
 #global-loader.citl-unified-loader img{display:block;width:142px!important;height:114px!important;max-width:100%;object-fit:contain;flex-shrink:0;margin:0!important;background:transparent!important;opacity:1!important;mix-blend-mode:normal!important;filter:url(#citl-loader-logo-alpha)!important}
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 #global-loader.citl-unified-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px;color:#2a3475;font-size:20px;font-weight:900;font-variation-settings:"wght" 900;line-height:1.6;margin:8px 0 0!important;letter-spacing:0;flex-shrink:0}
@@ -193,7 +193,6 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 #global-loader [data-boot-retry]{position:absolute;bottom:30px;left:18px;right:18px;margin:0;padding:5px;border:1px solid #cdd4e4;border-radius:8px;background:#f5f7fb;color:#2a3475;font-size:12px;cursor:pointer}
 .citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}.citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}.citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
 @keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
-@keyframes citl-load-track{from{background-position:0 0}to{background-position:100% 0}}
 @media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:132px!important;height:106px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}#global-loader>.relative::after{animation:none}}
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
@@ -533,6 +532,33 @@ html.citl-navigation-loading #global-loader::before,
         </div>
     </div>
 <script id="citl-loader-root">document.body.appendChild(document.getElementById('global-loader'));</script>
+<script id="citl-loader-progress">
+/* Visual progress only. Existing loader lifecycle remains the authority. */
+(function(w,d){
+ w.CITLLoaderProgress=function(box){
+  var active=false,frame=0,started=0,value=0,motion=w.matchMedia('(prefers-reduced-motion: reduce)');
+  function paint(n){value=n;box.style.setProperty('--citl-loader-progress',(n*100).toFixed(3)+'%');}
+  function cancel(){if(frame)w.cancelAnimationFrame(frame);frame=0;}
+  function visible(){var s=w.getComputedStyle(box);return box.isConnected&&s.display!=='none'&&s.visibility!=='hidden'&&s.opacity!=='0';}
+  function stop(){active=false;cancel();}
+  function tick(now){
+   frame=0;if(!active)return;if(!visible()){stop();return;}if(d.hidden||motion.matches)return;
+   // An estimate, not network completion. Only complete() may fill the last part.
+   paint(Math.max(value,Math.min(.94,.03+.91*(1-Math.exp(-(now-started)/6500)))));
+   if(value<.9399)frame=w.requestAnimationFrame(tick);
+  }
+  function resume(){cancel();if(active&&visible()&&!d.hidden&&!motion.matches)frame=w.requestAnimationFrame(tick);}
+  function start(){if(active)return;active=true;started=w.performance.now();paint(motion.matches?.08:0);resume();}
+  function complete(){stop();paint(1);}
+  var observer=new MutationObserver(function(){if(active&&!visible())stop();});
+  observer.observe(box,{attributes:true,attributeFilter:['class','hidden']});
+  d.addEventListener('visibilitychange',resume);w.addEventListener('pagehide',cancel);
+  w.addEventListener('pageshow',resume);motion.addEventListener('change',resume);
+  return Object.freeze({start:start,stop:stop,complete:complete});
+ };
+})(window,document);
+window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-loader'));window.CITLLoginProgress.start();
+</script>
 <script>
 // Keep the branded loader during session checking, with a bounded recovery path.
 // No protected content is revealed and no stored credentials are discarded.
@@ -551,9 +577,9 @@ html.citl-navigation-loading #global-loader::before,
         box.querySelector('span').textContent=message;box.querySelector('button').hidden=!retry;
     }
     function reveal(){document.documentElement.classList.remove('citl-login-checking');document.body.classList.remove('opacity-0');const loader=document.getElementById('global-loader');loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');}
-    function finish(){waiting=false;clearTimeout(timer);reveal();document.getElementById('citl-login-status')?.remove();}
-    function fail(){waiting=false;clearTimeout(timer);reveal();notice('لم يكتمل التحقق من جلسة الدخول. بياناتك محفوظة؛ أعد المحاولة.',true);}
-    function redirecting(){if(!waiting)return false;document.getElementById('loader-text').textContent='جاري فتح النظام…';return true;}
+    function finish(){root.CITLLoginProgress.complete();waiting=false;clearTimeout(timer);reveal();document.getElementById('citl-login-status')?.remove();}
+    function fail(){root.CITLLoginProgress.stop();waiting=false;clearTimeout(timer);reveal();notice('لم يكتمل التحقق من جلسة الدخول. بياناتك محفوظة؛ أعد المحاولة.',true);}
+    function redirecting(){if(!waiting)return false;root.CITLLoginProgress.complete();document.getElementById('loader-text').textContent='جاري فتح النظام…';return true;}
     root.CITLLoginEntry={finish,fail,redirecting,wait:async task=>{let deadline;try{if(!waiting)throw new Error('LOGIN_ENTRY_TIMEOUT');const value=await Promise.race([Promise.resolve().then(task),new Promise((_,reject)=>{deadline=setTimeout(()=>reject(new Error('LOGIN_ENTRY_TIMEOUT')),8000);})]);if(!waiting)throw new Error('LOGIN_ENTRY_TIMEOUT');return value;}finally{clearTimeout(deadline);}}};
     notice('جارٍ التحقق من جلسة الدخول…',false);
     timer=setTimeout(()=>{if(waiting)fail();},9000);
@@ -627,9 +653,10 @@ autoRedirect();
             const loader=document.getElementById('global-loader');
             if(loader.classList.contains('hidden')){const m=document.createElement('div');m.style.cssText='position:fixed;width:100vw;height:100svh;visibility:hidden;pointer-events:none';document.documentElement.append(m);const r=m.getBoundingClientRect();m.remove();loader.style.setProperty('--citl-load-width',r.width+'px');loader.style.setProperty('--citl-load-height',r.height+'px');}
             document.getElementById('loader-text').textContent=text;
-            loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');
+            loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');window.CITLLoginProgress.start();
         };
         window.hideLoader = function() {
+            window.CITLLoginProgress.stop();
             document.documentElement.classList.remove('citl-login-submitting');
             const loader=document.getElementById('global-loader');
             loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
@@ -685,6 +712,7 @@ autoRedirect();
                     }
                 }
 
+                window.CITLLoginProgress.complete();
                 // تحديث النص للنجاح
                 const textEl = document.getElementById('loader-text');
                 if(textEl) textEl.textContent = "تم الدخول بنجاح! جاري التوجيه...";

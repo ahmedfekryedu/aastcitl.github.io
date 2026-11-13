@@ -1,42 +1,61 @@
 (function(root){'use strict';
  const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const sections={'energy-logistics':{name:'قسم إدارة لوجستيات الطاقة والبترول',pages:[1,2,3]},'transport-logistics':{name:'قسم إدارة لوجستيات النقل',pages:[4,5,6,7]},'trade-logistics':{name:'قسم إدارة لوجستيات التجارة الدولية',pages:[8,9,10,11,12]},'supply-chain':{name:'قسم إدارة لوجستيات سلاسل الإمداد',pages:[13,14,15]}};
- const source='/references/SDG_All_Departments.pdf';
+ const source='/references/SDG_All_Departments.pdf',instances=new WeakMap();let cached;
+ function reference(){if(!cached)cached=fetch('/assets/course-sdg-reference.json',{credentials:'same-origin'}).then(r=>{if(!r.ok)throw Error('reference');return r.json();}).then(rows=>{if(!Array.isArray(rows)||rows.some(r=>!sections[r.department]?.pages.includes(r.source_page)))throw Error('reference');return rows;}).catch(e=>{cached=null;throw e;});return cached;}
  function mount(host,data){
-  host.querySelector('[data-sdg-companion]')?.remove();
-  const owner=data.reference?.owner_department,faculty=data.identity?.faculty_department;
-  const initial=sections[owner]?owner:sections[faculty]?faculty:'';
+  instances.get(host)?.destroy();
+  const owner=data.reference?.review_status==='verified'&&sections[data.reference?.owner_department]?data.reference.owner_department:'';
   const wrap=document.createElement('div');wrap.dataset.sdgCompanion='';
-  wrap.innerHTML=`<button type="button" class="sdgc-float" aria-haspopup="dialog" aria-controls="sdgc-dialog" aria-expanded="false"><span aria-hidden="true">▤</span> مرجع التنمية المستدامة</button><dialog id="sdgc-dialog" class="sdgc-dialog" aria-labelledby="sdgc-title" aria-describedby="sdgc-help" dir="rtl"><header class="sdgc-header"><div><h2 id="sdgc-title">التنمية المستدامة — مرجع الاستيفاء</h2><p dir="auto">${E(data.offering?.course_name||'')}</p></div><button type="button" class="sdgc-close" aria-label="إغلاق المرجع والعودة للاستيفاء">×</button></header><div class="sdgc-controls"><p id="sdgc-help">صفحات الملف الأصلي بنفس ترتيبها وتنسيقها. استرشد بها ثم سجّل ما طبّقته بنفسك في السؤال 26؛ فتح المرجع لا يغيّر إجابتك.</p><label>عرض مرجع القسم<select data-sdgc-department><option value="">اختر القسم</option>${Object.entries(sections).map(([k,v])=>`<option value="${k}">${E(v.name)}</option>`).join('')}</select></label><p class="sdgc-context">${sections[owner]?'بدأ العرض بالقسم المالك للمقرر.':sections[faculty]?'قسم المقرر غير محسوم؛ بدأ العرض بقسم المحاضر للاستدلال فقط.':'قسم المقرر غير محدد؛ اختر القسم لعرض مرجعه.'} تغيير القسم هنا يغيّر العرض فقط.</p><div class="sdgc-pager"><button type="button" data-sdgc-prev aria-label="الصفحة السابقة">السابق</button><label>صفحة المصدر<select data-sdgc-page></select></label><button type="button" data-sdgc-next aria-label="الصفحة التالية">التالي</button><button type="button" data-sdgc-zoom aria-pressed="false">تكبير</button></div><a data-sdgc-pdf href="${source}" target="_blank" rel="noopener">فتح الملف الأصلي كاملًا ↗</a></div><div class="sdgc-view" tabindex="0" aria-label="صفحة المرجع، يمكن التمرير عند التكبير"><p class="sdgc-status" role="status"></p><img class="sdgc-page-image" hidden alt=""><details class="sdgc-text"><summary>نص الصفحة للبحث والقراءة</summary><pre dir="auto"></pre></details></div><footer class="sdgc-footer"><span data-sdgc-position></span><button type="button" data-sdgc-return>العودة إلى الاستيفاء</button></footer></dialog>`;
+  wrap.innerHTML=`<button type="button" class="sdgc-float" aria-controls="sdgc-panel" aria-expanded="false"><span aria-hidden="true">▤</span> مرجع التنمية المستدامة</button><aside id="sdgc-panel" class="sdgc-panel" aria-labelledby="sdgc-title" dir="rtl" hidden><header class="sdgc-header"><div><h2 id="sdgc-title">مرجع التنمية المستدامة</h2><p>${E(data.offering?.course_name||'')}</p></div><button type="button" class="sdgc-close" aria-label="إغلاق المرجع والعودة للاستيفاء">×</button></header><div class="sdgc-content"><p class="sdgc-help">مرجع للقراءة أثناء الاستيفاء. سجّل إجابتك بنفسك في السؤال 26؛ فتح المرجع لا يثبت تطبيق الهدف.</p><p class="sdgc-context"></p><div class="sdgc-controls"><label>القسم<select data-filter="department"><option value="">اختر القسم</option>${Object.entries(sections).map(([k,v])=>`<option value="${k}">${E(v.name)}</option>`).join('')}</select></label><label>المقرر<select data-filter="course"></select></label><label>هدف التنمية المستدامة<select data-filter="goal"></select></label><label>الأسبوع الوارد بالمصدر<select data-filter="week"></select></label></div><div class="sdgc-tools"><button type="button" data-full>عرض جدول القسم كاملًا</button><a href="${source}" target="_blank" rel="noopener">الملف الأصلي ↗</a></div><p class="sdgc-summary" role="status"></p><div class="sdgc-results"></div></div><footer class="sdgc-footer"><span>التصفية للقراءة فقط؛ لا تغيّر القسم أو الإجابات.</span><button type="button" data-return>العودة إلى الاستيفاء</button></footer></aside>`;
   host.append(wrap);
-  const dialog=wrap.querySelector('dialog'),button=wrap.querySelector('.sdgc-float'),department=wrap.querySelector('[data-sdgc-department]'),page=wrap.querySelector('[data-sdgc-page]'),img=wrap.querySelector('img'),view=wrap.querySelector('.sdgc-view'),status=wrap.querySelector('.sdgc-status'),text=wrap.querySelector('pre');
-  const previous=wrap.querySelector('[data-sdgc-prev]'),next=wrap.querySelector('[data-sdgc-next]'),zoom=wrap.querySelector('[data-sdgc-zoom]');
-  let generation=0,loaded=false,returnTo=null;
-  department.value=initial;
+  const panel=wrap.querySelector('aside'),button=wrap.querySelector('.sdgc-float'),content=wrap.querySelector('.sdgc-content'),results=wrap.querySelector('.sdgc-results'),summary=wrap.querySelector('.sdgc-summary'),context=wrap.querySelector('.sdgc-context');
+  const filters=Object.fromEntries([...wrap.querySelectorAll('[data-filter]')].map(el=>[el.dataset.filter,el]));filters.department.value=owner;
+  let rows=null,loading=false,destroyed=false,opener=button,listScroll=0;
+  function options(el,values,label){const value=el.value;el.innerHTML=`<option value="">${E(label)}</option>`+values.map(([v,t])=>`<option value="${E(v)}">${E(t)}</option>`).join('');el.value=values.some(([v])=>String(v)===value)?value:'';}
   function draw(){
-   const n=Number(page.value),pages=sections[department.value]?.pages||[],index=pages.indexOf(n),version=++generation;
-   previous.disabled=index<=0;next.disabled=index<0||index===pages.length-1;zoom.disabled=index<0;
-   wrap.querySelector('[data-sdgc-position]').textContent=index<0?'اختر القسم أولًا':`صفحة ${index+1} من ${pages.length} للقسم · صفحة ${n} في الملف`;
-   wrap.querySelector('[data-sdgc-pdf]').href=source+(index<0?'':'#page='+n);
-   img.hidden=true;img.onload=null;img.onerror=null;img.removeAttribute('src');text.textContent='';
-   view.classList.remove('sdgc-zoomed');zoom.setAttribute('aria-pressed','false');zoom.textContent='تكبير';view.scrollTop=0;view.scrollLeft=0;
-   if(index<0){status.textContent='اختر القسم لعرض صفحاته الأصلية.';return;}
-   status.textContent='جارٍ تحميل صفحة المرجع…';img.alt=`صفحة ${n} من المرجع الأصلي — ${sections[department.value].name}`;
-   img.onload=()=>{if(version!==generation)return;img.hidden=false;status.textContent='';};
-   img.onerror=()=>{if(version!==generation)return;status.textContent='تعذر تحميل صورة الصفحة. افتح الملف الأصلي من الرابط أعلاه أو أعد اختيار الصفحة.';};
-   img.src='/references/sdg-pages/page-'+n+'.webp';
-   fetch('/references/sdg-pages/page-'+n+'.txt').then(r=>{if(!r.ok)throw Error('missing');return r.text();}).then(t=>{if(version===generation)text.textContent=t;}).catch(()=>{if(version===generation)text.textContent='النص غير متاح؛ استخدم الملف الأصلي.';});
+   const dept=filters.department.value,all=(rows||[]).filter(r=>r.department===dept);
+   options(filters.course,[...new Set(all.map(r=>r.course))].map(v=>[v,v]),'كل مقررات القسم');
+   const courses=all.filter(r=>!filters.course.value||r.course===filters.course.value);
+   options(filters.goal,[...new Set(courses.map(r=>String(r.goal)))].sort((a,b)=>Number(a)-Number(b)).map(v=>[v,'الهدف '+v]),'كل الأهداف');
+   const goals=courses.filter(r=>!filters.goal.value||String(r.goal)===filters.goal.value);
+   options(filters.week,[...new Set(goals.flatMap(r=>r.weeks||[]))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(v=>[v,v]),'كل الأسابيع');
+   for(const key of ['course','goal','week'])filters[key].disabled=!dept||(key==='week'&&!goals.some(r=>r.weeks?.length));
+   wrap.querySelector('[data-full]').disabled=!dept;
+   const linked=(data.sdg||[]).some(s=>s.approved_links>0&&all.some(r=>r.id===s.id));
+   context.textContent=!dept?'قسم المقرر غير مؤكد؛ اختر القسم لقراءة مرجعه دون تخمين.':dept!==owner?'عرض استرشادي للقسم المختار فقط؛ لا يغيّر ملكية المقرر.':linked?'القسم المالك مؤكد ويوجد ربط مرجعي معتمد. يظهر جدول القسم كاملًا افتراضيًا.':'القسم المالك مؤكد، لكن مطابقة المقرر بمرجع التنمية لم تتأكد. يظهر جدول القسم كاملًا دون ربط بتشابه الاسم.';
+   const visible=goals.filter(r=>!filters.week.value||(r.weeks||[]).includes(filters.week.value));
+   summary.textContent=dept?`${sections[dept].name} · ${visible.length} سجلًا من ${all.length} · الصفحات ${sections[dept].pages[0]}–${sections[dept].pages.at(-1)}`:'اختر القسم لعرض جدوله.';
+   results.innerHTML=!dept?'<p class="sdgc-empty">لا يُستنتج قسم المقرر من قسم المحاضر.</p>':!visible.length?'<p class="sdgc-empty">لا توجد نتائج لهذه الاختيارات. يمكنك عرض جدول القسم كاملًا.</p>':`<table class="sdgc-table"><caption>${E(sections[dept].name)} — بيانات المرجع الأصلي</caption><thead><tr><th>المقرر</th><th>الهدف ورقمه</th><th>الموضوع</th><th>الأسبوع</th><th>ملاحظات</th><th>المصدر</th></tr></thead><tbody>${visible.map(r=>`<tr><td data-label="المقرر"><b dir="auto">${E(r.course)}</b></td><td data-label="الهدف"><strong>${E(r.goal)}</strong><span dir="auto">${E(r.goal_text)}</span></td><td data-label="الموضوع" dir="auto">${E(r.topic||'—')}</td><td data-label="الأسبوع">${E((r.weeks||[]).join('، ')||'غير وارد')}</td><td data-label="ملاحظات">${r.irrelevant?'<b>غير منطبق بحسب المصدر</b>':''}${r.flags?.length?'<span class="sdgc-warning">اختلاف في ترقيم / تسمية الهدف بالمصدر؛ راجع الصفحة الأصلية.</span>':''}${!r.irrelevant&&!r.flags?.length?'—':''}</td><td data-label="المصدر"><button type="button" data-page="${r.source_page}" aria-label="عرض الصفحة الأصلية ${r.source_page}">ص ${r.source_page}</button></td></tr>`).join('')}</tbody></table>`;
+   results.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>original(Number(b.dataset.page)));
   }
-  function choose(){const pages=sections[department.value]?.pages||[];page.innerHTML=pages.map(n=>`<option value="${n}">${n}</option>`).join('');page.disabled=!pages.length;draw();}
-  department.onchange=choose;page.onchange=draw;
-  previous.onclick=()=>{page.selectedIndex--;draw();};next.onclick=()=>{page.selectedIndex++;draw();};
-  zoom.onclick=()=>{const active=view.classList.toggle('sdgc-zoomed');zoom.setAttribute('aria-pressed',String(active));zoom.textContent=active?'ملاءمة العرض':'تكبير';};
-  function show(from){returnTo=from||button;if(!loaded){choose();const linked=(data.sdg||[]).map(x=>Number(x.source_page)).find(n=>sections[department.value]?.pages.includes(n));if(linked&&page.value!==String(linked)){page.value=String(linked);draw();}loaded=true;}dialog.showModal();button.setAttribute('aria-expanded','true');}
-  button.onclick=()=>show(button);
-  wrap.querySelector('.sdgc-close').onclick=()=>dialog.close();wrap.querySelector('[data-sdgc-return]').onclick=()=>dialog.close();
-  dialog.addEventListener('close',()=>{button.setAttribute('aria-expanded','false');if(returnTo?.isConnected)returnTo.focus({preventScroll:true});});
+  function original(n){
+   if(!sections[filters.department.value]?.pages.includes(n))return;
+   listScroll=content.scrollTop;
+   results.innerHTML=`<div class="sdgc-source"><button type="button" data-table>العودة إلى جدول القسم</button><a href="${source}#page=${n}" target="_blank" rel="noopener">صفحة ${n} في PDF ↗</a><p>صورة الصفحة الأصلية ${n} — دون تعديل</p><img src="/references/sdg-pages/page-${n}.webp" alt="صفحة ${n} من مرجع التنمية المستدامة الأصلي"></div>`;
+   results.querySelector('[data-table]').onclick=()=>{draw();content.scrollTop=listScroll;};
+   results.querySelector('img').onerror=()=>{results.querySelector('p').textContent='تعذر عرض الصورة. استخدم رابط الصفحة في PDF.';};
+   content.scrollTop=results.offsetTop-content.offsetTop;
+  }
+  function layout(on){
+   const anchor=[...host.querySelectorAll('.p2-question')].find(el=>el.getBoundingClientRect().bottom>100&&el.getBoundingClientRect().width>0),top=anchor?.getBoundingClientRect().top;
+   host.classList.toggle('sdgc-reading',on);
+   if(anchor&&innerWidth>=1000)root.scrollBy(0,anchor.getBoundingClientRect().top-top);
+  }
+  async function show(trigger){
+   opener=trigger||button;panel.hidden=false;button.hidden=true;button.setAttribute('aria-expanded','true');layout(true);
+   if(rows||loading)return;loading=true;summary.textContent='جارٍ تحميل مرجع الأقسام…';
+   try{rows=await reference();if(!destroyed)draw();}catch(e){if(!destroyed){summary.textContent='تعذر تحميل المرجع. لم تُغيَّر إجاباتك.';results.innerHTML='<button type="button" data-retry>إعادة المحاولة</button>';results.querySelector('[data-retry]').onclick=()=>show(opener);}}finally{loading=false;}
+  }
+  function close(){panel.hidden=true;button.hidden=false;button.setAttribute('aria-expanded','false');layout(false);opener?.focus({preventScroll:true});}
+  button.onclick=()=>show(button);wrap.querySelector('.sdgc-close').onclick=close;wrap.querySelector('[data-return]').onclick=close;
+  panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close();}});
+  for(const [key,el]of Object.entries(filters))el.onchange=()=>{if(key==='department')for(const k of ['course','goal','week'])filters[k].value='';draw();};
+  wrap.querySelector('[data-full]').onclick=()=>{for(const k of ['course','goal','week'])filters[k].value='';draw();content.scrollTop=0;};
   const inline=host.querySelector('#p2-sdg-open');if(inline)inline.onclick=()=>show(inline);
-  return {open:()=>show(button)};
+  const observer=new MutationObserver(()=>{if(!host.contains(wrap))destroy();});observer.observe(host,{childList:true});
+  function destroy(){destroyed=true;observer.disconnect();host.classList.remove('sdgc-reading');wrap.remove();if(instances.get(host)===api)instances.delete(host);}
+  const api={open:()=>show(button),destroy,element:wrap};instances.set(host,api);return api;
  }
  root.CITLSDGCompanion={mount};
 })(window);

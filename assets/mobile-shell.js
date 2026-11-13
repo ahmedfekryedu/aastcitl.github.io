@@ -1,15 +1,22 @@
 (function(root){'use strict';
  function updateReturn(){
-  const path=location.pathname;
-  if(!/^\/(dashboard\/(attendance|control)|courses(?:\/|$)|management(?:\/|$)|schedules(?:\/|$)|smrm(?:\/|$)|attendance(?:\/|$)|today(?:\/|$)|study(?:\/|$)|account(?:\/|$))/.test(path))return;
-  const header=document.querySelector('body>header,.citl-main-header,#cm-header');if(!header)return;
+  const path=location.pathname,control=/^\/dashboard\/control(?:\.html|\/)?$/.test(path),attendance=/^\/dashboard\/attendance(?:\/(?:index\.html)?)?$/.test(path);
   let bar=document.querySelector('[data-citl-page-return]');
-  if(!bar){bar=document.createElement('nav');bar.dataset.citlPageReturn='';bar.className='citl-page-return';bar.setAttribute('aria-label','الرجوع');bar.innerHTML='<a><i class="fas fa-arrow-right" aria-hidden="true"></i><span></span></a>';header.after(bar);}
-  const user=root.currentUser,control=path.startsWith('/dashboard/control'),manager=!!root.CITLPermissions?.full(user)||Object.values(user?.permissions||{}).some(v=>v===true)||path.startsWith('/dashboard/attendance');
-  const link=bar.firstElementChild;link.href=manager&&!control?'/dashboard/control.html':'/dashboard/';link.querySelector('span').textContent=manager&&!control?'العودة إلى لوحة التحكم':'العودة إلى الرئيسية';
+  // Only administration pages own this navigation. Public modules retain their existing header links.
+  if(!control&&!attendance){bar?.remove();return;}
+  const heading=attendance?document.querySelector('.ar8-page-heading'):null;
+  const host=control?document.getElementById('citl-control-host'):(heading||document.querySelector('main.ar8-main'));
+  if(!host)return;
+  if(!bar){bar=document.createElement('nav');bar.dataset.citlPageReturn='';bar.setAttribute('aria-label','التنقل داخل لوحة التحكم');bar.innerHTML='<a><span class="citl-return-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span><span data-return-label></span></a>';}
+  bar.className='citl-page-return'+(heading?' citl-page-return-inline':'');
+  const link=bar.firstElementChild;link.href=control?'/dashboard/':'/dashboard/control.html';
+  link.querySelector('[data-return-label]').textContent=control?'الرئيسية':'لوحة التحكم';
+  link.setAttribute('aria-label',control?'العودة إلى الرئيسية':'العودة إلى لوحة التحكم');
+  if(bar.parentElement!==host){if(heading)host.append(bar);else host.prepend(bar);}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',updateReturn,{once:true});else updateReturn();
  root.addEventListener('citl-profile-loaded',updateReturn);
+ root.addEventListener('popstate',updateReturn);
 })(window);
 (function(root){'use strict';
  const menu=document.getElementById('mobile-menu')||document.getElementById('cm-mobile-nav');

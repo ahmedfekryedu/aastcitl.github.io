@@ -30,6 +30,24 @@
   if(!departments[department]||!context.departments?.includes(department))throw Error('تصدير هذا القسم غير متاح ضمن صلاحيات حسابك.');
   return pick(term,['id','name','code','starts_on','ends_on','is_active','schedule_deleted_at']);
  }
+ // Review names come from schedule cells, never from the account picker alone.
+ // An exact existing RPC identity plus an eligible account is required for a confirmed badge.
+ function teacherEntries(live,offering,accounts){
+  const entries=[];
+  for(const raw of unique(live.map(s=>String(s.instructor??'')))){
+   const key=nameKey(raw);
+   const confirmed=parts=>parts.map(part=>{const matches=(offering.teachers||[]).filter(t=>nameKey(t.name)===nameKey(part));const ids=unique(matches.map(t=>t.profile_id).filter(Boolean));return ids.length===1&&matches.every(t=>t.profile_id===ids[0])&&accounts.has(ids[0])?ids[0]:null;});
+   const parts=raw.split(/\s*\/\s*/);
+   const ids=confirmed(parts);
+   // Slash syntax alone never creates identities. Every part needs its own proven link.
+   if(parts.length>1&&ids.every(Boolean)&&new Set(ids).size===parts.length){
+    parts.forEach((name,i)=>entries.push({key:'account:'+ids[i],name,raw,profileId:ids[i],confirmed:true,needsReview:false}));continue;
+   }
+   const id=parts.length===1&&!unknown(raw)?confirmed([raw])[0]:null;
+   entries.push({key:id?'account:'+id:'source:'+offering.id+':'+key,name:raw||'المحاضر غير محدد في الجدول',raw,profileId:id,confirmed:!!id,needsReview:!id||parts.length>1});
+  }
+  return entries;
+ }
  function build({context,termId,department,listing,schedule,flags,registeredAccounts=[]}){
   const term=assertScope(context,termId,department),data=sanitizeList(listing);
   const registered=new Map(registeredAccounts.map(a=>[a.id,a.name]));
@@ -43,8 +61,13 @@
    if(!o.source_active)continue;
    if(!context.technical&&o.department_key!==department)throw Error('أعاد المصدر طرحًا خارج نطاق القسم المخول؛ أوقفنا التصدير.');
    if(byId.has(o.id)){if(canonical(byId.get(o.id).original)!==canonical(o))throw Error('بيانات متعارضة لنفس هوية الطرح.');continue;}
-   const teachers=new Set(o.teachers.map(t=>nameKey(t.name)));
-   const live=(sources.get(sourceKey(o.course_code,o.course_name,o.group_key))||[]).filter(s=>teachers.has(nameKey(s.instructor))||(!teachers.size&&unknown(s.instructor)));
+   const teachers=new Set(o.teachers.map(t=>nameKey(t.name)).filter(n=>!unknown(n)));
+   const exact=sources.get(sourceKey(o.course_code,o.course_name,o.group_key))||[];
+   // Empty/missing accounts must not remove an otherwise current offering. Named source
+   // links keep departmental scopes apart; with no names, retain the exact schedule key.
+   if(!teachers.size&&exact.length&&data.rows.filter(other=>other.source_active&&sourceKey(other.course_code,other.course_name,other.group_key)===sourceKey(o.course_code,o.course_name,o.group_key)).length>1)throw Error('هوية محاضر مادة مشتركة غير محسومة بين طروحاتها؛ لم ندمج الأسماء أو نصدر ملفًا ناقصًا. راجع ربط المصدر.');
+   const live=exact.filter(s=>!teachers.size||teachers.has(nameKey(s.instructor))||teacherEntries([s],o,accounts).every(t=>t.confirmed));
+   if(exact.length&&!live.length)throw Error('تعذر مطابقة أسماء مصدر إحدى المواد الحالية؛ لم نصدر قائمة ناقصة. حدّث بيانات المصدر ثم أعد فتح المعاينة.');
    if(!live.length){warnings.push({id:o.id,name:o.course_name,message:'استُبعد من التصدير: لا توجد حصة حالية مطابقة لهوية المصدر والمحاضر؛ راجع تحديث الصفحة.'});continue;}
    const ref=o.reference,verified=ref.review_status==='verified';
    const owner=verified&&departments[ref.owner_department]?ref.owner_department:null;
@@ -62,7 +85,7 @@
    const row={id:o.id,original:o,name:o.course_name,displayName:o.course_name,officialArabic:'',officialEnglish:o.course_name,officialCode:'',
     regulation:verified&&['OLD','NEW'].includes(ref.regulation)?ref.regulation:'UNKNOWN',language:verified&&['ar','en'].includes(ref.language)?ref.language:'UNKNOWN',
     departmentKey:owner||linked||null,departmentLabel:departments[owner||linked]||'تحتاج تحديد القسم',departmentStatus:status,candidateDepartments:candidates,
-    teachersRaw:raw,teachersSeparated:separated,groups:unique(live.map(s=>s.course_code).filter(Boolean)),scheduleIds:live.map(s=>String(s.id)),schedule:live,
+    teacherEntries:teacherEntries(live,o,accounts),teachersRaw:raw,teachersSeparated:separated,groups:unique(live.map(s=>s.course_code).filter(Boolean)),scheduleIds:live.map(s=>String(s.id)),schedule:live,
     assignments:o.assignments.filter(a=>a.active&&a.term_id===termId&&a.offering_id===o.id),rank,defaultSelected:match&&roster.get(o.id).enabled!==false,
     notes,source:'اسم الإنجليزية: جدول الفصل؛ الاسم العربي والكود الرسمي: للاستكمال من مرجع معتمد',flag:pick(roster.get(o.id),['enabled','updated_at'])};
    byId.set(o.id,row);
@@ -70,9 +93,9 @@
   const rows=[...byId.values()].sort((a,b)=>a.rank-b.rank||a.name.localeCompare(b.name,'ar')||a.id.localeCompare(b.id));
   return {version:VERSION,term,department,departmentLabel:departments[department],technical:!!context.technical,rows,accounts:data.accounts,
    seniors:data.seniors.filter(a=>a.active&&a.term_id===termId&&a.department_key===department&&a.responsibility==='senior_coordinator'),warnings,
-   sourceSnapshot:sourceRows,listingSnapshot:data,flagsSnapshot:(flags.items||[]).map(f=>pick(f,['id','enabled','updated_at'])).sort((a,b)=>a.id.localeCompare(b.id))};
+   scopeSnapshot:{technical:!!context.technical,departments:[...(context.departments||[])].sort()},sourceSnapshot:sourceRows,listingSnapshot:data,flagsSnapshot:(flags.items||[]).map(f=>pick(f,['id','enabled','updated_at'])).sort((a,b)=>a.id.localeCompare(b.id))};
  }
- async function stamp(model){model.sourceHash=await hash(model.sourceSnapshot);model.snapshotHash=await hash({version:VERSION,term:model.term,department:model.department,sourceHash:model.sourceHash,listing:model.listingSnapshot,flags:model.flagsSnapshot});return model;}
+ async function stamp(model){model.sourceHash=await hash(model.sourceSnapshot);model.snapshotHash=await hash({version:VERSION,term:model.term,department:model.department,sourceHash:model.sourceHash,listing:model.listingSnapshot,flags:model.flagsSnapshot,scope:model.scopeSnapshot});return model;}
  async function load({rpc,client,termId,department}){
   const context=await rpc('citl_course_setup135',{p_action:'context',p_payload:{term_id:termId,department}});assertScope(context,termId,department);
   async function readSchedule(){const all=[];for(let offset=0;offset<50000;offset+=500){const {data,error}=await client.from('academic_schedule').select('*').eq('term_id',termId).order('id',{ascending:true}).range(offset,offset+499);if(error)throw error;if(!Array.isArray(data))throw Error('تعذر قراءة جدول الفصل.');all.push(...data);if(data.length<500)return all;}throw Error('تجاوز الجدول حد القراءة الآمن؛ لم نصدر ملفًا ناقصًا.');}

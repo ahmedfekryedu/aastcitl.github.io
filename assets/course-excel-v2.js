@@ -15,8 +15,36 @@ function groups(w,meta){const m=new Map();for(const r of records(w,meta)){const 
  return [...m.values()].map((rs,i)=>({key:'G'+(i+1),records:rs,ids:rs.map(r=>r.id)}));}
 function summary(a,n=3){a=[...new Set(a.filter(Boolean).map(x=>txt(x).replace(/\s+/g,' ')))];const joined=a.slice(0,n).join(' / '),short=joined.length>36?joined.slice(0,33)+'…':joined;return short+(a.length>n?' (الإجمالي '+a.length+')':'');}
 function values(g,owner){const v=g.records[0].values,rs=g.records;return [g.key.slice(1),v[1],summary(rs.flatMap(r=>txt(r.values[10]).split('\n')))+' — '+rs.length+' طرح',summary(rs.flatMap(r=>txt(r.values[9]).split('\n')),2),v[5]==='غير محددة'?'':v[5],v[6]==='غير محددة'?'':v[6],v[4],v[2],v[11],v[13],'',rs.length>1?'':ALL,...(owner?[v[7]]:[])];}
-function styleSheet(w,name,head,meta){const ws=w.addWorksheet(name,{views:[{rightToLeft:true,state:'frozen',ySplit:5,xSplit:2,showGridLines:false}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,printTitlesRow:'1:5'}});ws.columns=head.map((h,i)=>({width:[6,34,26,30,12,12,20,30,29,29,26,27,30][i]||26}));for(let n=1;n<5;n++){ws.mergeCells(n,1,n,head.length);ws.getCell(n,1).value=[name,meta.departmentLabel+' — '+meta.term.name,'راجع مواد القسم، ثم استكمل الخانات الصفراء، واحفظ الملف، وارفعه إلى نظام CITL للمراجعة والاعتماد.','التجميع للعرض فقط؛ اختر نطاق القرار. تكرار الاسم يعني اختلاف بيانات أو تكليفات. المجموعات ليست أكوادًا رسمية.'][n-1];ws.getRow(n).height=n===3?32:26;}ws.getRow(5).values=head;ws.getRow(5).height=32;for(let n=1;n<=5;n++)ws.getRow(n).eachCell(c=>{c.font={name:'Arial',size:n===1?15:11,bold:n===1||n===5,color:{argb:n===1||n===5?'FFFFFF':'25316A'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:n===1||n===5?'25316A':'F1F5FA'}};c.alignment={horizontal:'right',vertical:'middle',wrapText:true};});return ws;}
-function paint(ws,n,editable){const r=ws.getRow(n);r.height=46;r.eachCell({includeEmpty:true},(c,i)=>{c.font={name:'Arial',size:11,color:{argb:'243454'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:editable.includes(i)?'FFF6DE':'F1F5FA'}};c.alignment={horizontal:'right',vertical:'middle',wrapText:true};c.border={bottom:{style:'thin',color:{argb:'DCE3ED'}}};c.protection={locked:!editable.includes(i)};});}
+function styleSheet(w,name,head,meta){
+ const ws=w.addWorksheet(name,{views:[{rightToLeft:true,state:'frozen',ySplit:5,xSplit:2,showGridLines:false}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,printTitlesRow:'1:5'}});
+ const extra=name==='تكليفات إضافية',widths=extra?[48,22,40,40]:[6,40,27,31,13,13,21,30,30,30,28,28,30];
+ ws.columns=head.map((h,i)=>({width:widths[i]||28}));
+ for(let n=1;n<5;n++){ws.mergeCells(n,1,n,head.length);ws.getCell(n,1).value=[name,meta.departmentLabel+' — '+meta.term.name,'راجع مواد القسم، ثم استكمل الخانات الصفراء، واحفظ الملف، وارفعه إلى نظام CITL للمراجعة والاعتماد.','التجميع للعرض فقط؛ اختر نطاق القرار. تكرار الاسم يعني اختلاف بيانات أو تكليفات. المجموعات ليست أكوادًا رسمية.'][n-1];ws.getRow(n).height=[0,38,30,30,30][n];}
+ ws.getRow(5).values=head;ws.getRow(5).height=38;
+ for(let n=1;n<=5;n++)ws.getRow(n).eachCell(c=>{
+  c.font={name:'Arial',size:n===1?17:n===2?13:11,bold:n===1||n===2||n===5,color:{argb:n===1||n===5?'FFFFFFFF':'FF25316A'}};
+  c.fill={type:'pattern',pattern:'solid',fgColor:{argb:n===1||n===5?'FF25316A':n===2?'FFE7AA3A':n===3?'FFFFFFFF':'FFF1F5FA'}};
+  c.alignment={horizontal:n===1||n===5?'center':'right',vertical:'middle',wrapText:true};
+  c.border=n===5?{left:{style:'thin',color:{argb:'FF7280A2'}},right:{style:'thin',color:{argb:'FF7280A2'}},bottom:{style:'medium',color:{argb:'FFE7AA3A'}}}:{bottom:{style:'thin',color:{argb:n===2?'FFD29A31':'FFD4DDE9'}}};
+ });return ws;
+}
+function paint(ws,n,editable,multipleOfferings=false){
+ const r=ws.getRow(n),extra=ws.name==='تكليفات إضافية',stripe=n%2===0?'FFFFFFFF':'FFF0F4F9';r.height=extra?42:ws.name==='تفاصيل المجموعات'?60:50;
+ if(extra)for(let i=1;i<=4;i++)r.getCell(i);
+ r.eachCell({includeEmpty:true},(c,i)=>{
+  c.style={...c.style};
+  const input=editable.includes(i),source=!extra&&i>=2&&i<=4,scope=!extra&&i===12&&multipleOfferings;
+  c.font={name:'Arial',size:11,bold:extra?i===1:i===2,color:{argb:scope?'FF874600':'FF25316A'}};
+  c.fill={type:'pattern',pattern:'solid',fgColor:{argb:scope?'FFFCE0B2':input?'FFFFF2CC':source?(n%2===0?'FFF4F7FB':'FFE8EFF7'):stripe}};
+  c.alignment={horizontal:!extra&&[1,5,6].includes(i)?'center':'right',vertical:'middle',wrapText:true};
+  c.border={left:{style:'thin',color:{argb:'FFD4DDE9'}},right:{style:'thin',color:{argb:'FFD4DDE9'}},bottom:{style:'thin',color:{argb:'FFBBC8D9'}}};
+  c.protection={locked:!input};
+ });
+ if(!extra)ws.addConditionalFormatting({ref:'E'+n,rules:[
+  {type:'cellIs',operator:'equal',formulae:['"قديمة"'],style:{fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFEDE8F5'},bgColor:{argb:'FFEDE8F5'}},font:{color:{argb:'FF51416F'},bold:true}}},
+  {type:'cellIs',operator:'equal',formulae:['"جديدة"'],style:{fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFE4F1E9'},bgColor:{argb:'FFE4F1E9'}},font:{color:{argb:'FF245A3C'},bold:true}}}
+ ]});
+}
 function dv(c,list){c.dataValidation={type:'list',allowBlank:true,formulae:[list],showErrorMessage:true,errorStyle:'stop',error:'اختر قيمة من القائمة.'};}
 async function simplify(w,{ExcelJS:X=root.ExcelJS}={}){
  const meta=readMeta(w);if(meta.version!==V1)fail('هذا التحويل لملف V1 فقط');
@@ -27,7 +55,7 @@ async function simplify(w,{ExcelJS:X=root.ExcelJS}={}){
  meta.v1_sheets=snapshot(w);meta.v2_groups=gs.map(g=>({key:g.key,ids:g.ids}));meta.version=V2;
  const out=new X.Workbook();out.creator='CITL Smart System';out.views=[{activeTab:0}];const main=styleSheet(out,'تسكين المقررات',[...headers,...(owner?['القسم المالك']:[])],meta);const detail=styleSheet(out,'تفاصيل المجموعات',[...headers,...(owner?['القسم المالك']:[])],meta);const lists=out.addWorksheet('_قوائم',{state:'veryHidden'});
  const listDefs={V2Reg:['قديمة','جديدة'],V2Lang:['عربي','إنجليزي'],V2Accounts:meta.accounts.map(a=>a.choice_label),V2Scope:[ALL,SEPARATE],V2Dept:[meta.departmentLabel],V2Roles:['منسق مقرر','منسق مساعد','رئيس مجموعة','كبير المنسقين'],V2Targets:[]};
- const idCol=owner?14:13;let ix=0;for(const g of gs){const n=main.addRow([...values(g,owner),g.key]).number;paint(main,n,[5,6,7,8,9,10,11,12,...(owner?[13]:[])]);for(const rec of g.records){const item={key:g.key+'-'+(++ix),records:[rec]};const vals=values(item,owner);vals[0]=g.key+' / '+ix;vals[2]=txt(rec.values[10]);vals[3]=txt(rec.values[9]);vals[11]='';const dn=detail.addRow([...vals,rec.id]).number;paint(detail,dn,[5,6,7,8,9,10,11,...(owner?[13]:[])]);listDefs.V2Targets.push(g.key+' / '+ix+' — '+rec.values[1]+' — '+txt(rec.values[10]).replaceAll('\n',' / '));}}
+ const idCol=owner?14:13;let ix=0;for(const g of gs){const n=main.addRow([...values(g,owner),g.key]).number;paint(main,n,[5,6,7,8,9,10,11,12,...(owner?[13]:[])],g.ids.length>1);for(const rec of g.records){const item={key:g.key+'-'+(++ix),records:[rec]};const vals=values(item,owner);vals[0]=g.key+' / '+ix;vals[2]=txt(rec.values[10]);vals[3]=txt(rec.values[9]);vals[11]='';const dn=detail.addRow([...vals,rec.id]).number;paint(detail,dn,[5,6,7,8,9,10,11,...(owner?[13]:[])]);listDefs.V2Targets.push(g.key+' / '+ix+' — '+rec.values[1]+' — '+txt(rec.values[10]).replaceAll('\n',' / '));}}
  for(const ws of [main,detail]){ws.getColumn(idCol).hidden=true;ws.autoFilter={from:'A5',to:{row:Math.max(5,ws.rowCount),column:idCol-1}};for(let n=6;n<=ws.rowCount;n++){dv(ws.getCell(n,5),'V2Reg');dv(ws.getCell(n,6),'V2Lang');dv(ws.getCell(n,9),'V2Accounts');dv(ws.getCell(n,10),'V2Accounts');if(owner)dv(ws.getCell(n,13),'V2Dept');if(ws===main)dv(ws.getCell(n,12),'V2Scope');}ws.pageSetup.printArea='A1:'+ws.getColumn(idCol-1).letter+ws.rowCount;}
  const extra=styleSheet(out,'تكليفات إضافية',['المجموعة / المادة','الدور','الحساب المعتمد','ملاحظات'],meta);extra.getCell('A4').value='للإضافة فقط: اختر مجموعة محددة. لكبير المنسقين اترك المادة فارغة. لا يؤدي مسح الخانة إلى إنهاء تكليف.';extra.getColumn(1).width=48;extra.getColumn(3).width=40;
  for(const [col,list] of [['A','V2Targets'],['B','V2Roles'],['C','V2Accounts']])extra.dataValidations.add(col+'6:'+col+'1005',{type:'list',allowBlank:true,formulae:[list],showErrorMessage:true,errorStyle:'stop',error:'اختر من القائمة'});paint(extra,6,[1,2,3,4]);

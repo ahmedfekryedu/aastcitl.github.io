@@ -151,11 +151,9 @@
 #notif-menu button[onclick*="markAllNotificationsRead"]:before{content:'✓✓';font-weight:900}
 #notif-menu button[onclick*="markAllNotificationsRead"]:focus-visible,.citl-page-return a:focus-visible{outline:3px solid #2a3475;outline-offset:3px}
 #notif-menu button[onclick*="markAllNotificationsRead"]:hover{background:#e2e8f5!important}
-.citl-page-return{width:96%;max-width:1600px;margin:12px auto 0;display:flex;justify-content:flex-start;font:700 12px Cairo,sans-serif}
-.citl-page-return a{display:inline-flex;align-items:center;gap:9px;min-height:42px;padding:8px 14px;border:1px solid #d8dfed;border-radius:10px;background:white;color:#2a3475;text-decoration:none}
-.citl-page-return a:hover{background:#eef1fa;border-color:#2a3475}
+
 #mobileEditBtn[hidden]{display:none!important}
-@media(max-width:600px){.citl-page-return{width:calc(100% - 24px);margin-top:8px}#notif-menu button[onclick*="markAllNotificationsRead"]{min-height:44px;font-size:11px!important;padding:8px!important}}
+@media(max-width:600px){#notif-menu button[onclick*="markAllNotificationsRead"]{min-height:44px;font-size:11px!important;padding:8px!important}}
 @media print{.citl-page-return{display:none!important}}
 
 .citl-notification-failure{padding:14px;border:1px solid #ead3ac;border-radius:10px;background:#fffaf0;color:#664916;font:12px Cairo,sans-serif;line-height:1.9}.citl-notification-failure button{margin-top:10px;min-height:44px;width:100%;font-weight:700}.citl-notification-failure button[aria-busy=true]{opacity:.65;cursor:wait}
@@ -186,3 +184,15 @@
 @keyframes citl-lead-wait{to{background-position:-200% 0}}
 @media(prefers-reduced-motion:reduce){#citl-leadership .lead-skeleton i{animation:none}}
 @media(max-width:600px){#dashboard-modal{padding:6px!important}#dashboard-modal>.modal-content{width:100%!important;max-height:calc(100dvh - 12px)!important;height:calc(100dvh - 12px)}#dashboard-modal>.modal-content>div:first-child{padding:12px!important}}
+
+/* Administrative return action: inside page content, never a global header strip. */
+.citl-page-return{display:flex;align-items:center;flex:none;margin:0 0 12px;font:700 12px/1.6 Cairo,sans-serif;direction:rtl}
+.citl-page-return a{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:5px 12px 5px 5px;border:1px solid #dce2ef;border-radius:12px;background:#fff;color:#2a3475;text-decoration:none;box-sizing:border-box;white-space:nowrap;transition:background .15s,border-color .15s}
+.citl-return-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#fff2d8;color:#83530b;flex:0 0 32px}
+.citl-return-icon svg{width:18px;height:18px}
+.citl-page-return a:hover{background:#f4f6fc;border-color:#bcc7e0}
+.citl-page-return a:focus-visible{outline:3px solid #f3a628;outline-offset:3px}
+.citl-page-return-inline{margin:0;margin-inline-start:auto}
+.ar8-page-heading:has(>.citl-page-return){gap:12px;flex-wrap:wrap;align-items:center}
+@media(max-width:600px){.citl-page-return{font-size:11px;margin-bottom:10px}.citl-page-return-inline{margin-block:0}.citl-page-return a{padding-inline-end:10px;gap:7px}.ar8-page-heading:has(>.citl-page-return)>div{flex:1 1 190px}}
+@media print{.citl-page-return{display:none!important}}

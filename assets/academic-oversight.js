@@ -87,7 +87,7 @@
  async function openApprovals(options={}){
   if(root.CITLControlPage?.navigate('academic-review',options))return;
   requestedApproval=options.request||new URLSearchParams(location.search).get('request');
-  if(!root.openAdminPanel){location.href='/dashboard/?open=approvals';return;}
+  if(!root.openAdminPanel){const link=new URL('/dashboard/?open=approvals',location.origin);if(requestedApproval)link.searchParams.set('request',requestedApproval);location.href=link.href;return;}
   if(!root.currentUser)await root.CITLAuth.loadProfile();
   const verified=await loadAccess();await mountAdmin();if(accessUser===root.currentUser?.id&&verified.registration){root.openAdminPanel('academic-review');return await loadApprovals();}else {root.showNotification?.('لا تملك صلاحية اعتماد طلبات الأعضاء','error');return false;}
  }
@@ -140,7 +140,7 @@
      }).catch(()=>{});
     }
    }
-   const request=requestedApproval||new URLSearchParams(location.search).get('request');if(request){const card=[...list.children].find(c=>c.dataset.claimId===request);if(card){card.classList.add('citl-ac-highlight');card.scrollIntoView({block:'center'});}else status.textContent='قد يكون الطلب المشار إليه تمت مراجعته بالفعل، أو لم يعد ضمن صلاحياتك.';}
+   const request=requestedApproval||new URLSearchParams(location.search).get('request');if(request){const card=[...list.children].find(c=>c.dataset.claimId===request);if(card){card.classList.add('citl-ac-highlight');if(root.CITLControlPage?.reveal)root.CITLControlPage.reveal(()=>[...list.children].find(c=>c.dataset.claimId===request));else card.scrollIntoView({block:'center'});}else status.textContent='قد يكون الطلب المشار إليه تمت مراجعته بالفعل، أو لم يعد ضمن صلاحياتك.';}
    return true;
   }catch(error){if(serial===approvalSerial){list.innerHTML='<div class="citl-admin-empty">تعذر تحميل الطلبات.</div>';status.textContent=error.message;}return false;}
   finally{if(serial===approvalSerial){refresh.disabled=false;list.setAttribute('aria-busy','false');}}
@@ -254,7 +254,7 @@
   document.querySelectorAll('[data-open-action]').forEach(b=>b.setAttribute('aria-expanded','false'));
  }
  async function openAction(item,refresh){
-  const body=document.getElementById('citl-ac-work-detail');if(!body)return;body.hidden=false;body.dataset.action=item.id;requestAnimationFrame(()=>{if(body.isConnected&&!body.hidden)body.scrollIntoView({block:'start',behavior:'smooth'});});
+  const body=document.getElementById('citl-ac-work-detail');if(!body)return;body.hidden=false;body.dataset.action=item.id;if(root.CITLControlPage?.reveal)root.CITLControlPage.reveal(()=>body.dataset.action===item.id&&!body.hidden?body:null);else requestAnimationFrame(()=>{if(body.isConnected&&!body.hidden)body.scrollIntoView({block:'start',behavior:'smooth'});});
   body.innerHTML='<dl class="citl-ac-details">'+[['الترم',item.term_name],['المادة',item.course],['المحاضر',item.instructor],['التاريخ والوقت',item.date+' · '+item.time],['القاعة',item.room],['رقم الإجراء',item.id],['نسخة المراجعة',item.revision],['القسم',label(item.department)],['الإجراء',types[item.action_type]],['بواسطة',item.actor],['السبب',item.reason],['المحاضر البديل',item.replacement_instructor],['القاعة البديلة',item.replacement_room]].filter(x=>x[1]).map(([k,v])=>'<div><dt>'+E(k)+'</dt><dd>'+E(v)+'</dd></div>').join('')+'</dl><p data-review class="citl-ac-review"></p><p class="citl-ac-muted">عدم اعتماد المراجعة لا يعكس الإجراء المنفذ. الإبطال الإداري مسار مستقل لتصحيح أثره داخل النظام.</p><div data-decisions></div><p data-status role="status"></p>';
   const timeline=document.createElement('ol');timeline.className='citl-ac-timeline';body.prepend(timeline);const close=document.createElement('button');close.type='button';close.className='citl-ac-button secondary citl-action-collapse';close.textContent='طيّ التفاصيل −';close.onclick=collapseAction;body.prepend(close);document.querySelectorAll('[data-open-action]').forEach(b=>{b.setAttribute('aria-controls','citl-ac-work-detail');b.setAttribute('aria-expanded',String(b.dataset.openAction===String(item.id)));});
   const status=body.querySelector('[data-status]'),draw=()=>{body.querySelector('[data-review]').innerHTML=reviewBadge(item.review)+(item.review?.head?' <span>'+E(item.review.head)+'</span>':'')+(item.review?.note?' <span>'+E(item.review.note)+'</span>':'');timeline.innerHTML=[['تسجيل الإجراء',item.created_at,item.actor],['قراءة المسؤول',item.review?.read_at,item.review?.head],['قرار المراجعة',item.review?.decision_at,item.review?.decision==='approved'?'معتمد':item.review?.decision==='not_approved'?'غير معتمد':'بانتظار القرار']].map(([name,date,who])=>'<li class="'+(date?'done':'')+'"><strong>'+E(name)+'</strong><span>'+E(date?stamp(date):'لم يتم بعد')+'</span><small>'+E(who||'')+'</small></li>').join('');};draw();renderR73Correction(item,body,refresh);

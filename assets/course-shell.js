@@ -40,7 +40,18 @@ root.CITLCourseDepartments={
 root.toggleMobileMenu=()=>root.CITLMobileShell?.toggle();
 root.toggleProfileInfoMenu=()=>{const d=document.createElement('dialog');d.className='cm-dialog';d.innerHTML='<header><strong>الملف الشخصي</strong><button data-close aria-label="إغلاق">×</button></header><div class="cm-body"><strong data-name></strong><span data-position></span><span data-department></span><span data-email dir="ltr"></span><a class="cm-btn secondary" href="/dashboard/?open=profile">تحديث بياناتي</a><button class="cm-btn" data-logout>تسجيل الخروج</button></div>';const p=root.currentUser;d.querySelector('[data-name]').textContent=p.full_name||p.email;d.querySelector('[data-position]').textContent=p.position||'';d.querySelector('[data-department]').textContent=root.CITLCourseDepartments[p.department]?.name||p.department||'';d.querySelector('[data-email]').textContent=p.email;d.querySelector('[data-logout]').onclick=()=>root.logout();d.onclick=e=>{if(e.target===d||e.target.closest('[data-close]'))d.close();};d.onclose=()=>d.remove();document.body.append(d);d.showModal();};
 root.showNotification=(message)=>{const el=document.getElementById('cm-status');el.textContent=message;};
-root.CITLOversight={openRegistrationNotice:item=>{if(['faculty_registration','account_registered'].includes(item.kind)&&['approved','rejected'].includes(item.payload?.status)){location.assign('/dashboard/?open=activity');return true;}return false;}};
+root.CITLOversight={openRegistrationNotice:item=>{
+ if(!['faculty_registration','account_registered'].includes(item?.kind)||!['approved','rejected'].includes(item.payload?.status))return false;
+ document.getElementById('notif-menu')?.classList.add('hidden');document.getElementById('citl-registration-decision')?.close();
+ // Display this recipient-scoped notice itself; do not replace it with a generic history page.
+ const d=document.createElement('dialog');d.id='citl-registration-decision';d.className='cm-dialog';d.dir='rtl';
+ d.innerHTML='<header><strong data-title></strong><button type="button" data-close aria-label="إغلاق">×</button></header><div class="cm-body"><strong data-status></strong><p data-body></p><p data-department></p><time data-date></time><p>هذا إشعار بنتيجة المراجعة في التاريخ الموضح، ولا يتطلب اعتمادًا جديدًا.</p></div>';
+ d.querySelector('[data-title]').textContent=item.title||'نتيجة اعتماد الحساب';d.querySelector('[data-status]').textContent=item.payload.status==='approved'?'تم الاعتماد':'لم يتم الاعتماد';
+ d.querySelector('[data-body]').textContent=item.body||'';const department=item.payload.department_key;
+ d.querySelector('[data-department]').textContent=root.CITLCourseDepartments[department]?.name||department||'—';
+ const date=new Date(item.created_at);d.querySelector('[data-date]').textContent=Number.isNaN(date.getTime())?'':date.toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
+ d.querySelector('[data-close]').onclick=()=>d.close();d.onclose=()=>d.remove();document.body.append(d);d.showModal();return true;
+}};
 root.CITLAdminAccess={openHistory:()=>location.assign('/dashboard/?open=activity')};
 root.addEventListener('citl-profile-loaded',e=>{const p=e.detail||root.currentUser;document.querySelectorAll('[data-cm-personal]').forEach(el=>{el.hidden=!(p.faculty_verification_status==='approved'&&(['faculty','visiting_lecturer'].includes(p.account_type)||p.is_visiting_lecturer===true));});for(const suffix of['','-mob']){
  const name=document.getElementById('profile-name'+suffix),role=document.getElementById('profile-role'+suffix);

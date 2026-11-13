@@ -11,7 +11,36 @@
   root.CITLPageBoot?.show('جاري فتح لوحة التحكم');
   location.assign(url.href);return true;
  }
- root.CITLControlPage=Object.freeze({navigate});
+
+ // Wait for the actual destination, not a hidden panel or its loading placeholder.
+ // A later navigation cancels an earlier pending reveal; no access/data decisions here.
+ let stopReveal=null;
+ function reveal(resolve,options={}){
+  stopReveal?.();let stopped=false,frame=0,timer=0;
+  const target=()=>typeof resolve==='function'?resolve():resolve;
+  const visible=el=>!!(el?.isConnected&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+  function ready(){const el=target();return visible(el)&&!el.closest('[aria-busy="true"]')&&!visible(document.getElementById('global-loader'))?el:null;}
+  function stop(){stopped=true;observer.disconnect();clearTimeout(timer);cancelAnimationFrame(frame);root.removeEventListener('resize',schedule);document.removeEventListener('visibilitychange',schedule);if(stopReveal===stop)stopReveal=null;}
+  function schedule(){if(stopped||frame||document.hidden)return;frame=requestAnimationFrame(()=>{frame=0;if(!ready())return;frame=requestAnimationFrame(()=>{
+   frame=0;const el=ready();if(!el)return;stop();
+   const modal=el.closest('dialog,.modal.show');
+   const header=document.querySelector('.citl-main-header'),style=header&&getComputedStyle(header);
+   const clearance=!modal&&header&&['sticky','fixed'].includes(style.position)?Math.max(0,header.getBoundingClientRect().bottom):0;
+   const oldMargin=el.style.scrollMarginTop;el.style.scrollMarginTop=(clearance+16)+'px';
+   el.scrollIntoView({behavior:'instant',block:options.block||'start',inline:'nearest'});el.style.scrollMarginTop=oldMargin;
+   const added=!el.hasAttribute('tabindex');if(added)el.setAttribute('tabindex','-1');
+   el.focus({preventScroll:true});if(added)el.addEventListener('blur',()=>el.removeAttribute('tabindex'),{once:true});
+  });});}
+  const observer=new MutationObserver(schedule);observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','hidden','aria-busy']});
+  stopReveal=stop;timer=setTimeout(stop,30000);root.addEventListener('resize',schedule);document.addEventListener('visibilitychange',schedule);schedule();return stop;
+ }
+ function selectedDestination(params){
+  const panel=document.getElementById('admin-'+(params.get('tab')||'users')+'-tab');if(!panel||panel.classList.contains('hidden'))return null;
+  if(params.get('tab')==='academic-review'&&params.get('request'))return [...panel.querySelectorAll('[data-claim-id]')].find(el=>el.dataset.claimId===params.get('request'))||panel.querySelector('[data-status]')||panel;
+  if(params.get('tab')==='academic-actions'&&params.get('action')){const detail=panel.querySelector('#citl-ac-work-detail');if(detail&&!detail.hidden&&detail.dataset.action===params.get('action'))return detail;}
+  return panel;
+ }
+ root.CITLControlPage=Object.freeze({navigate,reveal});
  if(!active)return;
  const panel=document.getElementById('admin-panel-modal'),host=document.getElementById('citl-control-host');
  if(!panel||!host)return;
@@ -32,6 +61,7 @@
   else if(tab==='academic-review')await root.CITLOversight.openApprovals({request:params.get('request')});
   else await root.openAdminPanel(tab);
   }finally{host.setAttribute('aria-busy','false');document.getElementById('citl-control-loading')?.remove();}
+  reveal(()=>selectedDestination(params));
   if(params.get('swap'))void root.CITLRoomSwaps?.open(params.get('swap'));
   if(params.get('meeting'))void root.CITLMeetingUI?.open(params.get('meeting'),false);
   if(params.get('broadcast'))void root.CITLAnnouncements?.open(params.get('broadcast'));
@@ -41,7 +71,7 @@
   const button=event.target.closest('.admin-tab');if(!button)return;
   const url=new URL(location.href);url.searchParams.set('tab',button.dataset.tab);
   history.replaceState(null,'',url.href);
-  if(innerWidth<768)requestAnimationFrame(()=>document.querySelector('#citl-control-host .admin-tab-content:not(.hidden)')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  reveal(()=>document.querySelector('#citl-control-host .admin-tab-content:not(.hidden)'));
  });
 })(window);
 

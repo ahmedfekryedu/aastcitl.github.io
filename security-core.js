@@ -86,9 +86,9 @@
         let navigating=false;
         try {
           if(item.kind==='admin_announcement'){document.getElementById('notif-menu')?.classList.add('hidden');await window.CITLAnnouncements.open(item.payload.announcement_id,false,item.payload.revision);return;}
-          if (!item.read_at) { await invoke('notifications.read', { ids: [item.id] }); if(notificationRead)await notificationRead; }
+          if (!item.read_at) { await invoke('notifications.read', { ids: [item.id] }); }
           document.getElementById('notif-menu')?.classList.add('hidden');
-          await checkUserNotifications();
+          void checkUserNotifications();
           if(window.CITLOversight?.openRegistrationNotice?.(item))return;
           if(await openSpecialNotice(item))return;
           if(item.entity_type==='meetings'&&window.CITLMeetingUI){await window.CITLMeetingUI.open(item.entity_id,true);return;}

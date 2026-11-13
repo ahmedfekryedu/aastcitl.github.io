@@ -77,7 +77,7 @@
     }catch(error){msg.textContent=removed?'تم الحذف؛ تعذر تحديث العرض، اضغط تحديث.':error.message||'تعذر حذف الإشعار.';}
     finally{button.disabled=false;}
    });
-   rows.querySelectorAll('[data-event]').forEach(b=>b.onclick=async()=>{const n=data.notifications.find(x=>x.id===b.dataset.event);if(n.kind==='admin_announcement'){await root.CITLAnnouncements.open(n.payload.announcement_id,false,n.payload.revision);return;}b.disabled=true;try{await rpc('citl_secure_api',{p_action:'notifications.read',p_payload:{ids:[n.id]}});await root.checkUserNotifications?.();if(root.CITLOversight?.openRegistrationNotice(n)){b.disabled=false;return;}if(await root.CITLOpenSpecialNotice?.(n)){b.disabled=false;return;}if(n.entity_type==='meetings'&&root.CITLMeetingUI){await root.CITLMeetingUI.open(n.entity_id,true);b.disabled=false;return;}if(n.route&&/^\/[a-z0-9_/?=&.-]*$/i.test(n.route)&&!n.route.includes('open=activity'))location.href=n.route;else await loadHistory();}catch(error){msg.textContent=error.message;b.disabled=false;}});
+   rows.querySelectorAll('[data-event]').forEach(b=>b.onclick=async()=>{const n=data.notifications.find(x=>x.id===b.dataset.event);if(n.kind==='admin_announcement'){await root.CITLAnnouncements.open(n.payload.announcement_id,false,n.payload.revision);return;}b.disabled=true;try{await rpc('citl_secure_api',{p_action:'notifications.read',p_payload:{ids:[n.id]}});void root.checkUserNotifications?.();if(root.CITLOversight?.openRegistrationNotice(n)){b.disabled=false;return;}if(await root.CITLOpenSpecialNotice?.(n)){b.disabled=false;return;}if(n.entity_type==='meetings'&&root.CITLMeetingUI){await root.CITLMeetingUI.open(n.entity_id,true);b.disabled=false;return;}if(n.route&&/^\/[a-z0-9_/?=&.-]*$/i.test(n.route)&&!n.route.includes('open=activity'))location.href=n.route;else await loadHistory();}catch(error){msg.textContent=error.message;b.disabled=false;}});
   panel.querySelector('[data-next]').disabled=historyBusy||!historyMore||historyItems.length>=5000;
  }
  async function loadHistory(append=false){
@@ -92,7 +92,7 @@
   }catch(error){if(serial===historySerial){if(!historyItems.length)rows.innerHTML='<div class="citl-admin-empty">تعذر تحميل السجل.</div>';msg.textContent=error.message||'تعذر تحميل السجل. أعد المحاولة.';}}
   finally{if(serial===historySerial){historyBusy=false;panel.querySelector('[data-refresh]').disabled=false;panel.querySelector('[data-next]').disabled=!historyMore||historyItems.length>=5000;rows.setAttribute('aria-busy','false');}}
  }
- async function openHistory(){if(root.CITLControlPage?.navigate('activity-history'))return;if(!root.openAdminPanel){location.href='/dashboard/?open=activity';return;}root.openAdminPanel();await root.CITLOversight.mountAdmin();root.switchAdminTab('activity-history');}
+ async function openHistory(){if(root.CITLControlPage?.navigate('activity-history'))return;if(!root.openAdminPanel){location.href='/dashboard/?open=activity';return;}root.openAdminPanel();await root.CITLOversight.mountAdmin();root.switchAdminTab('activity-history');root.CITLControlPage?.reveal(()=>document.getElementById('admin-activity-history-tab'));}
  root.CITLAdminAccess=Object.freeze({openPermissions,openHeads,mountHistory,loadHistory,openHistory});root.openPermissionsModal=openPermissions;
  const historyProfileKey=p=>JSON.stringify([p?.id,p?.role,p?.permissions,p?.department,p?.faculty_verification_status]);
  let historyProfile=historyProfileKey(root.currentUser);

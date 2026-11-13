@@ -31,3 +31,6 @@
 
 #schedule-import-form>.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:600px){#schedule-import-form>.grid{grid-template-columns:1fr}}
+
+/* Embedded schedule administration uses its parent control page navigation. */
+html.embedded body>[data-citl-page-return]{display:none!important}

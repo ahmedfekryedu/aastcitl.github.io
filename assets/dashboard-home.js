@@ -11,7 +11,7 @@
   function openAdmin(tab){
     const r=M.role(state.user);
     if(!r.manager||(tab==='meetings'&&!r.meetings)||(tab==='users'&&!r.users)||(['news','rooms','reports'].includes(tab)&&!r.full))return denied();
-    root.openAdminPanel();if(tab)root.switchAdminTab(tab);
+    root.openAdminPanel(tab);
   }
   async function readAll(table,select='*',configure=q=>q){
     const rows=[];
@@ -65,6 +65,27 @@
   function summaryCard(title,totalLabel,total,facts,footer,extraClass=''){
     return `<article class="dh-summary-card ${extraClass}"><div class="dh-summary-head"><h3>${E(title)}</h3>${metric(totalLabel,total)}</div><div class="dh-facts">${facts.join('')}</div><div class="dh-summary-foot">${footer}</div></article>`;
   }
+  function closeRoomLists(){document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>d.open=false);}
+  function renderRoomInfo(dialog){
+    const room=dialog.dataset.room,now=S.cairo(),body=dialog.querySelector('[data-room-body]');
+    const failed=state.errors.some(x=>['profile','schedule','actions'].includes(x));
+    const current=failed?[]:M.lectures(state.rows,state.actions,state.user,now).filter(x=>x.live&&x.room===room);
+    dialog.querySelector('[data-room-time]').textContent=dayLabel(now.day)+' · '+dateLabel(now.date)+' · '+clock(now.minutes);
+    body.innerHTML=failed?empty('تعذر تحديث تفاصيل القاعة','أعد تحديث لوحة المتابعة.'):current.length?current.map(x=>`<article class="dh-room-lecture"><div class="dh-room-lecture-head"><strong>${E(x.course_name||'المادة غير محددة')}</strong><span class="dh-badge live">جارية الآن</span></div><dl><div><dt>المحاضر</dt><dd>${E(x.effectiveInstructor||'غير محدد في الجدول')}</dd></div><div><dt>الوقت</dt><dd dir="ltr">${E(x.time)}</dd></div>${x.course_code?`<div><dt>رمز الجدول / المجموعة</dt><dd dir="auto">${E(x.course_code)}</dd></div>`:''}${x.replaced?`<div><dt>إحلال محاضر</dt><dd>بدلًا من ${E(x.instructor||'المحاضر الأصلي')}</dd></div>`:''}${x.moved?`<div><dt>تغيير القاعة</dt><dd>من <bdi>${E(x.room_name||'غير محددة')}</bdi> إلى <bdi>${E(x.room)}</bdi></dd></div>`:''}</dl></article>`).join(''):empty('لا توجد محاضرة جارية الآن','قد يكون موعد المحاضرة انتهى أو تغيرت القاعة.');
+  }
+  function openRoomInfo(room,trigger){
+    if(!state.user||!state.ready||state.view!=='overview')return;
+    document.getElementById('dh-room-dialog')?.close();
+    const dialog=document.createElement('dialog');dialog.id='dh-room-dialog';dialog.className='dh-room-dialog';dialog.dir='rtl';dialog.dataset.room=room;
+    dialog.setAttribute('aria-labelledby','dh-room-dialog-title');
+    dialog.innerHTML='<header><div><small>إشغال القاعة حسب الجدول</small><h3 id="dh-room-dialog-title"></h3></div><button type="button" data-close aria-label="إغلاق التفاصيل">×</button></header><div class="dh-room-dialog-body"><p class="dh-room-stamp" data-room-time></p><div data-room-body aria-live="polite"></div><p class="dh-room-source">البيانات من الجدول الحالي وإجراءات المحاضرات؛ ليست إثباتًا لتسجيل الحضور.</p></div><footer><button type="button" class="dh-button" data-close>إغلاق</button></footer>';
+    dialog.querySelector('h3').textContent='القاعة '+room;renderRoomInfo(dialog);
+    const summary=trigger?.closest('details')?.querySelector('summary');
+    dialog.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>dialog.close());
+    dialog.addEventListener('close',()=>{closeRoomLists();dialog.remove();if(summary?.isConnected)summary.focus({preventScroll:true});},{once:true});
+    dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
+    document.body.append(dialog);dialog.showModal();
+  }
   function renderOverview(items,stats,now){
     items=items.filter(x=>x.occurs!==false);
     const r=M.role(state.user),failed=state.errors.some(x=>['schedule','actions'].includes(x)),meetingFailed=state.errors.includes('meetings');
@@ -76,7 +97,7 @@
     const ended=stats.today.filter(x=>x.end!==null&&x.end<=now.minutes).length;
     const upcoming=stats.today.filter(x=>x.start!==null&&x.start>now.minutes).length;
     const cancelledToday=items.filter(x=>x.date===now.date&&x.cancelled),cancelled=cancelledToday.length;
-    const roomDetails=failed?'تعذر تحديث القاعات':`<span>الإشغال حسب المحاضرات</span><details class="dh-room-details"><summary>قاعات فارغة (${available})</summary><div>${stats.available.map(x=>`<span><bdi>${E(x)}</bdi></span>`).join('')||'لا توجد قاعات فارغة دراسيًا الآن'}</div></details><details class="dh-room-details"><summary>قاعات مشغولة (${busy})</summary><div>${stats.rooms.filter(room=>!stats.available.includes(room)).map(room=>`<span><bdi>${E(room)}</bdi></span>`).join('')||'لا توجد قاعات مشغولة بمحاضرات الآن'}</div></details>`;
+    const roomDetails=failed?'تعذر تحديث القاعات':`<span>الإشغال حسب المحاضرات</span><details class="dh-room-details"><summary>قاعات فارغة (${available})</summary><div>${stats.available.map(x=>`<span><bdi>${E(x)}</bdi></span>`).join('')||'لا توجد قاعات فارغة دراسيًا الآن'}</div></details><details class="dh-room-details"><summary>قاعات مشغولة (${busy})</summary><div>${stats.rooms.filter(room=>!stats.available.includes(room)).map(room=>`<button type="button" class="dh-room-choice" data-dh-room="${E(room)}" aria-haspopup="dialog" aria-label="تفاصيل القاعة ${E(room)}"><bdi>${E(room)}</bdi><span aria-hidden="true">‹</span></button>`).join('')||'لا توجد قاعات مشغولة بمحاضرات الآن'}</div></details>`;
     const rooms=summaryCard('إشغال القاعات','إجمالي القاعات',failed?'—':stats.rooms.length,[metric('قاعات بلا محاضرات',failed?'—':available),metric('مشغولة الآن',failed?'—':busy),metric('نسبة الإشغال',failed?'—':usage+'%')],roomDetails);
     const lectureFooter=failed?'تعذر تحديث المحاضرات':`<span class="dh-next-lecture" title="${E(next?next.course_name+' · '+next.room:'')}">${next?`القادمة <bdi>${clock(next.start)}</bdi> · ${E(next.course_name)}`:stats.live.length?'المحاضرات الحالية مستمرة':'لا توجد محاضرات تالية اليوم'}</span><details class="dh-room-details dh-cancelled-details"><summary>المحاضرات الملغاة اليوم (${cancelled})</summary><div>${cancelledToday.length?cancelledToday.map(x=>`<article><strong>${E(x.course_name||'محاضرة')}</strong><small>${E(x.effectiveInstructor||x.instructor||'')} · القاعة <bdi>${E(x.room||'غير محددة')}</bdi></small><small><bdi>${E(x.time)}</bdi> · ${E(dateLabel(x.date))}</small></article>`).join(''):'لا توجد محاضرات ملغاة اليوم'}</div></details>`;
     const lectures=summaryCard('الحركة الدراسية','محاضرات اليوم',failed?'—':stats.today.length,[metric('محاضرات جارية',failed?'—':stats.live.length),metric('انتهت',failed?'—':ended),metric('لم تبدأ',failed?'—':upcoming)],lectureFooter,'dh-lecture-summary');
@@ -114,6 +135,7 @@
     $('dh-updated').textContent=state.updated?'آخر تحديث '+new Date(state.updated).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Cairo'}):'جاري التحديث';
     $('dh-loading').hidden=true;$('dh-content').hidden=false;
     root.CITLOversight?.renderDashboard();
+    const roomDialog=document.getElementById('dh-room-dialog');if(roomDialog)renderRoomInfo(roomDialog);
   }
   async function refresh(){
     if(!started)return;if(pending)return pending;
@@ -122,6 +144,7 @@
       let profile;
       try{profile=await root.CITLAuth.loadProfile();}
       catch(error){
+        document.getElementById('dh-room-dialog')?.close();
         state.user=null;state.rows=[];state.actions=[];state.meetings=[];state.errors=['profile'];
         $('dh-content').hidden=true;$('dh-loading').hidden=false;$('dh-loading').innerHTML=empty('تعذر التحقق من حسابك','استخدم إعادة المحاولة للمتابعة.');
         root.clearDashboardPrivateState?.();root.CITLAuth.showFailure(error);return;
@@ -129,7 +152,7 @@
       const oldKey=state.user&&JSON.stringify([state.user.id,M.role(state.user),M.names(state.user)]);
       $('citl-connection-recovery')?.remove();
       const newKey=JSON.stringify([profile.id,M.role(profile),M.names(profile)]);
-      if(oldKey&&oldKey!==newKey){state.view=null;state.scope=null;state.scopeTarget='';state.meetings=[];state.rows=[];state.actions=[];root.clearDashboardPrivateState?.();$('dh-content').hidden=true;}
+      if(oldKey&&oldKey!==newKey){document.getElementById('dh-room-dialog')?.close();state.view=null;state.scope=null;state.scopeTarget='';state.meetings=[];state.rows=[];state.actions=[];root.clearDashboardPrivateState?.();$('dh-content').hidden=true;}
       if(!state.ready||oldKey!==newKey){$('dh-loading').innerHTML=root.CITLLoading.summary(M.role(profile).full||M.role(profile).faculty?4:3)+(M.role(profile).faculty?'<table style="width:100%"><tbody>'+root.CITLLoading.table(5)+'</tbody></table>':'');$('dh-loading').hidden=false;}
       state.user=profile;root.setDashboardProfile?.(profile);
       const r=M.role(profile),week=M.week(),today=S.cairo().date;
@@ -160,6 +183,7 @@
   function start(){
     if(started)return refresh();started=true;
     document.addEventListener('click',event=>{
+      if(event.target.closest?.('.dh-room-dialog'))return;
       const chosen=event.target.closest?.('.dh-room-details');
       document.querySelectorAll('#dashboard-home .dh-room-details[open]').forEach(d=>{if(d!==chosen)d.open=false;});
     });
@@ -170,6 +194,7 @@
     $('dashboard-home').addEventListener('click',event=>{
       const scope=event.target.closest('[data-dh-scope]');if(scope){state.scopeTarget=scope.dataset.dhScope;render();return;}
       const admin=event.target.closest('[data-dh-admin]');if(admin){openAdmin(admin.dataset.dhAdmin);return;}
+      const room=event.target.closest('[data-dh-room]');if(room){openRoomInfo(room.dataset.dhRoom,room);return;}
       const tab=event.target.closest('[data-dh-view]');if(tab){state.view=tab.dataset.dhView;render();}
     });
     $('dashboard-home').addEventListener('change',event=>{if(event.target.id==='dh-day-filter'){state.day=event.target.value;render();}});

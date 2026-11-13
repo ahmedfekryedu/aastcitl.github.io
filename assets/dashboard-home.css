@@ -41,3 +41,21 @@
 .dh-cancelled-details>div{display:block;max-height:220px}.dh-cancelled-details article{padding:8px;border-bottom:1px solid #e5e9f1;text-align:right}.dh-cancelled-details article:last-child{border-bottom:0}.dh-cancelled-details strong,.dh-cancelled-details small{display:block;overflow-wrap:anywhere}.dh-cancelled-details small{font-size:11px;line-height:1.8;color:#64748b}
 #dashboard-home .dh-room-details>div{box-sizing:border-box;overflow-wrap:anywhere;overscroll-behavior:contain}
 .dh-scope-switch{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-width:100%}.dh-scope-switch .dh-button{white-space:normal;text-align:start}.dh-scope-switch .dh-button.active{background:#2a3475;color:#fff;border-color:#2a3475;box-shadow:inset 0 -2px #f3a628}.dh-heading-copy{min-width:0}
+/* Compact, read-only details for a live lecture in the existing room list. */
+#dashboard-home .dh-room-choice{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;padding:6px 10px;background:#f1f4fa;border:1px solid #dce3f0;border-radius:8px;color:#25316a;font:800 12px Cairo,sans-serif;cursor:pointer}
+#dashboard-home .dh-room-choice:hover{background:#e8eef9;border-color:#b1bfdc}
+#dashboard-home .dh-room-choice>span{padding:0;background:transparent;color:#a26c17;font-size:18px}
+.dh-room-dialog{box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(620px,calc(100dvh - 32px));padding:0;margin:auto;border:1px solid #dce3f0;border-radius:16px;background:#fff;color:#25316a;box-shadow:0 18px 60px #101f4933;font-family:Cairo,sans-serif;overflow:hidden}
+.dh-room-dialog[open]{display:flex;flex-direction:column}
+.dh-room-dialog::backdrop{background:#17234c88;backdrop-filter:blur(3px)}
+.dh-room-dialog>header{position:static;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;background:#25316a;color:#fff;border-bottom:3px solid #e7aa3a;flex-shrink:0}
+.dh-room-dialog header small{font-size:11px;color:#dce3f5}.dh-room-dialog h3{margin:2px 0 0;font-size:17px;font-weight:800}
+.dh-room-dialog header button{width:36px;height:36px;flex-shrink:0;border:1px solid #ffffff40;background:#ffffff12;border-radius:9px;color:#fff;font-size:23px;cursor:pointer}
+.dh-room-dialog-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px}
+.dh-room-stamp{margin:0 0 10px;color:#66748d;font-size:11px}.dh-room-lecture{padding:12px;border:1px solid #e0e6f0;border-radius:11px;background:#f8faff;margin-bottom:10px}
+.dh-room-lecture-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.dh-room-lecture-head strong{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.dh-room-lecture-head .dh-badge{white-space:nowrap;flex-shrink:0}
+.dh-room-lecture dl{margin:10px 0 0;display:grid;gap:7px;font-size:12px}.dh-room-lecture dl>div{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px}.dh-room-lecture dt{color:#69768e}.dh-room-lecture dd{margin:0;font-weight:700;overflow-wrap:anywhere;text-align:start}
+.dh-room-source{margin:8px 0 0;padding-top:10px;border-top:1px solid #e5e9f1;font-size:10px;color:#69768e;line-height:1.8}
+.dh-room-dialog>footer{display:flex;justify-content:flex-end;padding:10px 16px;border-top:1px solid #e5e9f1;background:#f8faff;flex-shrink:0}.dh-room-dialog footer button{padding:7px 22px;min-height:38px;border-radius:8px;border:1px solid #25316a;background:#25316a;color:white;font:700 12px Cairo,sans-serif;cursor:pointer}
+.dh-room-dialog button:focus-visible{outline:3px solid #e7aa3a;outline-offset:2px}
+@media(max-width:360px){.dh-room-dialog-body{padding:10px}.dh-room-lecture{padding:10px}.dh-room-lecture dl>div{grid-template-columns:85px minmax(0,1fr)}.dh-room-lecture-head{flex-wrap:wrap}}

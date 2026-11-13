@@ -15,6 +15,10 @@ html[data-citl-control-page] #dashboard-main{display:none!important}
 #citl-control-host .citl-control-layout{display:block;background:transparent;box-shadow:none;border:0;border-radius:0}
 #citl-control-host #admin-panel-modal{box-shadow:none;border:0;border-radius:0}
 .citl-control-home{white-space:nowrap;font-size:13px}.citl-control-home i{font-size:inherit}
+/* Desktop already has the home action in the main header. Keep the content
+   return on phones, where that desktop header action is not visible. */
+@media(min-width:1024px){html[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}}
+html.citl-desktop-request[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}
 html[data-citl-control-page] #admin-panel-btn{display:none!important}
 #citl-control-host .citl-control-layout>div{background:transparent}
 #citl-control-host .citl-control-layout>div>div:first-child{border-radius:14px;border:1px solid #e2e8f0;align-self:flex-start}

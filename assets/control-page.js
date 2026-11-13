@@ -28,8 +28,9 @@
    const clearance=!modal&&header&&['sticky','fixed'].includes(style.position)?Math.max(0,header.getBoundingClientRect().bottom):0;
    const oldMargin=el.style.scrollMarginTop;el.style.scrollMarginTop=(clearance+16)+'px';
    el.scrollIntoView({behavior:'instant',block:options.block||'start',inline:'nearest'});el.style.scrollMarginTop=oldMargin;
-   const added=!el.hasAttribute('tabindex');if(added)el.setAttribute('tabindex','-1');
-   el.focus({preventScroll:true});if(added)el.addEventListener('blur',()=>el.removeAttribute('tabindex'),{once:true});
+   const added=!el.hasAttribute('tabindex'),oldOutline=el.style.outline;
+   if(added){el.setAttribute('tabindex','-1');el.style.outline='none';}
+   el.focus({preventScroll:true});if(added)el.addEventListener('blur',()=>{el.removeAttribute('tabindex');el.style.outline=oldOutline;},{once:true});
   });});}
   const observer=new MutationObserver(schedule);observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','hidden','aria-busy']});
   stopReveal=stop;timer=setTimeout(stop,30000);root.addEventListener('resize',schedule);document.addEventListener('visibilitychange',schedule);schedule();return stop;
@@ -61,7 +62,9 @@
   else if(tab==='academic-review')await root.CITLOversight.openApprovals({request:params.get('request')});
   else await root.openAdminPanel(tab);
   }finally{host.setAttribute('aria-busy','false');document.getElementById('citl-control-loading')?.remove();}
-  reveal(()=>selectedDestination(params));
+  // Ordinary control-page entry stays at the top with its return navigation.
+  // Only a link to a specific request/action should jump to an item on first load.
+  if((tab==='academic-review'&&params.get('request'))||(tab==='academic-actions'&&params.get('action')))reveal(()=>selectedDestination(params));
   if(params.get('swap'))void root.CITLRoomSwaps?.open(params.get('swap'));
   if(params.get('meeting'))void root.CITLMeetingUI?.open(params.get('meeting'),false);
   if(params.get('broadcast'))void root.CITLAnnouncements?.open(params.get('broadcast'));

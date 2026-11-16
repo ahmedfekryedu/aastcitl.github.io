@@ -18,10 +18,9 @@ html[data-citl-control-page] #dashboard-shell>.citl-main-header{position:sticky;
 #citl-control-host .citl-control-layout{display:block;background:transparent;box-shadow:none;border:0;border-radius:0}
 #citl-control-host #admin-panel-modal{box-shadow:none;border:0;border-radius:0}
 .citl-control-home{white-space:nowrap;font-size:13px}.citl-control-home i{font-size:inherit}
-/* Home is now available in both responsive headers; avoid a second return. */
+/* Desktop keeps its header link; mobile uses the existing drawer link. */
 html[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}
 html[data-citl-control-page] .citl-mobile-toolbar{flex-wrap:wrap}
-html[data-citl-control-page] .citl-mobile-toolbar [data-control-mobile-home]{flex:0 0 auto}
 html[data-citl-control-page] #admin-panel-btn{display:none!important}
 #citl-control-host .citl-control-layout>div{background:transparent}
 #citl-control-host .citl-control-layout>div>div:first-child{border-radius:14px;border:1px solid #e2e8f0;align-self:flex-start}

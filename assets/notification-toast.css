@@ -1,0 +1,70 @@
+/* Shared floating messages only; delivery, dismissal and severity stay unchanged. */
+#notification-toast.notification-toast {
+  box-sizing: border-box;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: min(560px, calc(100vw - 32px)) !important;
+  padding: 13px 20px;
+  border: 1px solid rgba(0, 0, 0, .12);
+  border-radius: 16px;
+  box-shadow: 0 8px 26px rgba(25, 35, 70, .18);
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  text-align: start;
+  visibility: hidden;
+  opacity: 0;
+}
+#notification-toast.notification-toast.show {
+  visibility: visible;
+  opacity: 1;
+}
+#notification-toast.notification-toast.bg-success,
+#notification-toast.notification-toast:has(.notification-icon-box.bg-success) {
+  background: #F3A628 !important;
+  color: #111111 !important;
+  border-color: #DC941D;
+}
+#notification-toast .notification-text,
+#notification-toast #notification-message {
+  min-width: 0;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.75;
+}
+#notification-toast.bg-success .notification-text,
+#notification-toast.bg-success #notification-message,
+#notification-toast:has(.notification-icon-box.bg-success) #notification-message {
+  color: #111111 !important;
+}
+#notification-toast > .flex {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+#notification-toast .notification-icon-box {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+}
+#notification-toast .notification-icon-box.bg-success {
+  background: rgba(255, 255, 255, .3) !important;
+  color: #111111;
+}
+@media (max-width: 640px) {
+  #notification-toast.notification-toast {
+    max-width: calc(100vw - 24px) !important;
+    padding: 12px 14px;
+    border-radius: 14px;
+  }
+  #notification-toast.notification-toast.bg-success.show,
+  #notification-toast.notification-toast.bg-error.show,
+  #notification-toast.notification-toast.bg-info.show {
+    top: max(12px, env(safe-area-inset-top, 0px));
+  }
+  #notification-toast .notification-text,
+  #notification-toast #notification-message { font-size: 13px !important; }
+}

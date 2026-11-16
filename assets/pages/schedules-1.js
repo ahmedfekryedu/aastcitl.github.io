@@ -4650,35 +4650,7 @@ function showCustomConfirm(message) {
 }
 
 function showNotification(message, type = 'success') {
-    let toast = document.getElementById('notification-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'notification-toast';
-        // !w-max بتخلي العرض على قد المحتوى بالظبط عشان يفضل سطر واحد
-        toast.className = 'notification-toast !fixed !left-1/2 !-translate-x-1/2 !right-auto !bottom-10 !flex !items-center !gap-2 !w-max !max-w-[95vw] !z-[9999]';
-        toast.innerHTML = '<div class="flex items-center gap-2"><div id="notif-icon" class="notification-icon-box shrink-0"><i class="fas"></i></div><span id="notification-message"></span></div>';
-        document.body.appendChild(toast);
-    }
-
-    const messageEl = document.getElementById('notification-message');
-    const iconBox = document.getElementById('notif-icon');
-    const icon = iconBox.querySelector('i');
-
-    messageEl.textContent = message;
-    
-    // ضبط الخط: أسود (!text-black) وسطر واحد (!whitespace-nowrap) وحجم أصغر للموبايل
-    messageEl.className = '!text-black !font-bold !text-[12px] md:!text-[14px] !whitespace-nowrap';
-    
-    if (type === 'error') {
-        iconBox.className = 'notification-icon-box bg-error shrink-0';
-        icon.className = 'fas fa-times';
-    } else {
-        iconBox.className = 'notification-icon-box bg-success shrink-0';
-        icon.className = 'fas fa-check';
-    }
-
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    window.CITLToast.show(message, type);
 }
 // ============================================================
 // 🔥 دالة وضع التعديل المحدثة: حل مشكلة الاختفاء وضبط الألوان

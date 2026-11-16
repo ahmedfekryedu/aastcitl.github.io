@@ -220,50 +220,18 @@ body {
         .assistant-priority { background: #ca8a04; }
         
 /* ---------- Notification: في منتصف الشاشة ---------- */
-.notification-toast {
-    position: fixed;
-    top: -120px;
-    left: 50%;                  /* مركز الشاشة أفقياً */
-    transform: translateX(-50%); /* توسيط العنصر نفسه */
-    right: auto;                /* إلغاء المحاذاة لليمين */
-    
-    min-width: 320px;
-    max-width: 90%;             /* لضمان عدم الخروج من شاشات الموبايل */
-    padding: 14px 24px;
-    color: #fff;
-    border-radius: 50px;        /* حواف دائرية بالكامل لشكل عصري */
-    z-index: 10000;
-    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    pointer-events: none;
-    
-    /* تنسيق المحتوى الداخلي */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    direction: rtl;
-    font-family: 'Cairo', sans-serif;
-    backdrop-filter: blur(8px); /* تأثير ضبابي للخلفية */
-}
+
 
 /* حالة الظهور */
-.notification-toast.show {
-    top: 30px;
-    pointer-events: auto;
-    opacity: 1;
-}
+
 
 /* الألوان */
-.notification-toast.bg-success { background: linear-gradient(135deg, #10b981, #059669) !important; }
-.notification-toast.bg-error   { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
-.notification-toast.bg-info    { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+
+
+
 
 /* النص */
-.notification-text {
-    font-size: 14px;
-    font-weight: 700;
-}
+
 
 
         
@@ -799,7 +767,8 @@ body {
 <link rel="stylesheet" href="/assets/lecture-room-swaps.css?v=20261028-r7.3.3.8-wa-ui">
 <link rel="stylesheet" href="/assets/whatsapp-admin.css?v=20261108-ui137-r2">
 <link rel="stylesheet" href="/assets/attendance-navigation.css?v=20261110-r7-confirmed-attendance"><link rel="stylesheet" href="/assets/lecture-booking-slot.css?v=20261115-partial-lecture-booking">
-<link rel="stylesheet" href="/assets/notification-toast.css?v=20261116-blue-toasts-v2">
+<link rel="stylesheet" href="/assets/notification-toast.css?v=20261117-toast-banner-v3">
+<script src="/assets/notification-toast.js?v=20261117-toast-banner-v3"></script>
 </head>
  <body class="citl-dashboard-page bg-gray-50 min-h-screen flex flex-col overflow-x-hidden">
 
@@ -1503,7 +1472,7 @@ body {
 <script src="/assets/tv-admin-ui.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/dashboard-home-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/pages/dashboard-1.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/pages/dashboard-1.js?v=20261117-toast-banner-v3"></script>
 <script src="/assets/lecture-booking-slot.js?v=20261115-partial-lecture-booking"></script><script src="/assets/academic-booking.js?v=20261115-partial-lecture-booking"></script>
 <script src="/assets/admin-panel.js?v=20261112-notifications146"></script>
 <script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-video-converter.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1513,7 +1482,7 @@ body {
 <script src="/assets/registration-validation.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/admin-member-registration.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/security-core.js?v=20261115-lecture-consent149"></script>
+<script src="/security-core.js?v=20261117-toast-banner-v3"></script>
 <script src="/assets/admin-permissions-ui.js?v=20261105-course-display-129"></script>
 <script src="/assets/dashboard-home.js?v=20261113-dashboard-rooms-fix"></script>
 <script src="/assets/department-heads.js?v=20261028-r7.3.3.8-wa-ui"></script>

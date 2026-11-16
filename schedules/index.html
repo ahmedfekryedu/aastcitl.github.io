@@ -293,46 +293,11 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 }
 
 /* --- أنماط الإشعارات (تم إصلاح مشكلة منع اللمس) --- */
-.notification-toast {
-    position: fixed; 
-    bottom: 20px; 
-    left: 50%; 
-    transform: translateX(-50%) translateY(100px);
-    background: white; 
-    padding: 12px 24px; 
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-    display: flex; 
-    align-items: center; 
-    gap: 12px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-    z-index: 9999; 
-    opacity: 0;
-    font-weight: bold;
-    border: 1px solid #f3f4f6;
-    
-    /* 🔥 هذا السطر هو الحل: يمنع الرسالة المخفية من اعتراض اللمس 🔥 */
-    pointer-events: none; 
-}
 
-.notification-toast.show { 
-    transform: translateX(-50%) translateY(0); 
-    opacity: 1; 
-    
-    /* 🔥 لما تظهر بس، تستقبل اللمس 🔥 */
-    pointer-events: auto; 
-}
 
-.notification-icon-box { 
-    width: 24px; 
-    height: 24px; 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    color: white; 
-    font-size: 12px;
-}
+
+
+
 
 .bg-success { background-color: #10B981; } /* لون أخضر للنجاح */
 .bg-error { background-color: #EF4444; }   /* لون أحمر للخطأ */
@@ -452,40 +417,11 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
         }
         
         /* --- أنماط الإشعارات (Toast) --- */
-        .notification-toast {
-            position: fixed; 
-            bottom: 20px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(100px);
-            background: white; 
-            padding: 12px 24px; 
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-            z-index: 9999; 
-            opacity: 0;
-            font-weight: bold;
-            border: 1px solid #f3f4f6;
-        }
 
-        .notification-toast.show { 
-            transform: translateX(-50%) translateY(0); 
-            opacity: 1; 
-        }
 
-        .notification-icon-box { 
-            width: 24px; 
-            height: 24px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-size: 12px;
-        }
+
+
+
 
         .bg-success { background-color: #10B981; } 
         .bg-error { background-color: #EF4444; }   
@@ -615,7 +551,8 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 <link rel="stylesheet" href="/assets/lecture-room-swaps.css?v=20261028-r7.3.3.8-wa-ui">
 <link rel="stylesheet" href="/assets/whatsapp-admin.css?v=20261108-ui137-r2">
 <link rel="stylesheet" href="/assets/attendance-navigation.css?v=20261110-r7-confirmed-attendance">
-<link rel="stylesheet" href="/assets/notification-toast.css?v=20261116-blue-toasts-v2">
+<link rel="stylesheet" href="/assets/notification-toast.css?v=20261117-toast-banner-v3">
+<script src="/assets/notification-toast.js?v=20261117-toast-banner-v3"></script>
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 
@@ -1633,11 +1570,11 @@ h1, h2, h3, h4, h5, h6, input, select, button, textarea {
 </div>
 
 <script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/pages/schedules-1.js?v=20261112-import145-ui"></script>
+<script src="/assets/pages/schedules-1.js?v=20261117-toast-banner-v3"></script>
 <script src="/assets/registration-validation.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/admin-member-registration.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/lecture-room-swaps.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/security-core.js?v=20261115-lecture-consent149"></script>
+<script src="/security-core.js?v=20261117-toast-banner-v3"></script>
 <script src="/assets/department-heads.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/faculty-delegates.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/registration-review-status.js?v=20261028-r7.3.3.8-wa-ui"></script>

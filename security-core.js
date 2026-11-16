@@ -356,7 +356,7 @@
           }
         }
         if (payload?.eventType === 'INSERT' && payload.new?.entity_type!=='meetings' && !document.getElementById('notif-list')) {
-          window.showNotification?.(payload.new?.title || 'وصلك تنبيه جديد', 'success');
+          window.showNotification?.(payload.new?.title || 'وصلك تنبيه جديد', 'info');
         }
       }).subscribe();
     } catch (error) { console.error('notification realtime:', error); }

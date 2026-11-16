@@ -1975,8 +1975,8 @@ function startAdminUsersPresenceLiveRefresh() {
 
                     // عرض النتيجة النهائية
                     if (messages.length > 0) {
-                        const hasWarning = messages.some(m => m.includes('⚠️'));
-                        showNotification(messages.join('<br>'), hasWarning ? 'info' : 'success');
+                        const hasWarning = newEmail !== currentUser.email;
+                        showNotification(messages.join('\n'), hasWarning ? 'warning' : 'success');
                         closeModal('profile-modal');
                         
                         // تسجيل في اللوج
@@ -2310,42 +2310,9 @@ window.renderAdminMeetingsTable = function(list) {
         }
 
 // ---------- showNotification: مركزي، بدون إيموجي، يزيل أي أيقونات تلقائياً ----------
-;(function(){ // 👈 (4) ضفنا فاصلة منقوطة هنا كمان ضروري جداً
-    // مساعدة لتنظيف النص من إيموجي ورموز مثل ✓ ❌ ⚠️ 🔒 ... 
-    function stripEmojisAndIcons(text) {
-        if (!text) return '';
-        // يحذف رموز Emoji + رموز شائعة مثل ✓ ❌ ⚠️ 🔒
-        // regex عام يغطي نطاقات Emoji + بعض الرموز الشائعة
-        return String(text)
-            .replace(/[\u{1F300}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{2700}-\u{27BF}\u{2600}-\u{26FF}]/gu, '')
-            .replace(/[✓✔✖❌⚠️⚠🔒🔔✅❎]/g, '') // إزالة أي علامات شائعة
-            .trim();
-    }
-
-    // الدالة نفسها
 window.showNotification = function(message, type = 'success') {
-        const toast = document.getElementById('notification-toast');
-        const messageEl = document.getElementById('notification-message') || document.querySelector('#notification-toast .notification-text');
-
-        if (!toast || !messageEl) return;
-
-        const clean = stripEmojisAndIcons(message);
-        messageEl.textContent = clean || '';
-        toast.className = 'notification-toast';
-
-        if (type === 'error') toast.classList.add('bg-error');
-        else if (type === 'info') toast.classList.add('bg-info');
-        else toast.classList.add('bg-success');
-
-        void toast.offsetWidth;
-        toast.classList.add('show');
-
-        if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
-        toast._hideTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    };
-})();
+    window.CITLToast.show(message, type);
+};
 
 // Custom confirmation dialog (تصميم احترافي للتحذير)
 // Custom confirmation dialog (النسخة الذكية المرنة)

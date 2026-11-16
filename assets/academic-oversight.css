@@ -277,3 +277,16 @@
 @media(max-width:500px){#admin-activity-history-tab .citl-history-filters{gap:8px;padding:10px}#admin-activity-history-tab .citl-history-filters label:last-child{grid-column:1/-1}#admin-activity-history-tab .citl-history-summary{align-items:flex-start}#admin-activity-history-tab .citl-event-card{padding:11px}#admin-activity-history-tab .citl-event-card header{grid-template-columns:20px 1fr}#admin-activity-history-tab .citl-event-read{grid-column:2;justify-self:start}#admin-activity-history-tab .citl-event-card footer button{flex:1}}
 
 #admin-activity-history-tab [data-refresh]{flex:0 0 auto;min-width:104px;white-space:nowrap}#admin-activity-history-tab .citl-admin-section-head{flex-wrap:wrap}
+/* Unregistered academic-name department assignment; isolated from the workboard. */
+.citl-department-assignment{width:min(850px,96vw)}
+.citl-department-assignment .citl-department-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.citl-department-assignment label{font-size:13px;font-weight:700}
+.citl-department-assignment input[type=search],.citl-department-assignment select{display:block;width:100%;min-height:42px;border:1px solid #d7dce8;border-radius:8px;padding:8px;background:white;font:inherit;box-sizing:border-box}
+.citl-department-selection{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px;background:#f1f4fa;border-radius:8px}
+.citl-department-selection>label{display:flex;gap:8px;align-items:center}
+.citl-department-people{max-height:42vh;overflow:auto;border:1px solid #dce2ed;border-radius:10px;margin:12px 0}
+.citl-department-assignment .citl-department-person{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #e7ebf1;cursor:pointer}
+.citl-department-person:nth-child(even){background:#f7f9fc}.citl-department-person>span{min-width:0;overflow-wrap:anywhere}.citl-department-person strong,.citl-department-person small{display:block}.citl-department-person small{font-size:11px;font-weight:400;color:#596579;margin-top:4px}
+.citl-department-assignment input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#25316a}
+.citl-department-save{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.citl-department-save>label{flex:1 1 260px}.citl-department-save>button{min-height:42px}
+@media(max-width:600px){.citl-department-assignment .citl-department-filters{grid-template-columns:1fr}.citl-department-save>button{flex:1 1 150px}.citl-department-selection{gap:8px}}

@@ -695,10 +695,10 @@ cell.className = 'time-slot metallic-blue-fill random-slanted-lines text-white f
                 addIcon.innerHTML = '<i class="fas fa-plus text-[#F3A628] text-xl opacity-50"></i>';
                 cell.appendChild(addIcon);
 
-                window.CITLAcademicBooking.paint(cell,supabase,currentRoomId,currentWeekStart,currentDate,time,() => {
+                window.CITLAcademicBooking.paint(cell,supabase,currentRoomId,currentWeekStart,currentDate,time,(selection) => {
                     openAddMeetingModal(currentDate,time);
                     // Use the complete displayed interval, including paired academic periods.
-                    academic.setTiming(time,(finalSlot.end-slot.start)/60);
+                    academic.setTiming(selection?.time||time,selection?.duration||(finalSlot.end-slot.start)/60);
                 },finalSlot.end);
             }
             container.appendChild(cell);
@@ -1101,7 +1101,7 @@ async function handleMeetingSubmission(e) {
     const meetingId = document.getElementById('meeting-id').value;
 
     window.CITLLoading.booking(true);
-    showLoader('جاري حفظ الحجز وإبلاغ المديرين...'); 
+    showLoader('جاري حفظ طلب الحجز...'); 
 
     try {
         const endTimeVal = calculateEndTime(timeVal, Number(durVal));
@@ -1124,12 +1124,13 @@ const meetingData = {
 
         hideLoader();
         Object.assign(meetingData, window.CITLBookingExtras?.values() || {});
+        if(meetingId)meetingData.id=originalMeeting.id;
         Object.assign(meetingData, await window.CITLAcademicBooking.check(supabase,meetingData,currentUser));
         showLoader('جاري حفظ الحجز…');
         const occurrences=meetingId?[meetingData]:window.CITLWeeklyBooking.expand(meetingData);
         for(const occurrence of occurrences.slice(1)){
             hideLoader();
-            Object.assign(occurrence,await window.CITLAcademicBooking.check(supabase,occurrence,currentUser,message=>showConfirmDialog('الحجز بتاريخ '+occurrence.date+' من '+occurrence.start_time+' إلى '+occurrence.end_time+'\n'+message)));
+            Object.assign(occurrence,await window.CITLAcademicBooking.check(supabase,occurrence,currentUser,(message,options)=>showConfirmDialog('الحجز بتاريخ '+occurrence.date+' من '+occurrence.start_time+' إلى '+occurrence.end_time+'\n'+message,options)));
             showLoader('جاري مراجعة المواعيد الأسبوعية…');
             if(checkConflicts(occurrence,null))throw new Error('يوجد تعارض في موعد '+occurrence.date);
         }
@@ -1209,9 +1210,11 @@ const meetingData = {
         // === السيناريو 2: حجز جديد ===
         else {
             const status = window.CITLPermissions.can(currentUser, 'can_approve') ? 'confirmed' : 'pending';
-            await window.CITLWeeklyBooking.save(supabase,occurrences.map(row=>({...row,status})));
+            const needsLecturer=occurrences.some(row=>window.CITLAcademicBooking.needsConsent(row));
+            const readyForManager=occurrences.filter(row=>!window.CITLAcademicBooking.needsConsent(row));
+            await window.CITLWeeklyBooking.save(supabase,occurrences.map(row=>({...row,status:window.CITLAcademicBooking.needsConsent(row)?'pending':status})));
 
-            if (status === 'pending') {
+            if (status === 'pending' && readyForManager.length) {
                 // جلب اسم الجهة المحجوز لها + اسم قسم مقدم الطلب
                 const bookingDeptName = departments[deptVal]?.name || deptVal;
                 const userDeptName = departments[currentUser.department]?.name || currentUser.department;
@@ -1222,7 +1225,7 @@ const meetingData = {
                 <strong>عنوان الاجتماع:</strong> ${titleVal}
                 <strong>الجهة الحاجزة:</strong> ${bookingDeptName}
                 <strong>مقدم الطلب:</strong> ${currentUser.full_name} (${userDeptName})
-                <strong>المواعيد المطلوبة:</strong> ${occurrences.map(row=>row.date+' ('+row.start_time+'–'+row.end_time+')').join('، ')}
+                <strong>المواعيد المطلوبة:</strong> ${readyForManager.map(row=>row.date+' ('+row.start_time+'–'+row.end_time+')').join('، ')}
                 <strong>التوقيت:</strong> من ${timeVal} إلى ${endTimeVal}
                 
                 <strong>يرجى التفضل بالدخول للنظام لاتخاذ الإجراء المناسب.</strong>`;
@@ -1230,7 +1233,7 @@ const meetingData = {
                 await notifyAllManagers("تنبيه: طلب حجز جديد", msgBody);
             }
 
-            showNotification(occurrences.length>1?'تم حفظ '+occurrences.length+' مواعيد أسبوعية بنجاح':'تم إرسال طلب الحجز بنجاح');
+            showNotification(needsLecturer?'تم إرسال طلب الوقت للمحاضر. بعد موافقته ينتقل لمسؤول الحجوزات للاعتماد.':occurrences.length>1?'تم حفظ '+occurrences.length+' مواعيد أسبوعية بنجاح':'تم إرسال طلب الحجز بنجاح');
         }
 
         await loadMeetings();
@@ -3475,3 +3478,4 @@ if ('serviceWorker' in navigator) {
   }
 
   
+

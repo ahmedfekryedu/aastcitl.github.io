@@ -104,6 +104,7 @@
 
   async function openSpecialNotice(item){
     document.getElementById('notif-menu')?.classList.add('hidden');
+    if(item.kind==='lecture_time_request'&&/^\d+$/.test(String(item.entity_id))){if(window.CITLLectureBookingApproval)await window.CITLLectureBookingApproval.open(item.entity_id);else window.location.assign('/smrm/?lectureTimeRequest='+encodeURIComponent(item.entity_id));return true;}
     if(item.kind==='schedule_action'&&window.CITLOversight?.openWorkboard){await window.CITLOversight.openWorkboard({action:item.entity_id||item.payload?.action_id});return true;}
     if(item.kind==='academic_review_result'&&window.CITLOversight?.openWorkboard){await window.CITLOversight.openWorkboard({action:item.payload?.action_id||item.entity_id});return true;}
     if(item.kind==='room_swap'){await window.CITLRoomSwaps.open(item.payload?.swap_id||item.entity_id);return true;}

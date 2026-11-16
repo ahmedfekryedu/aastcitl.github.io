@@ -1,6 +1,11 @@
 /* Courses only. Visual alignment with management/style.css; no data/permission changes. */
 @media screen {
- .citl-courses .cm-main{border:1px solid #e4e7ef;border-radius:14px;box-shadow:0 8px 24px #27316c09}
+ /* Reserve the same root scrollbar width as schedules and rooms. */
+ html:has(>body.citl-courses)::-webkit-scrollbar{width:8px}
+ html:has(>body.citl-courses)::-webkit-scrollbar-track{background:#f1f1f1}
+ html:has(>body.citl-courses)::-webkit-scrollbar-thumb{background:#2a3475;border-radius:4px}
+ /* Match schedules/smrm main: w-full max-w-[96%] mx-auto px-4. Screen only. */
+ body.citl-courses .cm-main{width:100%;max-width:96%;padding-inline:16px;border:1px solid #e4e7ef;border-radius:14px;box-shadow:0 8px 24px #27316c09}
  .citl-courses #cm-app{font-size:13px;line-height:1.75}
  .citl-courses :is(.s135-filters,.cm-filters,.p4-filters,.op-filters,.p2-toolbar){background:#f8fafc;border:1px solid #e4e7ef;border-radius:12px;padding:14px;gap:12px;align-items:end}
  .citl-courses :is(.s135-filters,.cm-filters,.p4-filters,.op-filters) label{font-size:13px;line-height:1.7;font-weight:700;min-width:0;display:grid;gap:6px}

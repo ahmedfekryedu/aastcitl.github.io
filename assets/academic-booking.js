@@ -1,6 +1,8 @@
 (function(root) {
   'use strict';
   const weeks = new Map(), pending = new Map();
+  const consentRequests=new WeakSet();
+  const bookingConfirm={title:'مراجعة وقت الاجتماع',confirmText:'تأكيد وقت الاجتماع',color:'bg-[#2A3475] hover:bg-[#20285e]',icon:'fa-calendar-check',iconColor:'text-[#2A3475]',iconBg:'bg-blue-50'};
   let watching = false, generation = 0;
   const invalidate = () => { generation++;weeks.clear(); };
   const dateKey = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -82,25 +84,45 @@
     const block = document.createElement('div');
     block.style.cssText='background:#eef0fa;color:#2A3475;border-right:3px solid #F3A628;margin:4px;padding:7px;border-radius:6px;font-size:10px;line-height:1.6;height:calc(100% - 8px)';
     const title=document.createElement('strong');title.textContent='محجوز لمحاضرة';block.append(title);
-    for (const row of rows) { const line=document.createElement('div');line.append(document.createTextNode((row.course_name||'محاضرة')+' · '));const clock=document.createElement('bdi');clock.dir='ltr';clock.textContent=row.start_time.slice(0,5)+'–'+row.end_time.slice(0,5);line.append(clock);block.append(line); }
+    const clock=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+    for (const row of rows) { const line=document.createElement('div');line.append(document.createTextNode((row.course_name||'محاضرة')+' · '));const range=document.createElement('bdi');range.dir='ltr';range.textContent=clock(Math.max(minutes(row.start_time),minutes(time)))+'–'+clock(Math.min(minutes(row.end_time),endMinutes));line.append(range);block.append(line); }
     cell.append(block);
     cell.addEventListener('click',async () => {
+      if(root.CITLLectureBookingSlot){
+        const selection=await root.CITLLectureBookingSlot.choose(rows,time,clock(endMinutes),dateKey(day));
+        if(selection)open(selection);
+        return;
+      }
       const approved = root.CITLPermissions.can(root.currentUser,'can_approve');
       const message = approved ? 'هذا الموعد محجوز لمحاضرة. هل تريد تجهيز اجتماع بدلًا منها في هذا التاريخ؟ ستؤكد التعارض الحالي عند الحفظ.' : 'هذا الموعد محجوز لمحاضرة. يمكن إرسال طلب اجتماع، ويظل معلقًا حتى يراجعه مسؤول الاعتماد. متابعة؟';
-      if (await root.showConfirmDialog(message)) open();
+      if (await root.showConfirmDialog(message,{...bookingConfirm,confirmText:'متابعة الطلب'})) open();
     });
   }
   async function check(sb, data, user, confirm = root.showConfirmDialog) {
+    consentRequests.delete(data);
     const {data:collisions,error} = await sb.rpc('citl_booking_conflicts',{p_room:data.room_id,p_date:data.date,p_start:data.start_time || data.startTime,p_end:data.end_time || data.endTime});
     if (error || !Array.isArray(collisions)) throw new Error('تعذر التحقق من تعارض المحاضرات؛ لم يُحفظ الحجز. تأكد من تطبيق ملف ربط القاعات.');
     if(data.booking_type==='lecture'&&collisions.length)throw new Error('القاعة مشغولة بمحاضرة في هذا الموعد؛ اختر فترة أخرى.');
+    const from=(data.start_time||data.startTime).slice(0,5),to=(data.end_time||data.endTime).slice(0,5);
+    const details=root.CITLLectureBookingSlot?.summary(collisions,from,to)||collisions.map(r=>`${r.course_name||'محاضرة'} (${r.start_time.slice(0,5)}–${r.end_time.slice(0,5)})`).join('\n');
+    const period='وقت الاجتماع المطلوب: '+from+'–'+to+'\n'+details;
+    if(collisions.length){
+      const existing=data.id!=null;
+      const {data:consent,error:consentError}=await sb.rpc('citl_lecture_time_api149',{p_action:existing?'get':'preview',p_payload:existing?{id:data.id}:{room_id:data.room_id,date:data.date,start_time:from,end_time:to}});
+      if(consentError)throw new Error(consentError.code==='PGRST202'?'يلزم تثبيت تصحيح موافقة المحاضر SQL149 قبل تقديم الطلب.':consentError.message||'تعذر التحقق من موافقة المحاضر؛ لم يتم الحفظ.');
+      if(!existing){
+        if(!consent?.requires_lecturer_consent)throw new Error('تغير الجدول أثناء الفحص؛ حدّث القاعة وأعد المحاولة.');
+        if(!await confirm(period+'\nسيصل الطلب للمحاضر أولًا، ثم لمسؤول الحجوزات بعد موافقته. لا يُحجز الوقت قبل الموافقتين.',{...bookingConfirm,confirmText:'إرسال طلب الموافقة'}))throw new Error('تم إلغاء الطلب');
+        consentRequests.add(data);return {academic_override:null};
+      }
+      if(consent?.state!=='approved')throw new Error(consent?.state==='rejected'?'رفض المحاضر الطلب؛ لا يمكن اعتماد الحجز.':'يلزم موافقة المحاضر أولًا. افتح «موافقة المحاضر» في تفاصيل الحجز.');
+    }
     if (!root.CITLPermissions.can(user,'can_approve')) {
-      if (collisions.length && !await confirm('الموعد محجوز لمحاضرة. هل تريد إرسال طلب اجتماع لمراجعة مسؤول الاعتماد؟ لن يصبح حجزًا مؤكدًا الآن.')) throw new Error('تم إلغاء الطلب');
+      if (collisions.length && !await confirm(period+'\nهل تريد إرسال الطلب لمراجعة مسؤول الاعتماد؟ لن يصبح حجزًا مؤكدًا الآن.',{...bookingConfirm,confirmText:'إرسال الطلب'})) throw new Error('تم إلغاء الطلب');
       return {};
     }
     if (!collisions.length) return {academic_override:null};
-    const names=collisions.map(r=>`${r.course_name || 'محاضرة'} (${r.start_time.slice(0,5)}–${r.end_time.slice(0,5)})`).join('\n');
-    if (!await confirm('الموعد يتعارض مع:\n'+names+'\nهل تعتمد تخصيص هذا الموعد للاجتماع في هذه القاعة وهذا اليوم؟')) throw new Error('تم إلغاء الحفظ؛ المحاضرة لم تتغير');
+    if (!await confirm(period+'\nهل تعتمد تخصيص هذا الوقت فقط للاجتماع في هذه القاعة وهذا اليوم؟ باقي الوقت محفوظ للمحاضرة.',bookingConfirm)) throw new Error('تم إلغاء الحفظ؛ المحاضرة لم تتغير');
     return {academic_override:collisions};
   }
   async function roomSelect(sb, selected='') {
@@ -119,5 +141,5 @@
     for(const name of [...names].sort((a,b)=>a.localeCompare(b,'ar'))) select.add(new Option(name,name));
     select.value=selected;select.disabled=false;select.dispatchEvent(new Event('change',{bubbles:true}));
   }
-  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,rowsFor,timeline,setTiming,invalidate});
+  root.CITLAcademicBooking=Object.freeze({load,paint,check,roomSelect,dateKey,weekStart,weekDays,rowsFor,timeline,setTiming,invalidate,needsConsent:data=>consentRequests.has(data)});
 })(window);

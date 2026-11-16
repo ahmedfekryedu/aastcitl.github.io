@@ -1,0 +1,31 @@
+.citl-lecture-slot{box-sizing:border-box;width:min(540px,calc(100% - 24px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid #dce2ef;border-top:4px solid #e7aa3a;border-radius:16px;background:#fff;color:#25316a;box-shadow:0 20px 70px #15214b55;font-family:Cairo,Arial,sans-serif;font-size:14px;overflow:auto}
+.citl-lecture-slot::backdrop{background:#17244ac9;backdrop-filter:blur(3px)}
+.citl-lecture-slot *{box-sizing:border-box}
+.citl-lecture-slot header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:#f3f6fc;border-bottom:1px solid #e0e5f0}
+.citl-lecture-slot h2{font-size:17px;font-weight:800;margin:0 0 4px;line-height:1.6}
+.citl-lecture-slot header p{margin:0;font-size:12px;color:#5b6683}
+.citl-lecture-slot button{font-family:inherit;font-size:13px;font-weight:700;min-height:42px;border:1px solid #cfd7e9;border-radius:9px;padding:8px 12px;background:#fff;color:#25316a;cursor:pointer}
+.citl-lecture-slot button:focus-visible,.citl-lecture-slot input:focus-visible{outline:3px solid #e7aa3a;outline-offset:2px}
+.citl-lecture-slot header button{font-size:24px;min-width:42px;padding:0;flex:none}
+.citl-slot-body{padding:16px 18px;display:grid;gap:14px}
+.citl-slot-body p{margin:0;line-height:1.8}
+.citl-slot-presets{display:flex;gap:8px;flex-wrap:wrap}
+.citl-slot-presets button{flex:1;white-space:nowrap}
+.citl-slot-presets button[aria-pressed=true]{background:#edf1fd;border-color:#25316a}
+.citl-slot-times{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.citl-slot-times label{display:grid;gap:6px;font-weight:700;min-width:0}
+.citl-slot-times input{width:100%;min-width:0;height:44px;padding:8px;border:1px solid #cfd7e9;border-radius:9px;background:#fff;color:#25316a;direction:ltr;font:inherit}
+.citl-slot-impact{white-space:pre-line;line-height:1.9;background:#f3f6fc;border-inline-start:3px solid #e7aa3a;padding:10px 12px;border-radius:8px;overflow-wrap:anywhere;font-size:13px}
+.citl-slot-note{font-size:12px;color:#586680}
+.citl-slot-error{color:#a12032;font-size:13px}
+.citl-lecture-slot footer{display:flex;gap:8px;padding:12px 18px;border-top:1px solid #e0e5f0;background:#fafbfe}
+.citl-lecture-slot .citl-slot-primary{background:#25316a;color:#fff;flex:1;border-color:#25316a}
+.citl-lecture-slot button:disabled{opacity:.45;cursor:not-allowed}
+.citl-lecture-requests{padding:14px;border:1px solid #dce2ef;border-inline-start:4px solid #e7aa3a;border-radius:12px;background:#f5f7fc;margin-block-end:16px;color:#25316a}
+.citl-lecture-requests p{font-size:12px;margin:6px 0}
+.citl-lecture-requests button{font:700 13px Cairo,Arial,sans-serif;background:white;border:1px solid #dce2ef;border-radius:8px;padding:10px;margin:4px;cursor:pointer;color:#25316a}
+.citl-slot-booking-details{margin:0;border:1px solid #e0e5f0;border-radius:9px;overflow:hidden;font-size:13px}
+.citl-slot-booking-details>div{display:grid;grid-template-columns:minmax(90px,30%) 1fr;gap:10px;padding:8px 10px;border-bottom:1px solid #e0e5f0}
+.citl-slot-booking-details>div:last-child{border-bottom:0}
+.citl-slot-booking-details dt{font-weight:700;color:#586680}
+.citl-slot-booking-details dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}

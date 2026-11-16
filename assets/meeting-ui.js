@@ -26,6 +26,7 @@
    const title=document.createElement('strong');title.textContent=lectures.length||booked.length?'الحجز في قاعة مشغولة':room.data?.academic_room_name?'الحجز في قاعة فارغة':'لا يوجد حجز متعارض؛ القاعة غير مرتبطة بجدول دراسي';box.replaceChildren(title);
    const when=document.createElement('div');when.textContent=candidate.date+' · '+clock(candidate.start_time||candidate.startTime)+' – '+clock(candidate.end_time||candidate.endTime)+(m.pending_changes?' — الموعد المطلوب بعد التعديل':'');box.append(when);
    for(const row of lectures){const line=document.createElement('div');line.textContent='محاضرة: '+(row.course_name||'—')+' · '+(row.instructor||'المحاضر غير محدد')+' · '+clock(row.start_time)+' – '+clock(row.end_time);box.append(line);}
+   if(lectures.length&&m.booking_type!=='lecture')void root.CITLLectureBookingApproval?.mount(m,section);
    for(const row of booked){const line=document.createElement('div');line.textContent='حجز قائم: '+(row.title||'—')+' · '+(row.profiles?.full_name||row.createdBy||row.booked_by||'صاحب الحجز غير متاح')+' · '+clock(row.start_time)+' – '+clock(row.end_time);box.append(line);}
    const note=document.createElement('small');note.textContent='الحالة الحالية وقت فتح التفاصيل، وليست لقطة محفوظة عند تقديم الطلب. يظل التحقق النهائي عند الاعتماد.';box.append(note);
   }catch(error){box.textContent='تعذر التحقق من إشغال القاعة. لا تعتبر القاعة فارغة؛ أعد فتح التفاصيل قبل الاعتماد.';}

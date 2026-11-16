@@ -1,4 +1,7 @@
 html[data-citl-control-page] #dashboard-main{display:none!important}
+/* The decorative .random-slanted-lines rule sets position:relative.
+   Keep this page's header sticky without changing that shared decoration. */
+html[data-citl-control-page] #dashboard-shell>.citl-main-header{position:sticky;top:0;z-index:60;flex-shrink:0}
 #citl-control-host{width:96%;max-width:1600px;margin:18px auto;flex:1;min-width:0;font-family:Cairo,sans-serif}
 #citl-control-host #admin-panel-modal{position:static!important;display:block!important;inset:auto!important;background:transparent!important;backdrop-filter:none!important;padding:0!important;opacity:1!important;visibility:visible!important;transform:none!important;z-index:auto!important}
 #citl-control-host #admin-panel-modal>.citl-control-layout{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0!important;transform:none!important;overflow:visible!important}
@@ -15,10 +18,10 @@ html[data-citl-control-page] #dashboard-main{display:none!important}
 #citl-control-host .citl-control-layout{display:block;background:transparent;box-shadow:none;border:0;border-radius:0}
 #citl-control-host #admin-panel-modal{box-shadow:none;border:0;border-radius:0}
 .citl-control-home{white-space:nowrap;font-size:13px}.citl-control-home i{font-size:inherit}
-/* Desktop already has the home action in the main header. Keep the content
-   return on phones, where that desktop header action is not visible. */
-@media(min-width:1024px){html[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}}
-html.citl-desktop-request[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}
+/* Home is now available in both responsive headers; avoid a second return. */
+html[data-citl-control-page] #citl-control-host>[data-citl-page-return]{display:none}
+html[data-citl-control-page] .citl-mobile-toolbar{flex-wrap:wrap}
+html[data-citl-control-page] .citl-mobile-toolbar [data-control-mobile-home]{flex:0 0 auto}
 html[data-citl-control-page] #admin-panel-btn{display:none!important}
 #citl-control-host .citl-control-layout>div{background:transparent}
 #citl-control-host .citl-control-layout>div>div:first-child{border-radius:14px;border:1px solid #e2e8f0;align-self:flex-start}

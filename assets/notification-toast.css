@@ -1,6 +1,6 @@
 /* Only transient toasts; bell inbox and confirmation dialogs are out of scope. */
 #notification-toast.notification-toast {
-  --toast-bg: #EFF6FF; --toast-border: #93C5FD; --toast-text: #1E40AF;
+  --toast-accent: #38658D;
   position: fixed;
   top: calc(16px + env(safe-area-inset-top, 0px));
   left: 50vw;
@@ -18,12 +18,13 @@
   grid-template-columns: 32px minmax(0, 1fr) 32px;
   align-items: center;
   gap: 12px;
-  padding: 10px 20px;
-  border: 1px solid var(--toast-border);
+  padding: 8px 20px;
+  border: 1px solid #E2E8F0;
+  border-right: 3px solid var(--toast-accent);
   border-radius: 8px;
-  background: var(--toast-bg);
-  color: var(--toast-text);
-  box-shadow: 0 4px 16px rgba(25, 35, 70, .12);
+  background: #FFFFFF;
+  color: #1E293B;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, .08);
   font-family: 'Cairo', sans-serif;
   font-size: 14px;
   font-weight: 600;
@@ -44,16 +45,16 @@
   animation: citl-toast-slide-down 250ms ease-out;
 }
 #notification-toast.notification-toast.bg-success {
-  --toast-bg: #ECFDF3; --toast-border: #86EFAC; --toast-text: #166534;
+  --toast-accent: #20765B;
 }
 #notification-toast.notification-toast.bg-error {
-  --toast-bg: #FEF2F2; --toast-border: #FCA5A5; --toast-text: #991B1B;
+  --toast-accent: #AD4646;
 }
 #notification-toast.notification-toast.bg-warning {
-  --toast-bg: #FFFBEB; --toast-border: #FCD34D; --toast-text: #92400E;
+  --toast-accent: #B08038;
 }
 #notification-toast.notification-toast.bg-info {
-  --toast-bg: #EFF6FF; --toast-border: #93C5FD; --toast-text: #1E40AF;
+  --toast-accent: #38658D;
 }
 #notification-toast #notification-message {
   min-width: 0;
@@ -63,6 +64,7 @@
   font: inherit;
 }
 #notification-toast .citl-toast-symbol {
+  color: var(--toast-accent);
   display: flex;
   align-items: center;
   justify-content: center;

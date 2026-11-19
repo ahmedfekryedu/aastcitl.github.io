@@ -32,53 +32,887 @@
     <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261028-r7.3.3.8-wa-ui">
     <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261028-r7.3.3.8-wa-ui">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    
-    
+
     <script src="/assets/password-recovery.js?v=20261028-r7.3.3.8-wa-ui"></script>
     <script src="/vendor/supabase-js-2.45.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/auth-client.js?v=20261028-r7.3.3.8-wa-ui"></script>
+    <script src="/assets/auth-client.js?v=20261028-r7.3.3.8-wa-ui"></script>
     <script src="/presence.js?v=20261028-r7.3.3.8-wa-ui"></script>
 
     <style>
+        :root {
+            --citl-navy: #2A3475;
+            --citl-navy-deep: #171E4B;
+            --citl-navy-dark: #101638;
+            --citl-gold: #F3A628;
+            --citl-gold-hover: #E09215;
+            --citl-bg: #F4F6FB;
+            --citl-surface: #FFFFFF;
+            --citl-border: #E2E8F0;
+            --citl-text: #0F172A;
+            --citl-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #f8fafc;
+            background-color: var(--citl-bg);
+            color: var(--citl-text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
+
         .bg-navy { background-color: #2A3475; }
         .text-navy { color: #2A3475; }
         .border-gold { border-color: #F3A628; }
         .text-gold { color: #F3A628; }
         .bg-gold { background-color: #F3A628; }
-        
-        /* تأثيرات حركية */
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Custom Dropdown Styles */
-        .custom-dropdown { position: relative; width: 100%; }
+        /* ========================================= */
+        /* Modern Split-Screen Portal Shell          */
+        /* ========================================= */
+        .citl-portal-shell {
+            min-height: 100vh;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            background: var(--citl-bg);
+            position: relative;
+        }
+
+        @media (min-width: 1024px) {
+            .citl-portal-shell {
+                grid-template-columns: minmax(420px, 44%) 1fr;
+            }
+        }
+
+        /* ========================================= */
+        /* Brand Showcase Panel (Right in RTL)       */
+        /* ========================================= */
+        .login-campus-panel {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(155deg, #161D47 0%, #2A3475 52%, #1B2358 100%);
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 20px 44px;
+        }
+
+        @media (min-width: 1024px) {
+            .login-campus-panel {
+                padding: 40px 44px;
+                min-height: 100vh;
+            }
+        }
+
+        .login-campus-image-layer {
+            position: absolute;
+            inset: 0;
+            background-image: url('CITL-Camp1.png');
+            background-size: cover;
+            background-position: 50% center;
+            background-repeat: no-repeat;
+            opacity: 0.24;
+            transform: scale(1.03);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .login-campus-pattern-layer {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.85), transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.85), transparent 80%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .login-campus-soft-light {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 88% 12%, rgba(243, 166, 40, 0.22) 0%, transparent 42%),
+                radial-gradient(circle at 12% 88%, rgba(99, 120, 230, 0.28) 0%, transparent 48%),
+                linear-gradient(160deg, rgba(16, 22, 56, 0.78) 0%, rgba(42, 52, 117, 0.76) 55%, rgba(16, 22, 56, 0.90) 100%);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .login-campus-content {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .citl-top-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .citl-top-pill .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--citl-gold);
+            box-shadow: 0 0 10px rgba(243, 166, 40, 0.85);
+        }
+
+        .citl-brand-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        @media (min-width: 1024px) {
+            .citl-brand-hero {
+                margin: auto 0;
+            }
+        }
+
+        .citl-logo-frame {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 10px 14px;
+            border-radius: 20px;
+            box-shadow:
+                0 18px 40px rgba(9, 14, 42, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.55);
+            margin-bottom: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .citl-logo-frame:hover {
+            transform: translateY(-2px);
+        }
+
+        .citl-logo-frame img {
+            display: block;
+            width: 82px;
+            height: auto;
+        }
+
+        @media (min-width: 1024px) {
+            .citl-logo-frame {
+                padding: 12px 18px;
+                margin-bottom: 22px;
+            }
+            .citl-logo-frame img {
+                width: 112px;
+            }
+        }
+
+        .citl-brand-title {
+            font-weight: 800;
+            font-size: clamp(19px, 3.6vw, 27px);
+            line-height: 1.35;
+            margin: 0 0 4px;
+            color: #FFFFFF;
+            letter-spacing: -0.2px;
+        }
+
+        .citl-brand-subtitle {
+            color: var(--citl-gold);
+            font-weight: 700;
+            font-size: clamp(11px, 2.2vw, 14px);
+            letter-spacing: 0.45px;
+            margin: 0 0 14px;
+        }
+
+        .citl-system-mark {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .citl-system-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .citl-system-divider span {
+            width: 34px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(243, 166, 40, 0.9), transparent);
+        }
+
+        .citl-system-name {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2.6px;
+            font-size: clamp(14px, 2.8vw, 19px);
+            color: #FFFFFF;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Glass Bento Feature Cards */
+        .citl-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 440px;
+            margin-top: 18px;
+        }
+
+        @media (min-width: 1024px) {
+            .citl-bento-grid {
+                gap: 14px;
+                margin-top: 28px;
+            }
+        }
+
+        .citl-glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            text-align: right;
+            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+        }
+
+        .citl-glass-card:hover {
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(243, 166, 40, 0.45);
+            transform: translateY(-2px);
+        }
+
+        @media (min-width: 1024px) {
+            .citl-glass-card {
+                padding: 16px;
+            }
+        }
+
+        .citl-glass-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(243, 166, 40, 0.16);
+            border: 1px solid rgba(243, 166, 40, 0.32);
+            color: var(--citl-gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .citl-glass-title {
+            display: block;
+            font-weight: 700;
+            font-size: 12px;
+            color: #FFFFFF;
+            line-height: 1.45;
+            margin-bottom: 3px;
+        }
+
+        .citl-glass-desc {
+            display: none;
+            font-size: 11px;
+            line-height: 1.55;
+            color: rgba(226, 232, 240, 0.82);
+        }
+
+        @media (min-width: 640px) {
+            .citl-glass-desc {
+                display: block;
+            }
+        }
+
+        .citl-install-pill {
+            margin: 14px auto 0;
+            padding: 8px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            font-size: 11.5px;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.92);
+            max-width: 440px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        /* ========================================= */
+        /* Auth Workspace Panel (Left in RTL)        */
+        /* ========================================= */
+        .citl-auth-workspace {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px 28px;
+            position: relative;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(42, 52, 117, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 88% 86%, rgba(243, 166, 40, 0.07) 0%, transparent 45%),
+                var(--citl-bg);
+        }
+
+        @media (min-width: 1024px) {
+            .citl-auth-workspace {
+                padding: 36px 40px;
+                min-height: 100vh;
+            }
+        }
+
+        .citl-auth-card {
+            width: 100%;
+            max-width: 500px;
+            background-color: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow:
+                0 22px 50px -15px rgba(23, 30, 75, 0.12),
+                0 4px 14px -4px rgba(23, 30, 75, 0.05);
+            position: relative;
+            z-index: 10;
+            margin-top: -26px;
+            animation: citlFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (min-width: 640px) {
+            .citl-auth-card {
+                padding: 32px 34px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .citl-auth-card {
+                margin-top: 0;
+                padding: 36px 38px;
+            }
+        }
+
+        @keyframes citlFadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Segmented Mode Switcher */
+        .citl-mode-switcher {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 5px;
+            background: #F1F5F9;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .citl-mode-tab {
+            border: none;
+            background: transparent;
+            color: #64748B;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .citl-mode-tab:hover:not(.is-active) {
+            color: var(--citl-navy);
+        }
+
+        .citl-mode-tab.is-active {
+            background: #FFFFFF;
+            color: var(--citl-navy);
+            box-shadow: 0 4px 12px rgba(42, 52, 117, 0.10);
+        }
+
+        .citl-mode-tab i {
+            font-size: 12px;
+        }
+
+        /* Form Headings */
+        .citl-form-header {
+            margin-bottom: 22px;
+            text-align: right;
+        }
+
+        .citl-form-header h1 {
+            font-size: 21px;
+            font-weight: 800;
+            color: var(--citl-navy);
+            margin: 0 0 4px;
+        }
+
+        .citl-form-header p {
+            font-size: 13px;
+            color: var(--citl-muted);
+            margin: 0;
+        }
+
+        /* Modern Form Controls */
+        .citl-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .citl-label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .citl-label-row .citl-label {
+            margin-bottom: 0;
+        }
+
+        .citl-input-wrap {
+            position: relative;
+        }
+
+        .citl-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            background-color: #F8FAFC;
+            color: #0F172A;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .citl-input::placeholder {
+            color: #94A3B8;
+            font-weight: 500;
+        }
+
+        .citl-input:hover {
+            border-color: #CBD5E1;
+        }
+
+        .citl-input:focus {
+            background-color: #FFFFFF;
+            border-color: var(--citl-navy);
+            box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10);
+        }
+
+        /* Consistent RTL Icon Placement: Leading Icon Right, Action Icon Left */
+        .citl-input.has-icon-right {
+            padding-right: 40px;
+        }
+
+        .citl-input.has-icon-left {
+            padding-left: 42px;
+        }
+
+        .citl-field-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            font-size: 13.5px;
+            pointer-events: none;
+            transition: color 0.2s ease;
+        }
+
+        .citl-input-wrap:focus-within .citl-field-icon {
+            color: var(--citl-navy);
+        }
+
+        .citl-eye-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            z-index: 2;
+        }
+
+        .citl-eye-btn:hover {
+            color: var(--citl-navy);
+            background-color: rgba(42, 52, 117, 0.06);
+        }
+
+        .citl-forgot-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--citl-navy);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .citl-forgot-link:hover {
+            color: var(--citl-gold-hover);
+            text-decoration: underline;
+        }
+
+        /* Access Code Highlight Card */
+        .citl-access-box {
+            background: linear-gradient(135deg, rgba(243, 166, 40, 0.09), rgba(243, 166, 40, 0.03));
+            border: 1px solid rgba(243, 166, 40, 0.35);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .citl-access-box .citl-input {
+            background: #FFFFFF;
+            border-color: rgba(243, 166, 40, 0.45);
+        }
+
+        .citl-access-box .citl-input:focus {
+            border-color: var(--citl-gold-hover);
+            box-shadow: 0 0 0 4px rgba(243, 166, 40, 0.16);
+        }
+
+        /* Custom Dropdowns (Preserving all JS hooks) */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
 
         .custom-dropdown-display {
             width: 100%;
-            padding: 0.5rem 0.75rem;
-            border-width: 1px;
-            border-color: #d1d5db;
-            border-radius: 0.5rem;
-            background-color: white;
+            padding: 10.5px 14px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            background-color: #F8FAFC;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            min-height: 44px;
         }
-        .custom-dropdown-display:focus {
-            outline: 2px solid #2A3475;
-            outline-offset: 2px;
-        }    
 
-        /* ========================================= */
-        /* 🔥 أنيميشن شاشة التحميل الجديدة 🔥 */
-        /* ========================================= */
+        .custom-dropdown-display:hover:not(.cursor-not-allowed) {
+            border-color: var(--citl-navy);
+            background-color: #FFFFFF;
+        }
+
+        .custom-dropdown-display.bg-gray-100 {
+            background-color: #F1F5F9 !important;
+            border-color: #E2E8F0 !important;
+        }
+
+        .custom-dropdown-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            max-height: 210px;
+            overflow-y: auto;
+            z-index: 60;
+            box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.16);
+            padding: 4px;
+            margin: 0;
+            list-style: none;
+        }
+
+        .custom-dropdown-options .custom-option {
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: none !important;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .custom-dropdown-options .custom-option:hover {
+            background-color: #EEF2FF;
+            color: var(--citl-navy);
+        }
+
+        .faculty-search-wrap {
+            position: sticky;
+            top: 0;
+            background: #FFFFFF;
+            padding: 6px;
+            border-bottom: 1px solid #F1F5F9;
+            z-index: 5;
+        }
+
+        .faculty-search-input {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            background: #F8FAFC;
+        }
+
+        .faculty-search-input:focus {
+            border-color: var(--citl-navy);
+            background: #FFFFFF;
+        }
+
+        /* 2-Step Wizard Indicator */
+        .citl-stepper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 10px 12px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+        }
+
+        .citl-step-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: right;
+            transition: opacity 0.2s ease;
+        }
+
+        .citl-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            background: #E2E8F0;
+            color: #64748B;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+
+        .citl-step-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748B;
+            transition: color 0.25s ease;
+        }
+
+        .citl-step-btn.is-active .citl-step-num {
+            background: var(--citl-navy);
+            color: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(42, 52, 117, 0.14);
+        }
+
+        .citl-step-btn.is-active .citl-step-label {
+            color: var(--citl-navy);
+        }
+
+        .citl-step-btn.is-done .citl-step-num {
+            background: var(--citl-gold);
+            color: var(--citl-navy-deep);
+        }
+
+        .citl-step-btn.is-done .citl-step-label {
+            color: #334155;
+        }
+
+        .citl-step-connector {
+            width: 24px;
+            height: 2px;
+            background: #E2E8F0;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Primary & Secondary Buttons */
+        .citl-btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #2A3475 0%, #1C255E 100%);
+            color: #FFFFFF;
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 800;
+            padding: 13px 18px;
+            border: none;
+            border-radius: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 10px 24px -8px rgba(42, 52, 117, 0.55);
+            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .citl-btn-primary:hover {
+            filter: brightness(1.07);
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px -8px rgba(42, 52, 117, 0.62);
+        }
+
+        .citl-btn-primary:active {
+            transform: scale(0.985);
+        }
+
+        .citl-btn-gold {
+            width: 100%;
+            background: linear-gradient(135deg, #F5B038 0%, #E59617 100%);
+            color: #171E4B;
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 800;
+            padding: 13px 18px;
+            border: none;
+            border-radius: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 10px 24px -8px rgba(243, 166, 40, 0.55);
+            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .citl-btn-gold:hover {
+            filter: brightness(1.04);
+            transform: translateY(-1px);
+        }
+
+        .citl-btn-gold:active {
+            transform: scale(0.985);
+        }
+
+        .citl-btn-secondary {
+            background: #F1F5F9;
+            color: #334155;
+            border: 1px solid #E2E8F0;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-radius: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .citl-btn-secondary:hover {
+            background: #E2E8F0;
+            color: var(--citl-navy);
+        }
+
+        .citl-error-banner {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 11px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .citl-error-banner.hidden {
+            display: none;
+        }
+
+        .citl-step-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .citl-step-actions .citl-btn-gold {
+            flex: 1;
+        }
+
+        /* Footer */
+        .citl-portal-footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #64748B;
+            font-size: clamp(10.5px, 2.6vw, 12px);
+            font-weight: 600;
+            line-height: 1.75;
+        }
+
+        /* Scrollbar polish */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Keep original utility animations intact */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes logo-pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -90,65 +924,8 @@
         }
         .loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
         .loader-ring { animation: spin-slow 4s linear infinite; }
-        
-        .loader-ring { animation: spin-slow 4s linear infinite; }
-
-        /* ========================================= */
-/* خلفية قسم الدخول بالصورة + الإيفكت */
-/* ========================================= */
-.login-campus-panel {
-    position: relative;
-    overflow: hidden;
-    background-color: #2A3475;
-}
-
-.login-campus-image-layer {
-    position: absolute;
-    inset: 0;
-    background-image: url('CITL-Camp1.png');
-    background-size: cover;
-    background-position: 50% center;
-    background-repeat: no-repeat;
-    opacity: 0.30; /* زوّدها أو قللها حسب الوضوح */
-    z-index: 1;
-    pointer-events: none;
-}
-
-.login-campus-pattern-layer {
-    position: absolute;
-    inset: 0;
-    background:
-        repeating-linear-gradient(
-            -30deg,
-            transparent,
-            transparent 14px,
-            rgba(255, 255, 255, 0.055) 14px,
-            rgba(255, 255, 255, 0.055) 15px
-        );
-    z-index: 2;
-    pointer-events: none;
-}
-
-.login-campus-soft-light {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(135deg, rgba(42, 52, 117, 0.72), rgba(31, 38, 88, 0.82)),
-        radial-gradient(circle at top right, rgba(243, 166, 40, 0.10), transparent 35%);
-    z-index: 3;
-    pointer-events: none;
-}
-
-.login-campus-content {
-    position: relative;
-    z-index: 5;
-}
-
-.login-campus-decor {
-    z-index: 4;
-}
-
     </style>
+
 <link rel="stylesheet" href="/assets/interface-controls.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/loading-placeholders.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script defer src="/assets/interface-controls.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -214,297 +991,350 @@ html.citl-navigation-loading #global-loader::before,
 </style>
 <style>#installContainer[hidden]{display:none!important}</style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-[#f8fafc] p-3 md:p-6 relative overflow-x-hidden transition-opacity duration-500">
+<body class="transition-opacity duration-500">
 
-<div class="absolute inset-0 z-0">
-    <div class="absolute inset-0 bg-cover bg-[position:40%_center] bg-no-repeat opacity-50" style="background-image:url('/CITL-Camp2.jpg')"></div>
-    <div class="absolute inset-0 bg-[#2A3475]/90 backdrop-blur-sm"></div>
-    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-</div>
+<main class="citl-portal-shell">
 
-<div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden relative z-10 fade-in mx-auto h-auto min-h-[600px]">
+    <!-- ==================== Brand Showcase Panel ==================== -->
+    <section class="login-campus-panel">
+        <div class="login-campus-image-layer"></div>
+        <div class="login-campus-pattern-layer"></div>
+        <div class="login-campus-soft-light"></div>
 
-<div class="flex w-full md:w-1/2 login-campus-panel flex-col justify-center items-center text-white p-6 md:p-8 relative shrink-0 order-first">
-
-    <div class="login-campus-image-layer"></div>
-    <div class="login-campus-pattern-layer"></div>
-    <div class="login-campus-soft-light"></div>
-
-    
-<div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16 login-campus-decor"></div>
-<div class="absolute bottom-0 left-0 w-24 h-24 bg-gold opacity-10 rounded-full -ml-10 -mb-10 login-campus-decor"></div>
-
-<div class="login-campus-content w-full flex flex-col items-center">
-    <img src="CITL.png" alt="Logo" class="w-24 md:w-32 h-auto mb-4 md:mb-6 drop-shadow-lg bg-white p-0 rounded-lg">
-    
-<h2 class="font-bold mb-2 text-center whitespace-nowrap text-[clamp(18px,4vw,25px)]">
-    كلية النقل الدولي واللوجستيات
-</h2>
-
-<h3 class="text-[#F3A628] font-bold text-center whitespace-nowrap text-[clamp(12px,2.6vw,15px)] mb-3 tracking-[0.5px]">
-    College of International Transport & Logistics
-</h3>
-
-<div class="flex justify-center">
-    <div class="text-center">
-        <div class="flex items-center justify-center gap-3 mb-1">
-            <span class="w-8 h-px bg-[#F3A628]/80"></span>
-            <i class="fas fa-globe text-[#F3A628] text-xs"></i>
-            <span class="w-8 h-px bg-[#F3A628]/80"></span>
-        </div>
-        
-        <span class="text-white font-extrabold uppercase tracking-[2.4px] text-[clamp(16px,3.5vw,22px)]">
-            CITL Smart System
-        </span>
-    </div>
-</div>
-    
-
-<div class="mt-4 md:mt-8 space-y-2 md:space-y-3 w-full max-w-xs">
-
-    <!-- كارت الجداول الدراسية -->
-    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
-        <i class="fas fa-chalkboard-teacher text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
-
-        <div class="text-center md:text-right">
-            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة الجداول الدراسية</span>
-            <span class="text-gray-300 hidden md:block">عرض، متابعة، وتحديث الجداول الدراسية بسهولة</span>
-        </div>
-    </div>
-
-    <!-- كارت القاعات الدراسية -->
-    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
-        <i class="fas fa-door-open text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
-
-        <div class="text-center md:text-right">
-            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة القاعات الدراسية</span>
-            <span class="text-gray-300 hidden md:block">تنظيم حجوزات القاعة ومنع التعارض بين المواعيد</span>
-        </div>
-    </div>
-
-    <!-- إشعار تثبيت التطبيق: تحت آخر كارت -->
-    <p id="installContainer"
-       hidden
-       role="status"
-       aria-live="polite"
-       style="margin:6px auto 0;
-              text-align:center;
-              font-size:12px;
-              line-height:1.5;
-              color:rgba(255,255,255,0.90);
-              pointer-events:none;">
-        يمكنك تثبيت التطبيق من قائمة المتصفح
-    </p>
-
-</div>
-
-</div>
-</div>
-<div class="w-full md:w-1/2 p-4 md:p-12 flex flex-col justify-center bg-white relative overflow-y-auto custom-scrollbar">
-
-    <form id="loginForm" class="space-y-3 md:space-y-5 block transition-all duration-300">
-        
-        <div class="text-center md:text-right mb-4 md:mb-8">
-            <h1 class="text-xl md:text-2xl font-bold text-navy mb-1">تسجيل الدخول</h1>
-            <p class="text-gray-500 text-xs md:text-sm">يرجى إدخال بيانات حسابك للمتابعة</p>
-        </div>
-
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1.5">البريد الإلكتروني</label>
-            <div class="relative group">
-                <input type="email" id="email" required 
-                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 bg-gray-50 focus:bg-white text-sm" 
-                       placeholder="user@aastcitl.me">
-                <i class="fas fa-envelope absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1.5">كلمة المرور</label>
-            <div class="relative group">
-                <input type="password" id="password" required 
-                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 pr-12 bg-gray-50 focus:bg-white text-sm" 
-                       placeholder="••••••••">
-                    
-                <i class="fas fa-lock absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
-                
-                <i class="fas fa-eye absolute right-3 top-2.5 md:top-3.5 text-gray-400 cursor-pointer hover:text-[#2A3475] transition-colors text-xs md:text-base" 
-                   onclick="togglePassword('password', this)"></i>
-            </div>
-        </div>
-
-        <button type="button" data-forgot-password class="text-sm font-bold text-navy hover:underline">نسيت كلمة المرور؟</button>
-        <div id="login-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg flex items-center">
-            <i class="fas fa-exclamation-circle ml-2"></i> <span>بيانات الدخول غير صحيحة</span>
-        </div>
-
-        <button type="submit" id="submitBtn" class="w-full bg-navy text-white font-bold py-2.5 md:py-3.5 rounded-lg hover:bg-[#1f2658] transition-all shadow-md transform active:scale-[0.98] flex justify-center items-center group text-sm md:text-base">
-            <span>دخول للنظام</span>
-            <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform text-xs md:text-sm"></i>
-        </button>
-        
-        <p class="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4">
-            ليس لديك حساب؟ <a href="#" onclick="toggleForms()" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
-        </p>
-    </form>
-
-    <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
-        <div class="text-center md:text-right mb-4">
-            <h1 class="text-xl font-bold text-navy mb-1">إنشاء حساب جديد</h1>
-            <p class="text-gray-500 text-xs">انضم إلينا الآن</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل</label>
-                <input type="text" id="reg-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+        <div class="login-campus-content">
+            <div class="citl-top-pill">
+                <span class="dot"></span>
+                <span>الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</span>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm text-left dir-ltr">
-            </div>
+            <div class="citl-brand-hero">
+                <div class="citl-logo-frame">
+                    <img src="CITL.png" alt="شعار كلية النقل الدولي واللوجستيات">
+                </div>
 
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">القسم / الجهة</label>
-                <div class="relative custom-dropdown w-full">
-                    <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
-                        <span class="text-sm text-gray-700">اختر...</span>
-                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                <h2 class="citl-brand-title">كلية النقل الدولي واللوجستيات</h2>
+                <h3 class="citl-brand-subtitle">College of International Transport &amp; Logistics</h3>
+
+                <div class="citl-system-mark">
+                    <div class="citl-system-divider">
+                        <span></span>
+                        <i class="fas fa-globe text-gold text-xs"></i>
+                        <span></span>
                     </div>
-                    
-                    <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="">اختر...</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="dean">مكتب العميد</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="admin-followup">قسم المتابعة الإدارية</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="education-agency">وكالة شؤون التعليم</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="students-agency">وكالة شؤون الطلاب</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="assistants-office">مكتب المعيدين</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="computer-lab">معمل الحاسب</li>
-                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
-                    </ul>
+                    <span class="citl-system-name">CITL Smart System</span>
+                </div>
 
-                    <select id="reg-dept" class="hidden" required>
-                        <option value="">اختر...</option> 
-                        <option value="dean">مكتب العميد</option>
-                        <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
-                        <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
-                        <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
-                        <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
-                        <option value="admin-followup">قسم المتابعة الإدارية</option>
-                        <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
-                        <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
-                        <option value="education-agency">وكالة شؤون التعليم</option>
-                        <option value="students-agency">وكالة شؤون الطلاب</option>
-                        <option value="assistants-office">مكتب المعيدين</option>
-                        <option value="computer-lab">معمل الحاسب</option> 
-                        <option value="visitor">زائر خارجي</option>
-                    </select>
+                <div class="citl-bento-grid">
+                    <!-- كارت الجداول الدراسية -->
+                    <div class="citl-glass-card">
+                        <div class="citl-glass-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <span class="citl-glass-title">إدارة الجداول الدراسية</span>
+                        <span class="citl-glass-desc">عرض، متابعة، وتحديث الجداول الدراسية بسهولة ودقة.</span>
+                    </div>
+
+                    <!-- كارت القاعات الدراسية -->
+                    <div class="citl-glass-card">
+                        <div class="citl-glass-icon">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <span class="citl-glass-title">إدارة القاعات الدراسية</span>
+                        <span class="citl-glass-desc">تنظيم حجوزات القاعات ومنع التعارض بين المواعيد.</span>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">المسمى الوظيفي</label>
-                <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق تعليمي" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
-            </div>
-            <div class="md:col-span-1">
-    <label class="block text-xs font-bold text-gray-700 mb-1">نوع الحساب</label>
-    <div class="relative custom-dropdown w-full">
-        <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
-            <span id="reg-account-type-label" class="text-sm text-gray-700">اختر...</span>
-            <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+            <!-- إشعار تثبيت التطبيق -->
+            <p id="installContainer"
+               hidden
+               role="status"
+               aria-live="polite"
+               class="citl-install-pill">
+                يمكنك تثبيت التطبيق من قائمة المتصفح
+            </p>
         </div>
+    </section>
 
-        <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
-            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="">اختر...</li>
-            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="admin">إداري</li>
-            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
-        </ul>
+    <!-- ==================== Auth Workspace Panel ==================== -->
+    <section class="citl-auth-workspace">
+        <div class="citl-auth-card bg-white">
 
-        <select id="reg-account-type" class="hidden" required>
-            <option value="">اختر...</option>
-            <option value="admin">إداري</option>
-            <option value="faculty">عضو هيئة تدريس</option>
-        </select>
-    </div>
-</div>
-
-<div id="faculty-link-block" class="md:col-span-1">
-    <label class="block text-xs font-bold text-gray-700 mb-1">ربط الحساب بعضو هيئة تدريس</label>
-
-    <div class="relative custom-dropdown w-full">
-        <div id="faculty-link-display" class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center justify-between cursor-not-allowed transition-all shadow-sm">
-            <span id="reg-linked-instructor-label" class="text-sm text-gray-500">خاص بالتعليم فقط</span>
-            <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
-        </div>
-
-        <ul id="faculty-name-options" class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
-        </ul>
-
-        <select id="reg-linked-instructor" class="hidden">
-            <option value="">اختر اسمك الأكاديمي</option>
-        </select>
-    </div>
-</div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
-                <input type="email" id="reg-email" required 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
-                       placeholder="user@aastcitl.me"> 
+            <!-- شريط التبديل العلوي العصري -->
+            <div class="citl-mode-switcher" role="tablist" aria-label="بوابة الدخول والتسجيل">
+                <button type="button" id="tab-login" role="tab" aria-selected="true" class="citl-mode-tab is-active" onclick="switchAuthMode('login')">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>تسجيل الدخول</span>
+                </button>
+                <button type="button" id="tab-signup" role="tab" aria-selected="false" class="citl-mode-tab" onclick="switchAuthMode('signup')">
+                    <i class="fas fa-user-plus"></i>
+                    <span>إنشاء حساب جديد</span>
+                </button>
             </div>
-<div class="md:col-span-2 mb-3">
-    <button type="button" data-forgot-password class="text-xs font-bold text-navy hover:underline">لديك حساب ونسيت كلمة المرور؟</button>
-    <label class="block text-xs font-bold text-gray-700 mb-1">كود التسجيل الخاص بالكلية</label>
-    <div class="relative group">
-        <input type="text" id="reg-access-code" required 
-               placeholder="ادخل كود التفعيل" 
-               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm bg-orange-50/50">
-        <i class="fas fa-shield-alt absolute left-3 top-2.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs"></i>
-    </div>
-</div>
-            <div class="md:col-span-2 mb-4">
-                <label class="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
-                <div class="relative">
-                    <input type="password" id="reg-password" required minlength="6" 
-                           class="w-full px-3 py-2 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
-                           placeholder="••••••••">
-                    <i class="fas fa-eye absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#2A3475] z-10" 
-                       onclick="togglePassword('reg-password', this)"></i>
+
+            <!-- ==================== نموذج تسجيل الدخول ==================== -->
+            <form id="loginForm" class="space-y-4 block transition-all duration-300">
+                <div class="citl-form-header">
+                    <h1>مرحباً بك مجدداً</h1>
+                    <p>يرجى إدخال بيانات حسابك للوصول إلى النظام</p>
                 </div>
-            </div>
-        </div> 
-        <div id="signup-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg"></div>
 
-        <button type="submit" class="w-full bg-[#F3A628] text-[#2A3475] font-bold py-3 rounded-lg hover:bg-yellow-400 transition-all shadow-md">تسجيل اشتراك</button>
-        
-        <p class="text-center text-xs text-gray-600 mt-2">
-            لديك حساب بالفعل؟ <a href="#" onclick="toggleForms()" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
-        </p>
-    </form>
+                <div>
+                    <label for="email" class="citl-label">البريد الإلكتروني</label>
+                    <div class="citl-input-wrap">
+                        <input type="email" id="email" required
+                               class="citl-input has-icon-right"
+                               placeholder="user@aastcitl.me">
+                        <i class="fas fa-envelope citl-field-icon"></i>
+                    </div>
+                </div>
 
-<div class="mt-2 md:mt-8 border-t border-gray-100 pt-2 md:pt-4 w-full">
-        <div class="flex flex-col items-center justify-center text-gray-500 font-medium text-[clamp(10px,3vw,12px)] gap-1">
-            <span class="whitespace-nowrap">جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
-            
-            <span class="whitespace-nowrap">تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+                <div>
+                    <div class="citl-label-row">
+                        <label for="password" class="citl-label">كلمة المرور</label>
+                        <button type="button" data-forgot-password class="citl-forgot-link">نسيت كلمة المرور؟</button>
+                    </div>
+                    <div class="citl-input-wrap">
+                        <input type="password" id="password" required
+                               class="citl-input has-icon-right has-icon-left"
+                               placeholder="••••••••">
+                        <i class="fas fa-lock citl-field-icon"></i>
+                        <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
+                    </div>
+                </div>
+
+                <div id="login-error" class="citl-error-banner hidden">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>بيانات الدخول غير صحيحة</span>
+                </div>
+
+                <button type="submit" id="submitBtn" class="citl-btn-primary group">
+                    <span>دخول للنظام</span>
+                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform text-xs"></i>
+                </button>
+
+                <p class="text-center text-xs text-gray-500 pt-1">
+                    ليس لديك حساب؟
+                    <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
+                </p>
+            </form>
+
+            <!-- ==================== نموذج إنشاء حساب جديد ==================== -->
+            <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
+                <div class="citl-form-header" style="margin-bottom: 14px;">
+                    <h1>إنشاء حساب جديد</h1>
+                    <p>سجّل بياناتك الأكاديمية أو الإدارية للانضمام للنظام</p>
+                </div>
+
+                <!-- مؤشر الخطوتين -->
+                <div class="citl-stepper" aria-label="خطوات التسجيل">
+                    <button type="button" id="step-indicator-1" class="citl-step-btn is-active" onclick="goToSignupStep(1)">
+                        <span class="citl-step-num">1</span>
+                        <span class="citl-step-label">البيانات الأساسية</span>
+                    </button>
+                    <span class="citl-step-connector"></span>
+                    <button type="button" id="step-indicator-2" class="citl-step-btn" onclick="goToSignupStep(2)">
+                        <span class="citl-step-num">2</span>
+                        <span class="citl-step-label">الحساب والتفعيل</span>
+                    </button>
+                </div>
+
+                <!-- الخطوة 1: البيانات الشخصية والوظيفية -->
+                <div id="signup-step-1" class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="reg-name" class="citl-label">الاسم بالكامل</label>
+                            <input type="text" id="reg-name" required placeholder="الاسم ثلاثي أو رباعي" class="citl-input">
+                        </div>
+
+                        <div>
+                            <label for="reg-mobile" class="citl-label">رقم الموبايل</label>
+                            <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
+                                   class="citl-input text-left" dir="ltr">
+                        </div>
+
+                        <div>
+                            <label class="citl-label">القسم / الجهة</label>
+                            <div class="relative custom-dropdown w-full">
+                                <div class="custom-dropdown-display">
+                                    <span class="text-sm text-gray-700 truncate">اختر...</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                                </div>
+
+                                <ul class="custom-dropdown-options hidden custom-scrollbar">
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="">اختر...</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="dean">مكتب العميد</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="admin-followup">قسم المتابعة الإدارية</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="education-agency">وكالة شؤون التعليم</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="students-agency">وكالة شؤون الطلاب</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="assistants-office">مكتب المعيدين</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="computer-lab">معمل الحاسب</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
+                                </ul>
+
+                                <select id="reg-dept" class="hidden" required>
+                                    <option value="">اختر...</option>
+                                    <option value="dean">مكتب العميد</option>
+                                    <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
+                                    <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
+                                    <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
+                                    <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
+                                    <option value="admin-followup">قسم المتابعة الإدارية</option>
+                                    <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
+                                    <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
+                                    <option value="education-agency">وكالة شؤون التعليم</option>
+                                    <option value="students-agency">وكالة شؤون الطلاب</option>
+                                    <option value="assistants-office">مكتب المعيدين</option>
+                                    <option value="computer-lab">معمل الحاسب</option>
+                                    <option value="visitor">زائر خارجي</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="reg-position" class="citl-label">المسمى الوظيفي</label>
+                            <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق" class="citl-input">
+                        </div>
+
+                        <div class="md:col-span-1">
+                            <label class="citl-label">نوع الحساب</label>
+                            <div class="relative custom-dropdown w-full">
+                                <div class="custom-dropdown-display">
+                                    <span id="reg-account-type-label" class="text-sm text-gray-700 truncate">اختر...</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                                </div>
+
+                                <ul class="custom-dropdown-options hidden custom-scrollbar">
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="">اختر...</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="admin">إداري</li>
+                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
+                                </ul>
+
+                                <select id="reg-account-type" class="hidden" required>
+                                    <option value="">اختر...</option>
+                                    <option value="admin">إداري</option>
+                                    <option value="faculty">عضو هيئة تدريس</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="faculty-link-block" class="md:col-span-1">
+                            <label class="citl-label">ربط الحساب بعضو هيئة تدريس</label>
+                            <div class="relative custom-dropdown w-full">
+                                <div id="faculty-link-display" class="custom-dropdown-display bg-gray-100 cursor-not-allowed">
+                                    <span id="reg-linked-instructor-label" class="text-sm text-gray-500 truncate">خاص بالتعليم فقط</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
+                                </div>
+
+                                <div class="custom-dropdown-options hidden custom-scrollbar" style="padding: 0;">
+                                    <div class="faculty-search-wrap">
+                                        <input type="text" id="faculty-search-input" class="faculty-search-input" placeholder="ابحث عن الاسم الأكاديمي..." autocomplete="off">
+                                    </div>
+                                    <ul id="faculty-name-options" style="list-style: none; margin: 0; padding: 4px;">
+                                    </ul>
+                                </div>
+
+                                <select id="reg-linked-instructor" class="hidden">
+                                    <option value="">اختر اسمك الأكاديمي</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="signup-step-1-error" class="citl-error-banner hidden">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>يرجى استكمال جميع البيانات المطلوبة للمتابعة</span>
+                    </div>
+
+                    <button type="button" id="nextSignupStepBtn" class="citl-btn-primary" onclick="goToSignupStep(2)">
+                        <span>التالي: بيانات الحساب والتفعيل</span>
+                        <i class="fas fa-arrow-left text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- الخطوة 2: البريد الإلكتروني وكود التفعيل وكلمة المرور -->
+                <div id="signup-step-2" class="space-y-3 hidden">
+                    <div>
+                        <label for="reg-email" class="citl-label">البريد الإلكتروني</label>
+                        <div class="citl-input-wrap">
+                            <input type="email" id="reg-email" required
+                                   class="citl-input has-icon-right"
+                                   placeholder="user@aastcitl.me">
+                            <i class="fas fa-envelope citl-field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="citl-access-box">
+                        <label for="reg-access-code" class="citl-label" style="color: #92400E;">
+                            <i class="fas fa-shield-alt ml-1 text-[#F3A628]"></i>
+                            كود التسجيل الخاص بالكلية
+                        </label>
+                        <div class="citl-input-wrap">
+                            <input type="text" id="reg-access-code" required
+                                   placeholder="أدخل كود التفعيل المعتمد"
+                                   class="citl-input has-icon-right">
+                            <i class="fas fa-key citl-field-icon" style="color: #D97706;"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="reg-password" class="citl-label">كلمة المرور</label>
+                        <div class="citl-input-wrap">
+                            <input type="password" id="reg-password" required minlength="6"
+                                   class="citl-input has-icon-right has-icon-left"
+                                   placeholder="6 أحرف أو أرقام على الأقل">
+                            <i class="fas fa-lock citl-field-icon"></i>
+                            <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('reg-password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
+                        </div>
+                    </div>
+
+                    <div id="signup-error" class="citl-error-banner hidden"></div>
+
+                    <div class="citl-step-actions">
+                        <button type="button" class="citl-btn-secondary" onclick="goToSignupStep(1)">
+                            <i class="fas fa-arrow-right text-xs"></i>
+                            <span>السابق</span>
+                        </button>
+                        <button type="submit" class="citl-btn-gold">
+                            <span>تسجيل اشتراك</span>
+                            <i class="fas fa-check text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="text-center pt-1">
+                        <button type="button" data-forgot-password class="citl-forgot-link">لديك حساب ونسيت كلمة المرور؟</button>
+                    </div>
+                </div>
+
+                <p class="text-center text-xs text-gray-500 pt-1">
+                    لديك حساب بالفعل؟
+                    <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
+                </p>
+            </form>
         </div>
-    </div>
 
-</div>
+        <footer class="citl-portal-footer">
+            <div>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</div>
+            <div>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</div>
+        </footer>
+    </section>
+
+</main>
+
 <div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center  opacity-0">
     
-<div class="relative"><svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden"><defs><filter id="citl-loader-logo-alpha" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.2126 -0.7152 -0.0722 1 0"/><feComponentTransfer><feFuncA type="linear" slope="20" intercept="0"/></feComponentTransfer></filter></defs></svg><img width="192" height="192" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAACXBIWXMAAAsTAAALEwEAmpwYAAAHZmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4wLWMwMDEgNzkuYzAyMDRiMiwgMjAyMy8wMi8wOS0wNjoyNjoxNCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wMi0wNVQxMDoxODozNyswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Zjk1ZTA2YzEtZDY4NC00NjQyLWFlZDAtZTQ0NTQ4MjkwMDVhIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NzhlOWQ1MmQtMzg3Ni05MDRiLThhMDMtMTcxZDM0YTIxMzhkIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBzdEV2dDp3aGVuPSIyMDI1LTEyLTI4VDEwOjE2OjMzKzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjQuNSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjMxM2U3ZTRjLTkxNDktYWE0NC05ZTgzLTQ2NDBiZTMwMjM4YSIgc3RFdnQ6d2hlbj0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpmOTVlMDZjMS1kNjg0LTQ2NDItYWVkMC1lNDQ1NDgyOTAwNWEiIHN0RXZ0OndoZW49IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyNC41IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPHBob3Rvc2hvcDpEb2N1bWVudEFuY2VzdG9ycz4gPHJkZjpCYWc+IDxyZGY6bGk+ODdGMDE3MUQwQjU3OUQwMzdDMjRBQjNDQUI1RUI2Rjg8L3JkZjpsaT4gPHJkZjpsaT5hZG9iZTpkb2NpZDpwaG90b3Nob3A6OWUxYTAyMzgtMmMwOS01MzQwLTk1NTQtZmJlMmZjZWM1M2VjPC9yZGY6bGk+IDwvcmRmOkJhZz4gPC9waG90b3Nob3A6RG9jdW1lbnRBbmNlc3RvcnM+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+aSR9LwAAIthJREFUeJztnXecFdXduL/nTL1te2fZxrLA0hcQpKpEMUZexAaWRH8SfSUxiT81RNFoEk00iUaNEnuJFbsBFRFpSu8ubQtb2d53b5t2znn/WAQklHt3LrDAeT7Ahzt35sz33nnuzOkHUUqBw+kp+HQHwDmzQYyx0x0D5wyG34E4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYQjzdAZweNM3cuKWaEIrCPNCiuH+KPyspEP6hkYABAAOEMGKV7UmdmhOjQ5PsUsrcbiU3J+FURnSOCtTeEfzTo0t9fkMQwvPAr6u/mfDlLWNWaoZ6kmILBUU0Fyy9cXV5vkM2Dm7UNGvUiL7PPX31qYzkHBUIIVAUkRAqCOE9xCmWREkELAGWTlJsIYEBC1gUBVEQDm4TRRbux7HPOSrQgbmNUc8eQ+j7P6cRhBBC6Aef4IiXpwaeiebYggvEsQUXiGMLLhDHFueoQAid5jzwWcM5KhBjwNeYiQjnqECnvrh7tnKOCsQVihTnqECML5MWIc5RgTiR4hwViDFgjBfEIsAZIFB7R7CsvMWyIrw4MLcnIvRGgSyLrttYsWtPfffLdz/Y9vK/N1RUtXW/LC5tWrGq1PZJeEE+MvSW1vjWVv+OXXW52QlV1W2abu7e2xgT7RiSn1pb16nrVkK8u7auIyXJ7fGo1fvbOzqCANDY5K1v6MofmCLLwgnT55wkTptAhFDdIIU7a/fXdCQlecrKWwpGpC9bUWwResGk3D5pMQ2NXQBgWVRVREkW3v9ox8C8JI9H7erSgprV2ORd+MH288dlffjpjjEFGRVVbUPyU5ISPRVVrZIkZGXEhRBC732IYXSCuyNGrJdEf6oFopS1dwSaW/wrvym9YFLumvUVE8fn7NpdP2hAcnOLf9x5WQkJHkWRPB45OycFADIzYm++aYJusBuvH4cRAMCkif137anbX9sxelRfXbMkSfh6ZcmwoWlfLisakp+q6WZebhKlDOOT9A0jzAwwu5h5qCsgQiKIzh6nyCw/MHIgKQAGgiF4ThQFpb1DoVMqUHlla3FJU01tR25Ooijg4pKm2Bhnbb3v6qvHxbgP7kWB+MFoE4lGA36glgMjB8agO0BwMOJISnBfNDm3e9egCQ4Jln5dXN/QVVrWfP7YrHUbKwSMP/9yz+U/zvf5dEUR4+KcoiAc8Zjr7o3Vg0wQolqHczwMn6SQQ18d9VVZ5QsB9eDLZICwNOgXWD3QkRkjtr+R/f5FP2Vw3J8Aaw1EqaIZ/hkjzMkViDFACHTd+m5n3e69DRl9Y5tbfDMuH1JW0X7Zj0fEJzhqanwe2RejbzLrdjNvBe0qZYE6ZvqYFQCqA7WAse5u5IBEwDISHSC5kJKIo/tjT7YSnQdxwwYNTNtd0jF1amxqauzUC/KaW3z7a9r9AfP5V9ZdfOGA1FRPXKyrT1r0DwI78Dd8qNblOB8GTjq8Qytp2WrtexsEIezHImOAsDzoF8iZemhjtFHd8TqhDB+3tlzA5IRPulPAyRLI69W/XVfWPzfR0Enl/rbOTi0m2tHRGRwzpl9Soicp0QN6Dan8OrvpG6t9r7+zkhENABASAAmAMCD8g4vBGDATqMFMLwQpoyWkYXX3/siZkhafn5E6BtKngSc1ZnCqNwCxsS4BQ7/shOysuLUbKq6ZOaK9PRAbe9hThgHrYSYIYWYcuc0K9CSlg7FY/h9EYvkkwcLoBAL1Ek6KQIGA8cniwt17GkYMT//PZ1tv+dnYZStK+qQnDR6c7BLbrPL3rIoPSNsOprUBQghLgCWET/TU76b7K8WHrj3T2vT9K7Tqr9COp7AnR8y43JN5+chhgy2Am24ct3V7ZUpy1HMvrR04ICkzI27o4NRjpszpEREWqLMz6Paoqir99LrRS5YVfbOmbMrEXIOIs64aAYF91q4nA1VfUH8NIIwEBUnuE6d4QrAIWEQAwBjtLNG/e9TYs0BIGCPlXu/InD7h/BzDBL9fH5KfqunWcy+vvfTiQdmZcbw/UKSIcEViaVnLh5/swBghhH50YV5cXPSYUX2TpXJ9/W/8i3+k7XmBac1IciPRCSjSlTcIgaAgKQoYJQ2rg2tuC35xMSl7SxG0K64YbhHo6Ah0dmolpc0Hjzj9OYgzn0gKZBEaH+8KBMwNm6oAQJaES6ZEGZvvDXx5qbnvDaAmkjynYjgVwiA6keiiHUXaul8Hv7gEKt7PzYnLH5I1OD8lNSUKDrTG945y8BlOxB5hgaCxdkPFrt0NI4f30UwMwKx9bxuFf6X+/Uh0ISm0LE5kERQkKLSzKLhmrlj+flTB76f/ePhpCOOsJjICNbf4Gpu8tbWd+QNT3DHxo/O6tOXXWnXLkSAjKSoip+g5gooERupX+pdukgbeLg+9GwTlNId0FhEBgRoaulavLWtq8o0cmdk3IzETlgUW/44GGyOTR44MCEQXMGIU/o00rnFMeBqk/r25KeMMwq5AhLKly4v75yaOKshOjFeja5/0b30CsNib7PkeJCA5ijZvNJfPoKn3WaBSRjDPSdvDViZ6f03Hm+9sjo1xdPlIbl/sKrzNt/kxEFTAcqTiizyiy/C3J5TdddPQzykIFuUt+bbooUBFxY0AsGZd+eiCDMUZdenUWG35bK18EZKjAfXGPkY/AEsUqTcOX3nvlE8lgZjcIRv05GIzxjwe9YulewUB79zbPH64oC+9xmpaj+TTnV8OGQbIb6o/GbjloYveVwTLJL2lX9QZR08E+m5n3aLPd8XFOVSX87ors5Utc8ymbZEpqDMLiMYsHzO93//xMfOwl5YfiHaw84NN/Lo6KWvPgxd+oIimSfh9qCf05Jfncslut9LSpl96YYa+eo7VuBFJUbbqdanBiI6QgBzJyJONnH2wIxk5U5ASD4IKAMwKgNZMgw0s2Mj8tdRbAXoLYxQJCmDJTnnKb6iTsvfcSz559JuZhOLe0L59ZhG2QPvKWj5dvHPcedmDBqVD4f1W9Wcgx/TQHkYZCSLAKLq/1OdHOHGckFCAHCknPs6/n7Rso82brPqVrKuUUYJER4/bRvyGOnXg1urOxJc2T3VI/9XSzjkuYQu0cUvVlIm5VfXWJN8n/uJXQIo+8TFHgTHLj0SXmPE/Ys4sIWUiEsMo9iNXX9HVFzJnSJaPNm20Kj+2apexYBOSXD3QyCXrhTX9v9o3TBKscI/lhCfQ+k2ViiJW1Xr/ZwLSVs0HLIc/RBh1Z2LE9Mukwb8WEs8L8/AfpiW6hbSpQtpUqavUKn3DLHuH6W1IdIcelUvWt9XmPLR8VlvQ1Rs6+J1xhJGJLitvaW72WRabPi1X2PV7K9jWg5ZRZnYid6Yy6RX1grds2nM4OKq/POphx7QlUr/rgZpAtFCOcsnauqqB9y+7rj3o5Pb0jFAFYgzWrK+glF195Qhc/Y6+f0XYdc2MMtMrZl3puGSxmDkj7EhDAEfnKeMXqBe8iTw5zOg6fs7MJeuryoc+tPxan6EqIn949ZBQBdqyrXrqBf1TUqIDbTV0z1PdhaMwYARIUB56jzrpVeRIDjvMcBD6XOyY9pmUewMzfcCOagaTwPdV6fA/rbhaJ6LMsz42CFWg1vbAkq/2FozMcNW+ZHVVhvfwohYwSxn7hDzi/p7EGD5ISVDGL1DGPg5IAKr/8E0mMn9LzHVPb55tEiThyFQpnbOEJNDW7TX797ePGJFldlUb+xYiyRXGGRhh1JRH/1Xsf3PPQuwxUt4cdcqbIMcwEjxQV8QoM33S0Luh4B+EgsDtsc2JBaKU7d7boKqS6nS7mt4mgcZwBkAxIJoy6k9S3s02guw5QuoFjqkfYnc2WH5gFEhAHn4fHnI/YhYG/uSKACcQyOfXa2o7LJNYBPqnm1rRe0hwhJ46M71i/5ukQXPtBWkLHDvUcdFC5MlmZqdc8LA8bB4ARKoxhHOCe0lLi//ZF9aMHZNx8dQhSvO7fm9V6G1ezAoKCWOUUY/YDtIuyJOjTn6VNG+W8m453bGcbZxAoKQk98zpQxVFRBjMikUo9HpeRpDoVMY+YWfQeATBsUNx7NDTHcVZyAkeYZu2VO8taQzqLFpuMJu3ht6bmFl+Ke8mHDfMdoScXs0JBKqqbh93XtaEcRlW9Uqmd4Ta0kRN7M6WBt9pPz5OL+eYAtXWdS75ak9uTsKevQ2BIKP1y0JvYGJEk/JuRkook/RwzmyOKZDDIfn9xuo1+2JiXG6nYbUXoRArD6mFnWliv+sjFiOnF3PMTHRcrPPqmSMAIBg0aesu5q8DFJJAjGhi6gVITYxUiJzezNHvQBWVrXuKGg2DAIDDIZGWrczyh/YIY4Cw0PeyiAbJ6b0c4w6E0MIPt7ld8tgxWZMm9mO+ilDToxZ29RWSJ0UqPk4v5+h3oOzMuLt+dUFG31inQwIA5q8LdbAONXF03hk0PINjk2NqUbqvuaNTE0QRA6P+2hCrEBkjOL4gcuFxejvHFKixyTt6ZF+f3wLwM60p1AZUJAhxvML3HOKYAvXLSdiwqXJIfjILtjHLF1IOmlEkqMjVN5IBcno3x7yvDBqQPGhAMgDQ9i4gRmhjrxiITjgtUwFxThPHvAN5vbrXqwMAIxpQK7Q7EEPdM/FyzhmOLpBhkPc+2v7Rf77zBRlGLIxxg0g4FZPYcXoNRxdI00xCKUJIN8Ic+IUQX0zynOLoeaCoKDU9LcY0SXw0oi3hpMcIUN7Z7xzi6HcgxhilrKMzuGFzLYgyICGkhxhCjFr/NQqCczZzdIH8AUMUcWpK1LpN+xtbLFFWQ8sGISA6szfvP+fM4uiPMFEUAkHTNEhcrCKpHsAKQPDEiSEERGN6e4Rj5PRijn4HUhVxQP8kRRFmXzksIS2dCJ7QhjEgRnTmLYtsiJzezLHbwsqam5p9JWVNgFXsTA05a8xI63eRCo7T+zmmQJKIu7xaZ2cQAJAzlYU2kAphkbbvjFh0nF7PMQWaMik3NtaZPzAFAJCzT6h1iVhiXeUsWB+p+Di9nKMLVFPb8eWyIrdL3ry1GgBwdF6o8xAikQYbSd2qyEXI6dUcXSBZFrMz4wb0T0pMcOk6wYkFSIkBRkNKEiGr5stIxsjpxRyjJtqj7iisDQSMqCh1QF6K4s5CznTWWRzKwEIkqKRpLfPv5/06zgWOdQcSrp45/KorhgeDptcbBBCE2CGMhjYJHBKY1mqWvhHJMDm9laMLhDGKiXaUV7QOH9anqKSJAYh9p4XeSooEh1n2LtOaIhcnp5dyvK7yfdKim5q8LS0+AMCJY7GaGOqsKFhkgVpj19MRCZHTmzmeQDnZ8bGxzqgo1TQs5EjBCWOYFdLspwCARJe1703aVhiJIDm9l+MJVFbeMrqg7/ChactXlQKAmDkdQl8JAGGwAvqm3/aStlWrfKG+ad7B2ixKGV8oLCIcT6Caus6S0uaU5ChNM9s6dDHjcuzpBzTkxQBEJ2naaGx7KAJh2sOqeF/fcKe5d4Gx5YGDG/miuxHheAINGpBcXNoEAIGg2dbmBcEpZl/LSBjdfZDsMUteM4tetBumDcw9C7R1vwLASIkz9v7L2PYHAECYr80TGY4nUFKiOyM99qFHlhQVN6YmRwGA1P9n2JEKNPTpKRESFGPrA9a+t2yHGj6MGlsfNLY+gLAIWARASHSbu5+mex8HQT0DFsY7EzjBcMHx47JSUjwx0Q6XSwYA5EgWs68xdj+F5JDXWEECYKZvuodR41ROUcj0dn3DnVbVf5DsOdQOgxCILuu7v1qJAQI5jPHlDexy4l9hTlZ8XOyheQ6l/DuwOzOMnBAAIBGQYGyaZ2yZH96BPYU0rg1+Nd2qXoTkqCNb8RC2QElufubqAUs1orCzKyOE8an+OGEv94QcifLQu7QN/x+FtbIuEkB0GHv/Rdt3y2P+gmMGh3veUKGGuWeBsfMfQLVjTSjLAFOkzBn1tWZK73w3wSnrZ4dEooAbm71vLdzCIlfAZMAQoMum5cfHHX2y1J6sWCj2u1Go/IQ0fBvmeisISVFW4xry1QxpwM+lQbcjOaYHZz8OpH6V8d2jpHkTEp1w3PmsKcMmgV+MW0IYWlg4wSVrZ4FDoogbG73PPr8mgmkyANMk/fslxp+XefST9iRVLCqj/xL8ajoQDXB4KSDRBSRoFD5GKj8WB8wRc2ZFRCPSssXc+y+yfwlQM8SZrAnDQOGX477UTPk/e8e45FDrSHszGKPu3GoE0XWLkGN2xOjhasU4drAy8kFt410Iu8JeshQJSIqivmp9831m0Qti1pVC358IsUPDdREAWLCJNK61yheSxrXMCiDRBWIY42IJxQjTuyYuNoi4bN8whS8ZdgyO0wra8+WuxbybpdatZukbYZTIDkeQkSCzQL2x8wm093kcPUBIGIVTJuKYwciRiCTP0b0kOjM6qK+KNm8mTetoWyEL1DFASFDDXr8MAAAsiiWB3Dfl4zpv3J6mPnzpp3CxtV66MuYx6qsiDd/2fM1vLCEsAaO0fRdp3QYlryIpCimxSI1HahJSYgErgAAYYYYP9BaqNYPezvR2RoIIYcAKiC472ReMmCRYH+8aV9GeKPLFe8LHlkAgutSJLweXX8U6doPo6fnK3wiDoKDu3mrUYIE65t/PGAVGv08TAUIIMGABEAYsIByBSWQETCVMXt0y9dWtF0oCEVBoXS45h2FPIADkSFInv66tnE29FSgiy2IgDAgDSCe7WCQJhDH07PrLFu4cr4oGXzG+Z0SgOh9H9VMveg9H5YLpCztDfZoQke7V1YeWz3q3cIJD4vb0nMi0B2FPjuOi93BCATM7I5LgyYRh4g0IWQ+uuHllWb5L1hDv2GGDiDUoInemetF7YsYMZnSFOn7j1MMsZvrk3Gt9o94rbst0SmdD3c/pJZIt0kiJVye/Lg+7J/SV208pVgCQqIx6RBj7guhKkVGQ33nsE+kuDQjJIx5QpryB3Fm96FZELWZ24YRRjqkfSfm/BABGdManUosEJ6VPjJg+zXHpEnngrcAssPwn4xQhw5jpBUGVRzzguHgRThxz+FunLaizCLvF+GOBlHj5vL8LGdONXf+g9d8whJHoOLVlNMasAIAgZl4hD70bxw45hac+hzhZAnUjpEx2JE+0qhebpa+RxnVALSQ6Ql32sMcwwqwAEhQxfZqU93Mh7aKj7YTQGVLj0Ms5uQIBACAsZs4QM2eQuuVWxftW7ddMbwOEkaCEs/58CDCLER0YRWqClDVTzJ4lpPBFg046J1+g7xHSpgppUyVvBalbQeqW09YdTGtkjCIsApYAhLAztYwBECAmYxZCGDmShfgCIe1HQtqF2H30zisH6T4VzwTZ59QJ1A32ZOMBc6QBc1igjjRvpm07SMs21rWPGZ3MCn4/8rW75Qsd+D9A97VmwIB9P+s5EpCgIjkOReUKCQU4foSQMAY5U0MMg1LmDxiBoCmE2QfUH9B1/b9a7JnFzC6gStiZPEYBS0eUVSllfr9BKMO9o5io6Wbk+wPZBznTxMwZkDkDAJjWxPx1NFjPvJUs2MD0DmZ5wQoANRm1ANCBu5ToRJIHyTHImYrcmdiZipxpPVtb0+2Sr71qhGkShBDr7heNEGMMuhU49pUzDGv40D5HfhZXupR/B8Ji+AIxwAKSYw/fFhPj+H8/GwustzQLWRbt2zf2WO8e+NY4nJ7Bx0ZxbMEF4tiCC3RiWls76+qaT3cUvZSTKNCnn6z862Ov9+zYZ599797f/fPwLYzB7f/753ff7cnsi9u3FxftPbTwdGVl3apVWwGgoaH1ypl379ldfvzDX3tt0fz7FvTgvOcCJ1GgwsLS5cs39ezY7Ky0gYOyD9+CEAwZ0q9Pn6QepLZ+feFzz3148OWbb37+6ScrAcDhUEaPzo+OOUFvfGIR0wyhsz21zD3Paiuu0b6+0tj2B7BCWBziCBijHXuBWrSz2Nj2x3CPNgr/rq2Ypa26QVt1Q3D5VaTh26OcwfJHdtKmk1iMl2XJ4VAAIBjUFUVqbm5vbGgbOChLliUAqK1tbmxszc/PUVU5ENAURa6qqmeM9euXDgA/ufxAJXIgoGGMystrU1MT7vjVbABgjAWDuqoqxcWViiLn5BwoVNfVNXd0+AYMyNR1w+FQ0GFF8R3biz/77Jt5827qk57k9foXvru0+yzR0e75988BAMsilFJKWXFRZWpaQlJSXPeBpaXVqqpIktg9ZJgxVvhdaVSUKys7DR1R1GdUWzcXqCkNnYcExdj9jLb6p+oFb4cyLemhNCyfvul3jqkfIiUeJ58f7hdO6lcKSeNxwigABowgT85R9qldZlV9qk5+PdzEj8WpqAf629/+vW3rXo/HVVJSmZ6e8t77jy1duv7JJ992OtQx5w1+8MFb777rH/UNLcSiZWU1N/70svnzb3n2mfdK91U//fRvf3vPU6Wl1YSQeb+7edGi1ZMnF8yceeHsWffFxUW1tnaWlFT+dt5NP//5zLfe+uLPj7ySnp6UkBAT1Iy3337E5TowMjUY1MrK9quq/OJLH//xj7cvXvyN1xdoaGhtbm53uRzXXD3v+Rfmt7V23XvvP/tmpJSX1TQ1tT//wv3jxw+7795nFi1anZeX2dLSMWRIP0rZL3/xaG1ts2VZf3p47ujR+Yd/RtK4hrYVOqev7W6fUcf/0yj8GyNBUvc1aC1WzVJ51MNIVI2dTzC9Tex7uZh9NQCQpvXWvreY2SUkjZcG3kYqP6ade429z0rZ14DZBQBW5UfAqLV/CVLj5WHzkJrI/DXGrifA0nDyeCR5xMwrDgUhyGLGdBw//FBUtV8Bo0L6pUBNs+Q1Mf1SUv0Zbd1BapcCAxAkIfUisAJm2dtS3i2kdhn115C65fKI+UhNMnY+zoJNYvqlYr/rjnNxT0UmuqmxLRjUn39h/rsLH9u+vaiqsn7Nt9sFjJ977r67774RAKqrG5IS4957/7Fnnp33rwXvV1fV67rR2tIJADW1jbm5fT//4plLLhlXVVXv9wcBoLi4cvLkgo8/efz6Gy5b9J9vNE1//O9v3Hnn9Ys/e2r0mMFl+6opPVS5tb+60bLIXx791eJF39TVNb/y8qf33PNTl8uxfXuRIAgN9S2WRUzL2rWr7Lbbrlzy5bPZ2Wlff72hpKTq7beXvPraH95865G+fZNN0yKErFi+6YorLnj7nT+PGjXoiM9IGlbjmMGHWvcEhzzyISTHWJWfGEUvCKlTgOramtuF+AJ56N1m+UKr4gMWbDS2PCBmXyMP+51V9q5VvRjHj0Rqoph0PvPXWiVvAIBZ9JJVtUjKu4kFGozCvwKj+oY7sbOPmPtTs+hFq+LDHwSBBHPfG2bxK2bR81blxwBA6r8h9asAAKhhlr7BGEHRA5EzFUX1t2q+JI1rAYCRgFn2DjBq1Swxi14UUiYDY9ra23FMvjzst1bVJ2bp68e5uKdCIMZYwaiBbrczOTk+Li66q8s3//45Of3Sr7jirpde/IQQKgh42qXjnU518uRRcXHR1dUNsiyJogAAGONhw/qrqowQEgUBYwwM3G7H2HFDJEkckJcpSkJ7W5dhmD++bIKqKlfMmOJ2O+Gw2tHNW/ZERblnz57WLzf9F3MfNS0yd+41AwZkbt9WLAhYlESEECE0Kyu1oGCgJIlZWWkY4fLy2qys1LFjh7jdjslTCnTdkCRxwb/ue+ONz66bPb+wsPTID0kMdIynlZR3izTwf1mgnumt4EimgXocnWeWvYuUeGXii0iOob5qEBQWqMexg5GSgJPGApZAdAAAEh3ykF8LKVPE/j9jwWbasQeoKQ29R0geLw+964jlaREgFmykvirqrTyw2oSogqB2v4lEJxJdOLo/cqZiTw5gCbDy/Vuu7hTEnFnSoLlMa2H+GuzqQ/11ODrPKnv3OBf3JApECLUsAgCWRQzDAgBCiGVZlkWqquofffSOJ5+8+9FHX62tbVIdypdL1vr92sYNhe3tXel9kw3TPHisRQ6M9+vOqQCAaVqGYQKAaZqmYUbHeCRJXLlisxbUP/pohaYZ6LAWrlUrt2RlpQLA3LnXfP75t9fNniZJ4oiRA9evL9Q0w7IIY4wxZppmd07ZNE3TsjIz06qrG3fsKPZ6A8uWbUQYa5qekBCzYuULyclx/3jiyPmycPxI6q04fIu5+2kWbEKC2j1yl5k+QAJt30lbtmMlXup3AwvWGVvmG3sX0I69IHkAIaAmMAqHz8eN5QO9XxgBQWamF4QDQ9+RFHVExxjGiJz/K2XUn5Qxj0mDfgkAQMmBfQ7syYCaABQAgNEDU2wdGlGOkOQEAGZ0ADDStou2bkdyrDRgznGu8knMA8XEuLtzowkJMQ6nCgAYo7S0RLfH9fln3y5evDo2NmrGjCnJyXGigMvKambN+l1Fee2tt87MykpTVSUxMQYAkpLiPJ4Dv4+k5Di32wkI0vokdufEXW5nfHyM06k+8PufP/Lwy2+99YXL7XC5HAdvQIyxLq//sp9MBIBJk0bedttV1866BAAKCgZ88fm3XV2+9PQkURQVRU5JSezOF8fFRzsc6qBBWddc86Mbr38gKztN0/T8/BxNM+bPXyDLotfrv+OO2Ud8WKHPJeauJ63iV8S8mwFhs+Q1s+Q1MW8OMNI9oRtyZwIweeDtIDqt8oXM6CANa4Ca6sSXACBYvRgYBUBAAtA9iSCzDvzLvr/eVhDHDmF6O23ZimPzzYqPDuxzEEaY+YP+n0hykfZdAEA7i5h/PyABGO3eB0lO5qsGANqyjQXqAAkH17vF0XmAZWngrUjyWBUfUl/lca7ySWwLMwyLUqKqiq4bAEhRpIMFKIxRSUmVFtSHDc8DgOmX/2bWrGnjJwwnhPTvnwEAhmEyyhRV1jRdEARJEgHg4P8DAU1VZYyxZRHLslRVWb16qygK6X2Sd+8uf/jhl1Z/87IsH/htBALawUJZIKA5nerB7YoiG4apKDJjzDDM7jLjwWgBoLioUlbkjIwU07S6S4u7d5f36ZOYlnaUFlzaVqhvmoewCACMaMp5j+P4EfrGu4SUSWLmTAAwdz5h1S3HjhQarFPOewIkt772duzJAUFl/v04eYI8+NfayhsAi9Kg263SfysTXtC/nSMN/jWOG07qllsVHygTnif1K43CvyM1iRlt2JmmTHj+YADa6pukAbcKKRMPheQt19fcjtRYJEXTYIM68SVmdGgrZkn9bxYyLtfX3IYcyUh0MtOnXviOsfVBFNWvexY5c/cz1v7PsTONBmrlUY8IP+gK/AN6RWPqJRfPnTV72pw5V/Q4hQfuX7By5ZaRBQM3bdw1a/a07rz5aYBR2r4bGMFxQ7oz1Mz0ISwdLMwzXzUNNglxQw9sMb2kYw/29ENqAjM6kRwNRKOBOuzsw6iBJA8zu5DgBCwCNRjRARDZ/7mYMR2waO5ZQH1VyrinDp3c7EKC44iMEVh+0lEkxAwChABLgESmNQE1kbMPMzpZ1z4cOxgYA1EF0w9Y/D7PBMxfQwP1QtyQ48+01CsE2rhhZ2paYkZGip1Etm0rqiivzRuQOXRobqQC63VQS183lxEDOVNo63fK2MdPe1/vXiEQJwwYJQ3fMtMrJJ+PlPjTHQ0XiGMP3hrPsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWzBBeLYggvEsQUXiGMLLhDHFlwgji24QBxbcIE4tuACcWwh8vmBOHbgdyCOLf4PKAC8r274nvIAAAAASUVORK5CYII=" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
+<div class="relative"><svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden"><defs><filter id="citl-loader-logo-alpha" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.2126 -0.7152 -0.0722 1 0"/><feComponentTransfer><feFuncA type="linear" slope="20" intercept="0"/></feComponentTransfer></filter></defs></svg><img width="192" height="192" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAACXBIWXMAAAsTAAALEwEAmpwYAAAHZmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4wLWMwMDEgNzkuYzAyMDRiMiwgMjAyMy8wMi8wOS0wNjoyNjoxNCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wMi0wNVQxMDoxODozNyswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Zjk1ZTA2YzEtZDY4NC00NjQyLWFlZDAtZTQ0NTQ4MjkwMDVhIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NzhlOWQ1MmQtMzg3Ni05MDRiLThhMDMtMTcxZDM0YTIxMzhkIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBzdEV2dDp3aGVuPSIyMDI1LTEyLTI4VDEwOjE2OjMzKzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjQuNSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjMxM2U3ZTRjLTkxNDktYWE0NC05ZTgzLTQ2NDBiZTMwMjM4YSIgc3RFdnQ6d2hlbj0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpmOTVlMDZjMS1kNjg0LTQ2NDItYWVkMC1lNDQ1NDgyOTAwNWEiIHN0RXZ0OndoZW49IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyNC41IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPHBob3Rvc2hvcDpEb2N1bWVudEFuY2VzdG9ycz4gPHJkZjpCYWc+IDxyZGY6bGk+ODdGMDE3MUQwQjU3OUQwMzdDMjRBQjNDQUI1RUI2Rjg8L3JkZjpsaT4gPHJkZjpsaT5hZG9iZTpkb2NpZDpwaG90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" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
 </div>
+
     <div id="success-modal" class="fixed inset-0 z-[100] hidden">
         <div class="absolute inset-0 bg-[#2A3475]/80 backdrop-blur-sm transition-opacity"></div>
-        
+
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -512,7 +1342,7 @@ html.citl-navigation-loading #global-loader::before,
                         <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-green-100 mb-4 animate-bounce">
                             <i class="fas fa-check text-2xl text-green-600"></i>
                         </div>
-                        
+
                         <div class="mt-3 text-center w-full">
                             <h3 class="text-xl font-bold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
                             <div class="mt-2">
@@ -521,7 +1351,7 @@ html.citl-navigation-loading #global-loader::before,
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
                     <button type="button" onclick="closeSuccessModal()" class="inline-flex w-full justify-center rounded-lg bg-[#2A3475] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1f2658] sm:w-auto transition-all">
                         تسجيل الدخول الآن
@@ -531,6 +1361,7 @@ html.citl-navigation-loading #global-loader::before,
             </div>
         </div>
     </div>
+
 <script id="citl-loader-root">
 /* Geometry only: the existing loader lifecycle remains the authority. */
 (function(w,d){
@@ -608,7 +1439,7 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         let box=document.getElementById('citl-login-status');
         if(!box){
             box=document.createElement('div');box.id='citl-login-status';box.setAttribute('role','status');
-            box.style.cssText='margin:0 0 12px;padding:10px 12px;background:#f4f6fb;border:1px solid #dce2ef;border-radius:10px;color:#2a3475;font-size:12px;line-height:1.8';
+            box.style.cssText='margin:0 0 14px;padding:10px 12px;background:#f4f6fb;border:1px solid #dce2ef;border-radius:12px;color:#2a3475;font-size:12px;line-height:1.8';
             const label=document.createElement('span');box.append(label);
             const button=document.createElement('button');button.id='citl-login-retry';button.type='button';button.textContent='إعادة المحاولة';button.hidden=true;
             button.style.cssText='margin-inline-start:8px;padding:5px 10px;border:1px solid #2a3475;border-radius:7px;cursor:pointer';button.onclick=()=>location.reload();box.append(button);
@@ -633,10 +1464,10 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
 
         const supabaseFactory = window.supabase;
-        
+
         // 🔥 الإنشاء مع توحيد مفتاح التخزين (storageKey) 🔥
         const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
-            
+
             auth: {
                 storageKey: 'sb-main-auth', // يجب أن يطابق ملف schedules.html
                 persistSession: true,
@@ -666,7 +1497,7 @@ async function autoRedirect() {
         if (redirect) {
             // Keep the login form hidden throughout navigation; watchdog remains active.
             if(!window.CITLLoginEntry.redirecting())return;
-            window.location.href = '/dashboard/'; 
+            window.location.href = '/dashboard/';
         } else {
             window.CITLLoginEntry.finish();
         }
@@ -690,7 +1521,7 @@ autoRedirect();
         window.showLoader = function(text = "جاري المعالجة...") {
             document.documentElement.classList.add('citl-login-submitting');
             const loader=document.getElementById('global-loader');
-            
+
             document.getElementById('loader-text').textContent=text;
             loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');window.CITLLoginViewport();window.CITLLoginProgress.start();
         };
@@ -701,23 +1532,104 @@ autoRedirect();
             loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
         };
 
-        // التبديل بين الفورم
+        // التبديل بين الفورم مع مزامنة التبويب العلوي
+        function syncAuthTabs() {
+            const loginHidden = document.getElementById('loginForm').classList.contains('hidden');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+            if (tabLogin && tabSignup) {
+                tabLogin.classList.toggle('is-active', !loginHidden);
+                tabLogin.setAttribute('aria-selected', String(!loginHidden));
+                tabSignup.classList.toggle('is-active', loginHidden);
+                tabSignup.setAttribute('aria-selected', String(loginHidden));
+            }
+        }
+
+        function switchAuthMode(mode) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            if (mode === 'signup') {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+            } else {
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            }
+            syncAuthTabs();
+        }
+
         function toggleForms() {
             document.getElementById('loginForm').classList.toggle('hidden');
             document.getElementById('signupForm').classList.toggle('hidden');
+            syncAuthTabs();
         }
+
+        // التنقل بين خطوتي التسجيل (بدون المساس بـ registration-secure.js)
+        function goToSignupStep(step) {
+            const step1 = document.getElementById('signup-step-1');
+            const step2 = document.getElementById('signup-step-2');
+            const ind1 = document.getElementById('step-indicator-1');
+            const ind2 = document.getElementById('step-indicator-2');
+            const step1Err = document.getElementById('signup-step-1-error');
+
+            if (step === 2) {
+                const name = (document.getElementById('reg-name')?.value || '').trim();
+                const mobile = (document.getElementById('reg-mobile')?.value || '').trim();
+                const dept = document.getElementById('reg-dept')?.value || '';
+                const position = (document.getElementById('reg-position')?.value || '').trim();
+                const accType = document.getElementById('reg-account-type')?.value || '';
+                const linkedInstructor = document.getElementById('reg-linked-instructor')?.value || '';
+
+                let errMsg = '';
+                if (!name) errMsg = 'يرجى إدخال الاسم بالكامل';
+                else if (!/^[0-9]{11}$/.test(mobile)) errMsg = 'يرجى إدخال رقم موبايل صحيح مكون من 11 رقماً';
+                else if (!dept) errMsg = 'يرجى اختيار القسم / الجهة';
+                else if (!position) errMsg = 'يرجى إدخال المسمى الوظيفي';
+                else if (!accType) errMsg = 'يرجى اختيار نوع الحساب';
+                else if (accType === 'faculty' && !linkedInstructor) errMsg = 'يرجى ربط الحساب بالاسم الأكاديمي لعضو هيئة التدريس';
+
+                if (errMsg) {
+                    if (step1Err) {
+                        step1Err.querySelector('span').textContent = errMsg;
+                        step1Err.classList.remove('hidden');
+                    }
+                    return;
+                }
+                if (step1Err) step1Err.classList.add('hidden');
+
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                ind1.classList.remove('is-active');
+                ind1.classList.add('is-done');
+                ind2.classList.add('is-active');
+            } else {
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+                ind2.classList.remove('is-active');
+                ind1.classList.remove('is-done');
+                ind1.classList.add('is-active');
+            }
+        }
+
+        // التأكد من إظهار الخطوة الصحيحة في حال وجود خطأ تحقق من المتصفح
+        document.getElementById('signupForm')?.addEventListener('invalid', function(e) {
+            const step1 = document.getElementById('signup-step-1');
+            if (step1 && step1.contains(e.target) && step1.classList.contains('hidden')) {
+                goToSignupStep(1);
+            }
+        }, true);
 
         // 1. تسجيل الدخول (محدث باللودر)
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorElement = document.getElementById('login-error');
 
             // 🔥 تشغيل اللودر
             showLoader("جاري التحقق من البيانات...");
-            
+
             if(errorElement) errorElement.classList.add('hidden');
 
             try {
@@ -771,7 +1683,7 @@ autoRedirect();
 
             } catch (error) {
                 console.error(error);
-                
+
                 // 🔥 إخفاء اللودر عند الخطأ
                 hideLoader();
 
@@ -781,7 +1693,7 @@ autoRedirect();
                 } else {
                     alert("بيانات الدخول غير صحيحة");
                 }
-                
+
                 document.querySelector('.bg-white').classList.add('animate-pulse');
                 setTimeout(() => document.querySelector('.bg-white').classList.remove('animate-pulse'), 200);
             }
@@ -857,6 +1769,7 @@ function toggleFacultyLinkBlock() {
     const display = document.getElementById('faculty-link-display');
     const label = document.getElementById('reg-linked-instructor-label');
     const options = document.getElementById('faculty-name-options');
+    const optionsContainer = options?.closest('.custom-dropdown-options');
 
     if (!block || !hiddenSelect || !display || !label || !options) return;
 
@@ -884,7 +1797,7 @@ function toggleFacultyLinkBlock() {
         label.classList.remove('text-[#2A3475]', 'font-bold', 'text-gray-700');
         label.classList.add('text-gray-500');
 
-        options.classList.add('hidden');
+        if (optionsContainer) optionsContainer.classList.add('hidden');
         const arrow = display.querySelector('.fa-chevron-down');
         if (arrow) arrow.style.transform = 'rotate(0deg)';
     }
@@ -918,9 +1831,24 @@ function syncDepartmentDropdownLabel(value) {
     }
 }
 
-        // --- دالة تشغيل القوائم المنسدلة ---
+        // --- دالة تشغيل القوائم المنسدلة (مع دعم البحث داخل قائمة أعضاء هيئة التدريس) ---
 function setupCustomDropdowns() {
+    const facultySearch = document.getElementById('faculty-search-input');
+    if (facultySearch) {
+        facultySearch.addEventListener('input', () => {
+            const q = facultySearch.value.trim().toLowerCase();
+            document.querySelectorAll('#faculty-name-options .custom-option').forEach(item => {
+                const match = item.textContent.toLowerCase().includes(q);
+                item.style.display = match ? '' : 'none';
+            });
+        });
+    }
+
     document.addEventListener('click', (e) => {
+        if (e.target.closest('.faculty-search-wrap')) {
+            return;
+        }
+
         const display = e.target.closest('.custom-dropdown-display');
         const option = e.target.closest('.custom-option');
 
@@ -971,6 +1899,15 @@ function setupCustomDropdowns() {
                     ? 'rotate(0deg)'
                     : 'rotate(180deg)';
             }
+
+            if (!options.classList.contains('hidden')) {
+                const searchBox = options.querySelector('.faculty-search-input');
+                if (searchBox) {
+                    searchBox.value = '';
+                    searchBox.dispatchEvent(new Event('input'));
+                    setTimeout(() => searchBox.focus(), 30);
+                }
+            }
             return;
         }
 
@@ -997,7 +1934,8 @@ function setupCustomDropdowns() {
         function closeSuccessModal() {
             const modal = document.getElementById('success-modal');
             modal.classList.add('hidden');
-            toggleForms();
+            goToSignupStep(1);
+            switchAuthMode('login');
         }
 
         function togglePassword(inputId, iconElement) {
@@ -1020,7 +1958,7 @@ if ('serviceWorker' in navigator) {
         .catch(err => console.log('حدث خطأ في التسجيل: ', err));
     });
   }
-  
+
 // Show browser-specific installation help even when no install event is emitted (Safari).
 (function(){
  const notice=document.getElementById('installContainer');

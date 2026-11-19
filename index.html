@@ -6,7 +6,7 @@
 <meta name="citl-release" content="20261105-login-transition-fix">
     <meta charset="UTF-8">
     <script>document.documentElement.classList.add('citl-login-checking');</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
     <meta name="description" content="CITL Smart System — التحكم وإدارة الجداول الدراسية والقاعات، تنظيم الحجوزات، متابعة الحضور والانصراف، وإدارة شاشات الإعلانات.">
     <link rel="canonical" href="https://aastcitl.me/">
@@ -55,6 +55,7 @@
 
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -64,6 +65,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
             position: relative;
         }
@@ -119,12 +121,13 @@
         }
 
         /* ========================================================= */
-        /* University SSO Layout Shell                               */
+        /* University Portal Layout Shell                            */
         /* ========================================================= */
         .citl-university-shell {
             position: relative;
             z-index: 10;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -134,49 +137,64 @@
         .citl-topbar {
             width: 100%;
             border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-            background: rgba(11, 16, 43, 0.42);
+            background: rgba(11, 16, 43, 0.44);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
+            padding-top: env(safe-area-inset-top, 0px);
         }
 
         .citl-topbar-inner {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 12px 20px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 14px;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .citl-topbar-inner {
+                padding: 12px 24px;
+                justify-content: space-between;
+            }
         }
 
         .citl-topbar-brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 11px;
             min-width: 0;
         }
 
         .citl-topbar-logo {
-            background: rgba(255, 255, 255, 0.96);
+            background: rgba(255, 255, 255, 0.97);
             padding: 5px 8px;
-            border-radius: 12px;
+            border-radius: 11px;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
             flex-shrink: 0;
         }
 
         .citl-topbar-logo img {
             display: block;
-            height: 36px;
+            height: 32px;
             width: auto;
             object-fit: contain;
         }
 
+        @media (min-width: 768px) {
+            .citl-topbar-logo img {
+                height: 36px;
+            }
+        }
+
         .citl-topbar-titles {
             min-width: 0;
+            text-align: right;
         }
 
         .citl-topbar-ar {
-            font-size: clamp(13px, 2.6vw, 15.5px);
+            font-size: clamp(13px, 3.4vw, 15.5px);
             font-weight: 800;
             color: #FFFFFF;
             line-height: 1.3;
@@ -186,47 +204,14 @@
         }
 
         .citl-topbar-en {
-            font-size: 11px;
+            font-size: clamp(9.5px, 2.3vw, 11px);
             font-weight: 700;
             color: var(--citl-gold);
-            letter-spacing: 0.35px;
+            letter-spacing: 0.3px;
             line-height: 1.3;
-            display: none;
-        }
-
-        @media (min-width: 640px) {
-            .citl-topbar-en {
-                display: block;
-            }
-        }
-
-        .citl-sso-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: rgba(255, 255, 255, 0.94);
-            font-size: 11.5px;
-            font-weight: 700;
             white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .citl-sso-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--citl-gold);
-            box-shadow: 0 0 10px rgba(243, 166, 40, 0.9);
-        }
-
-        @media (max-width: 480px) {
-            .citl-sso-badge span.hide-xs {
-                display: none;
-            }
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Center Stage */
@@ -236,49 +221,74 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 26px 16px 28px;
+            padding: 18px 14px 22px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .citl-stage {
+                padding: 28px 20px 30px;
+            }
         }
 
         .citl-hero-intro {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             max-width: 580px;
+            width: 100%;
+            padding: 0 4px;
             animation: citlFadeDown 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (min-width: 768px) {
+            .citl-hero-intro {
+                margin-bottom: 22px;
+            }
         }
 
         .citl-hero-eyebrow {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            font-size: 11.5px;
+            font-size: clamp(10.5px, 2.8vw, 12px);
             font-weight: 700;
             color: var(--citl-gold-light);
-            letter-spacing: 0.3px;
-            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+            margin-bottom: 5px;
+            max-width: 100%;
         }
 
         .citl-hero-eyebrow span.line {
-            width: 24px;
+            width: 18px;
             height: 1px;
+            flex-shrink: 0;
             background: linear-gradient(90deg, transparent, rgba(243, 166, 40, 0.85), transparent);
+        }
+
+        @media (min-width: 640px) {
+            .citl-hero-eyebrow span.line {
+                width: 26px;
+            }
         }
 
         .citl-hero-heading {
             margin: 0;
-            font-size: clamp(20px, 4vw, 28px);
+            font-size: clamp(19px, 5vw, 28px);
             font-weight: 900;
             color: #FFFFFF;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
+            line-height: 1.3;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
         }
 
         .citl-hero-system {
             margin-top: 4px;
-            font-size: 12px;
+            font-size: clamp(10.5px, 2.7vw, 12px);
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2.8px;
-            color: rgba(226, 232, 240, 0.82);
+            letter-spacing: 2.4px;
+            color: rgba(226, 232, 240, 0.84);
         }
 
         /* ========================================================= */
@@ -288,31 +298,42 @@
             width: 100%;
             max-width: 468px;
             background-color: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
+            border-radius: 20px;
             position: relative;
             overflow: visible;
             box-shadow:
-                0 32px 72px -18px rgba(5, 9, 28, 0.62),
-                0 12px 28px -10px rgba(5, 9, 28, 0.35),
+                0 28px 64px -16px rgba(5, 9, 28, 0.62),
+                0 10px 26px -10px rgba(5, 9, 28, 0.35),
                 0 0 0 1px rgba(255, 255, 255, 0.28);
             transition: max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
             animation: citlFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .citl-auth-card.is-signup-mode {
-            max-width: 570px;
+        @media (min-width: 640px) {
+            .citl-auth-card {
+                border-radius: 24px;
+            }
+            .citl-auth-card.is-signup-mode {
+                max-width: 570px;
+            }
         }
 
         /* Architectural Gold Accent Crest */
         .citl-card-crest {
             height: 4px;
             width: 100%;
-            border-radius: 24px 24px 0 0;
+            border-radius: 20px 20px 0 0;
             background: linear-gradient(90deg, #B56A0F 0%, #F3A628 32%, #FFD479 50%, #F3A628 68%, #B56A0F 100%);
         }
 
+        @media (min-width: 640px) {
+            .citl-card-crest {
+                border-radius: 24px 24px 0 0;
+            }
+        }
+
         .citl-card-body {
-            padding: 24px 20px 26px;
+            padding: 20px 16px 22px;
         }
 
         @media (min-width: 640px) {
@@ -335,12 +356,21 @@
         .citl-mode-switcher {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding: 5px;
+            gap: 5px;
+            padding: 4px;
             background: #F1F5F9;
-            border-radius: 14px;
-            margin-bottom: 22px;
+            border-radius: 13px;
+            margin-bottom: 18px;
             border: 1px solid #E2E8F0;
+        }
+
+        @media (min-width: 640px) {
+            .citl-mode-switcher {
+                gap: 6px;
+                padding: 5px;
+                border-radius: 14px;
+                margin-bottom: 22px;
+            }
         }
 
         .citl-mode-tab {
@@ -348,16 +378,26 @@
             background: transparent;
             color: #64748B;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 700;
-            padding: 10px 12px;
+            padding: 10px 8px;
+            min-height: 42px;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.22s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 640px) {
+            .citl-mode-tab {
+                font-size: 13px;
+                padding: 10px 12px;
+                gap: 7px;
+            }
         }
 
         .citl-mode-tab:hover:not(.is-active) {
@@ -376,21 +416,35 @@
 
         /* Form Headings */
         .citl-form-header {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: right;
         }
 
+        @media (min-width: 640px) {
+            .citl-form-header {
+                margin-bottom: 20px;
+            }
+        }
+
         .citl-form-header h1 {
-            font-size: 20px;
+            font-size: 18.5px;
             font-weight: 800;
             color: var(--citl-navy);
-            margin: 0 0 4px;
+            margin: 0 0 3px;
+        }
+
+        @media (min-width: 640px) {
+            .citl-form-header h1 {
+                font-size: 20px;
+                margin: 0 0 4px;
+            }
         }
 
         .citl-form-header p {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--citl-muted);
             margin: 0;
+            line-height: 1.5;
         }
 
         /* Modern Form Controls */
@@ -398,6 +452,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             margin-bottom: 6px;
         }
 
@@ -420,20 +475,30 @@
         .citl-input {
             width: 100%;
             padding: 11.5px 14px;
+            min-height: 46px;
             border: 1.5px solid #E2E8F0;
             border-radius: 12px;
             background-color: #F8FAFC;
             color: #0F172A;
             font-family: inherit;
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 600;
             outline: none;
             transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
         }
 
+        /* Prevent iOS Safari zoom on input focus while keeping desktop crisp */
+        @media (max-width: 639px) {
+            .citl-input {
+                font-size: 16px;
+                padding: 11px 13px;
+            }
+        }
+
         .citl-input::placeholder {
             color: #94A3B8;
             font-weight: 500;
+            font-size: 13px;
         }
 
         .citl-input:hover {
@@ -451,7 +516,7 @@
         }
 
         .citl-input.has-icon-left {
-            padding-left: 42px;
+            padding-left: 44px;
         }
 
         .citl-field-icon {
@@ -471,13 +536,13 @@
 
         .citl-eye-btn {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: #94A3B8;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
-            padding: 6px;
+            padding: 8px;
             border-radius: 8px;
             transition: color 0.2s ease, background-color 0.2s ease;
             z-index: 2;
@@ -491,7 +556,7 @@
         .citl-forgot-link {
             background: none;
             border: none;
-            padding: 0;
+            padding: 2px 0;
             font-family: inherit;
             font-size: 12px;
             font-weight: 700;
@@ -540,7 +605,7 @@
             justify-content: space-between;
             cursor: pointer;
             transition: all 0.2s ease;
-            min-height: 45px;
+            min-height: 46px;
         }
 
         .custom-dropdown-display:hover:not(.cursor-not-allowed) {
@@ -561,8 +626,9 @@
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 14px;
-            max-height: 210px;
+            max-height: 200px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             z-index: 60;
             box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.18);
             padding: 4px;
@@ -572,7 +638,7 @@
 
         .custom-dropdown-options .custom-option {
             border-radius: 9px;
-            padding: 9px 12px;
+            padding: 10px 12px;
             font-size: 13px;
             font-weight: 600;
             border-bottom: none !important;
@@ -595,13 +661,19 @@
 
         .faculty-search-input {
             width: 100%;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border: 1px solid #CBD5E1;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
             font-family: inherit;
             outline: none;
             background: #F8FAFC;
+        }
+
+        @media (max-width: 639px) {
+            .faculty-search-input {
+                font-size: 15px;
+            }
         }
 
         .faculty-search-input:focus {
@@ -613,37 +685,48 @@
         .citl-stepper {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 18px;
-            padding: 10px 12px;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 8px 10px;
             background: #F8FAFC;
             border: 1px solid #E2E8F0;
-            border-radius: 14px;
+            border-radius: 13px;
+        }
+
+        @media (min-width: 640px) {
+            .citl-stepper {
+                gap: 10px;
+                margin-bottom: 18px;
+                padding: 10px 12px;
+                border-radius: 14px;
+            }
         }
 
         .citl-step-btn {
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 6px;
             background: transparent;
             border: none;
-            padding: 4px 6px;
-            border-radius: 10px;
+            padding: 4px;
+            border-radius: 9px;
             cursor: pointer;
             font-family: inherit;
             text-align: right;
+            min-width: 0;
             transition: opacity 0.2s ease;
         }
 
         .citl-step-num {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 800;
             background: #E2E8F0;
             color: #64748B;
@@ -652,10 +735,24 @@
         }
 
         .citl-step-label {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #64748B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             transition: color 0.25s ease;
+        }
+
+        @media (min-width: 640px) {
+            .citl-step-num {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+            .citl-step-label {
+                font-size: 12.5px;
+            }
         }
 
         .citl-step-btn.is-active .citl-step-num {
@@ -678,7 +775,7 @@
         }
 
         .citl-step-connector {
-            width: 24px;
+            width: 18px;
             height: 2px;
             background: #E2E8F0;
             border-radius: 2px;
@@ -688,6 +785,7 @@
         /* Buttons */
         .citl-btn-primary {
             width: 100%;
+            min-height: 48px;
             background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%);
             color: #FFFFFF;
             font-family: inherit;
@@ -717,6 +815,7 @@
 
         .citl-btn-gold {
             width: 100%;
+            min-height: 48px;
             background: linear-gradient(135deg, #F5B038 0%, #E09215 100%);
             color: #11173D;
             font-family: inherit;
@@ -744,6 +843,7 @@
         }
 
         .citl-btn-secondary {
+            min-height: 48px;
             background: #F1F5F9;
             color: #334155;
             border: 1px solid #E2E8F0;
@@ -757,6 +857,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            flex-shrink: 0;
             transition: background 0.2s ease, color 0.2s ease;
         }
 
@@ -797,31 +898,44 @@
         /* ========================================================= */
         .citl-capabilities-strip {
             width: 100%;
-            max-width: 570px;
-            margin-top: 18px;
+            max-width: 468px;
+            margin-top: 14px;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            transition: max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @media (min-width: 640px) {
             .citl-capabilities-strip {
-                grid-template-columns: 1fr 1fr;
+                max-width: 570px;
+                margin-top: 18px;
                 gap: 12px;
             }
         }
 
         .citl-cap-pill {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            border-radius: 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 11px 12px;
+            border-radius: 15px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.14);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+        }
+
+        @media (min-width: 640px) {
+            .citl-cap-pill {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 14px;
+                border-radius: 16px;
+            }
         }
 
         .citl-cap-pill:hover {
@@ -831,67 +945,101 @@
         }
 
         .citl-cap-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 11px;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
             background: rgba(243, 166, 40, 0.18);
             border: 1px solid rgba(243, 166, 40, 0.34);
             color: var(--citl-gold);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             flex-shrink: 0;
+        }
+
+        @media (min-width: 640px) {
+            .citl-cap-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 11px;
+                font-size: 14px;
+            }
         }
 
         .citl-cap-text {
             text-align: right;
             min-width: 0;
+            width: 100%;
         }
 
         .citl-cap-title {
             display: block;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 800;
             color: #FFFFFF;
             line-height: 1.4;
         }
 
+        @media (min-width: 640px) {
+            .citl-cap-title {
+                font-size: 12px;
+            }
+        }
+
         .citl-cap-desc {
             display: block;
-            font-size: 11px;
+            font-size: 10.5px;
             color: rgba(226, 232, 240, 0.78);
             line-height: 1.45;
+            margin-top: 2px;
+        }
+
+        @media (min-width: 640px) {
+            .citl-cap-desc {
+                font-size: 11px;
+                margin-top: 0;
+            }
         }
 
         .citl-install-pill {
-            margin: 14px auto 0;
-            padding: 8px 16px;
-            border-radius: 999px;
+            margin: 12px auto 0;
+            padding: 8px 14px;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.09);
             border: 1px solid rgba(255, 255, 255, 0.16);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             text-align: center;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
             line-height: 1.55;
             color: rgba(255, 255, 255, 0.92);
             max-width: 570px;
+            width: 100%;
             pointer-events: none;
+        }
+
+        @media (min-width: 640px) {
+            .citl-install-pill {
+                border-radius: 999px;
+                width: auto;
+                padding: 8px 18px;
+                font-size: 11.5px;
+            }
         }
 
         /* Institutional Footer */
         .citl-portal-footer {
             width: 100%;
             border-top: 1px solid rgba(255, 255, 255, 0.09);
-            background: rgba(11, 16, 43, 0.48);
+            background: rgba(11, 16, 43, 0.50);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 13px 16px;
+            padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
             text-align: center;
             color: rgba(226, 232, 240, 0.80);
-            font-size: clamp(10.5px, 2.5vw, 12px);
+            font-size: clamp(10px, 2.6vw, 12px);
             font-weight: 600;
             line-height: 1.7;
         }
@@ -949,114 +1097,202 @@
     <!-- (Non-destructive: never overrides display or .hidden)     -->
     <!-- ========================================================= -->
     <style id="citl-recovery-theme">
-        /* Target dynamic modals injected by password-recovery.js safely */
-        .citl-recovery-themed,
-        [id*="recovery"]:not(script):not(style),
-        [id*="forgot-password"]:not(button):not(a):not(script):not(style),
-        [data-password-recovery-modal] {
+        /* Overlay Backdrop */
+        .citl-recovery-overlay {
+            background: rgba(11, 16, 43, 0.76) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             font-family: 'Cairo', sans-serif !important;
-            direction: rtl;
+            direction: rtl !important;
+            padding: 16px !important;
         }
 
-        /* Backdrop polish for recovery overlay */
-        .citl-recovery-themed.fixed,
-        [id*="recovery"].fixed,
-        [id*="forgot-password"].fixed,
-        [data-password-recovery-modal].fixed {
-            background: rgba(11, 16, 43, 0.72) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+        .citl-recovery-overlay[hidden],
+        .citl-recovery-overlay.hidden {
+            display: none !important;
         }
 
-        /* Inner dialog card inside recovery modal */
-        .citl-recovery-themed > div,
-        .citl-recovery-themed form,
-        [id*="recovery"] > div.bg-white,
-        [id*="recovery"] [role="dialog"],
-        [data-password-recovery-modal] > div {
-            border-radius: 22px !important;
-            font-family: 'Cairo', sans-serif !important;
-        }
-
-        .citl-recovery-themed .citl-recovery-card-surface,
-        [id*="recovery"] > div.bg-white,
-        [id*="recovery"] .bg-white,
-        [data-password-recovery-modal] .bg-white {
-            background: #FFFFFF !important;
+        /* Main Dialog Surface — matches .citl-auth-card */
+        .citl-recovery-dialog {
+            background: rgba(255, 255, 255, 0.99) !important;
             border: 1px solid rgba(226, 232, 240, 0.95) !important;
             border-top: 4px solid #F3A628 !important;
             border-radius: 22px !important;
-            box-shadow: 0 30px 70px -15px rgba(5, 9, 28, 0.58) !important;
+            box-shadow:
+                0 32px 72px -18px rgba(5, 9, 28, 0.65),
+                0 12px 28px -10px rgba(5, 9, 28, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.25) !important;
             color: #0F172A !important;
+            font-family: 'Cairo', sans-serif !important;
+            direction: rtl !important;
+            text-align: right !important;
+            padding: 24px 22px !important;
+            width: 100% !important;
+            max-width: 448px !important;
+            position: relative !important;
+            animation: citlFadeUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
-        .citl-recovery-themed h1,
-        .citl-recovery-themed h2,
-        .citl-recovery-themed h3,
-        [id*="recovery"] h2,
-        [id*="recovery"] h3 {
+        @media (min-width: 640px) {
+            .citl-recovery-dialog {
+                padding: 28px 30px !important;
+                border-radius: 24px !important;
+            }
+        }
+
+        /* Typography inside Recovery Dialog */
+        .citl-recovery-dialog h1,
+        .citl-recovery-dialog h2,
+        .citl-recovery-dialog h3,
+        .citl-recovery-dialog h4 {
             color: #2A3475 !important;
+            font-family: 'Cairo', sans-serif !important;
             font-weight: 800 !important;
-            font-family: 'Cairo', sans-serif !important;
+            font-size: 19px !important;
+            line-height: 1.4 !important;
+            margin-top: 0 !important;
         }
 
-        .citl-recovery-themed p,
-        [id*="recovery"] p {
-            color: #64748B;
+        .citl-recovery-dialog p {
+            color: #64748B !important;
             font-family: 'Cairo', sans-serif !important;
+            font-size: 13px !important;
+            line-height: 1.65 !important;
         }
 
-        .citl-recovery-themed input[type="email"],
-        .citl-recovery-themed input[type="password"],
-        .citl-recovery-themed input[type="text"],
-        [id*="recovery"] input[type="email"],
-        [id*="recovery"] input[type="password"],
-        [id*="recovery"] input[type="text"] {
+        .citl-recovery-dialog label {
+            color: #334155 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            display: block !important;
+            margin-bottom: 6px !important;
+        }
+
+        /* Inputs — exact match to .citl-input */
+        .citl-recovery-dialog input[type="email"],
+        .citl-recovery-dialog input[type="password"],
+        .citl-recovery-dialog input[type="text"],
+        .citl-recovery-dialog input[type="tel"],
+        .citl-recovery-dialog input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
+            width: 100% !important;
+            min-height: 46px !important;
+            padding: 11px 14px !important;
             border: 1.5px solid #E2E8F0 !important;
             border-radius: 12px !important;
             background-color: #F8FAFC !important;
-            padding: 11px 14px !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 13.5px !important;
-            font-weight: 600 !important;
             color: #0F172A !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
             outline: none !important;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+            box-shadow: none !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
         }
 
-        .citl-recovery-themed input:focus,
-        [id*="recovery"] input:focus {
+        @media (max-width: 639px) {
+            .citl-recovery-dialog input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
+                font-size: 16px !important;
+            }
+        }
+
+        .citl-recovery-dialog input:hover {
+            border-color: #CBD5E1 !important;
+        }
+
+        .citl-recovery-dialog input:focus {
             background-color: #FFFFFF !important;
             border-color: #2A3475 !important;
             box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10) !important;
         }
 
-        .citl-recovery-themed button[type="submit"],
-        [id*="recovery"] button[type="submit"] {
+        /* Primary Submit Button — exact match to .citl-btn-primary */
+        .citl-recovery-dialog button[type="submit"],
+        .citl-recovery-dialog .citl-recovery-submit {
+            min-height: 46px !important;
             background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%) !important;
             color: #FFFFFF !important;
             border: none !important;
-            border-radius: 12px !important;
-            padding: 11px 18px !important;
+            border-radius: 13px !important;
+            padding: 11px 20px !important;
             font-family: 'Cairo', sans-serif !important;
+            font-size: 14px !important;
             font-weight: 800 !important;
-            box-shadow: 0 10px 22px -8px rgba(42, 52, 117, 0.55) !important;
-            transition: filter 0.2s ease, transform 0.18s ease !important;
+            box-shadow: 0 12px 24px -8px rgba(42, 52, 117, 0.55) !important;
             cursor: pointer !important;
+            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
         }
 
-        .citl-recovery-themed button[type="submit"]:hover,
-        [id*="recovery"] button[type="submit"]:hover {
+        .citl-recovery-dialog button[type="submit"]:hover,
+        .citl-recovery-dialog .citl-recovery-submit:hover {
             filter: brightness(1.08) !important;
             transform: translateY(-1px) !important;
         }
 
-        .citl-recovery-themed button[type="button"],
-        [id*="recovery"] button[type="button"] {
+        .citl-recovery-dialog button[type="submit"]:disabled,
+        .citl-recovery-dialog .citl-recovery-submit:disabled {
+            opacity: 0.65 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        /* Secondary / Cancel Button — exact match to .citl-btn-secondary */
+        .citl-recovery-dialog .citl-recovery-cancel {
+            min-height: 44px !important;
+            background: #F1F5F9 !important;
+            color: #334155 !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            padding: 10px 16px !important;
             font-family: 'Cairo', sans-serif !important;
-            border-radius: 10px !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
+            cursor: pointer !important;
+            box-shadow: none !important;
             transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+
+        .citl-recovery-dialog .citl-recovery-cancel:hover {
+            background: #E2E8F0 !important;
+            color: #2A3475 !important;
+        }
+
+        /* Close (X) Button */
+        .citl-recovery-dialog .citl-recovery-close {
+            width: 34px !important;
+            height: 34px !important;
+            min-height: 34px !important;
+            padding: 0 !important;
+            border-radius: 10px !important;
+            background: #F1F5F9 !important;
+            color: #475569 !important;
+            border: 1px solid #E2E8F0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
+            box-shadow: none !important;
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+
+        .citl-recovery-dialog .citl-recovery-close:hover {
+            background: #FEE2E2 !important;
+            border-color: #FECACA !important;
+            color: #DC2626 !important;
+        }
+
+        /* Status / Alert Banners inside Recovery Dialog */
+        .citl-recovery-dialog [role="alert"],
+        .citl-recovery-dialog [role="status"] {
+            border-radius: 12px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            line-height: 1.65 !important;
         }
     </style>
 
@@ -1093,10 +1329,11 @@ html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:non
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 html.citl-page-booting #global-loader::before,html.citl-navigation-loading #global-loader::before{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 #global-loader.citl-unified-loader::before{content:"";position:absolute;inset:-3px;z-index:-1;background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:auto}
-#global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;isolation:isolate;color-scheme:only light}
-#global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:4px}
+#global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:22px 20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate;color-scheme:only light}
+#global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:8px}
 #global-loader>.relative::after{content:'';position:absolute;bottom:16px;right:22px;left:22px;height:3px;border-radius:6px;background:linear-gradient(270deg,#B95C14 0%,#F29A23 55%,#FFC65D 85%,#FFE2A0 100%) right center/var(--citl-loader-progress,0%) 100% no-repeat,#e1e5ef;animation:none}
-#global-loader.citl-unified-loader img{display:block;width:142px!important;height:114px!important;max-width:100%;object-fit:contain;flex-shrink:0;margin:0!important;background:transparent!important;opacity:1!important;mix-blend-mode:normal!important;filter:url(#citl-loader-logo-alpha)!important}
+/* Clean crisp RGBA logo — removed the old SVG alpha filter that caused blur/jagged edges */
+#global-loader.citl-unified-loader img{display:block;width:150px!important;height:auto!important;max-width:100%;max-height:104px!important;object-fit:contain;flex-shrink:0;margin:2px 0 4px!important;background:transparent!important;opacity:1!important;mix-blend-mode:normal!important;filter:none!important;image-rendering:auto}
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 #global-loader.citl-unified-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px;color:#2a3475;font-size:20px;font-weight:900;font-variation-settings:"wght" 900;line-height:1.6;margin:8px 0 0!important;letter-spacing:0;flex-shrink:0}
 #global-loader.citl-unified-loader #loader-text{color:#66718b;font-size:12px;font-weight:600;line-height:1.8;min-height:36px;max-height:40px;overflow:auto;max-width:100%;margin:4px 0 0!important;overflow-wrap:anywhere}
@@ -1104,7 +1341,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 #global-loader [data-boot-retry]{position:absolute;bottom:30px;left:18px;right:18px;margin:0;padding:5px;border:1px solid #cdd4e4;border-radius:8px;background:#f5f7fb;color:#2a3475;font-size:12px;cursor:pointer}
 .citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}.citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}.citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
 @keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
-@media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:132px!important;height:106px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:136px!important;max-height:94px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}#global-loader>.relative::after{animation:none}}
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
 
@@ -1116,7 +1353,7 @@ html.citl-navigation-loading #global-loader::before,
  inset:-18px;filter:blur(2px);pointer-events:auto;
 }
 #global-loader.citl-unified-loader>.relative{
- background:linear-gradient(155deg,rgba(253,252,248,.95),rgba(238,241,248,.92))!important;
+ background:linear-gradient(155deg,rgba(253,252,248,.96),rgba(238,241,248,.94))!important;
  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
 @media(max-width:767px){
@@ -1134,7 +1371,7 @@ html.citl-navigation-loading #global-loader::before,
     <div class="citl-campus-grid"></div>
 </div>
 
-<!-- ==================== University SSO Portal Shell ==================== -->
+<!-- ==================== University Portal Shell ==================== -->
 <div class="citl-university-shell">
 
     <!-- Top Institutional Bar -->
@@ -1148,13 +1385,6 @@ html.citl-navigation-loading #global-loader::before,
                     <div class="citl-topbar-ar">كلية النقل الدولي واللوجستيات</div>
                     <div class="citl-topbar-en">College of International Transport &amp; Logistics</div>
                 </div>
-            </div>
-
-            <div class="citl-sso-badge">
-                <span class="citl-sso-dot"></span>
-                <span>بوابة الدخول الموحّد</span>
-                <span class="hide-xs" style="opacity:0.45;">•</span>
-                <span class="hide-xs" style="letter-spacing:0.8px;">CITL</span>
             </div>
         </div>
     </header>
@@ -1229,10 +1459,7 @@ html.citl-navigation-loading #global-loader::before,
                         <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform text-xs"></i>
                     </button>
 
-                    <p class="text-center text-xs text-gray-500 pt-1">
-                        ليس لديك حساب؟
-                        <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
-                    </p>
+
                 </form>
 
                 <!-- ==================== نموذج إنشاء حساب جديد ==================== -->
@@ -1428,10 +1655,7 @@ html.citl-navigation-loading #global-loader::before,
                         </div>
                     </div>
 
-                    <p class="text-center text-xs text-gray-500 pt-1">
-                        لديك حساب بالفعل؟
-                        <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
-                    </p>
+
                 </form>
             </div>
         </div>
@@ -1443,8 +1667,8 @@ html.citl-navigation-loading #global-loader::before,
                     <i class="fas fa-chalkboard-teacher"></i>
                 </div>
                 <div class="citl-cap-text">
-                    <span class="citl-cap-title">التحكم وإدارة الجداول الدراسية</span>
-                    <span class="citl-cap-desc">عرض، متابعة، وتحديث الجداول بسهولة ودقة</span>
+                    <span class="citl-cap-title">إدارة الجداول الدراسية</span>
+                    <span class="citl-cap-desc">عرض ومتابعة وتحديث الجداول بسهولة</span>
                 </div>
             </div>
 
@@ -1453,8 +1677,8 @@ html.citl-navigation-loading #global-loader::before,
                     <i class="fas fa-door-open"></i>
                 </div>
                 <div class="citl-cap-text">
-                    <span class="citl-cap-title">التحكم وإدارة القاعات الدراسية</span>
-                    <span class="citl-cap-desc">تنظيم الحجوزات ومنع التعارض بين المواعيد</span>
+                    <span class="citl-cap-title">إدارة القاعات الدراسية</span>
+                    <span class="citl-cap-desc">تنظيم الحجوزات ومنع تعارض المواعيد</span>
                 </div>
             </div>
         </div>
@@ -1481,7 +1705,7 @@ html.citl-navigation-loading #global-loader::before,
 
 <div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center  opacity-0">
     
-<div class="relative"><svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden"><defs><filter id="citl-loader-logo-alpha" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -0.2126 -0.7152 -0.0722 1 0"/><feComponentTransfer><feFuncA type="linear" slope="20" intercept="0"/></feComponentTransfer></filter></defs></svg><img width="192" height="192" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAACXBIWXMAAAsTAAALEwEAmpwYAAAHZmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4wLWMwMDEgNzkuYzAyMDRiMiwgMjAyMy8wMi8wOS0wNjoyNjoxNCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wMi0wNVQxMDoxODozNyswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Zjk1ZTA2YzEtZDY4NC00NjQyLWFlZDAtZTQ0NTQ4MjkwMDVhIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NzhlOWQ1MmQtMzg3Ni05MDRiLThhMDMtMTcxZDM0YTIxMzhkIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZTAxZDFmNDktYWVlYi0wYTQwLWIyN2EtZWE1NzQ1MDYxNzQ4IiBzdEV2dDp3aGVuPSIyMDI1LTEyLTI4VDEwOjE2OjMzKzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjQuNSAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjMxM2U3ZTRjLTkxNDktYWE0NC05ZTgzLTQ2NDBiZTMwMjM4YSIgc3RFdnQ6d2hlbj0iMjAyNS0xMi0yOFQxMDoxNjozMyswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI0LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpmOTVlMDZjMS1kNjg0LTQ2NDItYWVkMC1lNDQ1NDgyOTAwNWEiIHN0RXZ0OndoZW49IjIwMjYtMDItMDVUMTA6MTg6MzcrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyNC41IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPHBob3Rvc2hvcDpEb2N1bWVudEFuY2VzdG9ycz4gPHJkZjpCYWc+IDxyZGY6bGk+ODdGMDE3MUQwQjU3OUQwMzdDMjRBQjNDQUI1RUI2Rjg8L3JkZjpsaT4gPHJkZjpsaT5hZG9iZTpkb2NpZDpwaG90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" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
+<div class="relative"><img width="189" height="128" src="data:image/png;base64,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" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
 </div>
 
     <div id="success-modal" class="fixed inset-0 z-[100] hidden">
@@ -1634,26 +1858,110 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
 
 // Non-destructive theme decorator for any password-recovery modal injected by password-recovery.js
 (function(){
-    function decorateRecoveryNode(node) {
-        if (!node || node.nodeType !== 1) return;
-        if (node.id === 'global-loader' || node.id === 'success-modal' || node.classList.contains('citl-university-shell') || node.classList.contains('citl-campus-backdrop')) return;
-        const id = (node.id || '').toLowerCase();
-        const cls = typeof node.className === 'string' ? node.className.toLowerCase() : '';
-        const isModal = node.getAttribute('role') === 'dialog' || id.includes('recovery') || id.includes('forgot') || id.includes('reset') || cls.includes('recovery') || (cls.includes('fixed') && cls.includes('inset-0') && node.querySelector('form, input[type="email"], input[type="password"]'));
-        if (isModal) {
-            node.classList.add('citl-recovery-themed');
-            const card = node.querySelector('.bg-white, form');
-            if (card && !card.classList.contains('citl-recovery-card-surface')) {
-                const surface = card.closest('.bg-white') || card;
-                surface.classList.add('citl-recovery-card-surface');
-            }
+    const SKIP_IDS = new Set(['global-loader', 'success-modal', 'citl-login-status', 'citl-auth-card']);
+
+    function keepThemeOnTop() {
+        const themeEl = document.getElementById('citl-recovery-theme');
+        if (themeEl && document.head && document.head.lastElementChild !== themeEl) {
+            document.head.appendChild(themeEl);
         }
     }
-    Array.from(document.body.children).forEach(decorateRecoveryNode);
-    const mo = new MutationObserver(muts => {
+
+    function isLikelyRecoveryModal(node) {
+        if (!node || node.nodeType !== 1) return false;
+        if (SKIP_IDS.has(node.id)) return false;
+        if (node.classList.contains('citl-university-shell') || node.classList.contains('citl-campus-backdrop')) return false;
+        if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return false;
+
+        const id = (node.id || '').toLowerCase();
+        const cls = typeof node.className === 'string' ? node.className.toLowerCase() : '';
+        const text = (node.textContent || '');
+        const stylePos = node.style ? node.style.position : '';
+        let computedPos = '';
+        try { computedPos = window.getComputedStyle(node).position; } catch (_) {}
+
+        const isFixedOverlay = stylePos === 'fixed' || computedPos === 'fixed' || cls.includes('fixed') || node.tagName === 'DIALOG';
+        const hasRecoveryHint =
+            id.includes('recovery') || id.includes('forgot') || id.includes('reset') || id.includes('password') || id.includes('pr-') ||
+            cls.includes('recovery') || cls.includes('forgot') || cls.includes('reset') ||
+            node.getAttribute('role') === 'dialog' || node.getAttribute('aria-modal') === 'true' ||
+            /استعادة|إعادة تعيين|كلمة المرور|نسيت كلمة/.test(text);
+
+        return (isFixedOverlay && (hasRecoveryHint || !!node.querySelector('form, input[type="email"], input[type="password"]'))) || (hasRecoveryHint && !!node.querySelector('form, input'));
+    }
+
+    function findDialogSurface(root) {
+        if (root.tagName === 'DIALOG') return root;
+        const explicit = root.querySelector('[role="dialog"], .citl-recovery-dialog, .bg-white');
+        if (explicit && explicit !== root) return explicit;
+        const form = root.querySelector('form');
+        if (form) {
+            // Walk up to the direct child of root that wraps the form (and heading)
+            let cur = form;
+            while (cur.parentElement && cur.parentElement !== root) {
+                cur = cur.parentElement;
+            }
+            return cur !== root ? cur : form;
+        }
+        const firstChildDiv = Array.from(root.children).find(el => el.tagName === 'DIV' && el.querySelector('input, button, h1, h2, h3'));
+        return firstChildDiv || root;
+    }
+
+    function classifyButtons(dialog) {
+        dialog.querySelectorAll('button').forEach(btn => {
+            if (btn.dataset.citlStyled) return;
+            const txt = (btn.textContent || '').trim();
+            const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+            const type = (btn.getAttribute('type') || '').toLowerCase();
+
+            if (txt === '×' || txt === '✕' || txt === 'x' || txt === 'X' || aria.includes('close') || aria.includes('إغلاق') || btn.querySelector('.fa-times, .fa-xmark')) {
+                btn.classList.add('citl-recovery-close');
+            } else if (type === 'submit' || /إرسال|تحديث|حفظ|تغيير|تأكيد|استعادة|متابعة/.test(txt)) {
+                btn.classList.add('citl-recovery-submit');
+            } else if (/إلغاء|إغلاق|رجوع|عودة/.test(txt)) {
+                btn.classList.add('citl-recovery-cancel');
+            }
+            btn.dataset.citlStyled = '1';
+        });
+    }
+
+    function decorateRecoveryNode(node) {
+        if (!isLikelyRecoveryModal(node)) return;
+        keepThemeOnTop();
+        const surface = findDialogSurface(node);
+        if (surface === node) {
+            node.classList.add('citl-recovery-dialog');
+        } else {
+            node.classList.add('citl-recovery-overlay');
+            surface.classList.add('citl-recovery-dialog');
+        }
+        classifyButtons(surface);
+    }
+
+    function scanAll() {
+        Array.from(document.body.children).forEach(decorateRecoveryNode);
+        Array.from(document.documentElement.children).forEach(el => {
+            if (el !== document.head && el !== document.body) decorateRecoveryNode(el);
+        });
+    }
+
+    scanAll();
+    const moBody = new MutationObserver(muts => {
         muts.forEach(m => m.addedNodes.forEach(decorateRecoveryNode));
     });
-    mo.observe(document.body, { childList: true });
+    moBody.observe(document.body, { childList: true });
+
+    const moHead = new MutationObserver(() => keepThemeOnTop());
+    if (document.head) moHead.observe(document.head, { childList: true });
+
+    document.addEventListener('click', e => {
+        if (e.target.closest('[data-forgot-password]')) {
+            setTimeout(scanAll, 0);
+            setTimeout(scanAll, 60);
+            setTimeout(scanAll, 180);
+        }
+    });
+    window.addEventListener('DOMContentLoaded', scanAll);
 })();
 
 // --- كود الدخول التلقائي الذكي (نسخة منع الوميض) ---

@@ -1179,603 +1179,28 @@ body.tv-display-page .schedule-instructor {
 <link rel="stylesheet" href="/assets/service-availability.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/service-connection.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/assets/service-availability.js?v=20261028-r7.3.3.8-wa-ui"></script>
-
-<style id="citl-tv-pro-theme">
-/* =====================================================================
-   CITL TV DISPLAY — EXECUTIVE DIGITAL SIGNAGE (Samsung Portrait Ready)
-   - Full-frame Posters & Videos (Zero side cropping)
-   - Pro Header with QR Code + Digital Clock Capsule
-   - High-contrast, student-attracting Schedule Table
-   - GPU-only transitions (transform + opacity), zero heavy blur lag
-===================================================================== */
-:root {
-    --citl-navy: #2A3475;
-    --citl-navy-2: #1A2358;
-    --citl-navy-3: #0D1336;
-    --citl-navy-ink: #080C24;
-    --citl-gold: #F3A628;
-    --citl-gold-light: #FFD479;
-    --citl-gold-2: #D98B14;
-}
-
-body.tv-display-page {
-    background:
-        radial-gradient(circle at 86% 6%, rgba(243, 166, 40, 0.16), transparent 34%),
-        radial-gradient(circle at 12% 92%, rgba(42, 52, 117, 0.20), transparent 42%),
-        linear-gradient(160deg, #EEF2FA 0%, #E4ECF8 52%, #F6F8FC 100%) !important;
-}
-
-body.tv-display-page.tv-rotate-cw,
-body.tv-display-page.tv-rotate-ccw {
-    --header-h: 102px !important;
-    --footer-h: 78px !important;
-}
-
-/* ---------- 1. EXECUTIVE BROADCAST HEADER (Clean, Spacious, No Overlap) ---------- */
-body.tv-display-page > header {
-    min-height: var(--header-h) !important;
-    height: var(--header-h) !important;
-    padding: 0 24px !important;
-    background: linear-gradient(135deg, #090E29 0%, #19235C 50%, #2A3475 100%) !important;
-    border-bottom: 3px solid var(--citl-gold) !important;
-    box-shadow: 0 10px 26px rgba(8, 12, 36, 0.34) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 20px !important;
-}
-
-body.tv-display-page > header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 12% 50%, rgba(243, 166, 40, 0.16), transparent 40%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-body.tv-display-page > header .tv-logo-btn {
-    width: 62px !important;
-    height: 62px !important;
-    border-radius: 15px !important;
-    background: #FFFFFF !important;
-    border: 2px solid rgba(243, 166, 40, 0.90) !important;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28) !important;
-    padding: 4px !important;
-    flex-shrink: 0 !important;
-}
-
-.tv-header-brand {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-width: 0;
-    flex: 1;
-}
-
-.tv-header-titles {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
-    gap: 4px;
-}
-
-body.tv-display-page > header #main-header-title {
-    font-size: clamp(20px, 2.2vw, 29px) !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-    letter-spacing: 0 !important;
-    color: #FFFFFF !important;
-    margin: 0 !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.28) !important;
-}
-
-body.tv-display-page > header .tv-header-en {
-    color: var(--citl-gold-light) !important;
-    font-size: clamp(10px, 1vw, 12.5px) !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.12em !important;
-    margin: 0 !important;
-    line-height: 1.2 !important;
-    opacity: 0.95;
-}
-
-/* Frameless Broadcast Clock & Date */
-.tv-clock-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    flex-shrink: 0;
-    padding-right: 18px;
-    border-right: 1.5px solid rgba(255, 255, 255, 0.16);
-}
-
-body.tv-display-page #current-time {
-    font-size: clamp(30px, 3.1vw, 42px) !important;
-    font-weight: 900 !important;
-    color: #FFFFFF !important;
-    line-height: 1 !important;
-    letter-spacing: 0.04em !important;
-    white-space: nowrap;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.30) !important;
-}
-
-body.tv-display-page #current-date {
-    font-size: clamp(11px, 1vw, 14px) !important;
-    font-weight: 700 !important;
-    color: var(--citl-gold-light) !important;
-    margin-top: 6px !important;
-    line-height: 1 !important;
-    opacity: 0.95 !important;
-    white-space: nowrap;
-}
-
-/* ---------- 2. MAIN STAGE — TIGHTER MARGINS, ZERO WASTED SPACE ---------- */
-body.tv-display-page > main,
-body.tv-display-page.tv-rotate-cw > main,
-body.tv-display-page.tv-rotate-ccw > main {
-    height: calc(100vw - var(--header-h)) !important;
-    padding: 10px 12px calc(var(--footer-h) + 10px) !important;
-}
-
-body.tv-display-page:not(.tv-rotate-cw):not(.tv-rotate-ccw) > main {
-    height: calc(100svh - var(--header-h)) !important;
-}
-
-#content-container {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-}
-
-@keyframes citlStageEnter {
-    0% { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.992); }
-    100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-#content-container > .room-card,
-#content-container > div {
-    animation: citlStageEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-    will-change: transform, opacity;
-}
-
-/* ---------- 3. HIGH-IMPACT STUDENT LECTURE SCHEDULE TABLE ---------- */
-body.tv-display-page .room-card {
-    border-radius: 22px !important;
-    box-shadow: 0 20px 44px rgba(13, 19, 54, 0.16), 0 0 0 1px rgba(42, 52, 117, 0.12) !important;
-}
-
-body.tv-display-page .room-hero {
-    padding: 12px 18px 11px !important;
-    gap: 12px !important;
-    background: linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 58%, #EBF1FF 100%) !important;
-    border-bottom: 2px solid #E2E8F0 !important;
-}
-
-body.tv-display-page .schedule-panel {
-    padding: 10px 12px 12px !important;
-    background: #F8FAFC !important;
-}
-
-body.tv-display-page .schedule-head {
-    background: linear-gradient(135deg, #161E52 0%, #2A3475 100%) !important;
-    color: #FFFFFF !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 9px 12px !important;
-    font-size: 12px !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.02em !important;
-    box-shadow: 0 6px 14px rgba(22, 30, 82, 0.16);
-}
-
-body.tv-display-page .schedule-list {
-    gap: 8px !important;
-    padding-top: 9px !important;
-}
-
-body.tv-display-page .schedule-row {
-    border-radius: 14px !important;
-    border: 1.5px solid #E2E8F0 !important;
-    background: #FFFFFF !important;
-    padding: 10px 13px !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
-}
-
-body.tv-display-page .schedule-row::before {
-    width: 5px !important;
-    top: 7px !important;
-    bottom: 7px !important;
-}
-
-body.tv-display-page .schedule-row.is-current {
-    background: linear-gradient(90deg, #FFF5F5 0%, #FFFFFF 65%) !important;
-    border-color: rgba(220, 38, 38, 0.42) !important;
-    box-shadow: 0 8px 22px rgba(220, 38, 38, 0.12) !important;
-}
-
-body.tv-display-page .schedule-row.is-upcoming {
-    background: #FFFFFF !important;
-    border-color: #DCE4F2 !important;
-}
-
-body.tv-display-page .schedule-time {
-    background: #EEF2FF !important;
-    color: #1E2866 !important;
-    border: 1px solid rgba(42, 52, 117, 0.14) !important;
-    font-weight: 900 !important;
-    border-radius: 11px !important;
-}
-
-body.tv-display-page .schedule-row.is-current .schedule-time {
-    background: #DC2626 !important;
-    color: #FFFFFF !important;
-    border-color: #DC2626 !important;
-}
-
-body.tv-display-page .schedule-row.is-upcoming .schedule-time {
-    background: linear-gradient(135deg, #FFF8EB 0%, #FEF0D5 100%) !important;
-    color: #9A5504 !important;
-    border-color: rgba(243, 166, 40, 0.42) !important;
-}
-
-body.tv-display-page .schedule-course {
-    color: #0F172A !important;
-    font-weight: 900 !important;
-    line-height: 1.24 !important;
-}
-
-body.tv-display-page .schedule-code {
-    display: inline-block;
-    background: #F1F5F9;
-    color: #334155 !important;
-    padding: 1px 7px;
-    border-radius: 6px;
-    margin-top: 4px !important;
-}
-
-body.tv-display-page .status-pill {
-    padding: 6px 11px !important;
-    font-size: 11px !important;
-    font-weight: 900 !important;
-}
-
-body.tv-display-page .study-grid,
-body.tv-display-page .tv-study-grid,
-body.tv-display-page .rooms-grid {
-    gap: 10px !important;
-}
-
-/* ---------- 4. FULL-FRAME POSTERS & VIDEOS (ZERO SIDE CROPPING) ---------- */
-.poster-slide.citl-split-stage {
-    background: #060A1C !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 22px 50px rgba(5, 9, 28, 0.45) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
-
-.poster-slide.citl-split-stage::before {
-    height: 4px !important;
-    background: linear-gradient(90deg, #B96D0D 0%, #F3A628 35%, #FFE08A 50%, #F3A628 65%, #B96D0D 100%) !important;
-}
-
-.poster-slide.citl-split-stage .poster-topbar {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 9px 16px !important;
-    background: linear-gradient(135deg, #101742 0%, #1F2A6B 100%) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
-}
-
-.poster-slide.citl-split-stage .poster-topbar .room-icon {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 12px !important;
-    background: rgba(243, 166, 40, 0.16) !important;
-    border: 1px solid rgba(243, 166, 40, 0.45) !important;
-    color: var(--citl-gold) !important;
-    box-shadow: none !important;
-    cursor: pointer;
-}
-
-.poster-slide.citl-split-stage .poster-topbar .room-icon svg {
-    width: 19px;
-    height: 19px;
-    fill: currentColor;
-}
-
-.poster-slide.citl-split-stage .poster-topbar h2 {
-    font-size: clamp(16px, 1.8vw, 22px) !important;
-    font-weight: 900 !important;
-    color: #FFFFFF !important;
-    margin: 0 !important;
-    line-height: 1.25 !important;
-}
-
-.poster-slide.citl-split-stage .poster-media-stage {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    background: #050816 !important;
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 6px !important;
-    overflow: hidden !important;
-}
-
-/* Force full-frame containment so NO poster or video is ever cropped from the sides */
-#poster-media-host {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    height: 100% !important;
-    overflow: hidden !important;
-    background: #050816 !important;
-}
-
-#poster-media-host img,
-#poster-media-host video {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-    display: block !important;
-    margin: auto !important;
-}
-
-/* Live Schedule Dock pinned underneath the video/poster */
-.tv-live-dock {
-    flex: 0 0 auto;
-    background: linear-gradient(180deg, #0D143B 0%, #090E2B 100%);
-    border-top: 2px solid rgba(243, 166, 40, 0.78);
-    padding: 9px 14px 11px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    position: relative;
-    z-index: 6;
-}
-
-.tv-live-dock.is-empty {
-    display: none !important;
-}
-
-.tv-live-dock-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.tv-live-dock-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 900;
-    color: #FFFFFF;
-}
-
-.tv-live-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #22C55E;
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-    display: inline-block;
-}
-
-.tv-live-dock-meta {
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--citl-gold-light);
-    background: rgba(243, 166, 40, 0.14);
-    border: 1px solid rgba(243, 166, 40, 0.35);
-    padding: 3px 10px;
-    border-radius: 999px;
-}
-
-.tv-live-dock-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 7px;
-    transition: opacity 0.28s ease, transform 0.28s ease;
-}
-
-.tv-live-dock-grid.is-fading {
-    opacity: 0;
-    transform: translate3d(0, 5px, 0);
-}
-
-.tv-dock-card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-right: 4px solid var(--citl-gold);
-    border-radius: 13px;
-    padding: 8px 12px;
-}
-
-.tv-dock-card.is-live {
-    background: linear-gradient(90deg, rgba(220, 38, 38, 0.20) 0%, rgba(255, 255, 255, 0.08) 100%);
-    border-color: rgba(248, 113, 113, 0.38);
-    border-right-color: #EF4444;
-}
-
-.tv-dock-room {
-    background: linear-gradient(135deg, #2A3475 0%, #1A2358 100%);
-    border: 1px solid rgba(243, 166, 40, 0.55);
-    color: #FFFFFF;
-    font-size: 13px;
-    font-weight: 900;
-    padding: 6px 11px;
-    border-radius: 10px;
-    min-width: 92px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.tv-dock-info {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.tv-dock-course {
-    font-size: 14px;
-    font-weight: 900;
-    color: #FFFFFF;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tv-dock-instructor {
-    font-size: 11.5px;
-    font-weight: 700;
-    color: rgba(226, 232, 240, 0.84);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tv-dock-instructor i {
-    color: var(--citl-gold);
-    margin-left: 5px;
-}
-
-.tv-dock-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-}
-
-.tv-dock-time {
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: 800;
-    color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.11);
-    padding: 3px 9px;
-    border-radius: 8px;
-    direction: ltr;
-    white-space: nowrap;
-}
-
-.tv-dock-badge {
-    font-size: 10.5px;
-    font-weight: 900;
-    padding: 2px 9px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-}
-
-.tv-dock-badge.live {
-    background: #DC2626;
-    color: #FFFFFF;
-}
-
-.tv-dock-badge.upcoming {
-    background: rgba(243, 166, 40, 0.22);
-    color: var(--citl-gold-light);
-    border: 1px solid rgba(243, 166, 40, 0.45);
-}
-
-/* ---------- 5. PRO NEWS TICKER & FOOTER ---------- */
-body.tv-display-page > footer {
-    height: var(--footer-h) !important;
-    background: linear-gradient(180deg, #0D1336 0%, #070B22 100%) !important;
-    border-top: 1px solid rgba(243, 166, 40, 0.38) !important;
-    box-shadow: 0 -10px 28px rgba(5, 8, 26, 0.45) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-body.tv-display-page > footer .progress-container {
-    height: 3px !important;
-    opacity: 1 !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-}
-
-body.tv-display-page > footer #slide-progress {
-    height: 3px !important;
-    background: linear-gradient(90deg, #D98B14 0%, #F3A628 50%, #FFE08A 100%) !important;
-    transform-origin: right center !important;
-}
-
-.tv-ticker-bar {
-    height: 46px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-}
-
-.tv-ticker-badge {
-    background: linear-gradient(135deg, #F5B038 0%, #E09215 100%) !important;
-    color: #0D1336 !important;
-    font-size: 13.5px !important;
-    font-weight: 900 !important;
-    padding: 0 18px !important;
-    box-shadow: -6px 0 18px rgba(0, 0, 0, 0.30) !important;
-}
-
-body.tv-display-page #news-ticker-content {
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    color: #F8FAFC !important;
-    will-change: transform;
-}
-
-.tv-footer-meta {
-    height: 29px !important;
-    padding: 0 20px !important;
-    background: rgba(0, 0, 0, 0.28) !important;
-}
-</style>
-
 </head>
 <body class="tv-display-page low-power tv-rotate-cw flex flex-col h-screen">
 
     <div class="bg-animated"></div>
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 z-0"></div>
 
-<header class="relative z-10">
-        <div class="tv-header-brand">
-            <div onclick="openSettings()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSettings();}" class="tv-logo-btn bg-white flex items-center justify-center cursor-pointer group relative overflow-hidden" title="اضغط لضبط القاعات">
-                <img src="/CITL.png" alt="Logo" class="h-full w-full object-contain transform scale-115">
+<header class="relative z-10 px-8 py-5 flex justify-between items-center border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div class="flex items-center gap-6">
+            <div onclick="openSettings()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSettings();}" class="bg-white p-1 rounded-xl shadow-lg h-20 w-20 flex items-center justify-center transform hover:scale-105 hover:rotate-3 transition-all duration-300 cursor-pointer group relative overflow-hidden" title="اضغط لضبط القاعات">
+                <img src="/CITL.png" alt="Logo" class="h-full w-full object-contain transform scale-125">
                 <div class="absolute inset-0 bg-black/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                    <i class="fas fa-cog text-navy text-2xl"></i>
+                    <i class="fas fa-cog text-navy text-2xl animate-spin"></i>
                 </div>
             </div>
-            <div class="tv-header-titles">
-                <h1 id="main-header-title" class="font-black text-white truncate">شاشة الجداول الدراسية اليومية</h1>
-                <p class="tv-header-en font-english uppercase truncate">COLLEGE OF INTERNATIONAL TRANSPORT &amp; LOGISTICS</p>
+                        <div>
+                <h1 id="main-header-title" class="text-3xl font-black tracking-wide text-white drop-shadow-md transition-all duration-300">شاشة الجداول الدراسية اليومية</h1>
+                <p class="text-gold text-lg font-medium tracking-widest mt-1 font-english uppercase">COLLEGE OF INTERNATIONAL TRANSPORT & LOGISTICS</p>
             </div>
         </div>
-        <div dir="ltr" class="tv-clock-group">
-            <div id="current-time" class="font-black text-white font-english">00:00</div>
-            <div id="current-date" class="font-bold font-english">...</div>
+        <div dir="ltr" class="text-left flex flex-col items-start">
+            <div id="current-time" class="text-5xl font-black text-white font-english tracking-wider drop-shadow-lg leading-none">00:00</div>
+            <div id="current-date" class="text-xl text-blue-200 font-bold mt-2 opacity-90 font-english">...</div>
         </div>
     </header>
 
@@ -1788,36 +1213,39 @@ body.tv-display-page #news-ticker-content {
         </div>
     </main>
 
-<footer class="fixed bottom-0 left-0 w-full z-50 text-white overflow-hidden">
-    <div class="progress-container top-0 absolute w-full">
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-black/90 backdrop-blur-xl border-t border-white/5 text-white overflow-hidden shadow-[0_-15px_40px_rgba(0,0,0,0.7)]">
+    <div class="progress-container top-0 absolute opacity-60">
         <div id="slide-progress" class="progress-bar" style="height: 3px;"></div>
     </div>
 
-    <div class="tv-ticker-bar w-full flex items-center overflow-hidden relative">
-        <div class="tv-ticker-badge bg-[#F3A628] text-[#2A3475] h-full px-5 flex items-center justify-center text-sm font-black z-30 shrink-0 relative">
-            <i class="fas fa-bullhorn ml-2"></i> آخر التحديثات
+    <div class="w-full bg-white/5 h-12 flex items-center overflow-hidden relative border-b border-white/5">
+        <div class="bg-[#F3A628] text-[#2A3475] h-full px-5 flex items-center justify-center text-sm font-black z-30 shrink-0 shadow-2xl relative">
+            <i class="fas fa-bullhorn ml-2 animate-pulse"></i> آخر التحديثات
         </div>
         
         <div class="flex-1 h-full relative overflow-hidden flex items-center">
-            <div id="news-ticker-content" class="ticker-text text-white font-bold px-4 flex items-center">
+            <div id="news-ticker-content" class="ticker-text text-white text-sm font-bold px-4 flex items-center">
                 جارٍ مزامنة شريط الأخبار...
             </div>
         </div>
         
-        <div class="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-[#0B102E] via-[#0B102E]/60 to-transparent z-20 pointer-events-none"></div>
+        <div class="absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-black via-black/50 to-transparent z-20"></div>
     </div>
 
-    <div class="tv-footer-meta flex justify-between items-center">
-        <div class="flex items-center gap-2 text-[10.5px] text-gray-300 font-bold tracking-wider">
-            <span class="inline-block h-2 w-2 rounded-full bg-green-400 shadow-[0_0_8px_#4ade80]"></span>
+    <div class="px-8 py-2 flex justify-between items-center bg-black/20">
+        <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+            <span class="flex h-1.5 w-1.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+            </span>
             <span>تحديث تلقائي مباشر</span>
         </div>
 
-        <div class="text-[10.5px] font-bold text-gray-400 flex items-center gap-3">
-            <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
-            <span class="text-white/15">|</span>
-            <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
-        </div>
+    <div class="text-[10px] font-bold text-gray-500 flex items-center gap-3">
+        <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
+        <span class="text-white/10">|</span>
+        <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+    </div>
     </div>
 </footer>
 
@@ -2450,7 +1878,16 @@ async function fetchData() {
     }
 }
 
-
+// دالة مساعدة لتحويل الوقت لشكل شيك (9:00 ص)
+function formatPeriodTime(timeStr) {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':');
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return `${hours}:${m} ${ampm}`;
+}
 
 // الدالة العقل: بتحدد السلايد الحالي قاعة ولا بوستر وتعدل الوقت بناء عليه
 function renderMasterSlide(index, preserveMedia = false) {
@@ -2469,7 +1906,6 @@ function renderMasterSlide(index, preserveMedia = false) {
     }
     renderedPosterSignature = '';
     displayedPoster = null;
-    stopTvLiveDock();
     window.CITLTVMedia.cancel(isExamMode || !postersEnabled);
     posterAlarm.pause(); posterAlarm.currentTime = 0;
     // 🔥 عرض امتحانات اليوم فقط وتثبيت الشريحة للوقت المستقل من الداشبورد
@@ -2701,31 +2137,10 @@ function startSlideshow() {
         if(generation!==slideshowGeneration)return;
         if (progressEpoch !== mediaProgressEpoch) { progressEpoch = mediaProgressEpoch; width = 0; if (bar) bar.style.transform = 'scaleX(0)'; }
         if (window.CITLTVMedia.waiting()) return;
-        const isVideoPoster = !!(displayedPoster && window.CITLTVMedia && window.CITLTVMedia.video(displayedPoster));
-        const activeVideo = isVideoPoster ? document.querySelector('#poster-media-host video') : null;
-        if (isVideoPoster) {
-            // حماية كاملة للفيديو: لا يقلب الشريحة أبداً قبل انتهاء الفيديو فعلياً
-            if (activeVideo) {
-                if (activeVideo.ended) {
-                    width = 100;
-                } else if (activeVideo.duration && Number.isFinite(activeVideo.duration) && activeVideo.duration > 0) {
-                    width = Math.min(99.5, (activeVideo.currentTime / activeVideo.duration) * 100);
-                } else {
-                    const vp = window.CITLTVMedia.videoProgress();
-                    if (vp !== null) width = Math.min(99.5, vp);
-                    else return;
-                }
-            } else {
-                const videoProgress = window.CITLTVMedia.videoProgress();
-                if (videoProgress !== null) width = videoProgress;
-                else return;
-            }
-        } else {
-            const videoProgress = window.CITLTVMedia.videoProgress();
-            if (videoProgress !== null) width = videoProgress;
-            else width += 100 / (currentSlideDurationMs / 50);
-        }
-        if (bar) bar.style.transform = `scaleX(${Math.min(1, Math.max(0, width / 100))})`;
+        const videoProgress = window.CITLTVMedia.videoProgress();
+        if (videoProgress !== null) width = videoProgress;
+        else width += 100 / (currentSlideDurationMs / 50);
+        if (bar) bar.style.transform = `scaleX(${width / 100})`;
         
         if (width >= 100) {
             clearInterval(progressInterval);
@@ -2757,90 +2172,7 @@ function startSlideshow() {
     progressInterval = setInterval(step, 50);
 }
 
-// =========================================================================
-// Live Schedule Dock (Shows 2 active/upcoming lectures below Posters/Videos)
-// =========================================================================
-let tvLiveDockInterval = null;
-let tvLiveDockOffset = 0;
-
-function stopTvLiveDock() {
-    if (tvLiveDockInterval) {
-        clearInterval(tvLiveDockInterval);
-        tvLiveDockInterval = null;
-    }
-}
-
-function collectLiveDockLectures() {
-    if (typeof roomsData !== 'object' || !roomsData) return [];
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const todayStr = (window.CITLStudy && typeof window.CITLStudy.cairo === 'function')
-        ? window.CITLStudy.cairo().date
-        : now.toISOString().slice(0, 10);
-
-    const roomsList = (Array.isArray(displayRooms) && displayRooms.length)
-        ? displayRooms
-        : (Array.isArray(activeRooms) ? activeRooms : Object.keys(roomsData));
-
-    const items = [];
-    roomsList.forEach(roomName => {
-        const list = roomsData[roomName] || [];
-        list.forEach(item => {
-            const isCancelled = item.status === 'cancelled' || (item.cancelled_dates && item.cancelled_dates.includes(todayStr));
-            if (isCancelled) return;
-            const displayTime = tvFormatTimeDisplay(item.time_slot);
-            const parts = displayTime.split('-');
-            let startMins = null, endMins = null, isLive = false, isFinished = false;
-            if (parts.length === 2) {
-                startMins = tvTimeToMinutes(parts[0]);
-                endMins = tvTimeToMinutes(parts[1]);
-                if (startMins !== null && endMins !== null) {
-                    if (currentMinutes >= endMins) isFinished = true;
-                    else if (currentMinutes >= startMins && currentMinutes < endMins) isLive = true;
-                }
-            }
-            if (isFinished) return;
-            items.push({
-                roomName,
-                course: item.course_name || 'محاضرة دراسية',
-                instructor: item.instructor || 'هيئة التدريس',
-                displayTime,
-                isLive,
-                sortKey: isLive ? (startMins ?? 0) - 10000 : (startMins ?? 9999)
-            });
-        });
-    });
-
-    items.sort((a, b) => a.sortKey - b.sortKey);
-    return items;
-}
-
-function buildLiveDockCardsHTML(lectures, offset, escapeHtml) {
-    const slice = [];
-    const count = Math.min(2, lectures.length);
-    for (let i = 0; i < count; i++) {
-        slice.push(lectures[(offset + i) % lectures.length]);
-    }
-    return slice.map(lec => `
-        <div class="tv-dock-card ${lec.isLive ? 'is-live' : ''}">
-            <div class="tv-dock-room">${escapeHtml(lec.roomName)}</div>
-            <div class="tv-dock-info">
-                <div class="tv-dock-course">${escapeHtml(lec.course)}</div>
-                <div class="tv-dock-instructor"><i class="fas fa-user-tie"></i>${escapeHtml(lec.instructor)}</div>
-            </div>
-            <div class="tv-dock-right">
-                <span class="tv-dock-badge ${lec.isLive ? 'live' : 'upcoming'}">
-                    <i class="fas ${lec.isLive ? 'fa-circle-play' : 'fa-clock'}"></i>
-                    ${lec.isLive ? 'الآن' : 'قادمة'}
-                </span>
-                <span class="tv-dock-time">${escapeHtml(lec.displayTime)}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
 async function showPoster(poster, currentNumber, totalCount) {
-    stopTvLiveDock();
     renderedPosterSignature = posterSignature(poster);
     displayedPoster = poster;
     mediaProgressEpoch++;
@@ -2850,51 +2182,34 @@ async function showPoster(poster, currentNumber, totalCount) {
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    const liveLectures = collectLiveDockLectures();
-    const hasDock = liveLectures.length > 0;
-    const liveCount = liveLectures.filter(l => l.isLive).length;
-    const dockMetaLabel = liveCount > 0 ? `${liveCount} محاضرة جارية الآن` : `${liveLectures.length} محاضرة قادمة اليوم`;
+    const objectFitClass = poster.fit_mode === 'contain' ? 'object-contain' : 'object-cover';
 
-    // بناء الهيكل فوراً (Split-Stage: الفيديو/البوستر فوق + شريط الجداول الحية أسفل الشاشة)
+    // بناء الهيكل فوراً لحماية الشاشة من اللاج البصري
     const shell = document.createElement('div');
     shell.innerHTML = `
-        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide citl-split-stage" style="background: #070B1E !important;">
-            <div class="room-hero poster-topbar flex justify-between items-center">
-                <div class="flex items-center gap-3 min-w-0">
+        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide" style="background: #090d16 !important;">
+            <div class="room-hero flex justify-between items-center px-6 py-4" style="background: linear-gradient(135deg, #1e255a 0%, #11183d 100%) !important; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <div class="flex items-center gap-3">
                     <button type="button" class="room-icon" data-tv-audio-control title="تفعيل واختبار الصوت" aria-label="تفعيل واختبار الصوت"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><!-- Font Awesome Free 6.4.0 by @fontawesome: https://fontawesome.com License https://fontawesome.com/license/free (Icons: CC BY 4.0). Copyright 2023 Fonticons, Inc. --><path d="M480 32c0-12.9-7.8-24.6-19.8-29.6s-25.7-2.2-34.9 6.9L381.7 53c-48 48-113.1 75-181 75H192 160 64c-35.3 0-64 28.7-64 64v96c0 35.3 28.7 64 64 64l0 128c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V352l8.7 0c67.9 0 133 27 181 75l43.6 43.6c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V300.4c18.6-8.8 32-32.5 32-60.4s-13.4-51.6-32-60.4V32zm-64 76.7V240 371.3C357.2 317.8 280.5 288 200.7 288H192V192h8.7c79.8 0 156.5-29.8 215.3-83.3z"/></svg></button>
-                    <div class="min-w-0">
-                        <h2 class="font-black text-white truncate">${escapeHtml(poster.title || 'إعلان مهم')}</h2>
+                    <div>
+                        <h2 class="text-2xl font-black text-white">${escapeHtml(poster.title || 'إعلان مهم')}</h2>
                     </div>
                 </div>
-                <div class="slide-counter !bg-white/10 !border-white/15 !text-[#FFD479] shrink-0">
+                <div class="slide-counter !bg-white/5 !border-white/10 !text-[#F3A628]">
                     <i class="fas fa-images ml-1"></i>
                     <span>إعلان</span>
                     <strong class="font-english ml-1">${currentNumber} / ${totalCount}</strong>
                 </div>
             </div>
             
-            <div class="poster-media-stage flex-1 flex items-center justify-center relative overflow-hidden" style="min-height:0">
-                <div id="poster-media-host" class="w-full h-full" style="position:relative;min-height:0;overflow:hidden;background:#060917"></div>
-            </div>
-
-            <div class="tv-live-dock ${hasDock ? '' : 'is-empty'}" id="tv-poster-live-dock">
-                <div class="tv-live-dock-head">
-                    <div class="tv-live-dock-title">
-                        <span class="tv-live-dot"></span>
-                        <span>المحاضرات الجارية والقادمة الآن</span>
-                    </div>
-                    <span class="tv-live-dock-meta">${escapeHtml(dockMetaLabel)}</span>
-                </div>
-                <div class="tv-live-dock-grid" id="tv-live-dock-grid">
-                    ${hasDock ? buildLiveDockCardsHTML(liveLectures, tvLiveDockOffset, escapeHtml) : ''}
-                </div>
+            <div class="flex-1 bg-[#090d16] flex items-center justify-center p-1 relative overflow-hidden" style="min-height:0">
+                <div id="poster-media-host" class="w-full h-full" style="position:relative;min-height:0;overflow:hidden;background:#090d16"></div>
             </div>
         </div>
     `;
 
-    const slideEl = shell.firstElementChild;
 
-    await window.CITLTVMedia.show(poster, slideEl, shell.querySelector('#poster-media-host'), container, videoDuration => {
+    await window.CITLTVMedia.show(poster, shell.firstElementChild, shell.querySelector('#poster-media-host'), container, videoDuration => {
         if (videoDuration !== null) currentSlideDurationMs = videoDuration * 1000;
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         const visibleSettings=displayedPoster||poster;
@@ -2902,24 +2217,6 @@ async function showPoster(poster, currentNumber, totalCount) {
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);
         window.CITLTVMedia.preload(tvPosters[(index + 1) % Math.max(1,tvPosters.length)]);
-
-        // تدوير لطيف لمحاضرات الشريط السفلي كل 6 ثوانٍ إذا وجد أكثر من محاضرتين
-        if (hasDock && liveLectures.length > 2) {
-            stopTvLiveDock();
-            tvLiveDockInterval = setInterval(() => {
-                const grid = document.getElementById('tv-live-dock-grid');
-                if (!grid) { stopTvLiveDock(); return; }
-                const fresh = collectLiveDockLectures();
-                if (fresh.length === 0) { stopTvLiveDock(); return; }
-                tvLiveDockOffset = (tvLiveDockOffset + 2) % fresh.length;
-                grid.classList.add('is-fading');
-                setTimeout(() => {
-                    if (!grid.isConnected) return;
-                    grid.innerHTML = buildLiveDockCardsHTML(fresh, tvLiveDockOffset, escapeHtml);
-                    grid.classList.remove('is-fading');
-                }, 220);
-            }, 6000);
-        }
     }, () => { currentSlideDurationMs = 3000; });
 }
 

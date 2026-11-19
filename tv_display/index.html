@@ -1211,169 +1211,106 @@ body.tv-display-page.tv-rotate-ccw {
     --footer-h: 78px !important;
 }
 
-/* ---------- 1. EXECUTIVE HEADER + QR CODE + CLOCK CAPSULE ---------- */
+/* ---------- 1. EXECUTIVE BROADCAST HEADER (Clean, Spacious, No Overlap) ---------- */
 body.tv-display-page > header {
     min-height: var(--header-h) !important;
     height: var(--header-h) !important;
-    padding: 10px 18px !important;
-    background: linear-gradient(135deg, #090E29 0%, #19235C 48%, #2A3475 100%) !important;
-    border-bottom: 3.5px solid var(--citl-gold) !important;
-    box-shadow: 0 12px 30px rgba(8, 12, 36, 0.36), inset 0 -1px 0 rgba(255, 255, 255, 0.10) !important;
+    padding: 0 24px !important;
+    background: linear-gradient(135deg, #090E29 0%, #19235C 50%, #2A3475 100%) !important;
+    border-bottom: 3px solid var(--citl-gold) !important;
+    box-shadow: 0 10px 26px rgba(8, 12, 36, 0.34) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
 }
 
 body.tv-display-page > header::before {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-        radial-gradient(circle at 12% 50%, rgba(243, 166, 40, 0.18), transparent 40%),
-        radial-gradient(circle at 88% 20%, rgba(99, 124, 240, 0.18), transparent 38%);
+    background: radial-gradient(circle at 12% 50%, rgba(243, 166, 40, 0.16), transparent 40%);
     pointer-events: none;
     z-index: 0;
 }
 
 body.tv-display-page > header .tv-logo-btn {
-    width: 66px !important;
-    height: 66px !important;
-    border-radius: 16px !important;
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 15px !important;
     background: #FFFFFF !important;
     border: 2px solid rgba(243, 166, 40, 0.90) !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.30), 0 0 0 3px rgba(255, 255, 255, 0.10) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28) !important;
     padding: 4px !important;
+    flex-shrink: 0 !important;
 }
 
-.tv-header-kicker {
-    display: inline-flex;
+.tv-header-brand {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 10.5px;
-    font-weight: 800;
-    color: var(--citl-gold-light);
-    background: rgba(243, 166, 40, 0.14);
-    border: 1px solid rgba(243, 166, 40, 0.34);
-    padding: 2px 9px;
-    border-radius: 999px;
-    margin-bottom: 4px;
+    gap: 16px;
+    min-width: 0;
+    flex: 1;
 }
 
-.tv-header-kicker .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #22C55E;
-    box-shadow: 0 0 8px #22C55E;
+.tv-header-titles {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    gap: 4px;
 }
 
 body.tv-display-page > header #main-header-title {
-    font-size: clamp(19px, 2.15vw, 28px) !important;
+    font-size: clamp(20px, 2.2vw, 29px) !important;
     font-weight: 900 !important;
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
     letter-spacing: 0 !important;
     color: #FFFFFF !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.30) !important;
+    margin: 0 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.28) !important;
 }
 
 body.tv-display-page > header .tv-header-en {
-    color: rgba(255, 212, 121, 0.92) !important;
-    font-size: clamp(9.5px, 0.95vw, 12px) !important;
+    color: var(--citl-gold-light) !important;
+    font-size: clamp(10px, 1vw, 12.5px) !important;
     font-weight: 800 !important;
-    letter-spacing: 0.11em !important;
-    margin-top: 2px !important;
+    letter-spacing: 0.12em !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    opacity: 0.95;
 }
 
-.tv-header-left-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-/* Header QR Code Widget */
-.tv-qr-widget {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(243, 166, 40, 0.42);
-    border-radius: 14px;
-    padding: 5px 10px 5px 6px;
-    height: 74px;
-}
-
-.tv-qr-frame {
-    width: 60px;
-    height: 60px;
-    background: #FFFFFF;
-    border-radius: 10px;
-    padding: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.tv-qr-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-.tv-qr-text {
+/* Frameless Broadcast Clock & Date */
+.tv-clock-group {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    text-align: right;
-    line-height: 1.3;
-}
-
-.tv-qr-title {
-    font-size: 11px;
-    font-weight: 900;
-    color: #FFFFFF;
-    white-space: nowrap;
-}
-
-.tv-qr-sub {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: var(--citl-gold-light);
-    white-space: nowrap;
-}
-
-/* Digital Clock & Date Capsule */
-.tv-clock-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.05) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-top: 2px solid var(--citl-gold);
-    border-radius: 14px;
-    padding: 7px 14px;
-    min-width: 158px;
-    height: 74px;
+    flex-shrink: 0;
+    padding-right: 18px;
+    border-right: 1.5px solid rgba(255, 255, 255, 0.16);
 }
 
 body.tv-display-page #current-time {
-    font-size: clamp(26px, 2.8vw, 36px) !important;
+    font-size: clamp(30px, 3.1vw, 42px) !important;
     font-weight: 900 !important;
     color: #FFFFFF !important;
     line-height: 1 !important;
     letter-spacing: 0.04em !important;
     white-space: nowrap;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.30) !important;
 }
 
 body.tv-display-page #current-date {
-    font-size: clamp(10.5px, 0.95vw, 13px) !important;
-    font-weight: 800 !important;
+    font-size: clamp(11px, 1vw, 14px) !important;
+    font-weight: 700 !important;
     color: var(--citl-gold-light) !important;
-    margin-top: 5px !important;
-    opacity: 0.98 !important;
+    margin-top: 6px !important;
+    line-height: 1 !important;
+    opacity: 0.95 !important;
     white-space: nowrap;
 }
 
@@ -1823,37 +1760,22 @@ body.tv-display-page #news-ticker-content {
     <div class="bg-animated"></div>
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 z-0"></div>
 
-<header class="relative z-10 flex justify-between items-center gap-3">
-        <div class="flex items-center gap-3.5 min-w-0">
-            <div onclick="openSettings()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSettings();}" class="tv-logo-btn bg-white flex items-center justify-center cursor-pointer group relative overflow-hidden shrink-0" title="اضغط لضبط القاعات">
+<header class="relative z-10">
+        <div class="tv-header-brand">
+            <div onclick="openSettings()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSettings();}" class="tv-logo-btn bg-white flex items-center justify-center cursor-pointer group relative overflow-hidden" title="اضغط لضبط القاعات">
                 <img src="/CITL.png" alt="Logo" class="h-full w-full object-contain transform scale-115">
                 <div class="absolute inset-0 bg-black/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
                     <i class="fas fa-cog text-navy text-2xl"></i>
                 </div>
             </div>
-            <div class="min-w-0">
-                <div class="tv-header-kicker">
-                    <span class="dot"></span>
-                    <span>CITL SMART SYSTEM</span>
-                </div>
+            <div class="tv-header-titles">
                 <h1 id="main-header-title" class="font-black text-white truncate">شاشة الجداول الدراسية اليومية</h1>
                 <p class="tv-header-en font-english uppercase truncate">COLLEGE OF INTERNATIONAL TRANSPORT &amp; LOGISTICS</p>
             </div>
         </div>
-        <div class="tv-header-left-group">
-            <div class="tv-qr-widget" title="امسح الكود لفتح الجداول على هاتفك">
-                <div class="tv-qr-text">
-                    <span class="tv-qr-title">جدولك على موبايلك</span>
-                    <span class="tv-qr-sub">امسح الكود الآن</span>
-                </div>
-                <div class="tv-qr-frame">
-                    <img src="qr.png" alt="CITL QR Code">
-                </div>
-            </div>
-            <div dir="ltr" class="tv-clock-box shrink-0">
-                <div id="current-time" class="font-black text-white font-english leading-none">00:00</div>
-                <div id="current-date" class="font-bold font-english">...</div>
-            </div>
+        <div dir="ltr" class="tv-clock-group">
+            <div id="current-time" class="font-black text-white font-english">00:00</div>
+            <div id="current-date" class="font-bold font-english">...</div>
         </div>
     </header>
 

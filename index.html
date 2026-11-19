@@ -41,11 +41,12 @@
     <style>
         :root {
             --citl-navy: #2A3475;
-            --citl-navy-deep: #171E4B;
-            --citl-navy-dark: #101638;
+            --citl-navy-mid: #1D255B;
+            --citl-navy-deep: #11173D;
+            --citl-navy-ink: #0B102B;
             --citl-gold: #F3A628;
-            --citl-gold-hover: #E09215;
-            --citl-bg: #F4F6FB;
+            --citl-gold-light: #FFD173;
+            --citl-gold-hover: #D98B14;
             --citl-surface: #FFFFFF;
             --citl-border: #E2E8F0;
             --citl-text: #0F172A;
@@ -58,12 +59,13 @@
 
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--citl-bg);
+            background-color: var(--citl-navy-deep);
             color: var(--citl-text);
             margin: 0;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
         .bg-navy { background-color: #2A3475; }
@@ -72,354 +74,260 @@
         .text-gold { color: #F3A628; }
         .bg-gold { background-color: #F3A628; }
 
-        /* ========================================= */
-        /* Modern Split-Screen Portal Shell          */
-        /* ========================================= */
-        .citl-portal-shell {
-            min-height: 100vh;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr;
-            background: var(--citl-bg);
-            position: relative;
-        }
-
-        @media (min-width: 1024px) {
-            .citl-portal-shell {
-                grid-template-columns: minmax(420px, 44%) 1fr;
-            }
-        }
-
-        /* ========================================= */
-        /* Brand Showcase Panel (Right in RTL)       */
-        /* ========================================= */
-        .login-campus-panel {
-            position: relative;
+        /* ========================================================= */
+        /* Full-Bleed Cinematic University Campus Backdrop           */
+        /* ========================================================= */
+        .citl-campus-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
             overflow: hidden;
-            background: linear-gradient(155deg, #161D47 0%, #2A3475 52%, #1B2358 100%);
-            color: #FFFFFF;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 24px 20px 44px;
+            background-color: var(--citl-navy-deep);
+            pointer-events: none;
         }
 
-        @media (min-width: 1024px) {
-            .login-campus-panel {
-                padding: 40px 44px;
-                min-height: 100vh;
-            }
-        }
-
-        .login-campus-image-layer {
+        .citl-campus-photo {
             position: absolute;
-            inset: 0;
-            background-image: url('CITL-Camp1.png');
+            inset: -12px;
+            background-image: url('/CITL-Camp2.jpg'), url('/CITL-Camp1.png');
             background-size: cover;
-            background-position: 50% center;
+            background-position: 50% 42%;
             background-repeat: no-repeat;
-            opacity: 0.24;
-            transform: scale(1.03);
-            z-index: 1;
-            pointer-events: none;
+            opacity: 0.42;
+            filter: saturate(0.95) contrast(1.04);
+            transform: scale(1.02);
         }
 
-        .login-campus-pattern-layer {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-            background-size: 36px 36px;
-            mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.85), transparent 80%);
-            -webkit-mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,0.85), transparent 80%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .login-campus-soft-light {
+        .citl-campus-vignette {
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(circle at 88% 12%, rgba(243, 166, 40, 0.22) 0%, transparent 42%),
-                radial-gradient(circle at 12% 88%, rgba(99, 120, 230, 0.28) 0%, transparent 48%),
-                linear-gradient(160deg, rgba(16, 22, 56, 0.78) 0%, rgba(42, 52, 117, 0.76) 55%, rgba(16, 22, 56, 0.90) 100%);
-            z-index: 3;
-            pointer-events: none;
+                radial-gradient(circle at 82% 16%, rgba(243, 166, 40, 0.22) 0%, transparent 42%),
+                radial-gradient(circle at 15% 84%, rgba(68, 92, 205, 0.30) 0%, transparent 48%),
+                linear-gradient(170deg, rgba(11, 16, 43, 0.86) 0%, rgba(28, 37, 94, 0.74) 48%, rgba(11, 16, 43, 0.94) 100%);
         }
 
-        .login-campus-content {
+        .citl-campus-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.9), transparent 82%);
+            -webkit-mask-image: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.9), transparent 82%);
+        }
+
+        /* ========================================================= */
+        /* University SSO Layout Shell                               */
+        /* ========================================================= */
+        .citl-university-shell {
             position: relative;
-            z-index: 5;
-            width: 100%;
-            height: 100%;
+            z-index: 10;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .citl-top-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-            color: rgba(255, 255, 255, 0.92);
-        }
-
-        .citl-top-pill .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--citl-gold);
-            box-shadow: 0 0 10px rgba(243, 166, 40, 0.85);
-        }
-
-        .citl-brand-hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin: 18px 0;
+        /* Top Institutional Bar */
+        .citl-topbar {
             width: 100%;
-            max-width: 440px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(11, 16, 43, 0.42);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
-        @media (min-width: 1024px) {
-            .citl-brand-hero {
-                margin: auto 0;
-            }
+        .citl-topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
         }
 
-        .citl-logo-frame {
+        .citl-topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .citl-topbar-logo {
             background: rgba(255, 255, 255, 0.96);
-            padding: 10px 14px;
-            border-radius: 20px;
-            box-shadow:
-                0 18px 40px rgba(9, 14, 42, 0.35),
-                0 0 0 1px rgba(255, 255, 255, 0.55);
-            margin-bottom: 16px;
-            transition: transform 0.3s ease;
+            padding: 5px 8px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
         }
 
-        .citl-logo-frame:hover {
-            transform: translateY(-2px);
-        }
-
-        .citl-logo-frame img {
+        .citl-topbar-logo img {
             display: block;
-            width: 82px;
-            height: auto;
+            height: 36px;
+            width: auto;
+            object-fit: contain;
         }
 
-        @media (min-width: 1024px) {
-            .citl-logo-frame {
-                padding: 12px 18px;
-                margin-bottom: 22px;
-            }
-            .citl-logo-frame img {
-                width: 112px;
-            }
+        .citl-topbar-titles {
+            min-width: 0;
         }
 
-        .citl-brand-title {
+        .citl-topbar-ar {
+            font-size: clamp(13px, 2.6vw, 15.5px);
             font-weight: 800;
-            font-size: clamp(19px, 3.6vw, 27px);
-            line-height: 1.35;
-            margin: 0 0 4px;
             color: #FFFFFF;
-            letter-spacing: -0.2px;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .citl-brand-subtitle {
-            color: var(--citl-gold);
-            font-weight: 700;
-            font-size: clamp(11px, 2.2vw, 14px);
-            letter-spacing: 0.45px;
-            margin: 0 0 14px;
-        }
-
-        .citl-system-mark {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .citl-system-divider {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .citl-system-divider span {
-            width: 34px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(243, 166, 40, 0.9), transparent);
-        }
-
-        .citl-system-name {
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2.6px;
-            font-size: clamp(14px, 2.8vw, 19px);
-            color: #FFFFFF;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Glass Bento Feature Cards */
-        .citl-bento-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            width: 100%;
-            max-width: 440px;
-            margin-top: 18px;
-        }
-
-        @media (min-width: 1024px) {
-            .citl-bento-grid {
-                gap: 14px;
-                margin-top: 28px;
-            }
-        }
-
-        .citl-glass-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 16px;
-            padding: 12px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            text-align: right;
-            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-        }
-
-        .citl-glass-card:hover {
-            background: rgba(255, 255, 255, 0.13);
-            border-color: rgba(243, 166, 40, 0.45);
-            transform: translateY(-2px);
-        }
-
-        @media (min-width: 1024px) {
-            .citl-glass-card {
-                padding: 16px;
-            }
-        }
-
-        .citl-glass-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: rgba(243, 166, 40, 0.16);
-            border: 1px solid rgba(243, 166, 40, 0.32);
-            color: var(--citl-gold);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .citl-glass-title {
-            display: block;
-            font-weight: 700;
-            font-size: 12px;
-            color: #FFFFFF;
-            line-height: 1.45;
-            margin-bottom: 3px;
-        }
-
-        .citl-glass-desc {
-            display: none;
+        .citl-topbar-en {
             font-size: 11px;
-            line-height: 1.55;
-            color: rgba(226, 232, 240, 0.82);
+            font-weight: 700;
+            color: var(--citl-gold);
+            letter-spacing: 0.35px;
+            line-height: 1.3;
+            display: none;
         }
 
         @media (min-width: 640px) {
-            .citl-glass-desc {
+            .citl-topbar-en {
                 display: block;
             }
         }
 
-        .citl-install-pill {
-            margin: 14px auto 0;
-            padding: 8px 14px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.09);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            text-align: center;
+        .citl-sso-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.94);
             font-size: 11.5px;
-            line-height: 1.55;
-            color: rgba(255, 255, 255, 0.92);
-            max-width: 440px;
-            width: 100%;
-            pointer-events: none;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        /* ========================================= */
-        /* Auth Workspace Panel (Left in RTL)        */
-        /* ========================================= */
-        .citl-auth-workspace {
+        .citl-sso-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--citl-gold);
+            box-shadow: 0 0 10px rgba(243, 166, 40, 0.9);
+        }
+
+        @media (max-width: 480px) {
+            .citl-sso-badge span.hide-xs {
+                display: none;
+            }
+        }
+
+        /* Center Stage */
+        .citl-stage {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0 16px 28px;
-            position: relative;
-            background:
-                radial-gradient(circle at 12% 14%, rgba(42, 52, 117, 0.05) 0%, transparent 45%),
-                radial-gradient(circle at 88% 86%, rgba(243, 166, 40, 0.07) 0%, transparent 45%),
-                var(--citl-bg);
+            padding: 26px 16px 28px;
         }
 
-        @media (min-width: 1024px) {
-            .citl-auth-workspace {
-                padding: 36px 40px;
-                min-height: 100vh;
-            }
+        .citl-hero-intro {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 580px;
+            animation: citlFadeDown 0.45s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .citl-hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--citl-gold-light);
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+
+        .citl-hero-eyebrow span.line {
+            width: 24px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(243, 166, 40, 0.85), transparent);
+        }
+
+        .citl-hero-heading {
+            margin: 0;
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 900;
+            color: #FFFFFF;
+            letter-spacing: 0.4px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .citl-hero-system {
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2.8px;
+            color: rgba(226, 232, 240, 0.82);
+        }
+
+        /* ========================================================= */
+        /* Elevated Institutional Portal Card                        */
+        /* ========================================================= */
         .citl-auth-card {
             width: 100%;
-            max-width: 500px;
-            background-color: #FFFFFF;
-            border: 1px solid rgba(226, 232, 240, 0.95);
+            max-width: 468px;
+            background-color: rgba(255, 255, 255, 0.98);
             border-radius: 24px;
-            padding: 24px 20px;
-            box-shadow:
-                0 22px 50px -15px rgba(23, 30, 75, 0.12),
-                0 4px 14px -4px rgba(23, 30, 75, 0.05);
             position: relative;
-            z-index: 10;
-            margin-top: -26px;
-            animation: citlFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: visible;
+            box-shadow:
+                0 32px 72px -18px rgba(5, 9, 28, 0.62),
+                0 12px 28px -10px rgba(5, 9, 28, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.28);
+            transition: max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: citlFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .citl-auth-card.is-signup-mode {
+            max-width: 570px;
+        }
+
+        /* Architectural Gold Accent Crest */
+        .citl-card-crest {
+            height: 4px;
+            width: 100%;
+            border-radius: 24px 24px 0 0;
+            background: linear-gradient(90deg, #B56A0F 0%, #F3A628 32%, #FFD479 50%, #F3A628 68%, #B56A0F 100%);
+        }
+
+        .citl-card-body {
+            padding: 24px 20px 26px;
         }
 
         @media (min-width: 640px) {
-            .citl-auth-card {
-                padding: 32px 34px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .citl-auth-card {
-                margin-top: 0;
-                padding: 36px 38px;
+            .citl-card-body {
+                padding: 30px 34px 32px;
             }
         }
 
         @keyframes citlFadeUp {
-            from { opacity: 0; transform: translateY(14px); }
+            from { opacity: 0; transform: translateY(16px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes citlFadeDown {
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -431,7 +339,7 @@
             padding: 5px;
             background: #F1F5F9;
             border-radius: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
             border: 1px solid #E2E8F0;
         }
 
@@ -459,7 +367,7 @@
         .citl-mode-tab.is-active {
             background: #FFFFFF;
             color: var(--citl-navy);
-            box-shadow: 0 4px 12px rgba(42, 52, 117, 0.10);
+            box-shadow: 0 4px 14px rgba(42, 52, 117, 0.12);
         }
 
         .citl-mode-tab i {
@@ -468,12 +376,12 @@
 
         /* Form Headings */
         .citl-form-header {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             text-align: right;
         }
 
         .citl-form-header h1 {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--citl-navy);
             margin: 0 0 4px;
@@ -511,7 +419,7 @@
 
         .citl-input {
             width: 100%;
-            padding: 11px 14px;
+            padding: 11.5px 14px;
             border: 1.5px solid #E2E8F0;
             border-radius: 12px;
             background-color: #F8FAFC;
@@ -538,7 +446,6 @@
             box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10);
         }
 
-        /* Consistent RTL Icon Placement: Leading Icon Right, Action Icon Left */
         .citl-input.has-icon-right {
             padding-right: 40px;
         }
@@ -600,8 +507,8 @@
 
         /* Access Code Highlight Card */
         .citl-access-box {
-            background: linear-gradient(135deg, rgba(243, 166, 40, 0.09), rgba(243, 166, 40, 0.03));
-            border: 1px solid rgba(243, 166, 40, 0.35);
+            background: linear-gradient(135deg, rgba(243, 166, 40, 0.10), rgba(243, 166, 40, 0.03));
+            border: 1px solid rgba(243, 166, 40, 0.38);
             border-radius: 14px;
             padding: 12px 14px;
         }
@@ -616,7 +523,7 @@
             box-shadow: 0 0 0 4px rgba(243, 166, 40, 0.16);
         }
 
-        /* Custom Dropdowns (Preserving all JS hooks) */
+        /* Custom Dropdowns */
         .custom-dropdown {
             position: relative;
             width: 100%;
@@ -633,7 +540,7 @@
             justify-content: space-between;
             cursor: pointer;
             transition: all 0.2s ease;
-            min-height: 44px;
+            min-height: 45px;
         }
 
         .custom-dropdown-display:hover:not(.cursor-not-allowed) {
@@ -657,7 +564,7 @@
             max-height: 210px;
             overflow-y: auto;
             z-index: 60;
-            box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.16);
+            box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.18);
             padding: 4px;
             margin: 0;
             list-style: none;
@@ -778,10 +685,10 @@
             flex-shrink: 0;
         }
 
-        /* Primary & Secondary Buttons */
+        /* Buttons */
         .citl-btn-primary {
             width: 100%;
-            background: linear-gradient(135deg, #2A3475 0%, #1C255E 100%);
+            background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%);
             color: #FFFFFF;
             font-family: inherit;
             font-size: 14.5px;
@@ -794,14 +701,14 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 10px 24px -8px rgba(42, 52, 117, 0.55);
+            box-shadow: 0 12px 24px -8px rgba(42, 52, 117, 0.55);
             transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
 
         .citl-btn-primary:hover {
-            filter: brightness(1.07);
+            filter: brightness(1.08);
             transform: translateY(-1px);
-            box-shadow: 0 14px 28px -8px rgba(42, 52, 117, 0.62);
+            box-shadow: 0 16px 28px -8px rgba(42, 52, 117, 0.65);
         }
 
         .citl-btn-primary:active {
@@ -810,8 +717,8 @@
 
         .citl-btn-gold {
             width: 100%;
-            background: linear-gradient(135deg, #F5B038 0%, #E59617 100%);
-            color: #171E4B;
+            background: linear-gradient(135deg, #F5B038 0%, #E09215 100%);
+            color: #11173D;
             font-family: inherit;
             font-size: 14.5px;
             font-weight: 800;
@@ -823,7 +730,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 10px 24px -8px rgba(243, 166, 40, 0.55);
+            box-shadow: 0 12px 24px -8px rgba(243, 166, 40, 0.55);
             transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
 
@@ -885,14 +792,125 @@
             flex: 1;
         }
 
-        /* Footer */
-        .citl-portal-footer {
-            margin-top: 20px;
+        /* ========================================================= */
+        /* Sleek Glass Capability Strip Underneath Card              */
+        /* ========================================================= */
+        .citl-capabilities-strip {
+            width: 100%;
+            max-width: 570px;
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .citl-capabilities-strip {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+        }
+
+        .citl-cap-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+        }
+
+        .citl-cap-pill:hover {
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(243, 166, 40, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .citl-cap-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: rgba(243, 166, 40, 0.18);
+            border: 1px solid rgba(243, 166, 40, 0.34);
+            color: var(--citl-gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .citl-cap-text {
+            text-align: right;
+            min-width: 0;
+        }
+
+        .citl-cap-title {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            color: #FFFFFF;
+            line-height: 1.4;
+        }
+
+        .citl-cap-desc {
+            display: block;
+            font-size: 11px;
+            color: rgba(226, 232, 240, 0.78);
+            line-height: 1.45;
+        }
+
+        .citl-install-pill {
+            margin: 14px auto 0;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             text-align: center;
-            color: #64748B;
-            font-size: clamp(10.5px, 2.6vw, 12px);
+            font-size: 11.5px;
             font-weight: 600;
-            line-height: 1.75;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.92);
+            max-width: 570px;
+            pointer-events: none;
+        }
+
+        /* Institutional Footer */
+        .citl-portal-footer {
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(11, 16, 43, 0.48);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 13px 16px;
+            text-align: center;
+            color: rgba(226, 232, 240, 0.80);
+            font-size: clamp(10.5px, 2.5vw, 12px);
+            font-weight: 600;
+            line-height: 1.7;
+        }
+
+        .citl-portal-footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        @media (min-width: 768px) {
+            .citl-portal-footer-inner {
+                flex-direction: row;
+                justify-content: space-between;
+            }
         }
 
         /* Scrollbar polish */
@@ -924,6 +942,122 @@
         }
         .loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
         .loader-ring { animation: spin-slow 4s linear infinite; }
+    </style>
+
+    <!-- ========================================================= -->
+    <!-- Unified New Identity Theme for Password Recovery Modal    -->
+    <!-- (Non-destructive: never overrides display or .hidden)     -->
+    <!-- ========================================================= -->
+    <style id="citl-recovery-theme">
+        /* Target dynamic modals injected by password-recovery.js safely */
+        .citl-recovery-themed,
+        [id*="recovery"]:not(script):not(style),
+        [id*="forgot-password"]:not(button):not(a):not(script):not(style),
+        [data-password-recovery-modal] {
+            font-family: 'Cairo', sans-serif !important;
+            direction: rtl;
+        }
+
+        /* Backdrop polish for recovery overlay */
+        .citl-recovery-themed.fixed,
+        [id*="recovery"].fixed,
+        [id*="forgot-password"].fixed,
+        [data-password-recovery-modal].fixed {
+            background: rgba(11, 16, 43, 0.72) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+        }
+
+        /* Inner dialog card inside recovery modal */
+        .citl-recovery-themed > div,
+        .citl-recovery-themed form,
+        [id*="recovery"] > div.bg-white,
+        [id*="recovery"] [role="dialog"],
+        [data-password-recovery-modal] > div {
+            border-radius: 22px !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .citl-recovery-themed .citl-recovery-card-surface,
+        [id*="recovery"] > div.bg-white,
+        [id*="recovery"] .bg-white,
+        [data-password-recovery-modal] .bg-white {
+            background: #FFFFFF !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            border-top: 4px solid #F3A628 !important;
+            border-radius: 22px !important;
+            box-shadow: 0 30px 70px -15px rgba(5, 9, 28, 0.58) !important;
+            color: #0F172A !important;
+        }
+
+        .citl-recovery-themed h1,
+        .citl-recovery-themed h2,
+        .citl-recovery-themed h3,
+        [id*="recovery"] h2,
+        [id*="recovery"] h3 {
+            color: #2A3475 !important;
+            font-weight: 800 !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .citl-recovery-themed p,
+        [id*="recovery"] p {
+            color: #64748B;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .citl-recovery-themed input[type="email"],
+        .citl-recovery-themed input[type="password"],
+        .citl-recovery-themed input[type="text"],
+        [id*="recovery"] input[type="email"],
+        [id*="recovery"] input[type="password"],
+        [id*="recovery"] input[type="text"] {
+            border: 1.5px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            background-color: #F8FAFC !important;
+            padding: 11px 14px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            color: #0F172A !important;
+            outline: none !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+        }
+
+        .citl-recovery-themed input:focus,
+        [id*="recovery"] input:focus {
+            background-color: #FFFFFF !important;
+            border-color: #2A3475 !important;
+            box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10) !important;
+        }
+
+        .citl-recovery-themed button[type="submit"],
+        [id*="recovery"] button[type="submit"] {
+            background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 11px 18px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 800 !important;
+            box-shadow: 0 10px 22px -8px rgba(42, 52, 117, 0.55) !important;
+            transition: filter 0.2s ease, transform 0.18s ease !important;
+            cursor: pointer !important;
+        }
+
+        .citl-recovery-themed button[type="submit"]:hover,
+        [id*="recovery"] button[type="submit"]:hover {
+            filter: brightness(1.08) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .citl-recovery-themed button[type="button"],
+        [id*="recovery"] button[type="button"] {
+            font-family: 'Cairo', sans-serif !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
     </style>
 
 <link rel="stylesheet" href="/assets/interface-controls.css?v=20261028-r7.3.3.8-wa-ui">
@@ -993,339 +1127,357 @@ html.citl-navigation-loading #global-loader::before,
 </head>
 <body class="transition-opacity duration-500">
 
-<main class="citl-portal-shell">
+<!-- ==================== Full-Bleed Campus Backdrop ==================== -->
+<div class="citl-campus-backdrop" aria-hidden="true">
+    <div class="citl-campus-photo"></div>
+    <div class="citl-campus-vignette"></div>
+    <div class="citl-campus-grid"></div>
+</div>
 
-    <!-- ==================== Brand Showcase Panel ==================== -->
-    <section class="login-campus-panel">
-        <div class="login-campus-image-layer"></div>
-        <div class="login-campus-pattern-layer"></div>
-        <div class="login-campus-soft-light"></div>
+<!-- ==================== University SSO Portal Shell ==================== -->
+<div class="citl-university-shell">
 
-        <div class="login-campus-content">
-            <div class="citl-top-pill">
-                <span class="dot"></span>
-                <span>الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</span>
-            </div>
-
-            <div class="citl-brand-hero">
-                <div class="citl-logo-frame">
+    <!-- Top Institutional Bar -->
+    <header class="citl-topbar">
+        <div class="citl-topbar-inner">
+            <div class="citl-topbar-brand">
+                <div class="citl-topbar-logo">
                     <img src="CITL.png" alt="شعار كلية النقل الدولي واللوجستيات">
                 </div>
-
-                <h2 class="citl-brand-title">كلية النقل الدولي واللوجستيات</h2>
-                <h3 class="citl-brand-subtitle">College of International Transport &amp; Logistics</h3>
-
-                <div class="citl-system-mark">
-                    <div class="citl-system-divider">
-                        <span></span>
-                        <i class="fas fa-globe text-gold text-xs"></i>
-                        <span></span>
-                    </div>
-                    <span class="citl-system-name">CITL Smart System</span>
-                </div>
-
-                <div class="citl-bento-grid">
-                    <!-- كارت الجداول الدراسية -->
-                    <div class="citl-glass-card">
-                        <div class="citl-glass-icon">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <span class="citl-glass-title">إدارة الجداول الدراسية</span>
-                        <span class="citl-glass-desc">عرض، متابعة، وتحديث الجداول الدراسية بسهولة ودقة.</span>
-                    </div>
-
-                    <!-- كارت القاعات الدراسية -->
-                    <div class="citl-glass-card">
-                        <div class="citl-glass-icon">
-                            <i class="fas fa-door-open"></i>
-                        </div>
-                        <span class="citl-glass-title">إدارة القاعات الدراسية</span>
-                        <span class="citl-glass-desc">تنظيم حجوزات القاعات ومنع التعارض بين المواعيد.</span>
-                    </div>
+                <div class="citl-topbar-titles">
+                    <div class="citl-topbar-ar">كلية النقل الدولي واللوجستيات</div>
+                    <div class="citl-topbar-en">College of International Transport &amp; Logistics</div>
                 </div>
             </div>
 
-            <!-- إشعار تثبيت التطبيق -->
-            <p id="installContainer"
-               hidden
-               role="status"
-               aria-live="polite"
-               class="citl-install-pill">
-                يمكنك تثبيت التطبيق من قائمة المتصفح
-            </p>
+            <div class="citl-sso-badge">
+                <span class="citl-sso-dot"></span>
+                <span>بوابة الدخول الموحّد</span>
+                <span class="hide-xs" style="opacity:0.45;">•</span>
+                <span class="hide-xs" style="letter-spacing:0.8px;">CITL</span>
+            </div>
         </div>
-    </section>
+    </header>
 
-    <!-- ==================== Auth Workspace Panel ==================== -->
-    <section class="citl-auth-workspace">
-        <div class="citl-auth-card bg-white">
-
-            <!-- شريط التبديل العلوي العصري -->
-            <div class="citl-mode-switcher" role="tablist" aria-label="بوابة الدخول والتسجيل">
-                <button type="button" id="tab-login" role="tab" aria-selected="true" class="citl-mode-tab is-active" onclick="switchAuthMode('login')">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>تسجيل الدخول</span>
-                </button>
-                <button type="button" id="tab-signup" role="tab" aria-selected="false" class="citl-mode-tab" onclick="switchAuthMode('signup')">
-                    <i class="fas fa-user-plus"></i>
-                    <span>إنشاء حساب جديد</span>
-                </button>
+    <!-- Center Portal Stage -->
+    <main class="citl-stage">
+        <div class="citl-hero-intro">
+            <div class="citl-hero-eyebrow">
+                <span class="line"></span>
+                <span>الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</span>
+                <span class="line"></span>
             </div>
+            <h2 class="citl-hero-heading">بوابة النظام الذكي للكلية</h2>
+            <div class="citl-hero-system">CITL SMART SYSTEM</div>
+        </div>
 
-            <!-- ==================== نموذج تسجيل الدخول ==================== -->
-            <form id="loginForm" class="space-y-4 block transition-all duration-300">
-                <div class="citl-form-header">
-                    <h1>مرحباً بك مجدداً</h1>
-                    <p>يرجى إدخال بيانات حسابك للوصول إلى النظام</p>
-                </div>
+        <!-- Elevated Institutional Auth Card -->
+        <div id="citl-auth-card" class="citl-auth-card bg-white">
+            <div class="citl-card-crest"></div>
 
-                <div>
-                    <label for="email" class="citl-label">البريد الإلكتروني</label>
-                    <div class="citl-input-wrap">
-                        <input type="email" id="email" required
-                               class="citl-input has-icon-right"
-                               placeholder="user@aastcitl.me">
-                        <i class="fas fa-envelope citl-field-icon"></i>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="citl-label-row">
-                        <label for="password" class="citl-label">كلمة المرور</label>
-                        <button type="button" data-forgot-password class="citl-forgot-link">نسيت كلمة المرور؟</button>
-                    </div>
-                    <div class="citl-input-wrap">
-                        <input type="password" id="password" required
-                               class="citl-input has-icon-right has-icon-left"
-                               placeholder="••••••••">
-                        <i class="fas fa-lock citl-field-icon"></i>
-                        <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
-                    </div>
-                </div>
-
-                <div id="login-error" class="citl-error-banner hidden">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>بيانات الدخول غير صحيحة</span>
-                </div>
-
-                <button type="submit" id="submitBtn" class="citl-btn-primary group">
-                    <span>دخول للنظام</span>
-                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform text-xs"></i>
-                </button>
-
-                <p class="text-center text-xs text-gray-500 pt-1">
-                    ليس لديك حساب؟
-                    <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
-                </p>
-            </form>
-
-            <!-- ==================== نموذج إنشاء حساب جديد ==================== -->
-            <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
-                <div class="citl-form-header" style="margin-bottom: 14px;">
-                    <h1>إنشاء حساب جديد</h1>
-                    <p>سجّل بياناتك الأكاديمية أو الإدارية للانضمام للنظام</p>
-                </div>
-
-                <!-- مؤشر الخطوتين -->
-                <div class="citl-stepper" aria-label="خطوات التسجيل">
-                    <button type="button" id="step-indicator-1" class="citl-step-btn is-active" onclick="goToSignupStep(1)">
-                        <span class="citl-step-num">1</span>
-                        <span class="citl-step-label">البيانات الأساسية</span>
+            <div class="citl-card-body">
+                <!-- شريط التبديل العلوي -->
+                <div class="citl-mode-switcher" role="tablist" aria-label="بوابة الدخول والتسجيل">
+                    <button type="button" id="tab-login" role="tab" aria-selected="true" class="citl-mode-tab is-active" onclick="switchAuthMode('login')">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>تسجيل الدخول</span>
                     </button>
-                    <span class="citl-step-connector"></span>
-                    <button type="button" id="step-indicator-2" class="citl-step-btn" onclick="goToSignupStep(2)">
-                        <span class="citl-step-num">2</span>
-                        <span class="citl-step-label">الحساب والتفعيل</span>
+                    <button type="button" id="tab-signup" role="tab" aria-selected="false" class="citl-mode-tab" onclick="switchAuthMode('signup')">
+                        <i class="fas fa-user-plus"></i>
+                        <span>إنشاء حساب جديد</span>
                     </button>
                 </div>
 
-                <!-- الخطوة 1: البيانات الشخصية والوظيفية -->
-                <div id="signup-step-1" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label for="reg-name" class="citl-label">الاسم بالكامل</label>
-                            <input type="text" id="reg-name" required placeholder="الاسم ثلاثي أو رباعي" class="citl-input">
-                        </div>
-
-                        <div>
-                            <label for="reg-mobile" class="citl-label">رقم الموبايل</label>
-                            <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
-                                   class="citl-input text-left" dir="ltr">
-                        </div>
-
-                        <div>
-                            <label class="citl-label">القسم / الجهة</label>
-                            <div class="relative custom-dropdown w-full">
-                                <div class="custom-dropdown-display">
-                                    <span class="text-sm text-gray-700 truncate">اختر...</span>
-                                    <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
-                                </div>
-
-                                <ul class="custom-dropdown-options hidden custom-scrollbar">
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="">اختر...</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="dean">مكتب العميد</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="admin-followup">قسم المتابعة الإدارية</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="education-agency">وكالة شؤون التعليم</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="students-agency">وكالة شؤون الطلاب</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="assistants-office">مكتب المعيدين</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="computer-lab">معمل الحاسب</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
-                                </ul>
-
-                                <select id="reg-dept" class="hidden" required>
-                                    <option value="">اختر...</option>
-                                    <option value="dean">مكتب العميد</option>
-                                    <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
-                                    <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
-                                    <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
-                                    <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
-                                    <option value="admin-followup">قسم المتابعة الإدارية</option>
-                                    <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
-                                    <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
-                                    <option value="education-agency">وكالة شؤون التعليم</option>
-                                    <option value="students-agency">وكالة شؤون الطلاب</option>
-                                    <option value="assistants-office">مكتب المعيدين</option>
-                                    <option value="computer-lab">معمل الحاسب</option>
-                                    <option value="visitor">زائر خارجي</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="reg-position" class="citl-label">المسمى الوظيفي</label>
-                            <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق" class="citl-input">
-                        </div>
-
-                        <div class="md:col-span-1">
-                            <label class="citl-label">نوع الحساب</label>
-                            <div class="relative custom-dropdown w-full">
-                                <div class="custom-dropdown-display">
-                                    <span id="reg-account-type-label" class="text-sm text-gray-700 truncate">اختر...</span>
-                                    <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
-                                </div>
-
-                                <ul class="custom-dropdown-options hidden custom-scrollbar">
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="">اختر...</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="admin">إداري</li>
-                                    <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
-                                </ul>
-
-                                <select id="reg-account-type" class="hidden" required>
-                                    <option value="">اختر...</option>
-                                    <option value="admin">إداري</option>
-                                    <option value="faculty">عضو هيئة تدريس</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div id="faculty-link-block" class="md:col-span-1">
-                            <label class="citl-label">ربط الحساب بعضو هيئة تدريس</label>
-                            <div class="relative custom-dropdown w-full">
-                                <div id="faculty-link-display" class="custom-dropdown-display bg-gray-100 cursor-not-allowed">
-                                    <span id="reg-linked-instructor-label" class="text-sm text-gray-500 truncate">خاص بالتعليم فقط</span>
-                                    <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
-                                </div>
-
-                                <div class="custom-dropdown-options hidden custom-scrollbar" style="padding: 0;">
-                                    <div class="faculty-search-wrap">
-                                        <input type="text" id="faculty-search-input" class="faculty-search-input" placeholder="ابحث عن الاسم الأكاديمي..." autocomplete="off">
-                                    </div>
-                                    <ul id="faculty-name-options" style="list-style: none; margin: 0; padding: 4px;">
-                                    </ul>
-                                </div>
-
-                                <select id="reg-linked-instructor" class="hidden">
-                                    <option value="">اختر اسمك الأكاديمي</option>
-                                </select>
-                            </div>
-                        </div>
+                <!-- ==================== نموذج تسجيل الدخول ==================== -->
+                <form id="loginForm" class="space-y-4 block transition-all duration-300">
+                    <div class="citl-form-header">
+                        <h1>تسجيل الدخول</h1>
+                        <p>أدخل بريدك الإلكتروني وكلمة المرور للوصول إلى لوحة التحكم</p>
                     </div>
 
-                    <div id="signup-step-1-error" class="citl-error-banner hidden">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>يرجى استكمال جميع البيانات المطلوبة للمتابعة</span>
-                    </div>
-
-                    <button type="button" id="nextSignupStepBtn" class="citl-btn-primary" onclick="goToSignupStep(2)">
-                        <span>التالي: بيانات الحساب والتفعيل</span>
-                        <i class="fas fa-arrow-left text-xs"></i>
-                    </button>
-                </div>
-
-                <!-- الخطوة 2: البريد الإلكتروني وكود التفعيل وكلمة المرور -->
-                <div id="signup-step-2" class="space-y-3 hidden">
                     <div>
-                        <label for="reg-email" class="citl-label">البريد الإلكتروني</label>
+                        <label for="email" class="citl-label">البريد الإلكتروني</label>
                         <div class="citl-input-wrap">
-                            <input type="email" id="reg-email" required
+                            <input type="email" id="email" required
                                    class="citl-input has-icon-right"
                                    placeholder="user@aastcitl.me">
                             <i class="fas fa-envelope citl-field-icon"></i>
                         </div>
                     </div>
 
-                    <div class="citl-access-box">
-                        <label for="reg-access-code" class="citl-label" style="color: #92400E;">
-                            <i class="fas fa-shield-alt ml-1 text-[#F3A628]"></i>
-                            كود التسجيل الخاص بالكلية
-                        </label>
-                        <div class="citl-input-wrap">
-                            <input type="text" id="reg-access-code" required
-                                   placeholder="أدخل كود التفعيل المعتمد"
-                                   class="citl-input has-icon-right">
-                            <i class="fas fa-key citl-field-icon" style="color: #D97706;"></i>
-                        </div>
-                    </div>
-
                     <div>
-                        <label for="reg-password" class="citl-label">كلمة المرور</label>
+                        <div class="citl-label-row">
+                            <label for="password" class="citl-label">كلمة المرور</label>
+                            <button type="button" data-forgot-password class="citl-forgot-link">نسيت كلمة المرور؟</button>
+                        </div>
                         <div class="citl-input-wrap">
-                            <input type="password" id="reg-password" required minlength="6"
+                            <input type="password" id="password" required
                                    class="citl-input has-icon-right has-icon-left"
-                                   placeholder="6 أحرف أو أرقام على الأقل">
+                                   placeholder="••••••••">
                             <i class="fas fa-lock citl-field-icon"></i>
-                            <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('reg-password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
+                            <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
                         </div>
                     </div>
 
-                    <div id="signup-error" class="citl-error-banner hidden"></div>
+                    <div id="login-error" class="citl-error-banner hidden">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>بيانات الدخول غير صحيحة</span>
+                    </div>
 
-                    <div class="citl-step-actions">
-                        <button type="button" class="citl-btn-secondary" onclick="goToSignupStep(1)">
-                            <i class="fas fa-arrow-right text-xs"></i>
-                            <span>السابق</span>
+                    <button type="submit" id="submitBtn" class="citl-btn-primary group">
+                        <span>دخول للنظام</span>
+                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform text-xs"></i>
+                    </button>
+
+                    <p class="text-center text-xs text-gray-500 pt-1">
+                        ليس لديك حساب؟
+                        <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
+                    </p>
+                </form>
+
+                <!-- ==================== نموذج إنشاء حساب جديد ==================== -->
+                <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
+                    <div class="citl-form-header" style="margin-bottom: 14px;">
+                        <h1>إنشاء حساب جديد</h1>
+                        <p>سجّل بياناتك الأكاديمية أو الإدارية للانضمام إلى بوابة الكلية</p>
+                    </div>
+
+                    <!-- مؤشر الخطوتين -->
+                    <div class="citl-stepper" aria-label="خطوات التسجيل">
+                        <button type="button" id="step-indicator-1" class="citl-step-btn is-active" onclick="goToSignupStep(1)">
+                            <span class="citl-step-num">1</span>
+                            <span class="citl-step-label">البيانات الأساسية</span>
                         </button>
-                        <button type="submit" class="citl-btn-gold">
-                            <span>تسجيل اشتراك</span>
-                            <i class="fas fa-check text-xs"></i>
+                        <span class="citl-step-connector"></span>
+                        <button type="button" id="step-indicator-2" class="citl-step-btn" onclick="goToSignupStep(2)">
+                            <span class="citl-step-num">2</span>
+                            <span class="citl-step-label">الحساب والتفعيل</span>
                         </button>
                     </div>
 
-                    <div class="text-center pt-1">
-                        <button type="button" data-forgot-password class="citl-forgot-link">لديك حساب ونسيت كلمة المرور؟</button>
-                    </div>
-                </div>
+                    <!-- الخطوة 1: البيانات الشخصية والوظيفية -->
+                    <div id="signup-step-1" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label for="reg-name" class="citl-label">الاسم بالكامل</label>
+                                <input type="text" id="reg-name" required placeholder="الاسم ثلاثي أو رباعي" class="citl-input">
+                            </div>
 
-                <p class="text-center text-xs text-gray-500 pt-1">
-                    لديك حساب بالفعل؟
-                    <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
-                </p>
-            </form>
+                            <div>
+                                <label for="reg-mobile" class="citl-label">رقم الموبايل</label>
+                                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
+                                       class="citl-input text-left" dir="ltr">
+                            </div>
+
+                            <div>
+                                <label class="citl-label">القسم / الجهة</label>
+                                <div class="relative custom-dropdown w-full">
+                                    <div class="custom-dropdown-display">
+                                        <span class="text-sm text-gray-700 truncate">اختر...</span>
+                                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                                    </div>
+
+                                    <ul class="custom-dropdown-options hidden custom-scrollbar">
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="">اختر...</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="dean">مكتب العميد</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="admin-followup">قسم المتابعة الإدارية</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="education-agency">وكالة شؤون التعليم</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="students-agency">وكالة شؤون الطلاب</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="assistants-office">مكتب المعيدين</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="computer-lab">معمل الحاسب</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
+                                    </ul>
+
+                                    <select id="reg-dept" class="hidden" required>
+                                        <option value="">اختر...</option>
+                                        <option value="dean">مكتب العميد</option>
+                                        <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
+                                        <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
+                                        <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
+                                        <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
+                                        <option value="admin-followup">قسم المتابعة الإدارية</option>
+                                        <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
+                                        <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
+                                        <option value="education-agency">وكالة شؤون التعليم</option>
+                                        <option value="students-agency">وكالة شؤون الطلاب</option>
+                                        <option value="assistants-office">مكتب المعيدين</option>
+                                        <option value="computer-lab">معمل الحاسب</option>
+                                        <option value="visitor">زائر خارجي</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="reg-position" class="citl-label">المسمى الوظيفي</label>
+                                <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق" class="citl-input">
+                            </div>
+
+                            <div class="md:col-span-1">
+                                <label class="citl-label">نوع الحساب</label>
+                                <div class="relative custom-dropdown w-full">
+                                    <div class="custom-dropdown-display">
+                                        <span id="reg-account-type-label" class="text-sm text-gray-700 truncate">اختر...</span>
+                                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                                    </div>
+
+                                    <ul class="custom-dropdown-options hidden custom-scrollbar">
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="">اختر...</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="admin">إداري</li>
+                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
+                                    </ul>
+
+                                    <select id="reg-account-type" class="hidden" required>
+                                        <option value="">اختر...</option>
+                                        <option value="admin">إداري</option>
+                                        <option value="faculty">عضو هيئة تدريس</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="faculty-link-block" class="md:col-span-1">
+                                <label class="citl-label">ربط الحساب بعضو هيئة تدريس</label>
+                                <div class="relative custom-dropdown w-full">
+                                    <div id="faculty-link-display" class="custom-dropdown-display bg-gray-100 cursor-not-allowed">
+                                        <span id="reg-linked-instructor-label" class="text-sm text-gray-500 truncate">خاص بالتعليم فقط</span>
+                                        <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
+                                    </div>
+
+                                    <div class="custom-dropdown-options hidden custom-scrollbar" style="padding: 0;">
+                                        <div class="faculty-search-wrap">
+                                            <input type="text" id="faculty-search-input" class="faculty-search-input" placeholder="ابحث عن الاسم الأكاديمي..." autocomplete="off">
+                                        </div>
+                                        <ul id="faculty-name-options" style="list-style: none; margin: 0; padding: 4px;">
+                                        </ul>
+                                    </div>
+
+                                    <select id="reg-linked-instructor" class="hidden">
+                                        <option value="">اختر اسمك الأكاديمي</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="signup-step-1-error" class="citl-error-banner hidden">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>يرجى استكمال جميع البيانات المطلوبة للمتابعة</span>
+                        </div>
+
+                        <button type="button" id="nextSignupStepBtn" class="citl-btn-primary" onclick="goToSignupStep(2)">
+                            <span>التالي: بيانات الحساب والتفعيل</span>
+                            <i class="fas fa-arrow-left text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- الخطوة 2: البريد الإلكتروني وكود التفعيل وكلمة المرور -->
+                    <div id="signup-step-2" class="space-y-3 hidden">
+                        <div>
+                            <label for="reg-email" class="citl-label">البريد الإلكتروني</label>
+                            <div class="citl-input-wrap">
+                                <input type="email" id="reg-email" required
+                                       class="citl-input has-icon-right"
+                                       placeholder="user@aastcitl.me">
+                                <i class="fas fa-envelope citl-field-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="citl-access-box">
+                            <label for="reg-access-code" class="citl-label" style="color: #92400E;">
+                                <i class="fas fa-shield-alt ml-1 text-[#F3A628]"></i>
+                                كود التسجيل الخاص بالكلية
+                            </label>
+                            <div class="citl-input-wrap">
+                                <input type="text" id="reg-access-code" required
+                                       placeholder="أدخل كود التفعيل المعتمد"
+                                       class="citl-input has-icon-right">
+                                <i class="fas fa-key citl-field-icon" style="color: #D97706;"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="reg-password" class="citl-label">كلمة المرور</label>
+                            <div class="citl-input-wrap">
+                                <input type="password" id="reg-password" required minlength="6"
+                                       class="citl-input has-icon-right has-icon-left"
+                                       placeholder="6 أحرف أو أرقام على الأقل">
+                                <i class="fas fa-lock citl-field-icon"></i>
+                                <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('reg-password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
+                            </div>
+                        </div>
+
+                        <div id="signup-error" class="citl-error-banner hidden"></div>
+
+                        <div class="citl-step-actions">
+                            <button type="button" class="citl-btn-secondary" onclick="goToSignupStep(1)">
+                                <i class="fas fa-arrow-right text-xs"></i>
+                                <span>السابق</span>
+                            </button>
+                            <button type="submit" class="citl-btn-gold">
+                                <span>تسجيل اشتراك</span>
+                                <i class="fas fa-check text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center pt-1">
+                            <button type="button" data-forgot-password class="citl-forgot-link">لديك حساب ونسيت كلمة المرور؟</button>
+                        </div>
+                    </div>
+
+                    <p class="text-center text-xs text-gray-500 pt-1">
+                        لديك حساب بالفعل؟
+                        <a href="#" onclick="event.preventDefault(); toggleForms();" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
+                    </p>
+                </form>
+            </div>
         </div>
 
-        <footer class="citl-portal-footer">
-            <div>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</div>
-            <div>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</div>
-        </footer>
-    </section>
+        <!-- Compact Glass Capability Strip -->
+        <div class="citl-capabilities-strip">
+            <div class="citl-cap-pill">
+                <div class="citl-cap-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="citl-cap-text">
+                    <span class="citl-cap-title">التحكم وإدارة الجداول الدراسية</span>
+                    <span class="citl-cap-desc">عرض، متابعة، وتحديث الجداول بسهولة ودقة</span>
+                </div>
+            </div>
 
-</main>
+            <div class="citl-cap-pill">
+                <div class="citl-cap-icon">
+                    <i class="fas fa-door-open"></i>
+                </div>
+                <div class="citl-cap-text">
+                    <span class="citl-cap-title">التحكم وإدارة القاعات الدراسية</span>
+                    <span class="citl-cap-desc">تنظيم الحجوزات ومنع التعارض بين المواعيد</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- إشعار تثبيت التطبيق -->
+        <p id="installContainer"
+           hidden
+           role="status"
+           aria-live="polite"
+           class="citl-install-pill">
+            يمكنك تثبيت التطبيق من قائمة المتصفح
+        </p>
+    </main>
+
+    <!-- Institutional Footer -->
+    <footer class="citl-portal-footer">
+        <div class="citl-portal-footer-inner">
+            <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
+            <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+        </div>
+    </footer>
+
+</div>
 
 <div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center  opacity-0">
     
@@ -1333,18 +1485,18 @@ html.citl-navigation-loading #global-loader::before,
 </div>
 
     <div id="success-modal" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-[#2A3475]/80 backdrop-blur-sm transition-opacity"></div>
+        <div class="absolute inset-0 bg-[#0B102B]/75 backdrop-blur-md transition-opacity"></div>
 
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="relative transform overflow-hidden rounded-3xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
+                <div class="bg-white px-5 pb-5 pt-6 sm:p-7 sm:pb-5">
                     <div class="sm:flex sm:items-start flex-col items-center">
-                        <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-green-100 mb-4 animate-bounce">
-                            <i class="fas fa-check text-2xl text-green-600"></i>
+                        <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 mb-4 shadow-sm">
+                            <i class="fas fa-check text-2xl text-emerald-600"></i>
                         </div>
 
-                        <div class="mt-3 text-center w-full">
-                            <h3 class="text-xl font-bold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
+                        <div class="mt-2 text-center w-full">
+                            <h3 class="text-xl font-extrabold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
                             <div class="mt-2">
                                 <p id="registration-success-message" class="text-sm text-gray-500">يمكنك الآن تسجيل الدخول للوصول إلى لوحة التحكم.</p>
                             </div>
@@ -1352,10 +1504,10 @@ html.citl-navigation-loading #global-loader::before,
                     </div>
                 </div>
 
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
-                    <button type="button" onclick="closeSuccessModal()" class="inline-flex w-full justify-center rounded-lg bg-[#2A3475] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1f2658] sm:w-auto transition-all">
-                        تسجيل الدخول الآن
-                        <i class="fas fa-arrow-left mr-2 mt-1"></i>
+                <div class="bg-slate-50 px-5 py-4 sm:flex sm:flex-row-reverse sm:px-7 justify-center border-t border-slate-100">
+                    <button type="button" onclick="closeSuccessModal()" class="citl-btn-primary sm:w-auto" style="padding: 11px 28px;">
+                        <span>تسجيل الدخول الآن</span>
+                        <i class="fas fa-arrow-left text-xs"></i>
                     </button>
                 </div>
             </div>
@@ -1480,6 +1632,30 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         window.PRESENCE_SUPABASE_URL = SUPABASE_URL;
         window.PRESENCE_SUPABASE_ANON_KEY = SUPABASE_KEY;
 
+// Non-destructive theme decorator for any password-recovery modal injected by password-recovery.js
+(function(){
+    function decorateRecoveryNode(node) {
+        if (!node || node.nodeType !== 1) return;
+        if (node.id === 'global-loader' || node.id === 'success-modal' || node.classList.contains('citl-university-shell') || node.classList.contains('citl-campus-backdrop')) return;
+        const id = (node.id || '').toLowerCase();
+        const cls = typeof node.className === 'string' ? node.className.toLowerCase() : '';
+        const isModal = node.getAttribute('role') === 'dialog' || id.includes('recovery') || id.includes('forgot') || id.includes('reset') || cls.includes('recovery') || (cls.includes('fixed') && cls.includes('inset-0') && node.querySelector('form, input[type="email"], input[type="password"]'));
+        if (isModal) {
+            node.classList.add('citl-recovery-themed');
+            const card = node.querySelector('.bg-white, form');
+            if (card && !card.classList.contains('citl-recovery-card-surface')) {
+                const surface = card.closest('.bg-white') || card;
+                surface.classList.add('citl-recovery-card-surface');
+            }
+        }
+    }
+    Array.from(document.body.children).forEach(decorateRecoveryNode);
+    const mo = new MutationObserver(muts => {
+        muts.forEach(m => m.addedNodes.forEach(decorateRecoveryNode));
+    });
+    mo.observe(document.body, { childList: true });
+})();
+
 // --- كود الدخول التلقائي الذكي (نسخة منع الوميض) ---
 async function autoRedirect() {
     try {
@@ -1532,16 +1708,20 @@ autoRedirect();
             loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
         };
 
-        // التبديل بين الفورم مع مزامنة التبويب العلوي
+        // التبديل بين الفورم مع مزامنة التبويب العلوي وحجم البطاقة
         function syncAuthTabs() {
             const loginHidden = document.getElementById('loginForm').classList.contains('hidden');
             const tabLogin = document.getElementById('tab-login');
             const tabSignup = document.getElementById('tab-signup');
+            const card = document.getElementById('citl-auth-card');
             if (tabLogin && tabSignup) {
                 tabLogin.classList.toggle('is-active', !loginHidden);
                 tabLogin.setAttribute('aria-selected', String(!loginHidden));
                 tabSignup.classList.toggle('is-active', loginHidden);
                 tabSignup.setAttribute('aria-selected', String(loginHidden));
+            }
+            if (card) {
+                card.classList.toggle('is-signup-mode', loginHidden);
             }
         }
 

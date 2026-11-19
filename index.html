@@ -6,7 +6,7 @@
 <meta name="citl-release" content="20261105-login-transition-fix">
     <meta charset="UTF-8">
     <script>document.documentElement.classList.add('citl-login-checking');</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CITL Smart System | كلية النقل الدولي واللوجستيات</title>
     <meta name="description" content="CITL Smart System — التحكم وإدارة الجداول الدراسية والقاعات، تنظيم الحجوزات، متابعة الحضور والانصراف، وإدارة شاشات الإعلانات.">
     <link rel="canonical" href="https://aastcitl.me/">
@@ -32,49 +32,66 @@
     <link rel="stylesheet" href="/assets/tailwind-3.4.17.min.css?v=20261028-r7.3.3.8-wa-ui">
     <link rel="stylesheet" href="/assets/ui-fixes.css?v=20261028-r7.3.3.8-wa-ui">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+    
+    
+    
     <script src="/assets/password-recovery.js?v=20261028-r7.3.3.8-wa-ui"></script>
     <script src="/vendor/supabase-js-2.45.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script>
-    <script src="/assets/auth-client.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/auth-client.js?v=20261028-r7.3.3.8-wa-ui"></script>
     <script src="/presence.js?v=20261028-r7.3.3.8-wa-ui"></script>
 
     <style>
-        :root {
-            --citl-navy: #2A3475;
-            --citl-navy-mid: #1D255B;
-            --citl-navy-deep: #11173D;
-            --citl-navy-ink: #0B102B;
-            --citl-gold: #F3A628;
-            --citl-gold-light: #FFD173;
-            --citl-gold-hover: #D98B14;
-            --citl-surface: #FFFFFF;
-            --citl-border: #E2E8F0;
-            --citl-text: #0F172A;
-            --citl-muted: #64748B;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--citl-navy-deep);
-            color: var(--citl-text);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow-x: hidden;
-            position: relative;
+            background-color: #11173D;
         }
-
         .bg-navy { background-color: #2A3475; }
         .text-navy { color: #2A3475; }
         .border-gold { border-color: #F3A628; }
         .text-gold { color: #F3A628; }
         .bg-gold { background-color: #F3A628; }
+        
+        /* تأثيرات حركية */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Dropdown Styles */
+        .custom-dropdown { position: relative; width: 100%; }
+
+        .custom-dropdown-display {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-width: 1px;
+            border-color: #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-dropdown-display:focus {
+            outline: 2px solid #2A3475;
+            outline-offset: 2px;
+        }    
+
+        /* ========================================= */
+        /* 🔥 أنيميشن شاشة التحميل الجديدة 🔥 */
+        /* ========================================= */
+        @keyframes logo-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
+        .loader-ring { animation: spin-slow 4s linear infinite; }
+        
+        .loader-ring { animation: spin-slow 4s linear infinite; }
 
         /* ========================================================= */
         /* Full-Bleed Cinematic University Campus Backdrop           */
@@ -84,7 +101,7 @@
             inset: 0;
             z-index: 0;
             overflow: hidden;
-            background-color: var(--citl-navy-deep);
+            background-color: #11173D;
             pointer-events: none;
         }
 
@@ -120,1182 +137,50 @@
             -webkit-mask-image: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.9), transparent 82%);
         }
 
-        /* ========================================================= */
-        /* University Portal Layout Shell                            */
-        /* ========================================================= */
-        .citl-university-shell {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+        /* ========================================= */
+/* خلفية قسم الدخول بدون الصورة + الإيفكت */
+/* ========================================= */
+.login-campus-panel {
+    position: relative;
+    overflow: hidden;
+    background-color: #2A3475;
+}
+
+.login-campus-pattern-layer {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            -30deg,
+            transparent,
+            transparent 14px,
+            rgba(255, 255, 255, 0.055) 14px,
+            rgba(255, 255, 255, 0.055) 15px
+        );
+    z-index: 2;
+    pointer-events: none;
+}
+
+.login-campus-soft-light {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(42, 52, 117, 0.72), rgba(31, 38, 88, 0.82)),
+        radial-gradient(circle at top right, rgba(243, 166, 40, 0.10), transparent 35%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.login-campus-content {
+    position: relative;
+    z-index: 5;
+}
+
+.login-campus-decor {
+    z-index: 4;
+}
 
-        /* Top Institutional Bar */
-        .citl-topbar {
-            width: 100%;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-            background: rgba(11, 16, 43, 0.44);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            padding-top: env(safe-area-inset-top, 0px);
-        }
-
-        .citl-topbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        @media (min-width: 768px) {
-            .citl-topbar-inner {
-                padding: 12px 24px;
-                justify-content: space-between;
-            }
-        }
-
-        .citl-topbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            min-width: 0;
-        }
-
-        .citl-topbar-logo {
-            background: rgba(255, 255, 255, 0.97);
-            padding: 5px 8px;
-            border-radius: 11px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-            flex-shrink: 0;
-        }
-
-        .citl-topbar-logo img {
-            display: block;
-            height: 32px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        @media (min-width: 768px) {
-            .citl-topbar-logo img {
-                height: 36px;
-            }
-        }
-
-        .citl-topbar-titles {
-            min-width: 0;
-            text-align: right;
-        }
-
-        .citl-topbar-ar {
-            font-size: clamp(13px, 3.4vw, 15.5px);
-            font-weight: 800;
-            color: #FFFFFF;
-            line-height: 1.3;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .citl-topbar-en {
-            font-size: clamp(9.5px, 2.3vw, 11px);
-            font-weight: 700;
-            color: var(--citl-gold);
-            letter-spacing: 0.3px;
-            line-height: 1.3;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Center Stage */
-        .citl-stage {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 18px 14px 22px;
-            width: 100%;
-        }
-
-        @media (min-width: 768px) {
-            .citl-stage {
-                padding: 28px 20px 30px;
-            }
-        }
-
-        .citl-hero-intro {
-            text-align: center;
-            margin-bottom: 16px;
-            max-width: 580px;
-            width: 100%;
-            padding: 0 4px;
-            animation: citlFadeDown 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @media (min-width: 768px) {
-            .citl-hero-intro {
-                margin-bottom: 22px;
-            }
-        }
-
-        .citl-hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: clamp(10.5px, 2.8vw, 12px);
-            font-weight: 700;
-            color: var(--citl-gold-light);
-            letter-spacing: 0.2px;
-            margin-bottom: 5px;
-            max-width: 100%;
-        }
-
-        .citl-hero-eyebrow span.line {
-            width: 18px;
-            height: 1px;
-            flex-shrink: 0;
-            background: linear-gradient(90deg, transparent, rgba(243, 166, 40, 0.85), transparent);
-        }
-
-        @media (min-width: 640px) {
-            .citl-hero-eyebrow span.line {
-                width: 26px;
-            }
-        }
-
-        .citl-hero-heading {
-            margin: 0;
-            font-size: clamp(19px, 5vw, 28px);
-            font-weight: 900;
-            color: #FFFFFF;
-            letter-spacing: 0.3px;
-            line-height: 1.3;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-        }
-
-        .citl-hero-system {
-            margin-top: 4px;
-            font-size: clamp(10.5px, 2.7vw, 12px);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2.4px;
-            color: rgba(226, 232, 240, 0.84);
-        }
-
-        /* ========================================================= */
-        /* Elevated Institutional Portal Card                        */
-        /* ========================================================= */
-        .citl-auth-card {
-            width: 100%;
-            max-width: 468px;
-            background-color: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            position: relative;
-            overflow: visible;
-            box-shadow:
-                0 28px 64px -16px rgba(5, 9, 28, 0.62),
-                0 10px 26px -10px rgba(5, 9, 28, 0.35),
-                0 0 0 1px rgba(255, 255, 255, 0.28);
-            transition: max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-            animation: citlFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @media (min-width: 640px) {
-            .citl-auth-card {
-                border-radius: 24px;
-            }
-            .citl-auth-card.is-signup-mode {
-                max-width: 570px;
-            }
-        }
-
-        /* Architectural Gold Accent Crest */
-        .citl-card-crest {
-            height: 4px;
-            width: 100%;
-            border-radius: 20px 20px 0 0;
-            background: linear-gradient(90deg, #B56A0F 0%, #F3A628 32%, #FFD479 50%, #F3A628 68%, #B56A0F 100%);
-        }
-
-        @media (min-width: 640px) {
-            .citl-card-crest {
-                border-radius: 24px 24px 0 0;
-            }
-        }
-
-        .citl-card-body {
-            padding: 20px 16px 22px;
-        }
-
-        @media (min-width: 640px) {
-            .citl-card-body {
-                padding: 30px 34px 32px;
-            }
-        }
-
-        @keyframes citlFadeUp {
-            from { opacity: 0; transform: translateY(16px) scale(0.985); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes citlFadeDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Segmented Mode Switcher */
-        .citl-mode-switcher {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            padding: 4px;
-            background: #F1F5F9;
-            border-radius: 13px;
-            margin-bottom: 18px;
-            border: 1px solid #E2E8F0;
-        }
-
-        @media (min-width: 640px) {
-            .citl-mode-switcher {
-                gap: 6px;
-                padding: 5px;
-                border-radius: 14px;
-                margin-bottom: 22px;
-            }
-        }
-
-        .citl-mode-tab {
-            border: none;
-            background: transparent;
-            color: #64748B;
-            font-family: inherit;
-            font-size: 12.5px;
-            font-weight: 700;
-            padding: 10px 8px;
-            min-height: 42px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.22s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        @media (min-width: 640px) {
-            .citl-mode-tab {
-                font-size: 13px;
-                padding: 10px 12px;
-                gap: 7px;
-            }
-        }
-
-        .citl-mode-tab:hover:not(.is-active) {
-            color: var(--citl-navy);
-        }
-
-        .citl-mode-tab.is-active {
-            background: #FFFFFF;
-            color: var(--citl-navy);
-            box-shadow: 0 4px 14px rgba(42, 52, 117, 0.12);
-        }
-
-        .citl-mode-tab i {
-            font-size: 12px;
-        }
-
-        /* Form Headings */
-        .citl-form-header {
-            margin-bottom: 16px;
-            text-align: right;
-        }
-
-        @media (min-width: 640px) {
-            .citl-form-header {
-                margin-bottom: 20px;
-            }
-        }
-
-        .citl-form-header h1 {
-            font-size: 18.5px;
-            font-weight: 800;
-            color: var(--citl-navy);
-            margin: 0 0 3px;
-        }
-
-        @media (min-width: 640px) {
-            .citl-form-header h1 {
-                font-size: 20px;
-                margin: 0 0 4px;
-            }
-        }
-
-        .citl-form-header p {
-            font-size: 12.5px;
-            color: var(--citl-muted);
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        /* Modern Form Controls */
-        .citl-label-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .citl-label {
-            display: block;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 6px;
-        }
-
-        .citl-label-row .citl-label {
-            margin-bottom: 0;
-        }
-
-        .citl-input-wrap {
-            position: relative;
-        }
-
-        .citl-input {
-            width: 100%;
-            padding: 11.5px 14px;
-            min-height: 46px;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 12px;
-            background-color: #F8FAFC;
-            color: #0F172A;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
-            outline: none;
-            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        /* Prevent iOS Safari zoom on input focus while keeping desktop crisp */
-        @media (max-width: 639px) {
-            .citl-input {
-                font-size: 16px;
-                padding: 11px 13px;
-            }
-        }
-
-        .citl-input::placeholder {
-            color: #94A3B8;
-            font-weight: 500;
-            font-size: 13px;
-        }
-
-        .citl-input:hover {
-            border-color: #CBD5E1;
-        }
-
-        .citl-input:focus {
-            background-color: #FFFFFF;
-            border-color: var(--citl-navy);
-            box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10);
-        }
-
-        .citl-input.has-icon-right {
-            padding-right: 40px;
-        }
-
-        .citl-input.has-icon-left {
-            padding-left: 44px;
-        }
-
-        .citl-field-icon {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94A3B8;
-            font-size: 13.5px;
-            pointer-events: none;
-            transition: color 0.2s ease;
-        }
-
-        .citl-input-wrap:focus-within .citl-field-icon {
-            color: var(--citl-navy);
-        }
-
-        .citl-eye-btn {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94A3B8;
-            font-size: 15px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: color 0.2s ease, background-color 0.2s ease;
-            z-index: 2;
-        }
-
-        .citl-eye-btn:hover {
-            color: var(--citl-navy);
-            background-color: rgba(42, 52, 117, 0.06);
-        }
-
-        .citl-forgot-link {
-            background: none;
-            border: none;
-            padding: 2px 0;
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--citl-navy);
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .citl-forgot-link:hover {
-            color: var(--citl-gold-hover);
-            text-decoration: underline;
-        }
-
-        /* Access Code Highlight Card */
-        .citl-access-box {
-            background: linear-gradient(135deg, rgba(243, 166, 40, 0.10), rgba(243, 166, 40, 0.03));
-            border: 1px solid rgba(243, 166, 40, 0.38);
-            border-radius: 14px;
-            padding: 12px 14px;
-        }
-
-        .citl-access-box .citl-input {
-            background: #FFFFFF;
-            border-color: rgba(243, 166, 40, 0.45);
-        }
-
-        .citl-access-box .citl-input:focus {
-            border-color: var(--citl-gold-hover);
-            box-shadow: 0 0 0 4px rgba(243, 166, 40, 0.16);
-        }
-
-        /* Custom Dropdowns */
-        .custom-dropdown {
-            position: relative;
-            width: 100%;
-        }
-
-        .custom-dropdown-display {
-            width: 100%;
-            padding: 10.5px 14px;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 12px;
-            background-color: #F8FAFC;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-height: 46px;
-        }
-
-        .custom-dropdown-display:hover:not(.cursor-not-allowed) {
-            border-color: var(--citl-navy);
-            background-color: #FFFFFF;
-        }
-
-        .custom-dropdown-display.bg-gray-100 {
-            background-color: #F1F5F9 !important;
-            border-color: #E2E8F0 !important;
-        }
-
-        .custom-dropdown-options {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 14px;
-            max-height: 200px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            z-index: 60;
-            box-shadow: 0 18px 36px -8px rgba(15, 23, 42, 0.18);
-            padding: 4px;
-            margin: 0;
-            list-style: none;
-        }
-
-        .custom-dropdown-options .custom-option {
-            border-radius: 9px;
-            padding: 10px 12px;
-            font-size: 13px;
-            font-weight: 600;
-            border-bottom: none !important;
-            transition: background-color 0.15s ease, color 0.15s ease;
-        }
-
-        .custom-dropdown-options .custom-option:hover {
-            background-color: #EEF2FF;
-            color: var(--citl-navy);
-        }
-
-        .faculty-search-wrap {
-            position: sticky;
-            top: 0;
-            background: #FFFFFF;
-            padding: 6px;
-            border-bottom: 1px solid #F1F5F9;
-            z-index: 5;
-        }
-
-        .faculty-search-input {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: inherit;
-            outline: none;
-            background: #F8FAFC;
-        }
-
-        @media (max-width: 639px) {
-            .faculty-search-input {
-                font-size: 15px;
-            }
-        }
-
-        .faculty-search-input:focus {
-            border-color: var(--citl-navy);
-            background: #FFFFFF;
-        }
-
-        /* 2-Step Wizard Indicator */
-        .citl-stepper {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 16px;
-            padding: 8px 10px;
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 13px;
-        }
-
-        @media (min-width: 640px) {
-            .citl-stepper {
-                gap: 10px;
-                margin-bottom: 18px;
-                padding: 10px 12px;
-                border-radius: 14px;
-            }
-        }
-
-        .citl-step-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: transparent;
-            border: none;
-            padding: 4px;
-            border-radius: 9px;
-            cursor: pointer;
-            font-family: inherit;
-            text-align: right;
-            min-width: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .citl-step-num {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11.5px;
-            font-weight: 800;
-            background: #E2E8F0;
-            color: #64748B;
-            flex-shrink: 0;
-            transition: all 0.25s ease;
-        }
-
-        .citl-step-label {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #64748B;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: color 0.25s ease;
-        }
-
-        @media (min-width: 640px) {
-            .citl-step-num {
-                width: 24px;
-                height: 24px;
-                font-size: 12px;
-            }
-            .citl-step-label {
-                font-size: 12.5px;
-            }
-        }
-
-        .citl-step-btn.is-active .citl-step-num {
-            background: var(--citl-navy);
-            color: #FFFFFF;
-            box-shadow: 0 0 0 3px rgba(42, 52, 117, 0.14);
-        }
-
-        .citl-step-btn.is-active .citl-step-label {
-            color: var(--citl-navy);
-        }
-
-        .citl-step-btn.is-done .citl-step-num {
-            background: var(--citl-gold);
-            color: var(--citl-navy-deep);
-        }
-
-        .citl-step-btn.is-done .citl-step-label {
-            color: #334155;
-        }
-
-        .citl-step-connector {
-            width: 18px;
-            height: 2px;
-            background: #E2E8F0;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-
-        /* Buttons */
-        .citl-btn-primary {
-            width: 100%;
-            min-height: 48px;
-            background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%);
-            color: #FFFFFF;
-            font-family: inherit;
-            font-size: 14.5px;
-            font-weight: 800;
-            padding: 13px 18px;
-            border: none;
-            border-radius: 13px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 12px 24px -8px rgba(42, 52, 117, 0.55);
-            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
-        }
-
-        .citl-btn-primary:hover {
-            filter: brightness(1.08);
-            transform: translateY(-1px);
-            box-shadow: 0 16px 28px -8px rgba(42, 52, 117, 0.65);
-        }
-
-        .citl-btn-primary:active {
-            transform: scale(0.985);
-        }
-
-        .citl-btn-gold {
-            width: 100%;
-            min-height: 48px;
-            background: linear-gradient(135deg, #F5B038 0%, #E09215 100%);
-            color: #11173D;
-            font-family: inherit;
-            font-size: 14.5px;
-            font-weight: 800;
-            padding: 13px 18px;
-            border: none;
-            border-radius: 13px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 12px 24px -8px rgba(243, 166, 40, 0.55);
-            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
-        }
-
-        .citl-btn-gold:hover {
-            filter: brightness(1.04);
-            transform: translateY(-1px);
-        }
-
-        .citl-btn-gold:active {
-            transform: scale(0.985);
-        }
-
-        .citl-btn-secondary {
-            min-height: 48px;
-            background: #F1F5F9;
-            color: #334155;
-            border: 1px solid #E2E8F0;
-            font-family: inherit;
-            font-size: 13.5px;
-            font-weight: 700;
-            padding: 12px 16px;
-            border-radius: 13px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex-shrink: 0;
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-
-        .citl-btn-secondary:hover {
-            background: #E2E8F0;
-            color: var(--citl-navy);
-        }
-
-        .citl-error-banner {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            color: #DC2626;
-            font-size: 12.5px;
-            font-weight: 700;
-            padding: 11px 14px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .citl-error-banner.hidden {
-            display: none;
-        }
-
-        .citl-step-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .citl-step-actions .citl-btn-gold {
-            flex: 1;
-        }
-
-        /* ========================================================= */
-        /* Sleek Glass Capability Strip Underneath Card              */
-        /* ========================================================= */
-        .citl-capabilities-strip {
-            width: 100%;
-            max-width: 468px;
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-            transition: max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @media (min-width: 640px) {
-            .citl-capabilities-strip {
-                max-width: 570px;
-                margin-top: 18px;
-                gap: 12px;
-            }
-        }
-
-        .citl-cap-pill {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 11px 12px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
-        }
-
-        @media (min-width: 640px) {
-            .citl-cap-pill {
-                flex-direction: row;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 14px;
-                border-radius: 16px;
-            }
-        }
-
-        .citl-cap-pill:hover {
-            background: rgba(255, 255, 255, 0.13);
-            border-color: rgba(243, 166, 40, 0.45);
-            transform: translateY(-2px);
-        }
-
-        .citl-cap-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            background: rgba(243, 166, 40, 0.18);
-            border: 1px solid rgba(243, 166, 40, 0.34);
-            color: var(--citl-gold);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        @media (min-width: 640px) {
-            .citl-cap-icon {
-                width: 36px;
-                height: 36px;
-                border-radius: 11px;
-                font-size: 14px;
-            }
-        }
-
-        .citl-cap-text {
-            text-align: right;
-            min-width: 0;
-            width: 100%;
-        }
-
-        .citl-cap-title {
-            display: block;
-            font-size: 11.5px;
-            font-weight: 800;
-            color: #FFFFFF;
-            line-height: 1.4;
-        }
-
-        @media (min-width: 640px) {
-            .citl-cap-title {
-                font-size: 12px;
-            }
-        }
-
-        .citl-cap-desc {
-            display: block;
-            font-size: 10.5px;
-            color: rgba(226, 232, 240, 0.78);
-            line-height: 1.45;
-            margin-top: 2px;
-        }
-
-        @media (min-width: 640px) {
-            .citl-cap-desc {
-                font-size: 11px;
-                margin-top: 0;
-            }
-        }
-
-        .citl-install-pill {
-            margin: 12px auto 0;
-            padding: 8px 14px;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.09);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 1.55;
-            color: rgba(255, 255, 255, 0.92);
-            max-width: 570px;
-            width: 100%;
-            pointer-events: none;
-        }
-
-        @media (min-width: 640px) {
-            .citl-install-pill {
-                border-radius: 999px;
-                width: auto;
-                padding: 8px 18px;
-                font-size: 11.5px;
-            }
-        }
-
-        /* Institutional Footer */
-        .citl-portal-footer {
-            width: 100%;
-            border-top: 1px solid rgba(255, 255, 255, 0.09);
-            background: rgba(11, 16, 43, 0.50);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-            text-align: center;
-            color: rgba(226, 232, 240, 0.80);
-            font-size: clamp(10px, 2.6vw, 12px);
-            font-weight: 600;
-            line-height: 1.7;
-        }
-
-        .citl-portal-footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-        }
-
-        @media (min-width: 768px) {
-            .citl-portal-footer-inner {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-        }
-
-        /* Scrollbar polish */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 999px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
-        }
-
-        /* Keep original utility animations intact */
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes logo-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes spin-slow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loader-logo { animation: logo-pulse 2s infinite ease-in-out; }
-        .loader-ring { animation: spin-slow 4s linear infinite; }
     </style>
-
-    <!-- ========================================================= -->
-    <!-- Unified New Identity Theme for Password Recovery Modal    -->
-    <!-- (Non-destructive: never overrides display or .hidden)     -->
-    <!-- ========================================================= -->
-    <style id="citl-recovery-theme">
-        /* Overlay Backdrop */
-        .citl-recovery-overlay {
-            background: rgba(11, 16, 43, 0.76) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            font-family: 'Cairo', sans-serif !important;
-            direction: rtl !important;
-            padding: 16px !important;
-        }
-
-        .citl-recovery-overlay[hidden],
-        .citl-recovery-overlay.hidden {
-            display: none !important;
-        }
-
-        /* Main Dialog Surface — matches .citl-auth-card */
-        .citl-recovery-dialog {
-            background: rgba(255, 255, 255, 0.99) !important;
-            border: 1px solid rgba(226, 232, 240, 0.95) !important;
-            border-top: 4px solid #F3A628 !important;
-            border-radius: 22px !important;
-            box-shadow:
-                0 32px 72px -18px rgba(5, 9, 28, 0.65),
-                0 12px 28px -10px rgba(5, 9, 28, 0.35),
-                0 0 0 1px rgba(255, 255, 255, 0.25) !important;
-            color: #0F172A !important;
-            font-family: 'Cairo', sans-serif !important;
-            direction: rtl !important;
-            text-align: right !important;
-            padding: 24px 22px !important;
-            width: 100% !important;
-            max-width: 448px !important;
-            position: relative !important;
-            animation: citlFadeUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-
-        @media (min-width: 640px) {
-            .citl-recovery-dialog {
-                padding: 28px 30px !important;
-                border-radius: 24px !important;
-            }
-        }
-
-        /* Typography inside Recovery Dialog */
-        .citl-recovery-dialog h1,
-        .citl-recovery-dialog h2,
-        .citl-recovery-dialog h3,
-        .citl-recovery-dialog h4 {
-            color: #2A3475 !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-weight: 800 !important;
-            font-size: 19px !important;
-            line-height: 1.4 !important;
-            margin-top: 0 !important;
-        }
-
-        .citl-recovery-dialog p {
-            color: #64748B !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 13px !important;
-            line-height: 1.65 !important;
-        }
-
-        .citl-recovery-dialog label {
-            color: #334155 !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 12.5px !important;
-            font-weight: 700 !important;
-            display: block !important;
-            margin-bottom: 6px !important;
-        }
-
-        /* Inputs — exact match to .citl-input */
-        .citl-recovery-dialog input[type="email"],
-        .citl-recovery-dialog input[type="password"],
-        .citl-recovery-dialog input[type="text"],
-        .citl-recovery-dialog input[type="tel"],
-        .citl-recovery-dialog input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
-            width: 100% !important;
-            min-height: 46px !important;
-            padding: 11px 14px !important;
-            border: 1.5px solid #E2E8F0 !important;
-            border-radius: 12px !important;
-            background-color: #F8FAFC !important;
-            color: #0F172A !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            outline: none !important;
-            box-shadow: none !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
-        }
-
-        @media (max-width: 639px) {
-            .citl-recovery-dialog input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
-                font-size: 16px !important;
-            }
-        }
-
-        .citl-recovery-dialog input:hover {
-            border-color: #CBD5E1 !important;
-        }
-
-        .citl-recovery-dialog input:focus {
-            background-color: #FFFFFF !important;
-            border-color: #2A3475 !important;
-            box-shadow: 0 0 0 4px rgba(42, 52, 117, 0.10) !important;
-        }
-
-        /* Primary Submit Button — exact match to .citl-btn-primary */
-        .citl-recovery-dialog button[type="submit"],
-        .citl-recovery-dialog .citl-recovery-submit {
-            min-height: 46px !important;
-            background: linear-gradient(135deg, #2A3475 0%, #1B2358 100%) !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 13px !important;
-            padding: 11px 20px !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 14px !important;
-            font-weight: 800 !important;
-            box-shadow: 0 12px 24px -8px rgba(42, 52, 117, 0.55) !important;
-            cursor: pointer !important;
-            transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
-        }
-
-        .citl-recovery-dialog button[type="submit"]:hover,
-        .citl-recovery-dialog .citl-recovery-submit:hover {
-            filter: brightness(1.08) !important;
-            transform: translateY(-1px) !important;
-        }
-
-        .citl-recovery-dialog button[type="submit"]:disabled,
-        .citl-recovery-dialog .citl-recovery-submit:disabled {
-            opacity: 0.65 !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-        }
-
-        /* Secondary / Cancel Button — exact match to .citl-btn-secondary */
-        .citl-recovery-dialog .citl-recovery-cancel {
-            min-height: 44px !important;
-            background: #F1F5F9 !important;
-            color: #334155 !important;
-            border: 1px solid #E2E8F0 !important;
-            border-radius: 12px !important;
-            padding: 10px 16px !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            box-shadow: none !important;
-            transition: background-color 0.2s ease, color 0.2s ease !important;
-        }
-
-        .citl-recovery-dialog .citl-recovery-cancel:hover {
-            background: #E2E8F0 !important;
-            color: #2A3475 !important;
-        }
-
-        /* Close (X) Button */
-        .citl-recovery-dialog .citl-recovery-close {
-            width: 34px !important;
-            height: 34px !important;
-            min-height: 34px !important;
-            padding: 0 !important;
-            border-radius: 10px !important;
-            background: #F1F5F9 !important;
-            color: #475569 !important;
-            border: 1px solid #E2E8F0 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            box-shadow: none !important;
-            transition: background-color 0.2s ease, color 0.2s ease !important;
-        }
-
-        .citl-recovery-dialog .citl-recovery-close:hover {
-            background: #FEE2E2 !important;
-            border-color: #FECACA !important;
-            color: #DC2626 !important;
-        }
-
-        /* Status / Alert Banners inside Recovery Dialog */
-        .citl-recovery-dialog [role="alert"],
-        .citl-recovery-dialog [role="status"] {
-            border-radius: 12px !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-size: 12.5px !important;
-            font-weight: 700 !important;
-            line-height: 1.65 !important;
-        }
-    </style>
-
 <link rel="stylesheet" href="/assets/interface-controls.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/loading-placeholders.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script defer src="/assets/interface-controls.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1329,10 +214,9 @@ html.citl-page-booting body>*:not(script):not(#global-loader){pointer-events:non
 html.citl-page-booting #global-loader{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 html.citl-page-booting #global-loader::before,html.citl-navigation-loading #global-loader::before{background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 #global-loader.citl-unified-loader::before{content:"";position:absolute;inset:-3px;z-index:-1;background:radial-gradient(ellipse at 15% 15%,#52618a 0,transparent 60%),radial-gradient(ellipse at 90% 85%,#54516e 0,transparent 55%),#303c60;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:auto}
-#global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:22px 20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate;color-scheme:only light}
-#global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:8px}
+#global-loader.citl-unified-loader>.relative{position:relative!important;inset:auto!important;margin:0!important;width:348px!important;height:278px!important;max-width:calc(100% - 32px)!important;max-height:calc(100% - 24px);box-sizing:border-box!important;padding:20px!important;overflow:auto;transform:none!important;animation:none!important;transition:none!important;border-radius:24px;border:1px solid #ffffffb3;background:linear-gradient(155deg,#fdfcf8,#eef1f8)!important;color:#2a3475!important;box-shadow:0 24px 80px #09102b55,inset 0 1px 0 #fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate;color-scheme:only light}
+#global-loader>.relative::before{content:'CITL SMART SYSTEM';display:block;flex-shrink:0;font:700 10px/16px Arial,sans-serif;letter-spacing:2px;color:#626b89;margin-bottom:4px}
 #global-loader>.relative::after{content:'';position:absolute;bottom:16px;right:22px;left:22px;height:3px;border-radius:6px;background:linear-gradient(270deg,#B95C14 0%,#F29A23 55%,#FFC65D 85%,#FFE2A0 100%) right center/var(--citl-loader-progress,0%) 100% no-repeat,#e1e5ef;animation:none}
-/* Clean crisp RGBA logo — removed the old SVG alpha filter that caused blur/jagged edges */
 #global-loader.citl-unified-loader img{display:block;width:150px!important;height:auto!important;max-width:100%;max-height:104px!important;object-fit:contain;flex-shrink:0;margin:2px 0 4px!important;background:transparent!important;opacity:1!important;mix-blend-mode:normal!important;filter:none!important;image-rendering:auto}
 #global-loader h3,#global-loader p,#global-loader button,#global-loader h3 *{font-family:CITLBootCairo,sans-serif!important}
 #global-loader.citl-unified-loader h3{display:flex;align-items:baseline;justify-content:center;gap:6px;color:#2a3475;font-size:20px;font-weight:900;font-variation-settings:"wght" 900;line-height:1.6;margin:8px 0 0!important;letter-spacing:0;flex-shrink:0}
@@ -1341,7 +225,7 @@ html:not(.citl-loader-font-ready) #global-loader h3,html:not(.citl-loader-font-r
 #global-loader [data-boot-retry]{position:absolute;bottom:30px;left:18px;right:18px;margin:0;padding:5px;border:1px solid #cdd4e4;border-radius:8px;background:#f5f7fb;color:#2a3475;font-size:12px;cursor:pointer}
 .citl-loader-dots{display:inline-flex;direction:rtl;width:1.15em;flex:none;justify-content:space-between}.citl-loader-dots i{font-style:normal;opacity:0;animation:citl-dot-one 1.5s linear infinite}.citl-loader-dots i:nth-child(2){animation-name:citl-dot-two}.citl-loader-dots i:nth-child(3){animation-name:citl-dot-three}
 @keyframes citl-dot-one{0%,15%,100%{opacity:0}20%,90%{opacity:1}}@keyframes citl-dot-two{0%,40%,100%{opacity:0}45%,90%{opacity:1}}@keyframes citl-dot-three{0%,65%,100%{opacity:0}70%,90%{opacity:1}}
-@media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:136px!important;max-height:94px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
+@media(max-width:767px){#global-loader.citl-unified-loader>.relative{width:304px!important;height:260px!important;padding:18px!important;border-radius:22px}#global-loader.citl-unified-loader img{width:136px!important;height:auto!important;max-height:94px!important}#global-loader.citl-unified-loader h3{font-size:18px;margin-top:6px!important}#global-loader.citl-unified-loader #loader-text{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.citl-loader-dots i{animation:none;opacity:1}#global-loader>.relative::after{animation:none}}
 #global-loader>.relative:has([data-boot-retry]:not([hidden])) #loader-text{visibility:hidden}
 
@@ -1353,7 +237,7 @@ html.citl-navigation-loading #global-loader::before,
  inset:-18px;filter:blur(2px);pointer-events:auto;
 }
 #global-loader.citl-unified-loader>.relative{
- background:linear-gradient(155deg,rgba(253,252,248,.96),rgba(238,241,248,.94))!important;
+ background:linear-gradient(155deg,rgba(253,252,248,.95),rgba(238,241,248,.92))!important;
  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
 @media(max-width:767px){
@@ -1362,382 +246,322 @@ html.citl-navigation-loading #global-loader::before,
 </style>
 <style>#installContainer[hidden]{display:none!important}</style>
 </head>
-<body class="transition-opacity duration-500">
+<body class="min-h-screen flex items-center justify-center bg-[#11173D] p-3 md:p-6 relative overflow-x-hidden transition-opacity duration-500">
 
-<!-- ==================== Full-Bleed Campus Backdrop ==================== -->
 <div class="citl-campus-backdrop" aria-hidden="true">
     <div class="citl-campus-photo"></div>
     <div class="citl-campus-vignette"></div>
     <div class="citl-campus-grid"></div>
 </div>
 
-<!-- ==================== University Portal Shell ==================== -->
-<div class="citl-university-shell">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden relative z-10 fade-in mx-auto h-auto min-h-[600px]">
 
-    <!-- Top Institutional Bar -->
-    <header class="citl-topbar">
-        <div class="citl-topbar-inner">
-            <div class="citl-topbar-brand">
-                <div class="citl-topbar-logo">
-                    <img src="CITL.png" alt="شعار كلية النقل الدولي واللوجستيات">
-                </div>
-                <div class="citl-topbar-titles">
-                    <div class="citl-topbar-ar">كلية النقل الدولي واللوجستيات</div>
-                    <div class="citl-topbar-en">College of International Transport &amp; Logistics</div>
-                </div>
-            </div>
+<div class="flex w-full md:w-1/2 login-campus-panel flex-col justify-center items-center text-white p-6 md:p-8 relative shrink-0 order-first">
+
+    <div class="login-campus-pattern-layer"></div>
+    <div class="login-campus-soft-light"></div>
+
+    
+<div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16 login-campus-decor"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-gold opacity-10 rounded-full -ml-10 -mb-10 login-campus-decor"></div>
+
+<div class="login-campus-content w-full flex flex-col items-center">
+    <img src="CITL.png" alt="Logo" class="w-24 md:w-32 h-auto mb-4 md:mb-6 drop-shadow-lg bg-white p-0 rounded-lg">
+    
+<h2 class="font-bold mb-2 text-center whitespace-nowrap text-[clamp(18px,4vw,25px)]">
+    كلية النقل الدولي واللوجستيات
+</h2>
+
+<h3 class="text-[#F3A628] font-bold text-center whitespace-nowrap text-[clamp(12px,2.6vw,15px)] mb-3 tracking-[0.5px]">
+    College of International Transport & Logistics
+</h3>
+
+<div class="flex justify-center">
+    <div class="text-center">
+        <div class="flex items-center justify-center gap-3 mb-1">
+            <span class="w-8 h-px bg-[#F3A628]/80"></span>
+            <i class="fas fa-globe text-[#F3A628] text-xs"></i>
+            <span class="w-8 h-px bg-[#F3A628]/80"></span>
         </div>
-    </header>
+        
+        <span class="text-white font-extrabold uppercase tracking-[2.4px] text-[clamp(16px,3.5vw,22px)]">
+            CITL Smart System
+        </span>
+    </div>
+</div>
+    
 
-    <!-- Center Portal Stage -->
-    <main class="citl-stage">
-        <div class="citl-hero-intro">
-            <div class="citl-hero-eyebrow">
-                <span class="line"></span>
-                <span>الأكاديمية العربية للعلوم والتكنولوجيا والنقل البحري</span>
-                <span class="line"></span>
-            </div>
-            <h2 class="citl-hero-heading">بوابة النظام الذكي للكلية</h2>
-            <div class="citl-hero-system">CITL SMART SYSTEM</div>
+<div class="mt-4 md:mt-8 space-y-2 md:space-y-3 w-full max-w-xs">
+
+    <!-- كارت الجداول الدراسية -->
+    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+        <i class="fas fa-chalkboard-teacher text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
+
+        <div class="text-center md:text-right">
+            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة الجداول الدراسية</span>
+            <span class="text-gray-300 hidden md:block">عرض، متابعة، وتحديث الجداول الدراسية بسهولة</span>
         </div>
+    </div>
 
-        <!-- Elevated Institutional Auth Card -->
-        <div id="citl-auth-card" class="citl-auth-card bg-white">
-            <div class="citl-card-crest"></div>
+    <!-- كارت القاعات الدراسية -->
+    <div class="flex items-center text-xs bg-white/10 p-2 md:p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default justify-center md:justify-start">
+        <i class="fas fa-door-open text-gold ml-0 md:ml-3 text-lg hidden md:block"></i>
 
-            <div class="citl-card-body">
-                <!-- شريط التبديل العلوي -->
-                <div class="citl-mode-switcher" role="tablist" aria-label="بوابة الدخول والتسجيل">
-                    <button type="button" id="tab-login" role="tab" aria-selected="true" class="citl-mode-tab is-active" onclick="switchAuthMode('login')">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>تسجيل الدخول</span>
-                    </button>
-                    <button type="button" id="tab-signup" role="tab" aria-selected="false" class="citl-mode-tab" onclick="switchAuthMode('signup')">
-                        <i class="fas fa-user-plus"></i>
-                        <span>إنشاء حساب جديد</span>
-                    </button>
-                </div>
-
-                <!-- ==================== نموذج تسجيل الدخول ==================== -->
-                <form id="loginForm" class="space-y-4 block transition-all duration-300">
-                    <div class="citl-form-header">
-                        <h1>تسجيل الدخول</h1>
-                        <p>أدخل بريدك الإلكتروني وكلمة المرور للوصول إلى لوحة التحكم</p>
-                    </div>
-
-                    <div>
-                        <label for="email" class="citl-label">البريد الإلكتروني</label>
-                        <div class="citl-input-wrap">
-                            <input type="email" id="email" required
-                                   class="citl-input has-icon-right"
-                                   placeholder="user@aastcitl.me">
-                            <i class="fas fa-envelope citl-field-icon"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="citl-label-row">
-                            <label for="password" class="citl-label">كلمة المرور</label>
-                            <button type="button" data-forgot-password class="citl-forgot-link">نسيت كلمة المرور؟</button>
-                        </div>
-                        <div class="citl-input-wrap">
-                            <input type="password" id="password" required
-                                   class="citl-input has-icon-right has-icon-left"
-                                   placeholder="••••••••">
-                            <i class="fas fa-lock citl-field-icon"></i>
-                            <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
-                        </div>
-                    </div>
-
-                    <div id="login-error" class="citl-error-banner hidden">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>بيانات الدخول غير صحيحة</span>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="citl-btn-primary group">
-                        <span>دخول للنظام</span>
-                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform text-xs"></i>
-                    </button>
-
-
-                </form>
-
-                <!-- ==================== نموذج إنشاء حساب جديد ==================== -->
-                <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
-                    <div class="citl-form-header" style="margin-bottom: 14px;">
-                        <h1>إنشاء حساب جديد</h1>
-                        <p>سجّل بياناتك الأكاديمية أو الإدارية للانضمام إلى بوابة الكلية</p>
-                    </div>
-
-                    <!-- مؤشر الخطوتين -->
-                    <div class="citl-stepper" aria-label="خطوات التسجيل">
-                        <button type="button" id="step-indicator-1" class="citl-step-btn is-active" onclick="goToSignupStep(1)">
-                            <span class="citl-step-num">1</span>
-                            <span class="citl-step-label">البيانات الأساسية</span>
-                        </button>
-                        <span class="citl-step-connector"></span>
-                        <button type="button" id="step-indicator-2" class="citl-step-btn" onclick="goToSignupStep(2)">
-                            <span class="citl-step-num">2</span>
-                            <span class="citl-step-label">الحساب والتفعيل</span>
-                        </button>
-                    </div>
-
-                    <!-- الخطوة 1: البيانات الشخصية والوظيفية -->
-                    <div id="signup-step-1" class="space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label for="reg-name" class="citl-label">الاسم بالكامل</label>
-                                <input type="text" id="reg-name" required placeholder="الاسم ثلاثي أو رباعي" class="citl-input">
-                            </div>
-
-                            <div>
-                                <label for="reg-mobile" class="citl-label">رقم الموبايل</label>
-                                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
-                                       class="citl-input text-left" dir="ltr">
-                            </div>
-
-                            <div>
-                                <label class="citl-label">القسم / الجهة</label>
-                                <div class="relative custom-dropdown w-full">
-                                    <div class="custom-dropdown-display">
-                                        <span class="text-sm text-gray-700 truncate">اختر...</span>
-                                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
-                                    </div>
-
-                                    <ul class="custom-dropdown-options hidden custom-scrollbar">
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="">اختر...</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="dean">مكتب العميد</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="admin-followup">قسم المتابعة الإدارية</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="education-agency">وكالة شؤون التعليم</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="students-agency">وكالة شؤون الطلاب</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="assistants-office">مكتب المعيدين</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="computer-lab">معمل الحاسب</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
-                                    </ul>
-
-                                    <select id="reg-dept" class="hidden" required>
-                                        <option value="">اختر...</option>
-                                        <option value="dean">مكتب العميد</option>
-                                        <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
-                                        <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
-                                        <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
-                                        <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
-                                        <option value="admin-followup">قسم المتابعة الإدارية</option>
-                                        <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
-                                        <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
-                                        <option value="education-agency">وكالة شؤون التعليم</option>
-                                        <option value="students-agency">وكالة شؤون الطلاب</option>
-                                        <option value="assistants-office">مكتب المعيدين</option>
-                                        <option value="computer-lab">معمل الحاسب</option>
-                                        <option value="visitor">زائر خارجي</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="reg-position" class="citl-label">المسمى الوظيفي</label>
-                                <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق" class="citl-input">
-                            </div>
-
-                            <div class="md:col-span-1">
-                                <label class="citl-label">نوع الحساب</label>
-                                <div class="relative custom-dropdown w-full">
-                                    <div class="custom-dropdown-display">
-                                        <span id="reg-account-type-label" class="text-sm text-gray-700 truncate">اختر...</span>
-                                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
-                                    </div>
-
-                                    <ul class="custom-dropdown-options hidden custom-scrollbar">
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="">اختر...</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="admin">إداري</li>
-                                        <li class="custom-option cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
-                                    </ul>
-
-                                    <select id="reg-account-type" class="hidden" required>
-                                        <option value="">اختر...</option>
-                                        <option value="admin">إداري</option>
-                                        <option value="faculty">عضو هيئة تدريس</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="faculty-link-block" class="md:col-span-1">
-                                <label class="citl-label">ربط الحساب بعضو هيئة تدريس</label>
-                                <div class="relative custom-dropdown w-full">
-                                    <div id="faculty-link-display" class="custom-dropdown-display bg-gray-100 cursor-not-allowed">
-                                        <span id="reg-linked-instructor-label" class="text-sm text-gray-500 truncate">خاص بالتعليم فقط</span>
-                                        <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
-                                    </div>
-
-                                    <div class="custom-dropdown-options hidden custom-scrollbar" style="padding: 0;">
-                                        <div class="faculty-search-wrap">
-                                            <input type="text" id="faculty-search-input" class="faculty-search-input" placeholder="ابحث عن الاسم الأكاديمي..." autocomplete="off">
-                                        </div>
-                                        <ul id="faculty-name-options" style="list-style: none; margin: 0; padding: 4px;">
-                                        </ul>
-                                    </div>
-
-                                    <select id="reg-linked-instructor" class="hidden">
-                                        <option value="">اختر اسمك الأكاديمي</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="signup-step-1-error" class="citl-error-banner hidden">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span>يرجى استكمال جميع البيانات المطلوبة للمتابعة</span>
-                        </div>
-
-                        <button type="button" id="nextSignupStepBtn" class="citl-btn-primary" onclick="goToSignupStep(2)">
-                            <span>التالي: بيانات الحساب والتفعيل</span>
-                            <i class="fas fa-arrow-left text-xs"></i>
-                        </button>
-                    </div>
-
-                    <!-- الخطوة 2: البريد الإلكتروني وكود التفعيل وكلمة المرور -->
-                    <div id="signup-step-2" class="space-y-3 hidden">
-                        <div>
-                            <label for="reg-email" class="citl-label">البريد الإلكتروني</label>
-                            <div class="citl-input-wrap">
-                                <input type="email" id="reg-email" required
-                                       class="citl-input has-icon-right"
-                                       placeholder="user@aastcitl.me">
-                                <i class="fas fa-envelope citl-field-icon"></i>
-                            </div>
-                        </div>
-
-                        <div class="citl-access-box">
-                            <label for="reg-access-code" class="citl-label" style="color: #92400E;">
-                                <i class="fas fa-shield-alt ml-1 text-[#F3A628]"></i>
-                                كود التسجيل الخاص بالكلية
-                            </label>
-                            <div class="citl-input-wrap">
-                                <input type="text" id="reg-access-code" required
-                                       placeholder="أدخل كود التفعيل المعتمد"
-                                       class="citl-input has-icon-right">
-                                <i class="fas fa-key citl-field-icon" style="color: #D97706;"></i>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="reg-password" class="citl-label">كلمة المرور</label>
-                            <div class="citl-input-wrap">
-                                <input type="password" id="reg-password" required minlength="6"
-                                       class="citl-input has-icon-right has-icon-left"
-                                       placeholder="6 أحرف أو أرقام على الأقل">
-                                <i class="fas fa-lock citl-field-icon"></i>
-                                <i class="fas fa-eye citl-eye-btn" onclick="togglePassword('reg-password', this)" aria-label="إظهار أو إخفاء كلمة المرور"></i>
-                            </div>
-                        </div>
-
-                        <div id="signup-error" class="citl-error-banner hidden"></div>
-
-                        <div class="citl-step-actions">
-                            <button type="button" class="citl-btn-secondary" onclick="goToSignupStep(1)">
-                                <i class="fas fa-arrow-right text-xs"></i>
-                                <span>السابق</span>
-                            </button>
-                            <button type="submit" class="citl-btn-gold">
-                                <span>تسجيل اشتراك</span>
-                                <i class="fas fa-check text-xs"></i>
-                            </button>
-                        </div>
-
-                        <div class="text-center pt-1">
-                            <button type="button" data-forgot-password class="citl-forgot-link">لديك حساب ونسيت كلمة المرور؟</button>
-                        </div>
-                    </div>
-
-
-                </form>
-            </div>
+        <div class="text-center md:text-right">
+            <span class="block font-bold text-white mb-0 md:mb-0.5 whitespace-nowrap text-[clamp(11px,3.5vw,12px)]">التحكم وإدارة القاعات الدراسية</span>
+            <span class="text-gray-300 hidden md:block">تنظيم حجوزات القاعة ومنع التعارض بين المواعيد</span>
         </div>
+    </div>
 
-        <!-- Compact Glass Capability Strip -->
-        <div class="citl-capabilities-strip">
-            <div class="citl-cap-pill">
-                <div class="citl-cap-icon">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div class="citl-cap-text">
-                    <span class="citl-cap-title">إدارة الجداول الدراسية</span>
-                    <span class="citl-cap-desc">عرض ومتابعة وتحديث الجداول بسهولة</span>
-                </div>
-            </div>
-
-            <div class="citl-cap-pill">
-                <div class="citl-cap-icon">
-                    <i class="fas fa-door-open"></i>
-                </div>
-                <div class="citl-cap-text">
-                    <span class="citl-cap-title">إدارة القاعات الدراسية</span>
-                    <span class="citl-cap-desc">تنظيم الحجوزات ومنع تعارض المواعيد</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- إشعار تثبيت التطبيق -->
-        <p id="installContainer"
-           hidden
-           role="status"
-           aria-live="polite"
-           class="citl-install-pill">
-            يمكنك تثبيت التطبيق من قائمة المتصفح
-        </p>
-    </main>
-
-    <!-- Institutional Footer -->
-    <footer class="citl-portal-footer">
-        <div class="citl-portal-footer-inner">
-            <span>جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
-            <span>تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
-        </div>
-    </footer>
+    <!-- إشعار تثبيت التطبيق: تحت آخر كارت -->
+    <p id="installContainer"
+       hidden
+       role="status"
+       aria-live="polite"
+       style="margin:6px auto 0;
+              text-align:center;
+              font-size:12px;
+              line-height:1.5;
+              color:rgba(255,255,255,0.90);
+              pointer-events:none;">
+        يمكنك تثبيت التطبيق من قائمة المتصفح
+    </p>
 
 </div>
 
+</div>
+</div>
+<div class="w-full md:w-1/2 p-4 md:p-12 flex flex-col justify-center bg-white relative overflow-y-auto custom-scrollbar">
+
+    <form id="loginForm" class="space-y-3 md:space-y-5 block transition-all duration-300">
+        
+        <div class="text-center md:text-right mb-4 md:mb-8">
+            <h1 class="text-xl md:text-2xl font-bold text-navy mb-1">تسجيل الدخول</h1>
+            <p class="text-gray-500 text-xs md:text-sm">يرجى إدخال بيانات حسابك للمتابعة</p>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">البريد الإلكتروني</label>
+            <div class="relative group">
+                <input type="email" id="email" required 
+                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 bg-gray-50 focus:bg-white text-sm" 
+                       placeholder="user@aastcitl.me">
+                <i class="fas fa-envelope absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">كلمة المرور</label>
+            <div class="relative group">
+                <input type="password" id="password" required 
+                       class="w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none transition-all pl-10 pr-12 bg-gray-50 focus:bg-white text-sm" 
+                       placeholder="••••••••">
+                    
+                <i class="fas fa-lock absolute left-3 top-2.5 md:top-3.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs md:text-base"></i>
+                
+                <i class="fas fa-eye absolute right-3 top-2.5 md:top-3.5 text-gray-400 cursor-pointer hover:text-[#2A3475] transition-colors text-xs md:text-base" 
+                   onclick="togglePassword('password', this)"></i>
+            </div>
+        </div>
+
+        <button type="button" data-forgot-password class="text-sm font-bold text-navy hover:underline">نسيت كلمة المرور؟</button>
+        <div id="login-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg flex items-center">
+            <i class="fas fa-exclamation-circle ml-2"></i> <span>بيانات الدخول غير صحيحة</span>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-navy text-white font-bold py-2.5 md:py-3.5 rounded-lg hover:bg-[#1f2658] transition-all shadow-md transform active:scale-[0.98] flex justify-center items-center group text-sm md:text-base">
+            <span>دخول للنظام</span>
+            <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform text-xs md:text-sm"></i>
+        </button>
+        
+        <p class="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4">
+            ليس لديك حساب؟ <a href="#" onclick="toggleForms()" class="text-[#F3A628] font-bold hover:underline">إنشاء حساب جديد</a>
+        </p>
+    </form>
+
+    <form onsubmit="event.preventDefault()" id="signupForm" class="space-y-4 hidden transition-all duration-300">
+        <div class="text-center md:text-right mb-4">
+            <h1 class="text-xl font-bold text-navy mb-1">إنشاء حساب جديد</h1>
+            <p class="text-gray-500 text-xs">انضم إلينا الآن</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل</label>
+                <input type="text" id="reg-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">رقم الموبايل</label>
+                <input type="tel" id="reg-mobile" required placeholder="01xxxxxxxxx" maxlength="11" minlength="11" pattern="[0-9]{11}" inputmode="numeric"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm text-left dir-ltr">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">القسم / الجهة</label>
+                <div class="relative custom-dropdown w-full">
+                    <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
+                        <span class="text-sm text-gray-700">اختر...</span>
+                        <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+                    </div>
+                    
+                    <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="">اختر...</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="dean">مكتب العميد</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="transport-logistics">قسم إدارة لوجستيات النقل</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="energy-logistics">قسم إدارة لوجستيات الطاقة</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="admin-followup">قسم المتابعة الإدارية</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="education-agency">وكالة شؤون التعليم</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="students-agency">وكالة شؤون الطلاب</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="assistants-office">مكتب المعيدين</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-value="computer-lab">معمل الحاسب</li>
+                        <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-value="visitor">زائر خارجي</li>
+                    </ul>
+
+                    <select id="reg-dept" class="hidden" required>
+                        <option value="">اختر...</option> 
+                        <option value="dean">مكتب العميد</option>
+                        <option value="transport-logistics">قسم إدارة لوجستيات النقل</option>
+                        <option value="trade-logistics">قسم إدارة لوجستيات التجارة الدولية</option>
+                        <option value="supply-chain">قسم إدارة لوجستيات سلاسل الإمداد</option>
+                        <option value="energy-logistics">قسم إدارة لوجستيات الطاقة</option>
+                        <option value="admin-followup">قسم المتابعة الإدارية</option>
+                        <option value="training-agency">وكالة شؤون التدريب وخدمة المجتمع</option>
+                        <option value="postgrad-agency">وكالة الدراسات العليا والبحث العلمي</option>
+                        <option value="education-agency">وكالة شؤون التعليم</option>
+                        <option value="students-agency">وكالة شؤون الطلاب</option>
+                        <option value="assistants-office">مكتب المعيدين</option>
+                        <option value="computer-lab">معمل الحاسب</option> 
+                        <option value="visitor">زائر خارجي</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">المسمى الوظيفي</label>
+                <input type="text" id="reg-position" required placeholder="مثال: معيد، دكتور، منسق تعليمي" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm">
+            </div>
+            <div class="md:col-span-1">
+    <label class="block text-xs font-bold text-gray-700 mb-1">نوع الحساب</label>
+    <div class="relative custom-dropdown w-full">
+        <div class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-white flex items-center justify-between cursor-pointer transition-all shadow-sm hover:border-[#2A3475]">
+            <span id="reg-account-type-label" class="text-sm text-gray-700">اختر...</span>
+            <i class="fas fa-chevron-down text-[10px] text-gray-500 transition-transform duration-200"></i>
+        </div>
+
+        <ul class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="">اختر...</li>
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 border-b border-gray-50" data-target="reg-account-type" data-value="admin">إداري</li>
+            <li class="custom-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700" data-target="reg-account-type" data-value="faculty">عضو هيئة تدريس</li>
+        </ul>
+
+        <select id="reg-account-type" class="hidden" required>
+            <option value="">اختر...</option>
+            <option value="admin">إداري</option>
+            <option value="faculty">عضو هيئة تدريس</option>
+        </select>
+    </div>
+</div>
+
+<div id="faculty-link-block" class="md:col-span-1">
+    <label class="block text-xs font-bold text-gray-700 mb-1">ربط الحساب بعضو هيئة تدريس</label>
+
+    <div class="relative custom-dropdown w-full">
+        <div id="faculty-link-display" class="custom-dropdown-display w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center justify-between cursor-not-allowed transition-all shadow-sm">
+            <span id="reg-linked-instructor-label" class="text-sm text-gray-500">خاص بالتعليم فقط</span>
+            <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
+        </div>
+
+        <ul id="faculty-name-options" class="custom-dropdown-options absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto z-50 hidden shadow-xl custom-scrollbar">
+        </ul>
+
+        <select id="reg-linked-instructor" class="hidden">
+            <option value="">اختر اسمك الأكاديمي</option>
+        </select>
+    </div>
+</div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
+                <input type="email" id="reg-email" required 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
+                       placeholder="user@aastcitl.me"> 
+            </div>
+<div class="md:col-span-2 mb-3">
+    <button type="button" data-forgot-password class="text-xs font-bold text-navy hover:underline">لديك حساب ونسيت كلمة المرور؟</button>
+    <label class="block text-xs font-bold text-gray-700 mb-1">كود التسجيل الخاص بالكلية</label>
+    <div class="relative group">
+        <input type="text" id="reg-access-code" required 
+               placeholder="ادخل كود التفعيل" 
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm bg-orange-50/50">
+        <i class="fas fa-shield-alt absolute left-3 top-2.5 text-gray-400 group-focus-within:text-[#2A3475] text-xs"></i>
+    </div>
+</div>
+            <div class="md:col-span-2 mb-4">
+                <label class="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
+                <div class="relative">
+                    <input type="password" id="reg-password" required minlength="6" 
+                           class="w-full px-3 py-2 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A3475] outline-none text-sm"
+                           placeholder="••••••••">
+                    <i class="fas fa-eye absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#2A3475] z-10" 
+                       onclick="togglePassword('reg-password', this)"></i>
+                </div>
+            </div>
+        </div> 
+        <div id="signup-error" class="hidden bg-red-50 text-red-600 text-xs font-bold p-3 rounded-lg"></div>
+
+        <button type="submit" class="w-full bg-[#F3A628] text-[#2A3475] font-bold py-3 rounded-lg hover:bg-yellow-400 transition-all shadow-md">تسجيل اشتراك</button>
+        
+        <p class="text-center text-xs text-gray-600 mt-2">
+            لديك حساب بالفعل؟ <a href="#" onclick="toggleForms()" class="text-navy font-bold hover:underline">تسجيل الدخول</a>
+        </p>
+    </form>
+
+<div class="mt-2 md:mt-8 border-t border-gray-100 pt-2 md:pt-4 w-full">
+        <div class="flex flex-col items-center justify-center text-gray-500 font-medium text-[clamp(10px,3vw,12px)] gap-1">
+            <span class="whitespace-nowrap">جميع الحقوق محفوظة لكلية النقل الدولي واللوجستيات © 2026</span>
+            
+            <span class="whitespace-nowrap">تطوير وإدارة النظام بواسطة أ. أحمد فكري ( فني معمل الحاسب ).</span>
+        </div>
+    </div>
+
+</div>
 <div id="global-loader" class="citl-unified-loader fixed inset-0 z-[99999] hidden items-center justify-center  opacity-0">
     
 <div class="relative"><img width="189" height="128" src="data:image/png;base64,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" alt="CITL" fetchpriority="high"><h3><span>جاري تهيئة النظام</span><span class="citl-loader-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h3><p id="loader-text">يتم استدعاء البيانات، يرجى الانتظار...</p></div>
 </div>
-
     <div id="success-modal" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-[#0B102B]/75 backdrop-blur-md transition-opacity"></div>
-
+        <div class="absolute inset-0 bg-[#2A3475]/80 backdrop-blur-sm transition-opacity"></div>
+        
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-3xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
-                <div class="bg-white px-5 pb-5 pt-6 sm:p-7 sm:pb-5">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-[#F3A628]">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start flex-col items-center">
-                        <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 mb-4 shadow-sm">
-                            <i class="fas fa-check text-2xl text-emerald-600"></i>
+                        <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-green-100 mb-4 animate-bounce">
+                            <i class="fas fa-check text-2xl text-green-600"></i>
                         </div>
-
-                        <div class="mt-2 text-center w-full">
-                            <h3 class="text-xl font-extrabold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
+                        
+                        <div class="mt-3 text-center w-full">
+                            <h3 class="text-xl font-bold leading-6 text-[#2A3475] mb-2" id="modal-title">تم إنشاء الحساب بنجاح</h3>
                             <div class="mt-2">
                                 <p id="registration-success-message" class="text-sm text-gray-500">يمكنك الآن تسجيل الدخول للوصول إلى لوحة التحكم.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-slate-50 px-5 py-4 sm:flex sm:flex-row-reverse sm:px-7 justify-center border-t border-slate-100">
-                    <button type="button" onclick="closeSuccessModal()" class="citl-btn-primary sm:w-auto" style="padding: 11px 28px;">
-                        <span>تسجيل الدخول الآن</span>
-                        <i class="fas fa-arrow-left text-xs"></i>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
+                    <button type="button" onclick="closeSuccessModal()" class="inline-flex w-full justify-center rounded-lg bg-[#2A3475] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1f2658] sm:w-auto transition-all">
+                        تسجيل الدخول الآن
+                        <i class="fas fa-arrow-left mr-2 mt-1"></i>
                     </button>
                 </div>
             </div>
         </div>
     </div>
-
 <script id="citl-loader-root">
 /* Geometry only: the existing loader lifecycle remains the authority. */
 (function(w,d){
@@ -1815,7 +639,7 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         let box=document.getElementById('citl-login-status');
         if(!box){
             box=document.createElement('div');box.id='citl-login-status';box.setAttribute('role','status');
-            box.style.cssText='margin:0 0 14px;padding:10px 12px;background:#f4f6fb;border:1px solid #dce2ef;border-radius:12px;color:#2a3475;font-size:12px;line-height:1.8';
+            box.style.cssText='margin:0 0 12px;padding:10px 12px;background:#f4f6fb;border:1px solid #dce2ef;border-radius:10px;color:#2a3475;font-size:12px;line-height:1.8';
             const label=document.createElement('span');box.append(label);
             const button=document.createElement('button');button.id='citl-login-retry';button.type='button';button.textContent='إعادة المحاولة';button.hidden=true;
             button.style.cssText='margin-inline-start:8px;padding:5px 10px;border:1px solid #2a3475;border-radius:7px;cursor:pointer';button.onclick=()=>location.reload();box.append(button);
@@ -1840,10 +664,10 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncXVrZGJvbnp1a3hycGpvdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg4MDMsImV4cCI6MjA3OTQ3NDgwM30.3-70d7uB-zjVF7Jfr8ZjITT7suYPo3EWsYngO-sFVqM';
 
         const supabaseFactory = window.supabase;
-
+        
         // 🔥 الإنشاء مع توحيد مفتاح التخزين (storageKey) 🔥
         const sb = supabaseFactory.createClient(SUPABASE_URL, SUPABASE_KEY, {
-
+            
             auth: {
                 storageKey: 'sb-main-auth', // يجب أن يطابق ملف schedules.html
                 persistSession: true,
@@ -1855,114 +679,6 @@ window.CITLLoginProgress=CITLLoaderProgress(document.getElementById('global-load
         window.CITLPasswordRecovery.init(sb);
         window.PRESENCE_SUPABASE_URL = SUPABASE_URL;
         window.PRESENCE_SUPABASE_ANON_KEY = SUPABASE_KEY;
-
-// Non-destructive theme decorator for any password-recovery modal injected by password-recovery.js
-(function(){
-    const SKIP_IDS = new Set(['global-loader', 'success-modal', 'citl-login-status', 'citl-auth-card']);
-
-    function keepThemeOnTop() {
-        const themeEl = document.getElementById('citl-recovery-theme');
-        if (themeEl && document.head && document.head.lastElementChild !== themeEl) {
-            document.head.appendChild(themeEl);
-        }
-    }
-
-    function isLikelyRecoveryModal(node) {
-        if (!node || node.nodeType !== 1) return false;
-        if (SKIP_IDS.has(node.id)) return false;
-        if (node.classList.contains('citl-university-shell') || node.classList.contains('citl-campus-backdrop')) return false;
-        if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return false;
-
-        const id = (node.id || '').toLowerCase();
-        const cls = typeof node.className === 'string' ? node.className.toLowerCase() : '';
-        const text = (node.textContent || '');
-        const stylePos = node.style ? node.style.position : '';
-        let computedPos = '';
-        try { computedPos = window.getComputedStyle(node).position; } catch (_) {}
-
-        const isFixedOverlay = stylePos === 'fixed' || computedPos === 'fixed' || cls.includes('fixed') || node.tagName === 'DIALOG';
-        const hasRecoveryHint =
-            id.includes('recovery') || id.includes('forgot') || id.includes('reset') || id.includes('password') || id.includes('pr-') ||
-            cls.includes('recovery') || cls.includes('forgot') || cls.includes('reset') ||
-            node.getAttribute('role') === 'dialog' || node.getAttribute('aria-modal') === 'true' ||
-            /استعادة|إعادة تعيين|كلمة المرور|نسيت كلمة/.test(text);
-
-        return (isFixedOverlay && (hasRecoveryHint || !!node.querySelector('form, input[type="email"], input[type="password"]'))) || (hasRecoveryHint && !!node.querySelector('form, input'));
-    }
-
-    function findDialogSurface(root) {
-        if (root.tagName === 'DIALOG') return root;
-        const explicit = root.querySelector('[role="dialog"], .citl-recovery-dialog, .bg-white');
-        if (explicit && explicit !== root) return explicit;
-        const form = root.querySelector('form');
-        if (form) {
-            // Walk up to the direct child of root that wraps the form (and heading)
-            let cur = form;
-            while (cur.parentElement && cur.parentElement !== root) {
-                cur = cur.parentElement;
-            }
-            return cur !== root ? cur : form;
-        }
-        const firstChildDiv = Array.from(root.children).find(el => el.tagName === 'DIV' && el.querySelector('input, button, h1, h2, h3'));
-        return firstChildDiv || root;
-    }
-
-    function classifyButtons(dialog) {
-        dialog.querySelectorAll('button').forEach(btn => {
-            if (btn.dataset.citlStyled) return;
-            const txt = (btn.textContent || '').trim();
-            const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
-            const type = (btn.getAttribute('type') || '').toLowerCase();
-
-            if (txt === '×' || txt === '✕' || txt === 'x' || txt === 'X' || aria.includes('close') || aria.includes('إغلاق') || btn.querySelector('.fa-times, .fa-xmark')) {
-                btn.classList.add('citl-recovery-close');
-            } else if (type === 'submit' || /إرسال|تحديث|حفظ|تغيير|تأكيد|استعادة|متابعة/.test(txt)) {
-                btn.classList.add('citl-recovery-submit');
-            } else if (/إلغاء|إغلاق|رجوع|عودة/.test(txt)) {
-                btn.classList.add('citl-recovery-cancel');
-            }
-            btn.dataset.citlStyled = '1';
-        });
-    }
-
-    function decorateRecoveryNode(node) {
-        if (!isLikelyRecoveryModal(node)) return;
-        keepThemeOnTop();
-        const surface = findDialogSurface(node);
-        if (surface === node) {
-            node.classList.add('citl-recovery-dialog');
-        } else {
-            node.classList.add('citl-recovery-overlay');
-            surface.classList.add('citl-recovery-dialog');
-        }
-        classifyButtons(surface);
-    }
-
-    function scanAll() {
-        Array.from(document.body.children).forEach(decorateRecoveryNode);
-        Array.from(document.documentElement.children).forEach(el => {
-            if (el !== document.head && el !== document.body) decorateRecoveryNode(el);
-        });
-    }
-
-    scanAll();
-    const moBody = new MutationObserver(muts => {
-        muts.forEach(m => m.addedNodes.forEach(decorateRecoveryNode));
-    });
-    moBody.observe(document.body, { childList: true });
-
-    const moHead = new MutationObserver(() => keepThemeOnTop());
-    if (document.head) moHead.observe(document.head, { childList: true });
-
-    document.addEventListener('click', e => {
-        if (e.target.closest('[data-forgot-password]')) {
-            setTimeout(scanAll, 0);
-            setTimeout(scanAll, 60);
-            setTimeout(scanAll, 180);
-        }
-    });
-    window.addEventListener('DOMContentLoaded', scanAll);
-})();
 
 // --- كود الدخول التلقائي الذكي (نسخة منع الوميض) ---
 async function autoRedirect() {
@@ -1981,7 +697,7 @@ async function autoRedirect() {
         if (redirect) {
             // Keep the login form hidden throughout navigation; watchdog remains active.
             if(!window.CITLLoginEntry.redirecting())return;
-            window.location.href = '/dashboard/';
+            window.location.href = '/dashboard/'; 
         } else {
             window.CITLLoginEntry.finish();
         }
@@ -2005,7 +721,7 @@ autoRedirect();
         window.showLoader = function(text = "جاري المعالجة...") {
             document.documentElement.classList.add('citl-login-submitting');
             const loader=document.getElementById('global-loader');
-
+            
             document.getElementById('loader-text').textContent=text;
             loader.classList.remove('hidden','opacity-0');loader.classList.add('flex');window.CITLLoginViewport();window.CITLLoginProgress.start();
         };
@@ -2016,108 +732,23 @@ autoRedirect();
             loader.classList.add('hidden','opacity-0');loader.classList.remove('flex');
         };
 
-        // التبديل بين الفورم مع مزامنة التبويب العلوي وحجم البطاقة
-        function syncAuthTabs() {
-            const loginHidden = document.getElementById('loginForm').classList.contains('hidden');
-            const tabLogin = document.getElementById('tab-login');
-            const tabSignup = document.getElementById('tab-signup');
-            const card = document.getElementById('citl-auth-card');
-            if (tabLogin && tabSignup) {
-                tabLogin.classList.toggle('is-active', !loginHidden);
-                tabLogin.setAttribute('aria-selected', String(!loginHidden));
-                tabSignup.classList.toggle('is-active', loginHidden);
-                tabSignup.setAttribute('aria-selected', String(loginHidden));
-            }
-            if (card) {
-                card.classList.toggle('is-signup-mode', loginHidden);
-            }
-        }
-
-        function switchAuthMode(mode) {
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
-            if (mode === 'signup') {
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-            } else {
-                signupForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-            }
-            syncAuthTabs();
-        }
-
+        // التبديل بين الفورم
         function toggleForms() {
             document.getElementById('loginForm').classList.toggle('hidden');
             document.getElementById('signupForm').classList.toggle('hidden');
-            syncAuthTabs();
         }
-
-        // التنقل بين خطوتي التسجيل (بدون المساس بـ registration-secure.js)
-        function goToSignupStep(step) {
-            const step1 = document.getElementById('signup-step-1');
-            const step2 = document.getElementById('signup-step-2');
-            const ind1 = document.getElementById('step-indicator-1');
-            const ind2 = document.getElementById('step-indicator-2');
-            const step1Err = document.getElementById('signup-step-1-error');
-
-            if (step === 2) {
-                const name = (document.getElementById('reg-name')?.value || '').trim();
-                const mobile = (document.getElementById('reg-mobile')?.value || '').trim();
-                const dept = document.getElementById('reg-dept')?.value || '';
-                const position = (document.getElementById('reg-position')?.value || '').trim();
-                const accType = document.getElementById('reg-account-type')?.value || '';
-                const linkedInstructor = document.getElementById('reg-linked-instructor')?.value || '';
-
-                let errMsg = '';
-                if (!name) errMsg = 'يرجى إدخال الاسم بالكامل';
-                else if (!/^[0-9]{11}$/.test(mobile)) errMsg = 'يرجى إدخال رقم موبايل صحيح مكون من 11 رقماً';
-                else if (!dept) errMsg = 'يرجى اختيار القسم / الجهة';
-                else if (!position) errMsg = 'يرجى إدخال المسمى الوظيفي';
-                else if (!accType) errMsg = 'يرجى اختيار نوع الحساب';
-                else if (accType === 'faculty' && !linkedInstructor) errMsg = 'يرجى ربط الحساب بالاسم الأكاديمي لعضو هيئة التدريس';
-
-                if (errMsg) {
-                    if (step1Err) {
-                        step1Err.querySelector('span').textContent = errMsg;
-                        step1Err.classList.remove('hidden');
-                    }
-                    return;
-                }
-                if (step1Err) step1Err.classList.add('hidden');
-
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                ind1.classList.remove('is-active');
-                ind1.classList.add('is-done');
-                ind2.classList.add('is-active');
-            } else {
-                step2.classList.add('hidden');
-                step1.classList.remove('hidden');
-                ind2.classList.remove('is-active');
-                ind1.classList.remove('is-done');
-                ind1.classList.add('is-active');
-            }
-        }
-
-        // التأكد من إظهار الخطوة الصحيحة في حال وجود خطأ تحقق من المتصفح
-        document.getElementById('signupForm')?.addEventListener('invalid', function(e) {
-            const step1 = document.getElementById('signup-step-1');
-            if (step1 && step1.contains(e.target) && step1.classList.contains('hidden')) {
-                goToSignupStep(1);
-            }
-        }, true);
 
         // 1. تسجيل الدخول (محدث باللودر)
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorElement = document.getElementById('login-error');
 
             // 🔥 تشغيل اللودر
             showLoader("جاري التحقق من البيانات...");
-
+            
             if(errorElement) errorElement.classList.add('hidden');
 
             try {
@@ -2171,7 +802,7 @@ autoRedirect();
 
             } catch (error) {
                 console.error(error);
-
+                
                 // 🔥 إخفاء اللودر عند الخطأ
                 hideLoader();
 
@@ -2181,7 +812,7 @@ autoRedirect();
                 } else {
                     alert("بيانات الدخول غير صحيحة");
                 }
-
+                
                 document.querySelector('.bg-white').classList.add('animate-pulse');
                 setTimeout(() => document.querySelector('.bg-white').classList.remove('animate-pulse'), 200);
             }
@@ -2257,7 +888,6 @@ function toggleFacultyLinkBlock() {
     const display = document.getElementById('faculty-link-display');
     const label = document.getElementById('reg-linked-instructor-label');
     const options = document.getElementById('faculty-name-options');
-    const optionsContainer = options?.closest('.custom-dropdown-options');
 
     if (!block || !hiddenSelect || !display || !label || !options) return;
 
@@ -2285,7 +915,7 @@ function toggleFacultyLinkBlock() {
         label.classList.remove('text-[#2A3475]', 'font-bold', 'text-gray-700');
         label.classList.add('text-gray-500');
 
-        if (optionsContainer) optionsContainer.classList.add('hidden');
+        options.classList.add('hidden');
         const arrow = display.querySelector('.fa-chevron-down');
         if (arrow) arrow.style.transform = 'rotate(0deg)';
     }
@@ -2319,24 +949,9 @@ function syncDepartmentDropdownLabel(value) {
     }
 }
 
-        // --- دالة تشغيل القوائم المنسدلة (مع دعم البحث داخل قائمة أعضاء هيئة التدريس) ---
+        // --- دالة تشغيل القوائم المنسدلة ---
 function setupCustomDropdowns() {
-    const facultySearch = document.getElementById('faculty-search-input');
-    if (facultySearch) {
-        facultySearch.addEventListener('input', () => {
-            const q = facultySearch.value.trim().toLowerCase();
-            document.querySelectorAll('#faculty-name-options .custom-option').forEach(item => {
-                const match = item.textContent.toLowerCase().includes(q);
-                item.style.display = match ? '' : 'none';
-            });
-        });
-    }
-
     document.addEventListener('click', (e) => {
-        if (e.target.closest('.faculty-search-wrap')) {
-            return;
-        }
-
         const display = e.target.closest('.custom-dropdown-display');
         const option = e.target.closest('.custom-option');
 
@@ -2387,15 +1002,6 @@ function setupCustomDropdowns() {
                     ? 'rotate(0deg)'
                     : 'rotate(180deg)';
             }
-
-            if (!options.classList.contains('hidden')) {
-                const searchBox = options.querySelector('.faculty-search-input');
-                if (searchBox) {
-                    searchBox.value = '';
-                    searchBox.dispatchEvent(new Event('input'));
-                    setTimeout(() => searchBox.focus(), 30);
-                }
-            }
             return;
         }
 
@@ -2422,8 +1028,7 @@ function setupCustomDropdowns() {
         function closeSuccessModal() {
             const modal = document.getElementById('success-modal');
             modal.classList.add('hidden');
-            goToSignupStep(1);
-            switchAuthMode('login');
+            toggleForms();
         }
 
         function togglePassword(inputId, iconElement) {
@@ -2446,7 +1051,7 @@ if ('serviceWorker' in navigator) {
         .catch(err => console.log('حدث خطأ في التسجيل: ', err));
     });
   }
-
+  
 // Show browser-specific installation help even when no install event is emitted (Safari).
 (function(){
  const notice=document.getElementById('installContainer');

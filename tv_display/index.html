@@ -1167,6 +1167,609 @@ body.tv-display-page .schedule-instructor {
     background-clip: padding-box !important;
     outline: none !important;
 }
+
+/* =====================================================
+   CITL PRO TABLES & POSTER/VIDEO COMPANION DUAL-TABLES
+   تطوير احترافي للجداول + جدولين حيين أسفل كل بوستر/فيديو
+   مع حماية كاملة لأبعاد الفيديو (Zero Distortion)
+===================================================== */
+
+/* --- 1. تطوير بصري احترافي للجداول الدراسية لجذب انتباه الطالب --- */
+.room-card:not(.poster-slide) .schedule-head {
+    background: linear-gradient(135deg, #1b245c 0%, #2A3475 55%, #161d4a 100%) !important;
+    color: #f8fafc !important;
+    border: none !important;
+    border-bottom: 3px solid var(--citl-gold) !important;
+    border-radius: 14px !important;
+    padding: 10px 14px !important;
+    box-shadow: 0 8px 18px rgba(21,27,69,0.14);
+    letter-spacing: 0.03em;
+}
+.room-card:not(.poster-slide) .schedule-head > div {
+    color: rgba(255,255,255,0.95) !important;
+    font-weight: 900 !important;
+}
+.room-card:not(.poster-slide) .schedule-row {
+    border: 1px solid #e2e8f4 !important;
+    box-shadow: 0 6px 16px rgba(17,24,61,0.055) !important;
+}
+.room-card:not(.poster-slide) .schedule-row::before {
+    width: 5px !important;
+}
+.room-card:not(.poster-slide) .schedule-row.is-current {
+    border: 1.5px solid rgba(220,38,38,0.42) !important;
+    background: linear-gradient(90deg, #fff5f5 0%, #ffffff 48%, #fff1f2 100%) !important;
+    box-shadow: 0 10px 24px rgba(220,38,38,0.13) !important;
+}
+.room-card:not(.poster-slide) .schedule-row.is-upcoming {
+    background: linear-gradient(90deg, #ffffff 0%, #fbfdff 70%, #fffaf0 100%) !important;
+}
+.room-card:not(.poster-slide) .schedule-time {
+    background: linear-gradient(135deg, #eef2ff 0%, #e4ebfa 100%) !important;
+    color: #1b245c !important;
+    border: 1px solid rgba(42,52,117,0.12);
+    font-weight: 900 !important;
+}
+.room-card:not(.poster-slide) .schedule-row.is-current .schedule-time {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    border-color: transparent;
+    box-shadow: 0 6px 14px rgba(220,38,38,0.28);
+}
+.room-card:not(.poster-slide) .schedule-row.is-upcoming .schedule-time {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
+    color: #b45309 !important;
+    border-color: rgba(243,166,40,0.35);
+}
+.room-card:not(.poster-slide) .schedule-course {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+}
+.room-card:not(.poster-slide) .schedule-code:not(:empty) {
+    display: inline-flex;
+    align-items: center;
+    background: #eef2ff;
+    color: #2A3475 !important;
+    border: 1px solid #dbe3f8;
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-top: 4px;
+    width: fit-content;
+    max-width: 100%;
+}
+.room-card:not(.poster-slide) .status-now {
+    background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 14px rgba(220,38,38,0.30) !important;
+}
+.room-card:not(.poster-slide) .status-upcoming {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7) !important;
+    color: #b45309 !important;
+    border: 1px solid #fcd34d !important;
+}
+
+/* --- 2. هيكل البوستر والفيديو مع حماية كاملة لأبعاد الفيديو --- */
+.poster-slide {
+    background: #070b14 !important;
+}
+.poster-slide .poster-hero-bar {
+    flex: 0 0 auto;
+    padding: 10px 20px !important;
+    background: linear-gradient(135deg, #1b245c 0%, #11183d 100%) !important;
+    border-bottom: 2px solid rgba(243,166,40,0.45) !important;
+}
+.poster-slide .poster-hero-bar .room-icon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 13px !important;
+}
+.poster-slide .poster-hero-bar h2 {
+    font-size: clamp(16px, 1.55vw, 24px) !important;
+    line-height: 1.2 !important;
+}
+
+/* منصة العرض: تحافظ على أبعاد الفيديو 100% بدون قص أو شد أو تشويه */
+.poster-media-stage {
+    position: relative;
+    width: 100%;
+    min-height: 0;
+    background: #050811;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex: 1 1 56%;
+}
+.poster-media-stage.is-video-stage {
+    flex: 1 1 58%;
+    background: #000000;
+}
+.poster-media-stage #poster-media-host {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0;
+    transform: scale(0.985);
+}
+/* ضمان الحفاظ على النسبة الطبيعية للفيديو والصور تماماً */
+.poster-media-stage.is-video-stage #poster-media-host video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #000000 !important;
+}
+.poster-media-stage.is-image-stage #poster-media-host img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+}
+
+/* في الشاشة الطولية أو شاشة سامسونج المتدوّرة:
+   الفيديو يأخذ عرضه الكامل 100% بنسبته الحقيقية (16:9 أو النسبة الأصلية للفيديو)
+   فلا يتأثر نهائياً بوجود الجدولين تحته */
+@media (orientation: portrait) {
+    .poster-media-stage.is-video-stage {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        aspect-ratio: var(--video-ar, 16 / 9) !important;
+        max-height: 54% !important;
+    }
+    .poster-media-stage.is-image-stage {
+        flex: 0 0 48% !important;
+        max-height: 50% !important;
+    }
+}
+body.tv-display-page.tv-rotate-cw .poster-media-stage.is-video-stage,
+body.tv-display-page.tv-rotate-ccw .poster-media-stage.is-video-stage {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    aspect-ratio: var(--video-ar, 16 / 9) !important;
+    max-height: 54% !important;
+}
+body.tv-display-page.tv-rotate-cw .poster-media-stage.is-image-stage,
+body.tv-display-page.tv-rotate-ccw .poster-media-stage.is-image-stage {
+    flex: 0 0 48% !important;
+    max-height: 50% !important;
+}
+
+/* --- 3. حاوية الجدولين الاحترافية أسفل البوستر والفيديو --- */
+.poster-companion-dock {
+    flex: 1 1 42%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(circle at 8% 0%, rgba(243,166,40,0.14), transparent 36%),
+        radial-gradient(circle at 92% 100%, rgba(42,52,117,0.34), transparent 45%),
+        linear-gradient(180deg, #0d142b 0%, #141d3f 100%);
+    border-top: 3px solid var(--citl-gold);
+    padding: 9px 12px 10px;
+    gap: 8px;
+    overflow: hidden;
+    position: relative;
+}
+.poster-companion-dock::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,235,165,0.8), transparent);
+    pointer-events: none;
+}
+
+.pcd-topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 4px;
+    opacity: 0;
+    transform: translateY(10px);
+}
+.pcd-topbar-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: clamp(11px, 1.05vw, 15px);
+    font-weight: 900;
+    letter-spacing: 0.01em;
+}
+.pcd-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(243,166,40,0.16);
+    border: 1px solid rgba(243,166,40,0.45);
+    color: #ffd479;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: clamp(9px, 0.85vw, 12px);
+    font-weight: 900;
+}
+.pcd-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34,197,94,0.22);
+}
+.pcd-topbar-hint {
+    color: rgba(255,255,255,0.75);
+    font-size: clamp(9px, 0.8vw, 12px);
+    font-weight: 800;
+}
+
+/* شبكة الجدولين: جنباً إلى جنب في العرضي، وفوق بعض بكامل العرض في الطولي */
+.pcd-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    gap: 10px;
+    overflow: hidden;
+}
+@media (orientation: portrait) {
+    .pcd-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+    .poster-companion-dock {
+        flex: 1 1 auto !important;
+        padding: 10px 12px 12px !important;
+    }
+}
+body.tv-display-page.tv-rotate-cw .pcd-grid,
+body.tv-display-page.tv-rotate-ccw .pcd-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+body.tv-display-page.tv-rotate-cw .poster-companion-dock,
+body.tv-display-page.tv-rotate-ccw .poster-companion-dock {
+    flex: 1 1 auto !important;
+    padding: 10px 12px 12px !important;
+}
+
+/* بطاقة كل جدول من الجدولين */
+.pcd-card {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.18);
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(5,10,28,0.34);
+    opacity: 0;
+    transform: translateY(26px) scale(0.975);
+    position: relative;
+}
+.pcd-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--citl-gold), #ffe08a, var(--citl-gold-2));
+    z-index: 3;
+}
+
+.pcd-card-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #1b245c 0%, #2A3475 60%, #151d4a 100%);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(243,166,40,0.35);
+}
+.pcd-room-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.pcd-room-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: rgba(243,166,40,0.18);
+    border: 1px solid rgba(243,166,40,0.5);
+    color: var(--citl-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.pcd-room-name {
+    font-family: 'Roboto', sans-serif;
+    font-size: clamp(16px, 1.55vw, 24px);
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1;
+    white-space: nowrap;
+}
+.pcd-room-sub {
+    font-size: clamp(9px, 0.72vw, 11px);
+    color: rgba(255,255,255,0.72);
+    font-weight: 800;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+.pcd-head-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.pcd-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: clamp(9px, 0.75vw, 11px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+.pcd-status-tag.is-busy {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220,38,38,0.35);
+}
+.pcd-status-tag.is-free {
+    background: #10b981;
+    color: #ffffff;
+}
+.pcd-count-tag {
+    background: rgba(255,255,255,0.14);
+    color: #ffd479;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: clamp(9px, 0.72vw, 11px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+/* رأس أعمدة الجدول المصغّر الاحترافي */
+.pcd-col-head {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(98px, 0.78fr) minmax(0, 1.85fr) minmax(110px, 1.05fr) minmax(58px, 0.42fr);
+    gap: 8px;
+    padding: 5px 10px;
+    background: #f1f5fb;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: clamp(9px, 0.7vw, 11px);
+    font-weight: 900;
+}
+
+.pcd-rows {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: repeat(var(--pcd-rows, 1), minmax(0, 1fr));
+    gap: 5px;
+    padding: 6px 8px 7px;
+    background: #f8fafd;
+    overflow: hidden;
+}
+
+.pcd-row {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(98px, 0.78fr) minmax(0, 1.85fr) minmax(110px, 1.05fr) minmax(58px, 0.42fr);
+    gap: 8px;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e5eaf4;
+    border-right: 4px solid #cbd5e1;
+    border-radius: 11px;
+    padding: 4px 8px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-10px);
+}
+.pcd-row.is-current {
+    background: linear-gradient(90deg, #fff5f5 0%, #ffffff 65%, #fff1f2 100%);
+    border-color: rgba(220,38,38,0.32);
+    border-right-color: #dc2626;
+}
+.pcd-row.is-upcoming {
+    border-right-color: var(--citl-gold);
+}
+.pcd-row.is-cancelled {
+    background: #fff1f2;
+    border-right-color: #ef4444;
+    opacity: 0.75;
+}
+.pcd-row.is-cancelled .pcd-course,
+.pcd-row.is-cancelled .pcd-time,
+.pcd-row.is-cancelled .pcd-teacher {
+    text-decoration: line-through;
+    opacity: 0.65;
+}
+
+.pcd-time {
+    direction: ltr;
+    font-family: 'Roboto', sans-serif;
+    font-size: clamp(10px, 0.95vw, 14px);
+    font-weight: 900;
+    text-align: center;
+    padding: 4px 5px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #1e255a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pcd-row.is-current .pcd-time {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
+}
+.pcd-row.is-upcoming .pcd-time {
+    background: #fff7ed;
+    color: #b45309;
+    border: 1px solid rgba(243,166,40,0.35);
+}
+
+.pcd-main {
+    min-width: 0;
+    overflow: hidden;
+}
+.pcd-course {
+    color: #0f172a;
+    font-size: clamp(11px, 0.98vw, 15px);
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pcd-code {
+    display: inline-block;
+    font-family: 'Roboto', sans-serif;
+    font-size: clamp(8px, 0.66vw, 10px);
+    font-weight: 800;
+    color: #2A3475;
+    background: #eef2ff;
+    border-radius: 5px;
+    padding: 1px 5px;
+    margin-top: 2px;
+}
+.pcd-code:empty { display: none; }
+
+.pcd-teacher {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #1e293b;
+    font-size: clamp(10px, 0.85vw, 13px);
+    font-weight: 800;
+    overflow: hidden;
+}
+.pcd-teacher i {
+    color: #2A3475;
+    font-size: 0.85em;
+    flex-shrink: 0;
+}
+.pcd-teacher span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pcd-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.pcd-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: clamp(8px, 0.7vw, 10px);
+    font-weight: 900;
+    white-space: nowrap;
+}
+.pcd-pill.now { background: #dc2626; color: #ffffff; }
+.pcd-pill.upcoming { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+.pcd-pill.cancelled { background: #ef4444; color: #ffffff; }
+
+.pcd-empty {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #059669;
+    background: #ecfdf5;
+    border: 1px dashed #a7f3d0;
+    border-radius: 12px;
+    font-size: clamp(11px, 0.95vw, 14px);
+    font-weight: 900;
+    padding: 8px;
+    text-align: center;
+}
+
+/* --- 4. إيفكت الدخول الاحترافي المتزامن عند ظهور البوستر أو الفيديو --- */
+.poster-slide.pcd-revealed .poster-media-stage #poster-media-host {
+    animation: pcdMediaReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.poster-slide.pcd-revealed .pcd-topbar {
+    animation: pcdBarReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
+}
+.poster-slide.pcd-revealed .pcd-card-1 {
+    animation: pcdCardRise 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.16s forwards;
+}
+.poster-slide.pcd-revealed .pcd-card-2 {
+    animation: pcdCardRise 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.30s forwards;
+}
+.poster-slide.pcd-revealed .pcd-row {
+    animation: pcdRowGlide 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pcdMediaReveal {
+    from { opacity: 0; transform: scale(0.985); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pcdBarReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pcdCardRise {
+    0%   { opacity: 0; transform: translateY(26px) scale(0.975); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pcdRowGlide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ضبط خطوط الجدولين في وضع شاشة سامسونج المتدوّرة */
+body.tv-display-page.tv-rotate-cw .pcd-room-name,
+body.tv-display-page.tv-rotate-ccw .pcd-room-name {
+    font-size: 20px !important;
+}
+body.tv-display-page.tv-rotate-cw .pcd-course,
+body.tv-display-page.tv-rotate-ccw .pcd-course {
+    font-size: 14px !important;
+}
+body.tv-display-page.tv-rotate-cw .pcd-time,
+body.tv-display-page.tv-rotate-ccw .pcd-time {
+    font-size: 13px !important;
+}
+body.tv-display-page.tv-rotate-cw .pcd-teacher,
+body.tv-display-page.tv-rotate-ccw .pcd-teacher {
+    font-size: 12px !important;
+}
+
 </style>
 <link rel="stylesheet" href="/assets/tv-study.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2172,6 +2775,201 @@ function startSlideshow() {
     progressInterval = setInterval(step, 50);
 }
 
+let posterCompanionCursor = 0;
+
+function buildPosterCompanionDockHTML() {
+    const escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const todayStr = now.toLocaleDateString('en-CA');
+
+    const pool = (Array.isArray(displayRooms) && displayRooms.length)
+        ? displayRooms
+        : (Array.isArray(activeRooms) && activeRooms.length ? activeRooms : Object.keys(roomsData || {}));
+
+    const analyzeRoom = (roomName) => {
+        const raw = (roomsData && Array.isArray(roomsData[roomName])) ? roomsData[roomName] : [];
+        const visible = [];
+        let hasLive = false;
+
+        raw.forEach(item => {
+            const displayTime = tvFormatTimeDisplay(item.time_slot);
+            const times = displayTime.split('-');
+            const isCancelled = item.status === 'cancelled' || (item.cancelled_dates && item.cancelled_dates.includes(todayStr));
+            let isCurrent = false;
+            let isFinished = false;
+
+            if (times.length === 2) {
+                const sMins = tvTimeToMinutes(times[0]);
+                const eMins = tvTimeToMinutes(times[1]);
+                if (sMins !== null && eMins !== null) {
+                    if (currentMinutes >= eMins) isFinished = true;
+                    else if (currentMinutes >= sMins && currentMinutes < eMins) isCurrent = !isCancelled;
+                }
+            }
+            if (!isFinished) {
+                if (isCurrent) hasLive = true;
+                visible.push({ item, displayTime, isCancelled, isCurrent });
+            }
+        });
+
+        return { roomName, visible, hasLive, totalToday: raw.length };
+    };
+
+    const analyzed = pool.map(analyzeRoom);
+    // أولوية للقاعات التي بها محاضرات جارية ثم القادمة ثم المتبقية مع تدوير تلقائي
+    const activeOnes = analyzed.filter(r => r.visible.length > 0);
+    const ordered = activeOnes.length >= 2
+        ? [...activeOnes.filter(r => r.hasLive), ...activeOnes.filter(r => !r.hasLive)]
+        : analyzed;
+
+    let selectedRooms = [];
+    if (ordered.length >= 2) {
+        const start = posterCompanionCursor % ordered.length;
+        selectedRooms = [ordered[start], ordered[(start + 1) % ordered.length]];
+        posterCompanionCursor = (start + 2) % ordered.length;
+    } else if (ordered.length === 1) {
+        selectedRooms = [
+            ordered[0],
+            { roomName: 'حالة القاعات', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
+        ];
+    } else {
+        selectedRooms = [
+            { roomName: 'القاعات الدراسية', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true },
+            { roomName: 'المحاضرات القادمة', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
+        ];
+    }
+
+    const renderMiniTable = (info, cardIdx) => {
+        const maxRows = 4;
+        const rowsSlice = info.visible.slice(0, maxRows);
+        const rowCount = Math.max(rowsSlice.length, 1);
+        const statusTag = info.hasLive
+            ? '<span class="pcd-status-tag is-busy"><i class="fas fa-broadcast-tower"></i> مشغولة الآن</span>'
+            : '<span class="pcd-status-tag is-free"><i class="fas fa-check-circle"></i> متاحة الآن</span>';
+        const countTag = `<span class="pcd-count-tag">${info.visible.length} متبقية</span>`;
+
+        let bodyHTML = '';
+        if (rowsSlice.length > 0) {
+            const rowsMarkup = rowsSlice.map((entry, idx) => {
+                const stateClass = entry.isCancelled ? 'is-cancelled' : (entry.isCurrent ? 'is-current' : 'is-upcoming');
+                const pill = entry.isCancelled
+                    ? '<span class="pcd-pill cancelled"><i class="fas fa-ban"></i> ملغاة</span>'
+                    : (entry.isCurrent
+                        ? '<span class="pcd-pill now"><i class="fas fa-circle-play"></i> الآن</span>'
+                        : '<span class="pcd-pill upcoming"><i class="fas fa-clock"></i> قادمة</span>');
+                const rowDelay = (cardIdx === 0 ? 320 : 440) + (idx * 65);
+                return `
+                    <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
+                        <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
+                        <div class="pcd-main">
+                            <div class="pcd-course">${escapeHtml(entry.item.course_name || 'محاضرة')}</div>
+                            <div class="pcd-code">${escapeHtml(entry.item.course_code || '')}</div>
+                        </div>
+                        <div class="pcd-teacher">
+                            <i class="fas fa-user-tie"></i>
+                            <span>${escapeHtml(entry.item.instructor || 'غير محدد')}</span>
+                        </div>
+                        <div class="pcd-state">${pill}</div>
+                    </div>
+                `;
+            }).join('');
+
+            bodyHTML = `
+                <div class="pcd-col-head">
+                    <div>التوقيت</div>
+                    <div>المقرر</div>
+                    <div>المحاضر</div>
+                    <div style="text-align:center">الحالة</div>
+                </div>
+                <div class="pcd-rows" style="--pcd-rows:${rowCount}">
+                    ${rowsMarkup}
+                </div>
+            `;
+        } else {
+            const emptyMsg = info.isFallbackSummary
+                ? 'جميع القاعات الأخرى متاحة حالياً — تابع التحديث المباشر'
+                : (info.totalToday > 0 ? 'انتهت محاضرات هذه القاعة اليوم — القاعة متاحة الآن' : 'لا توجد محاضرات متبقية — القاعة متاحة الآن');
+            bodyHTML = `
+                <div class="pcd-rows" style="--pcd-rows:1">
+                    <div class="pcd-empty">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>${escapeHtml(emptyMsg)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="pcd-card pcd-card-${cardIdx + 1}">
+                <div class="pcd-card-head">
+                    <div class="pcd-room-id">
+                        <div class="pcd-room-badge"><i class="fas fa-door-open"></i></div>
+                        <div>
+                            <div class="pcd-room-name">${escapeHtml(info.roomName)}</div>
+                            <div class="pcd-room-sub">جدول المحاضرات المباشر</div>
+                        </div>
+                    </div>
+                    <div class="pcd-head-badges">
+                        ${countTag}
+                        ${statusTag}
+                    </div>
+                </div>
+                ${bodyHTML}
+            </div>
+        `;
+    };
+
+    const roomNamesSummary = selectedRooms.map(r => r.roomName).join(' • ');
+    return `
+        <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جداول القاعات المباشرة">
+            <div class="pcd-topbar">
+                <div class="pcd-topbar-title">
+                    <span class="pcd-live-badge"><span class="pcd-live-dot"></span> متابعة حية</span>
+                    <span>جداول القاعات الجارية والقادمة</span>
+                </div>
+                <div class="pcd-topbar-hint font-english">${escapeHtml(roomNamesSummary)}</div>
+            </div>
+            <div class="pcd-grid">
+                ${renderMiniTable(selectedRooms[0], 0)}
+                ${renderMiniTable(selectedRooms[1], 1)}
+            </div>
+        </section>
+    `;
+}
+
+function lockVideoNaturalAspect(stageEl, hostEl) {
+    if (!stageEl || !hostEl) return;
+    const applyFromVideo = (videoEl) => {
+        if (!videoEl) return;
+        const setRatio = () => {
+            if (videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
+                stageEl.style.setProperty('--video-ar', `${videoEl.videoWidth} / ${videoEl.videoHeight}`);
+            }
+        };
+        setRatio();
+        videoEl.addEventListener('loadedmetadata', setRatio, { once: true });
+    };
+
+    const existing = hostEl.querySelector('video');
+    if (existing) {
+        applyFromVideo(existing);
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        const v = hostEl.querySelector('video');
+        if (v) {
+            applyFromVideo(v);
+            observer.disconnect();
+        }
+    });
+    observer.observe(hostEl, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 8000);
+}
+
 async function showPoster(poster, currentNumber, totalCount) {
     renderedPosterSignature = posterSignature(poster);
     displayedPoster = poster;
@@ -2182,13 +2980,15 @@ async function showPoster(poster, currentNumber, totalCount) {
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    const objectFitClass = poster.fit_mode === 'contain' ? 'object-contain' : 'object-cover';
+    const isVideoPoster = Boolean(window.CITLTVMedia && typeof window.CITLTVMedia.video === 'function' && window.CITLTVMedia.video(poster));
+    const stageTypeClass = isVideoPoster ? 'is-video-stage' : 'is-image-stage';
+    const companionDockHTML = buildPosterCompanionDockHTML();
 
     // بناء الهيكل فوراً لحماية الشاشة من اللاج البصري
     const shell = document.createElement('div');
     shell.innerHTML = `
-        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide" style="background: #090d16 !important;">
-            <div class="room-hero flex justify-between items-center px-6 py-4" style="background: linear-gradient(135deg, #1e255a 0%, #11183d 100%) !important; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide" style="background: #070b14 !important;">
+            <div class="room-hero poster-hero-bar flex justify-between items-center px-6 py-4">
                 <div class="flex items-center gap-3">
                     <button type="button" class="room-icon" data-tv-audio-control title="تفعيل واختبار الصوت" aria-label="تفعيل واختبار الصوت"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><!-- Font Awesome Free 6.4.0 by @fontawesome: https://fontawesome.com License https://fontawesome.com/license/free (Icons: CC BY 4.0). Copyright 2023 Fonticons, Inc. --><path d="M480 32c0-12.9-7.8-24.6-19.8-29.6s-25.7-2.2-34.9 6.9L381.7 53c-48 48-113.1 75-181 75H192 160 64c-35.3 0-64 28.7-64 64v96c0 35.3 28.7 64 64 64l0 128c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V352l8.7 0c67.9 0 133 27 181 75l43.6 43.6c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V300.4c18.6-8.8 32-32.5 32-60.4s-13.4-51.6-32-60.4V32zm-64 76.7V240 371.3C357.2 317.8 280.5 288 200.7 288H192V192h8.7c79.8 0 156.5-29.8 215.3-83.3z"/></svg></button>
                     <div>
@@ -2196,28 +2996,48 @@ async function showPoster(poster, currentNumber, totalCount) {
                     </div>
                 </div>
                 <div class="slide-counter !bg-white/5 !border-white/10 !text-[#F3A628]">
-                    <i class="fas fa-images ml-1"></i>
-                    <span>إعلان</span>
+                    <i class="fas ${isVideoPoster ? 'fa-film' : 'fa-images'} ml-1"></i>
+                    <span>${isVideoPoster ? 'فيديو' : 'إعلان'}</span>
                     <strong class="font-english ml-1">${currentNumber} / ${totalCount}</strong>
                 </div>
             </div>
             
-            <div class="flex-1 bg-[#090d16] flex items-center justify-center p-1 relative overflow-hidden" style="min-height:0">
-                <div id="poster-media-host" class="w-full h-full" style="position:relative;min-height:0;overflow:hidden;background:#090d16"></div>
+            <div class="poster-media-stage ${stageTypeClass}">
+                <div id="poster-media-host" class="w-full h-full"></div>
             </div>
+
+            ${companionDockHTML}
         </div>
     `;
 
+    const slideEl = shell.firstElementChild;
+    const stageEl = slideEl.querySelector('.poster-media-stage');
+    const hostEl = slideEl.querySelector('#poster-media-host');
+    if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl);
 
-    await window.CITLTVMedia.show(poster, shell.firstElementChild, shell.querySelector('#poster-media-host'), container, videoDuration => {
+    const triggerReveal = () => {
+        if (!slideEl || slideEl.classList.contains('pcd-revealed')) return;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                slideEl.classList.add('pcd-revealed');
+            });
+        });
+    };
+
+    await window.CITLTVMedia.show(poster, slideEl, hostEl, container, videoDuration => {
         if (videoDuration !== null) currentSlideDurationMs = videoDuration * 1000;
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         const visibleSettings=displayedPoster||poster;
         window.CITLTVMedia.updateSettings(visibleSettings);
+        if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl);
+        triggerReveal();
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);
         window.CITLTVMedia.preload(tvPosters[(index + 1) % Math.max(1,tvPosters.length)]);
-    }, () => { currentSlideDurationMs = 3000; });
+    }, () => {
+        triggerReveal();
+        currentSlideDurationMs = 3000;
+    });
 }
 
 // دالة لتغيير عنوان الهيدر بنعومة (Fade Animation)

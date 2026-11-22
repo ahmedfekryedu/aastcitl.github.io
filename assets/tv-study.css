@@ -491,9 +491,12 @@ body.tv-display-page.tv-rotate-ccw .pcd-rows{
 .pcd-main{min-width:0;overflow:hidden;display:flex;align-items:center;gap:8px}
 .pcd-course{
   flex:1 1 auto;min-width:0;overflow:hidden;
-  direction:rtl;text-align:right;
+  direction:ltr;text-align:left;
   color:#0f172a;font-size:clamp(12px,1.08vw,16px);font-weight:900;line-height:1.25;
   white-space:nowrap;
+}
+.pcd-course.is-rtl{
+  direction:rtl;text-align:right;
 }
 .pcd-course-track{
   display:inline-block;
@@ -582,4 +585,13 @@ body.tv-display-page.tv-rotate-ccw .pcd-teacher{font-size:14px!important}
 @keyframes pcdTimerSweep{
   from{transform:scaleX(0)}
   to{transform:scaleX(1)}
+}
+
+/* Smooth expand effect when a companion room under a poster/video expands to full-screen */
+body.tv-display-page #content-container .study-screen.study-handoff-expand{
+  animation:studyHandoffExpand .46s cubic-bezier(0.16,1,0.3,1) both!important;
+}
+@keyframes studyHandoffExpand{
+  from{opacity:.85;transform:translateY(26px) scale(0.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
 }

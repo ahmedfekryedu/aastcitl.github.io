@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro5">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro6">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro5"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro6"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2177,10 +2177,32 @@ function startSlideshow() {
                     return;
                 }
                 
-                // الانتقال للمؤشر الشامل المصحح
-                currentMasterIndex = (currentMasterIndex + 1) % totalSlides;
-                if (!isExamMode && currentMasterIndex === 0) { window.CITLTVStudy.nextCycle(); window.CITLTVStudy.build(displayRooms, roomsData, tvPosters); }
+                // الانتقال للمؤشر الشامل المصحح مع تكبير القاعة المرفقة لو لم تكمل وقتها أسفل البوستر/الفيديو
+                let handoffToRoom = false;
+                if (!isExamMode) {
+                    const snapshot = window.CITLTVStudy.snapshot();
+                    const prevSlide = snapshot[currentMasterIndex];
+                    const cycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
+                    const elapsed = activeCompanionShownAt ? (Date.now() - activeCompanionShownAt) : cycleMs;
+                    if (prevSlide?.kind === 'poster' && activeCompanionRoomName && elapsed < cycleMs * 0.85) {
+                        const targetIdx = snapshot.findIndex(p => p.kind === 'study' && p.room === activeCompanionRoomName);
+                        if (targetIdx >= 0) {
+                            currentMasterIndex = targetIdx;
+                            handoffToRoom = true;
+                        }
+                    }
+                }
+                if (!handoffToRoom) {
+                    currentMasterIndex = (currentMasterIndex + 1) % totalSlides;
+                    if (!isExamMode && currentMasterIndex === 0) { window.CITLTVStudy.nextCycle(); window.CITLTVStudy.build(displayRooms, roomsData, tvPosters); }
+                }
+                activeCompanionRoomName = null;
+                activeCompanionShownAt = 0;
                 renderMasterSlide(currentMasterIndex);
+                if (handoffToRoom) {
+                    const expandedCard = document.querySelector('#content-container .study-screen');
+                    if (expandedCard) expandedCard.classList.add('study-handoff-expand');
+                }
                 
                 // هنا يتم الحذف وإعادة البناء بالوقت الجديد الخاص بالسلايد الحالي
                 clearInterval(progressInterval);
@@ -2193,6 +2215,8 @@ function startSlideshow() {
 
 let posterCompanionCursor = 0;
 let posterCompanionTimer = null;
+let activeCompanionRoomName = null;
+let activeCompanionShownAt = 0;
 
 function stopPosterCompanionRotation() {
     if (posterCompanionTimer) {
@@ -2208,11 +2232,17 @@ function initPosterCompanionMarquee(rootEl) {
         boxes.forEach(box => {
             const track = box.querySelector('.pcd-course-track');
             if (!track) return;
+            const text = (track.textContent || '').trim();
+            const isArabic = /[\u0600-\u06FF]/.test(text);
+            box.classList.toggle('is-rtl', isArabic);
             box.classList.remove('is-marquee');
             const overflow = Math.ceil(track.scrollWidth - box.clientWidth);
             if (overflow > 4) {
-                const shift = overflow + 14;
-                const dur = Math.max(4.5, Math.min(12, 3.2 + (shift / 36)));
+                const dist = overflow + 16;
+                // English (LTR): move left (-dist) so sentence reads naturally Left -> Right
+                // Arabic  (RTL): move right (+dist) so sentence reads naturally Right -> Left
+                const shift = isArabic ? dist : -dist;
+                const dur = Math.max(4.5, Math.min(13, 3.2 + (dist / 36)));
                 box.style.setProperty('--pcd-marquee-shift', `${shift}px`);
                 box.style.setProperty('--pcd-marquee-dur', `${dur.toFixed(2)}s`);
                 box.classList.add('is-marquee');
@@ -2283,9 +2313,13 @@ function buildPosterCompanionCardHTML(cycleMs) {
         selected = ordered[idx];
         posterCompanionCursor = (idx + 1) % ordered.length;
         roomPosLabel = `قاعة ${idx + 1} من ${ordered.length}`;
+        activeCompanionRoomName = selected.roomName;
+        activeCompanionShownAt = Date.now();
     } else {
         selected = { roomName: 'القاعات الدراسية', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true };
         roomPosLabel = 'متابعة حية';
+        activeCompanionRoomName = null;
+        activeCompanionShownAt = 0;
     }
 
     const rowsSlice = selected.visible.slice(0, 2);
@@ -2459,6 +2493,7 @@ async function showPoster(poster, currentNumber, totalCount) {
         mediaProgressEpoch++;
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         window.CITLTVMedia.updateSettings(visibleSettings);
+        activeCompanionShownAt = Date.now();
         triggerReveal();
         initPosterCompanionMarquee(slideEl.querySelector('#poster-companion-dock'));
         // تشغيل مؤقت مستقل تماماً لتبديل القاعات أسفل البوستر/الفيديو حسب توقيت الجداول (roomDurationMs)

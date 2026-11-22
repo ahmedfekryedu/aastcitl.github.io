@@ -284,8 +284,9 @@ body.tv-display-page [data-tv-audio-control] svg{display:block;width:clamp(22px,
 body.tv-display-page [data-tv-audio-control]:focus-visible{outline:2px solid #F3A628;outline-offset:3px}
 
 /* =====================================================
-   POSTER / VIDEO STAGE + COMPANION DUAL TABLES DOCK
-   حماية أبعاد الفيديو 100% + إيفكت دخول احترافي للجدولين
+   POSTER / VIDEO STAGE + COMPACT SINGLE-ROOM DOCK (V2)
+   البوستر والفيديو بأكبر مساحة ممكنة (~78%-82%) بدون أي تأثير على الأبعاد
+   + عرض قاعة واحدة (محاضرتين) بالتناوب بإيفكت دخول احترافي
 ===================================================== */
 body.tv-display-page .poster-slide{
   background:#070b14!important;
@@ -296,35 +297,42 @@ body.tv-display-page .poster-slide{
 }
 .poster-slide .poster-hero-bar{
   flex:0 0 auto;
-  padding:10px 20px!important;
+  padding:8px 18px!important;
   background:linear-gradient(135deg,#182155 0%,#11183d 100%)!important;
   border-bottom:2px solid rgba(243,166,40,0.55)!important;
 }
 .poster-slide .poster-hero-bar .room-icon{
-  width:46px!important;height:46px!important;border-radius:14px!important;
+  width:42px!important;height:42px!important;border-radius:12px!important;
 }
 .poster-slide .poster-hero-bar h2{
-  font-size:clamp(18px,1.7vw,25px)!important;line-height:1.2!important;margin:0;
+  font-size:clamp(16px,1.55vw,23px)!important;line-height:1.2!important;margin:0;
 }
 
-/* Media stage: ZERO distortion for video or image */
+/* Media stage takes ALL remaining height (~78%-82%), NEVER squishing poster or video */
 .poster-media-stage{
-  position:relative;width:100%;min-height:0;
+  position:relative;
+  width:100%;
+  flex:1 1 auto!important;
+  min-height:0!important;
   background:#050811;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   overflow:hidden;
-  flex:1 1 56%;
 }
 .poster-media-stage.is-video-stage{
   background:#000000;
-  flex:1 1 58%;
 }
 .poster-media-stage #poster-media-host{
   position:relative!important;
-  width:100%!important;height:100%!important;
-  min-height:0!important;overflow:hidden!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
   background:transparent!important;
-  display:flex!important;align-items:center!important;justify-content:center!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
 }
 /* Non-native-cw videos keep exact aspect ratio via contain (zero crop, zero stretch) */
 .poster-media-stage.is-video-stage #active-poster-video:not([data-video-plane="native"]):not([data-video-plane="composited"]){
@@ -339,44 +347,18 @@ body.tv-display-page .poster-slide{
   object-fit:contain!important;object-position:center center!important;
 }
 
-/* Portrait & Samsung TV Rotated Mode:
-   Video gets FULL 100% width with its TRUE natural aspect ratio (--video-ar, default 16/9),
-   so the two tables underneath NEVER shrink, crop, or distort the video! */
-@media(orientation:portrait){
-  .poster-media-stage.is-video-stage{
-    flex:0 0 auto!important;
-    width:100%!important;
-    aspect-ratio:var(--video-ar,16 / 9)!important;
-    max-height:54%!important;
-  }
-  .poster-media-stage.is-image-stage{
-    flex:0 0 47%!important;
-    max-height:49%!important;
-  }
-}
-body.tv-display-page.tv-rotate-cw .poster-media-stage.is-video-stage,
-body.tv-display-page.tv-rotate-ccw .poster-media-stage.is-video-stage{
-  flex:0 0 auto!important;
-  width:100%!important;
-  aspect-ratio:var(--video-ar,16 / 9)!important;
-  max-height:54%!important;
-}
-body.tv-display-page.tv-rotate-cw .poster-media-stage.is-image-stage,
-body.tv-display-page.tv-rotate-ccw .poster-media-stage.is-image-stage{
-  flex:0 0 47%!important;
-  max-height:49%!important;
-}
-
-/* --- Companion Dual-Tables Dock --- */
+/* --- Compact Single-Room Companion Dock (Takes ONLY minimal height) --- */
 .poster-companion-dock{
-  flex:1 1 42%;min-height:0;
-  display:flex;flex-direction:column;
+  flex:0 0 auto!important;
+  display:flex;
+  flex-direction:column;
   background:
-    radial-gradient(circle at 10% 0%,rgba(243,166,40,0.16),transparent 38%),
-    radial-gradient(circle at 90% 100%,rgba(42,52,117,0.38),transparent 46%),
+    radial-gradient(circle at 10% 0%,rgba(243,166,40,0.16),transparent 42%),
     linear-gradient(180deg,#0c1329 0%,#141f46 100%);
   border-top:3px solid #F3A628;
-  padding:10px 14px 12px;gap:9px;overflow:hidden;position:relative;
+  padding:8px 12px 10px;
+  overflow:hidden;
+  position:relative;
 }
 .poster-companion-dock::before{
   content:"";position:absolute;top:0;left:0;right:0;height:1px;
@@ -384,115 +366,108 @@ body.tv-display-page.tv-rotate-ccw .poster-media-stage.is-image-stage{
   pointer-events:none;
 }
 
-.pcd-topbar{
-  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-  gap:10px;padding:0 4px;
-  opacity:0;transform:translateY(14px);
-}
-.pcd-topbar-title{
-  display:inline-flex;align-items:center;gap:9px;
-  color:#ffffff;font-size:clamp(13px,1.2vw,17px);font-weight:900;
-}
-.pcd-live-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(243,166,40,0.18);border:1px solid rgba(243,166,40,0.55);
-  color:#ffd678;border-radius:999px;padding:3px 11px;
-  font-size:clamp(11px,0.9vw,13px);font-weight:900;
-}
-.pcd-live-dot{
-  width:8px;height:8px;border-radius:999px;background:#22c55e;
-  box-shadow:0 0 0 4px rgba(34,197,94,0.25);
-}
-.pcd-topbar-hint{
-  color:rgba(255,255,255,0.82);font-size:clamp(11px,0.9vw,13px);font-weight:800;
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
-  border-radius:999px;padding:3px 11px;
-}
-
-.pcd-grid{
-  flex:1 1 auto;min-height:0;
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr);
-  gap:12px;overflow:hidden;
-}
-@media(orientation:portrait){
-  .poster-companion-dock{flex:1 1 auto!important;padding:11px 14px 13px!important}
-  .pcd-grid{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:11px!important}
-}
-body.tv-display-page.tv-rotate-cw .poster-companion-dock,
-body.tv-display-page.tv-rotate-ccw .poster-companion-dock{
-  flex:1 1 auto!important;padding:11px 14px 13px!important;
-}
-body.tv-display-page.tv-rotate-cw .pcd-grid,
-body.tv-display-page.tv-rotate-ccw .pcd-grid{
-  grid-template-columns:minmax(0,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:11px!important;
-}
-
-/* Each Table Card */
-.pcd-card{
-  min-height:0;display:flex;flex-direction:column;
-  background:#ffffff;border-radius:18px;
+/* Single Room Card */
+.pcd-single-card{
+  display:flex;
+  flex-direction:column;
+  background:#ffffff;
+  border-radius:16px;
   border:1.5px solid rgba(255,255,255,0.22);
-  overflow:hidden;position:relative;
-  box-shadow:0 16px 34px rgba(4,9,26,0.38);
-  opacity:0;transform:translateY(32px) scale(0.965);
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 12px 26px rgba(4,9,26,0.36);
+  opacity:0;
+  transform:translateY(24px) scale(0.98);
 }
-.pcd-card::before{
+.pcd-single-card::before{
   content:"";position:absolute;top:0;left:0;right:0;height:3px;
   background:linear-gradient(90deg,#F3A628,#ffe294,#d48a1b);z-index:3;
 }
+
 .pcd-card-head{
-  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-  gap:8px;padding:9px 14px;
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 14px;
   background:linear-gradient(135deg,#172054 0%,#2A3475 62%,#141c49 100%);
-  color:#ffffff;border-bottom:2px solid rgba(243,166,40,0.45);
+  color:#ffffff;
+  border-bottom:2px solid rgba(243,166,40,0.45);
 }
 .pcd-room-id{display:flex;align-items:center;gap:9px;min-width:0}
 .pcd-room-badge{
-  width:34px;height:34px;border-radius:10px;
+  width:32px;height:32px;border-radius:9px;
   background:rgba(243,166,40,0.20);border:1px solid rgba(243,166,40,0.55);
   color:#F3A628;display:flex;align-items:center;justify-content:center;
-  font-size:15px;flex-shrink:0;
+  font-size:14px;flex-shrink:0;
 }
+.pcd-room-title-line{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
 .pcd-room-name{
-  font-family:'Roboto',sans-serif;font-size:clamp(18px,1.7vw,25px);
+  font-family:'Roboto',sans-serif;
+  font-size:clamp(17px,1.6vw,23px);
   font-weight:900;color:#ffffff;line-height:1.05;white-space:nowrap;
 }
-.pcd-room-sub{
-  font-size:clamp(10px,0.8vw,12px);color:rgba(255,255,255,0.75);
-  font-weight:800;margin-top:2px;white-space:nowrap;
+.pcd-live-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(243,166,40,0.18);border:1px solid rgba(243,166,40,0.5);
+  color:#ffd678;border-radius:999px;padding:2px 9px;
+  font-size:clamp(10px,0.82vw,12px);font-weight:900;white-space:nowrap;
+}
+.pcd-live-dot{
+  width:7px;height:7px;border-radius:999px;background:#22c55e;
+  box-shadow:0 0 0 3px rgba(34,197,94,0.25);
 }
 .pcd-head-badges{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .pcd-status-tag{
   display:inline-flex;align-items:center;gap:5px;border-radius:999px;
-  padding:4px 10px;font-size:clamp(10px,0.82vw,12px);font-weight:900;white-space:nowrap;
+  padding:3px 10px;font-size:clamp(10px,0.82vw,12px);font-weight:900;white-space:nowrap;
 }
 .pcd-status-tag.is-busy{background:#dc2626;color:#ffffff}
 .pcd-status-tag.is-free{background:#10b981;color:#ffffff}
 .pcd-count-tag{
   background:rgba(255,255,255,0.14);color:#ffd678;
   border:1px solid rgba(255,255,255,0.18);border-radius:999px;
-  padding:4px 9px;font-size:clamp(10px,0.78vw,12px);font-weight:900;white-space:nowrap;
+  padding:3px 9px;font-size:clamp(10px,0.78vw,12px);font-weight:900;white-space:nowrap;
 }
 
-.pcd-col-head{
-  flex:0 0 auto;display:grid;
-  grid-template-columns:minmax(108px,0.78fr) minmax(0,1.9fr) minmax(120px,1.05fr) minmax(66px,0.44fr);
-  gap:9px;padding:6px 12px;
-  background:#eef2fa;border-bottom:1px solid #dbe2f0;
-  color:#334155;font-size:clamp(10px,0.78vw,12px);font-weight:900;
-}
+/* Landscape: 2 lectures side-by-side so dock height stays ultra-compact (~130px) */
 .pcd-rows{
-  flex:1 1 auto;min-height:0;
-  display:grid;grid-template-rows:repeat(var(--pcd-rows,1),minmax(0,1fr));
-  gap:6px;padding:7px 10px 8px;background:#f7f9fd;overflow:hidden;
+  display:grid;
+  grid-template-columns:repeat(var(--pcd-cols,2),minmax(0,1fr));
+  gap:8px;
+  padding:8px 10px 9px;
+  background:#f7f9fd;
 }
+/* Portrait & Samsung Rotated TV: 2 crisp full-width stacked rows (~195px total dock) */
+@media(orientation:portrait){
+  .pcd-rows{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:7px!important;
+    padding:8px 10px 9px!important;
+  }
+}
+body.tv-display-page.tv-rotate-cw .pcd-rows,
+body.tv-display-page.tv-rotate-ccw .pcd-rows{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:7px!important;
+  padding:8px 10px 9px!important;
+}
+
 .pcd-row{
-  min-height:0;display:grid;
-  grid-template-columns:minmax(108px,0.78fr) minmax(0,1.9fr) minmax(120px,1.05fr) minmax(66px,0.44fr);
-  gap:9px;align-items:center;
-  background:#ffffff;border:1px solid #e1e7f3;border-right:5px solid #2A3475;
-  border-radius:12px;padding:5px 10px;overflow:hidden;
-  opacity:0;transform:translateX(-14px);
+  display:grid;
+  grid-template-columns:minmax(108px,0.72fr) minmax(0,1.95fr) minmax(115px,1.05fr) minmax(64px,0.42fr);
+  gap:9px;
+  align-items:center;
+  background:#ffffff;
+  border:1px solid #dfe6f2;
+  border-right:5px solid #2A3475;
+  border-radius:12px;
+  padding:7px 10px;
+  overflow:hidden;
+  opacity:0;
+  transform:translateX(-14px);
+  box-shadow:0 3px 10px rgba(17,24,61,0.04);
 }
 .pcd-row.is-current{
   background:linear-gradient(90deg,#ecfdf5 0%,#ffffff 62%,#f0fdf4 100%);
@@ -506,22 +481,22 @@ body.tv-display-page.tv-rotate-ccw .pcd-grid{
 
 .pcd-time{
   direction:ltr;font-family:'Roboto',sans-serif;
-  font-size:clamp(11px,1.02vw,15px);font-weight:900;text-align:center;
+  font-size:clamp(11px,1.0vw,15px);font-weight:900;text-align:center;
   padding:5px 6px;border-radius:9px;background:#eef2ff;color:#1e255a;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .pcd-row.is-current .pcd-time{background:linear-gradient(135deg,#059669,#047857);color:#ffffff}
 .pcd-row.is-upcoming .pcd-time{background:#fffbeb;color:#92400e;border:1px solid rgba(243,166,40,0.4)}
 
-.pcd-main{min-width:0;overflow:hidden}
+.pcd-main{min-width:0;overflow:hidden;display:flex;align-items:center;gap:8px}
 .pcd-course{
-  color:#0f172a;font-size:clamp(12px,1.08vw,16px);font-weight:900;line-height:1.22;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:#0f172a;font-size:clamp(12px,1.08vw,16px);font-weight:900;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
 }
 .pcd-code{
-  display:inline-block;font-family:'Roboto',sans-serif;
-  font-size:clamp(9px,0.7vw,11px);font-weight:900;
-  color:#2A3475;background:#eef2ff;border-radius:5px;padding:1px 6px;margin-top:2px;
+  flex-shrink:0;font-family:'Roboto',sans-serif;
+  font-size:clamp(9px,0.72vw,11px);font-weight:900;
+  color:#2A3475;background:#eef2ff;border-radius:5px;padding:2px 6px;
 }
 .pcd-code:empty{display:none}
 
@@ -535,38 +510,29 @@ body.tv-display-page.tv-rotate-ccw .pcd-grid{
 .pcd-state{display:flex;justify-content:center;align-items:center}
 .pcd-pill{
   display:inline-flex;align-items:center;gap:4px;border-radius:999px;
-  padding:4px 9px;font-size:clamp(9px,0.75vw,11px);font-weight:900;white-space:nowrap;
+  padding:4px 9px;font-size:clamp(9px,0.76vw,11px);font-weight:900;white-space:nowrap;
 }
 .pcd-pill.now{background:#059669;color:#ffffff}
 .pcd-pill.upcoming{background:#fef3c7;color:#92400e;border:1px solid #f59e0b}
 .pcd-pill.cancelled{background:#dc2626;color:#ffffff}
 
 .pcd-empty{
-  height:100%;display:flex;align-items:center;justify-content:center;gap:9px;
-  color:#047857;background:#ecfdf5;border:1.5px dashed #6ee7b7;border-radius:13px;
-  font-size:clamp(12px,1.02vw,15px);font-weight:900;padding:10px;text-align:center;
+  grid-column:1 / -1;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  color:#047857;background:#ecfdf5;border:1.5px dashed #6ee7b7;border-radius:12px;
+  font-size:clamp(12px,1.02vw,15px);font-weight:900;padding:12px 10px;text-align:center;
 }
 
 /* --- Professional Synchronized Entrance Effect --- */
-.poster-slide.pcd-revealed .pcd-topbar{
-  animation:pcdBarRise .48s cubic-bezier(0.16,1,0.3,1) .06s forwards!important;
-}
-.poster-slide.pcd-revealed .pcd-card-1{
-  animation:pcdCardRise .64s cubic-bezier(0.16,1,0.3,1) .14s forwards!important;
-}
-.poster-slide.pcd-revealed .pcd-card-2{
-  animation:pcdCardRise .64s cubic-bezier(0.16,1,0.3,1) .28s forwards!important;
+.poster-slide.pcd-revealed .pcd-single-card{
+  animation:pcdCardRise .56s cubic-bezier(0.16,1,0.3,1) .08s forwards!important;
 }
 .poster-slide.pcd-revealed .pcd-row{
   animation:pcdRowGlide .44s cubic-bezier(0.16,1,0.3,1) forwards!important;
 }
 
-@keyframes pcdBarRise{
-  from{opacity:0;transform:translateY(14px)}
-  to{opacity:1;transform:translateY(0)}
-}
 @keyframes pcdCardRise{
-  0%{opacity:0;transform:translateY(32px) scale(0.965)}
+  0%{opacity:0;transform:translateY(24px) scale(0.98)}
   100%{opacity:1;transform:translateY(0) scale(1)}
 }
 @keyframes pcdRowGlide{
@@ -574,7 +540,7 @@ body.tv-display-page.tv-rotate-ccw .pcd-grid{
   to{opacity:1;transform:translateX(0)}
 }
 
-/* Sharp readable typography on Samsung rotated TV */
+/* Crisp readable sizing on Samsung rotated TV */
 body.tv-display-page.tv-rotate-cw .pcd-room-name,
 body.tv-display-page.tv-rotate-ccw .pcd-room-name{font-size:22px!important}
 body.tv-display-page.tv-rotate-cw .pcd-course,

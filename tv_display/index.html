@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro1">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro2">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro1"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro2"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2218,95 +2218,79 @@ function buildPosterCompanionDockHTML() {
 
     const analyzed = pool.map(analyzeRoom);
     const activeOnes = analyzed.filter(r => r.visible.length > 0);
-    const ordered = activeOnes.length >= 2
+    const ordered = activeOnes.length > 0
         ? [...activeOnes.filter(r => r.hasLive), ...activeOnes.filter(r => !r.hasLive)]
-        : (analyzed.length ? analyzed : []);
+        : analyzed;
 
-    let selectedRooms = [];
-    if (ordered.length >= 2) {
-        const start = posterCompanionCursor % ordered.length;
-        selectedRooms = [ordered[start], ordered[(start + 1) % ordered.length]];
-        posterCompanionCursor = (start + 2) % ordered.length;
-    } else if (ordered.length === 1) {
-        selectedRooms = [
-            ordered[0],
-            { roomName: 'حالة القاعات', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
-        ];
+    let selected;
+    let roomPosLabel = '';
+    if (ordered.length > 0) {
+        const idx = posterCompanionCursor % ordered.length;
+        selected = ordered[idx];
+        posterCompanionCursor = (idx + 1) % ordered.length;
+        roomPosLabel = `قاعة ${idx + 1} من ${ordered.length}`;
     } else {
-        selectedRooms = [
-            { roomName: 'القاعات الدراسية', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true },
-            { roomName: 'المحاضرات القادمة', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
-        ];
+        selected = { roomName: 'القاعات الدراسية', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true };
+        roomPosLabel = 'متابعة حية';
     }
 
-    const renderMiniTable = (info, cardIdx) => {
-        const maxRows = 4;
-        const rowsSlice = info.visible.slice(0, maxRows);
-        const rowCount = Math.max(rowsSlice.length, 1);
-        const statusTag = info.hasLive
-            ? '<span class="pcd-status-tag is-busy"><i class="fas fa-broadcast-tower"></i> مشغولة الآن</span>'
-            : '<span class="pcd-status-tag is-free"><i class="fas fa-check-circle"></i> متاحة الآن</span>';
-        const countTag = `<span class="pcd-count-tag">${info.visible.length} متبقية</span>`;
+    const rowsSlice = selected.visible.slice(0, 2);
+    const colsCount = Math.max(1, rowsSlice.length);
+    const statusTag = selected.hasLive
+        ? '<span class="pcd-status-tag is-busy"><i class="fas fa-broadcast-tower"></i> مشغولة الآن</span>'
+        : '<span class="pcd-status-tag is-free"><i class="fas fa-check-circle"></i> متاحة الآن</span>';
+    const countTag = `<span class="pcd-count-tag">${selected.visible.length} متبقية اليوم</span>`;
 
-        let bodyHTML = '';
-        if (rowsSlice.length > 0) {
-            const rowsMarkup = rowsSlice.map((entry, idx) => {
-                const stateClass = entry.isCancelled ? 'is-cancelled' : (entry.isCurrent ? 'is-current' : 'is-upcoming');
-                const pill = entry.isCancelled
-                    ? '<span class="pcd-pill cancelled"><i class="fas fa-ban"></i> ملغاة</span>'
-                    : (entry.isCurrent
-                        ? '<span class="pcd-pill now"><i class="fas fa-circle-play"></i> الآن</span>'
-                        : '<span class="pcd-pill upcoming"><i class="fas fa-clock"></i> قادمة</span>');
-                const rowDelay = (cardIdx === 0 ? 300 : 440) + (idx * 70);
-                return `
-                    <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
-                        <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
-                        <div class="pcd-main">
-                            <div class="pcd-course">${escapeHtml(entry.item.course_name || 'محاضرة')}</div>
-                            <div class="pcd-code">${escapeHtml(entry.item.course_code || '')}</div>
-                        </div>
-                        <div class="pcd-teacher">
-                            <i class="fas fa-user-tie"></i>
-                            <span>${escapeHtml(entry.item.instructor || 'غير محدد')}</span>
-                        </div>
-                        <div class="pcd-state">${pill}</div>
+    let bodyHTML = '';
+    if (rowsSlice.length > 0) {
+        const rowsMarkup = rowsSlice.map((entry, idx) => {
+            const stateClass = entry.isCancelled ? 'is-cancelled' : (entry.isCurrent ? 'is-current' : 'is-upcoming');
+            const pill = entry.isCancelled
+                ? '<span class="pcd-pill cancelled"><i class="fas fa-ban"></i> ملغاة</span>'
+                : (entry.isCurrent
+                    ? '<span class="pcd-pill now"><i class="fas fa-circle-play"></i> الآن</span>'
+                    : '<span class="pcd-pill upcoming"><i class="fas fa-clock"></i> قادمة</span>');
+            const rowDelay = 220 + (idx * 110);
+            return `
+                <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
+                    <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
+                    <div class="pcd-main">
+                        <div class="pcd-course">${escapeHtml(entry.item.course_name || 'محاضرة')}</div>
+                        <div class="pcd-code">${escapeHtml(entry.item.course_code || '')}</div>
                     </div>
-                `;
-            }).join('');
-
-            bodyHTML = `
-                <div class="pcd-col-head">
-                    <div>التوقيت</div>
-                    <div>المقرر</div>
-                    <div>المحاضر</div>
-                    <div style="text-align:center">الحالة</div>
-                </div>
-                <div class="pcd-rows" style="--pcd-rows:${rowCount}">
-                    ${rowsMarkup}
+                    <div class="pcd-teacher">
+                        <i class="fas fa-user-tie"></i>
+                        <span>${escapeHtml(entry.item.instructor || 'غير محدد')}</span>
+                    </div>
+                    <div class="pcd-state">${pill}</div>
                 </div>
             `;
-        } else {
-            const emptyMsg = info.isFallbackSummary
-                ? 'جميع القاعات الأخرى متاحة حالياً — تابع التحديث المباشر'
-                : (info.totalToday > 0 ? 'انتهت محاضرات هذه القاعة اليوم — القاعة متاحة الآن' : 'لا توجد محاضرات متبقية — القاعة متاحة الآن');
-            bodyHTML = `
-                <div class="pcd-rows" style="--pcd-rows:1">
-                    <div class="pcd-empty">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>${escapeHtml(emptyMsg)}</span>
-                    </div>
-                </div>
-            `;
-        }
+        }).join('');
 
-        return `
-            <div class="pcd-card pcd-card-${cardIdx + 1}">
+        bodyHTML = `<div class="pcd-rows" style="--pcd-cols:${colsCount}">${rowsMarkup}</div>`;
+    } else {
+        const emptyMsg = selected.isFallbackSummary
+            ? 'جميع القاعات متاحة حالياً — تابع التحديث المباشر'
+            : (selected.totalToday > 0 ? 'انتهت محاضرات هذه القاعة اليوم — القاعة متاحة الآن' : 'لا توجد محاضرات متبقية — القاعة متاحة الآن');
+        bodyHTML = `
+            <div class="pcd-rows" style="--pcd-cols:1">
+                <div class="pcd-empty">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>${escapeHtml(emptyMsg)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جدول القاعة المباشر">
+            <div class="pcd-single-card">
                 <div class="pcd-card-head">
                     <div class="pcd-room-id">
                         <div class="pcd-room-badge"><i class="fas fa-door-open"></i></div>
-                        <div>
-                            <div class="pcd-room-name">${escapeHtml(info.roomName)}</div>
-                            <div class="pcd-room-sub">جدول المحاضرات المباشر</div>
+                        <div class="pcd-room-title-line">
+                            <span class="pcd-room-name">قاعة ${escapeHtml(selected.roomName)}</span>
+                            <span class="pcd-live-badge"><span class="pcd-live-dot"></span> ${escapeHtml(roomPosLabel)}</span>
                         </div>
                     </div>
                     <div class="pcd-head-badges">
@@ -2316,59 +2300,8 @@ function buildPosterCompanionDockHTML() {
                 </div>
                 ${bodyHTML}
             </div>
-        `;
-    };
-
-    const roomNamesSummary = selectedRooms.map(r => r.roomName).join(' • ');
-    return `
-        <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جداول القاعات المباشرة">
-            <div class="pcd-topbar">
-                <div class="pcd-topbar-title">
-                    <span class="pcd-live-badge"><span class="pcd-live-dot"></span> متابعة حية</span>
-                    <span>جداول القاعات الجارية والقادمة</span>
-                </div>
-                <div class="pcd-topbar-hint font-english">${escapeHtml(roomNamesSummary)}</div>
-            </div>
-            <div class="pcd-grid">
-                ${renderMiniTable(selectedRooms[0], 0)}
-                ${renderMiniTable(selectedRooms[1], 1)}
-            </div>
         </section>
     `;
-}
-
-function lockVideoNaturalAspect(stageEl, hostEl, poster) {
-    if (!stageEl || !hostEl) return;
-    const isNativeCW = poster?.video_layout === 'native-cw';
-    const applyFromVideo = (videoEl) => {
-        if (!videoEl) return;
-        const setRatio = () => {
-            if (videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
-                // For native-cw (pre-rotated 90° CW for Samsung portrait), visual aspect ratio is swapped (H / W)
-                const w = isNativeCW ? videoEl.videoHeight : videoEl.videoWidth;
-                const h = isNativeCW ? videoEl.videoWidth : videoEl.videoHeight;
-                stageEl.style.setProperty('--video-ar', `${w} / ${h}`);
-            }
-        };
-        setRatio();
-        videoEl.addEventListener('loadedmetadata', setRatio, { once: true });
-    };
-
-    const existing = hostEl.querySelector('video');
-    if (existing) {
-        applyFromVideo(existing);
-        return;
-    }
-
-    const observer = new MutationObserver(() => {
-        const v = hostEl.querySelector('video');
-        if (v) {
-            applyFromVideo(v);
-            observer.disconnect();
-        }
-    });
-    observer.observe(hostEl, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 8000);
 }
 
 async function showPoster(poster, currentNumber, totalCount) {
@@ -2412,9 +2345,7 @@ async function showPoster(poster, currentNumber, totalCount) {
     `;
 
     const slideEl = shell.firstElementChild;
-    const stageEl = slideEl.querySelector('.poster-media-stage');
     const hostEl = slideEl.querySelector('#poster-media-host');
-    if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl, poster);
 
     const triggerReveal = () => {
         if (!slideEl || slideEl.classList.contains('pcd-revealed')) return;
@@ -2426,11 +2357,20 @@ async function showPoster(poster, currentNumber, totalCount) {
     };
 
     await window.CITLTVMedia.show(poster, slideEl, hostEl, container, videoDuration => {
-        if (videoDuration !== null) currentSlideDurationMs = videoDuration * 1000;
+        const visibleSettings = displayedPoster || poster;
+        // الالتزام التام بالتوقيت المضبوط من النظام (مدة الفيديو الفعلية أو مدة البوستر المحددة في السيستم)
+        if (videoDuration !== null && Number.isFinite(videoDuration) && videoDuration > 0) {
+            currentSlideDurationMs = videoDuration * 1000;
+        } else {
+            const configuredSec = Number(visibleSettings?.duration);
+            currentSlideDurationMs = (Number.isFinite(configuredSec) && configuredSec >= 2)
+                ? Math.min(600, configuredSec) * 1000
+                : posterDurationMs;
+        }
+        // بدء شريط العد من الصفر تماماً لحظة ظهور البوستر/الفيديو على الشاشة
+        mediaProgressEpoch++;
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
-        const visibleSettings=displayedPoster||poster;
         window.CITLTVMedia.updateSettings(visibleSettings);
-        if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl, poster);
         triggerReveal();
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);

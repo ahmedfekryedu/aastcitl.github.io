@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro2">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro3">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro2"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro3"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -1892,18 +1892,37 @@ function formatPeriodTime(timeStr) {
 // الدالة العقل: بتحدد السلايد الحالي قاعة ولا بوستر وتعدل الوقت بناء عليه
 function renderMasterSlide(index, preserveMedia = false) {
     if (preserveMedia && !isExamMode) {
-        const page = window.CITLTVStudy.snapshot()[index];
-        const poster = page?.kind === 'poster' && tvPosters.find(p => page.key === `poster:${p.id}` || page.key.startsWith(`poster:${p.id}:slot:`));
+        const snapshot = window.CITLTVStudy.snapshot();
+        let page = snapshot[index];
+        let poster = page?.kind === 'poster' && tvPosters.find(p => page.key === `poster:${p.id}` || page.key.startsWith(`poster:${p.id}:slot:`));
+        // حماية صارمة: لو فيه فيديو أو بوستر شغال حالياً وحصل تحديث للجدول أو انتهت محاضرة، لا نقطع الفيديو أو البوستر أبداً
+        if (!poster && displayedPoster && renderedPosterSignature) {
+            const stillActive = tvPosters.find(p => posterSignature(p) === renderedPosterSignature);
+            if (stillActive) {
+                const matchIdx = snapshot.findIndex(p => p.kind === 'poster' && (p.key === `poster:${stillActive.id}` || p.key.startsWith(`poster:${stillActive.id}:slot:`)));
+                if (matchIdx >= 0) {
+                    currentMasterIndex = matchIdx;
+                    page = snapshot[matchIdx];
+                    poster = stillActive;
+                } else if (window.CITLTVMedia.video(stillActive)) {
+                    poster = stillActive;
+                }
+            }
+        }
         if (poster && renderedPosterSignature === posterSignature(poster)) {
             window.CITLTVMedia.updateSettings(poster);
             const title=document.querySelector('.poster-slide h2');if(title)title.textContent=poster.title||'إعلان مهم';
-            const counter=document.querySelector('.poster-slide .slide-counter strong');if(counter)counter.textContent=`${page.index+1} / ${page.total||tvPosters.length}`;
-            if(!window.CITLTVMedia.video(poster))currentSlideDurationMs=(poster.duration||posterDurationMs/1000)*1000;
+            const counter=document.querySelector('.poster-slide .slide-counter strong');if(counter && page)counter.textContent=`${page.index+1} / ${page.total||tvPosters.length}`;
+            if(!window.CITLTVMedia.video(poster)){
+                const configuredSec = Number(poster.duration);
+                currentSlideDurationMs = (Number.isFinite(configuredSec) && configuredSec >= 2) ? Math.min(600, configuredSec) * 1000 : posterDurationMs;
+            }
             if(!poster.play_sound){posterAlarm.pause();posterAlarm.currentTime=0;}
             else if(!displayedPoster?.play_sound&&!window.CITLTVMedia.video(poster)&&!window.CITLTVMedia.waiting())playPosterAlarm();
             displayedPoster=poster;return;
         }
     }
+    stopPosterCompanionRotation();
     renderedPosterSignature = '';
     displayedPoster = null;
     window.CITLTVMedia.cancel(isExamMode || !postersEnabled);
@@ -2173,12 +2192,17 @@ function startSlideshow() {
 }
 
 let posterCompanionCursor = 0;
+let posterCompanionTimer = null;
 
-function buildPosterCompanionDockHTML() {
+function stopPosterCompanionRotation() {
+    if (posterCompanionTimer) {
+        clearInterval(posterCompanionTimer);
+        posterCompanionTimer = null;
+    }
+}
+
+function getOrderedCompanionRooms() {
     const M = window.CITLStudy;
-    const escapeHtml = (value) => M ? M.escape(value) : String(value ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-
     const now = M ? M.cairo() : { day: daysMap[new Date().getDay()], date: new Date().toLocaleDateString('en-CA'), minutes: new Date().getHours() * 60 + new Date().getMinutes() };
     const pool = (Array.isArray(displayRooms) && displayRooms.length)
         ? displayRooms
@@ -2218,10 +2242,17 @@ function buildPosterCompanionDockHTML() {
 
     const analyzed = pool.map(analyzeRoom);
     const activeOnes = analyzed.filter(r => r.visible.length > 0);
-    const ordered = activeOnes.length > 0
+    return activeOnes.length > 0
         ? [...activeOnes.filter(r => r.hasLive), ...activeOnes.filter(r => !r.hasLive)]
         : analyzed;
+}
 
+function buildPosterCompanionCardHTML(cycleMs) {
+    const M = window.CITLStudy;
+    const escapeHtml = (value) => M ? M.escape(value) : String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    const ordered = getOrderedCompanionRooms();
     let selected;
     let roomPosLabel = '';
     if (ordered.length > 0) {
@@ -2240,6 +2271,7 @@ function buildPosterCompanionDockHTML() {
         ? '<span class="pcd-status-tag is-busy"><i class="fas fa-broadcast-tower"></i> مشغولة الآن</span>'
         : '<span class="pcd-status-tag is-free"><i class="fas fa-check-circle"></i> متاحة الآن</span>';
     const countTag = `<span class="pcd-count-tag">${selected.visible.length} متبقية اليوم</span>`;
+    const showTimerBar = ordered.length > 1;
 
     let bodyHTML = '';
     if (rowsSlice.length > 0) {
@@ -2250,7 +2282,7 @@ function buildPosterCompanionDockHTML() {
                 : (entry.isCurrent
                     ? '<span class="pcd-pill now"><i class="fas fa-circle-play"></i> الآن</span>'
                     : '<span class="pcd-pill upcoming"><i class="fas fa-clock"></i> قادمة</span>');
-            const rowDelay = 220 + (idx * 110);
+            const rowDelay = 200 + (idx * 105);
             return `
                 <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
                     <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
@@ -2282,9 +2314,11 @@ function buildPosterCompanionDockHTML() {
         `;
     }
 
-    return `
-        <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جدول القاعة المباشر">
-            <div class="pcd-single-card">
+    return {
+        roomCount: ordered.length,
+        html: `
+            <div class="pcd-single-card" style="--pcd-cycle-ms:${cycleMs}ms">
+                ${showTimerBar ? '<div class="pcd-card-timer"><div class="pcd-card-timer-fill"></div></div>' : ''}
                 <div class="pcd-card-head">
                     <div class="pcd-room-id">
                         <div class="pcd-room-badge"><i class="fas fa-door-open"></i></div>
@@ -2300,11 +2334,32 @@ function buildPosterCompanionDockHTML() {
                 </div>
                 ${bodyHTML}
             </div>
-        </section>
-    `;
+        `
+    };
+}
+
+function startPosterCompanionRotation(slideEl) {
+    stopPosterCompanionRotation();
+    const cycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
+    posterCompanionTimer = setInterval(() => {
+        if (!slideEl || !slideEl.isConnected) {
+            stopPosterCompanionRotation();
+            return;
+        }
+        const dock = slideEl.querySelector('#poster-companion-dock');
+        if (!dock) {
+            stopPosterCompanionRotation();
+            return;
+        }
+        const ordered = getOrderedCompanionRooms();
+        if (ordered.length <= 1) return;
+        const nextCard = buildPosterCompanionCardHTML(cycleMs);
+        dock.innerHTML = nextCard.html;
+    }, cycleMs);
 }
 
 async function showPoster(poster, currentNumber, totalCount) {
+    stopPosterCompanionRotation();
     renderedPosterSignature = posterSignature(poster);
     displayedPoster = poster;
     mediaProgressEpoch++;
@@ -2316,7 +2371,8 @@ async function showPoster(poster, currentNumber, totalCount) {
 
     const isVideoPoster = Boolean(window.CITLTVMedia && typeof window.CITLTVMedia.video === 'function' && window.CITLTVMedia.video(poster));
     const stageTypeClass = isVideoPoster ? 'is-video-stage' : 'is-image-stage';
-    const companionDockHTML = buildPosterCompanionDockHTML();
+    const cycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
+    const initialCard = buildPosterCompanionCardHTML(cycleMs);
 
     // بناء الهيكل فوراً لحماية الشاشة من اللاج البصري
     const shell = document.createElement('div');
@@ -2340,7 +2396,9 @@ async function showPoster(poster, currentNumber, totalCount) {
                 <div id="poster-media-host" class="w-full h-full"></div>
             </div>
 
-            ${companionDockHTML}
+            <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جدول القاعة المباشر">
+                ${initialCard.html}
+            </section>
         </div>
     `;
 
@@ -2358,7 +2416,7 @@ async function showPoster(poster, currentNumber, totalCount) {
 
     await window.CITLTVMedia.show(poster, slideEl, hostEl, container, videoDuration => {
         const visibleSettings = displayedPoster || poster;
-        // الالتزام التام بالتوقيت المضبوط من النظام (مدة الفيديو الفعلية أو مدة البوستر المحددة في السيستم)
+        // الالتزام التام بالتوقيت المضبوط من النظام (مدة الفيديو الفعلية للنهاية أو مدة البوستر المحددة في السيستم)
         if (videoDuration !== null && Number.isFinite(videoDuration) && videoDuration > 0) {
             currentSlideDurationMs = videoDuration * 1000;
         } else {
@@ -2372,6 +2430,8 @@ async function showPoster(poster, currentNumber, totalCount) {
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         window.CITLTVMedia.updateSettings(visibleSettings);
         triggerReveal();
+        // تشغيل مؤقت مستقل تماماً لتبديل القاعات أسفل البوستر/الفيديو حسب توقيت الجداول (roomDurationMs)
+        startPosterCompanionRotation(slideEl);
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);
         window.CITLTVMedia.preload(tvPosters[(index + 1) % Math.max(1,tvPosters.length)]);

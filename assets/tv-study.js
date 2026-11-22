@@ -44,7 +44,11 @@
       pages.forEach((page,i)=>{playlist.push(page);if((i+1)%config.every===0||i===pages.length-1)playlist.push({...ads[ad++%ads.length],key:ads[(ad-1)%ads.length].key+':slot:'+i});});
     }
     adsPerCycle=playlist.filter(p=>p.kind==='poster').length;
-    const index=playlist.findIndex(p=>p.key===currentKey);
+    let index=playlist.findIndex(p=>p.key===currentKey);
+    if(index<0&&currentKey.startsWith('poster:')){
+      const pid=currentKey.split(':')[1];
+      index=playlist.findIndex(p=>p.kind==='poster'&&(p.key===`poster:${pid}`||p.key.startsWith(`poster:${pid}:`)));
+    }
     return index>=0?index:0;
   }
   function nextCycle(){posterOffset+=Math.max(1,adsPerCycle);}

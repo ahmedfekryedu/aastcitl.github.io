@@ -549,3 +549,22 @@ body.tv-display-page.tv-rotate-cw .pcd-time,
 body.tv-display-page.tv-rotate-ccw .pcd-time{font-size:14px!important}
 body.tv-display-page.tv-rotate-cw .pcd-teacher,
 body.tv-display-page.tv-rotate-ccw .pcd-teacher{font-size:14px!important}
+
+/* Independent schedule rotation timer bar inside companion card */
+.pcd-card-timer{
+  position:absolute;top:0;left:0;right:0;height:3px;z-index:5;
+  background:rgba(255,255,255,0.18);overflow:hidden;pointer-events:none;
+}
+.pcd-card-timer-fill{
+  height:100%;width:100%;
+  background:linear-gradient(90deg,#F3A628,#ffe599,#F3A628);
+  transform-origin:left center;
+  transform:scaleX(0);
+}
+.poster-slide.pcd-revealed .pcd-card-timer-fill{
+  animation:pcdTimerSweep var(--pcd-cycle-ms,7000ms) linear forwards!important;
+}
+@keyframes pcdTimerSweep{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}

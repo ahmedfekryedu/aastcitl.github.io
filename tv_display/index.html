@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261028-r7.3.3.8-wa-ui">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro1">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261028-r7.3.3.8-wa-ui"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro1"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2172,6 +2172,205 @@ function startSlideshow() {
     progressInterval = setInterval(step, 50);
 }
 
+let posterCompanionCursor = 0;
+
+function buildPosterCompanionDockHTML() {
+    const M = window.CITLStudy;
+    const escapeHtml = (value) => M ? M.escape(value) : String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    const now = M ? M.cairo() : { day: daysMap[new Date().getDay()], date: new Date().toLocaleDateString('en-CA'), minutes: new Date().getHours() * 60 + new Date().getMinutes() };
+    const pool = (Array.isArray(displayRooms) && displayRooms.length)
+        ? displayRooms
+        : (Array.isArray(activeRooms) && activeRooms.length ? activeRooms : Object.keys(roomsData || {}));
+
+    const analyzeRoom = (roomName) => {
+        const raw = (roomsData && Array.isArray(roomsData[roomName])) ? roomsData[roomName] : [];
+        let rows = [];
+        if (M) {
+            rows = raw
+                .filter(r => M.day(r) === now.day && M.runsOn(r, now.date) && M.state(r, now) !== 'ended')
+                .sort(M.compare)
+                .map(item => {
+                    const st = M.state(item, now);
+                    return {
+                        item,
+                        displayTime: M.slot(item.time_slot).label,
+                        isCancelled: st === 'cancelled',
+                        isCurrent: st === 'live'
+                    };
+                });
+        } else {
+            rows = raw.map(item => ({
+                item,
+                displayTime: tvFormatTimeDisplay(item.time_slot),
+                isCancelled: item.status === 'cancelled',
+                isCurrent: false
+            }));
+        }
+        return {
+            roomName,
+            visible: rows,
+            hasLive: rows.some(r => r.isCurrent),
+            totalToday: raw.length
+        };
+    };
+
+    const analyzed = pool.map(analyzeRoom);
+    const activeOnes = analyzed.filter(r => r.visible.length > 0);
+    const ordered = activeOnes.length >= 2
+        ? [...activeOnes.filter(r => r.hasLive), ...activeOnes.filter(r => !r.hasLive)]
+        : (analyzed.length ? analyzed : []);
+
+    let selectedRooms = [];
+    if (ordered.length >= 2) {
+        const start = posterCompanionCursor % ordered.length;
+        selectedRooms = [ordered[start], ordered[(start + 1) % ordered.length]];
+        posterCompanionCursor = (start + 2) % ordered.length;
+    } else if (ordered.length === 1) {
+        selectedRooms = [
+            ordered[0],
+            { roomName: 'حالة القاعات', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
+        ];
+    } else {
+        selectedRooms = [
+            { roomName: 'القاعات الدراسية', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true },
+            { roomName: 'المحاضرات القادمة', visible: [], hasLive: false, totalToday: 0, isFallbackSummary: true }
+        ];
+    }
+
+    const renderMiniTable = (info, cardIdx) => {
+        const maxRows = 4;
+        const rowsSlice = info.visible.slice(0, maxRows);
+        const rowCount = Math.max(rowsSlice.length, 1);
+        const statusTag = info.hasLive
+            ? '<span class="pcd-status-tag is-busy"><i class="fas fa-broadcast-tower"></i> مشغولة الآن</span>'
+            : '<span class="pcd-status-tag is-free"><i class="fas fa-check-circle"></i> متاحة الآن</span>';
+        const countTag = `<span class="pcd-count-tag">${info.visible.length} متبقية</span>`;
+
+        let bodyHTML = '';
+        if (rowsSlice.length > 0) {
+            const rowsMarkup = rowsSlice.map((entry, idx) => {
+                const stateClass = entry.isCancelled ? 'is-cancelled' : (entry.isCurrent ? 'is-current' : 'is-upcoming');
+                const pill = entry.isCancelled
+                    ? '<span class="pcd-pill cancelled"><i class="fas fa-ban"></i> ملغاة</span>'
+                    : (entry.isCurrent
+                        ? '<span class="pcd-pill now"><i class="fas fa-circle-play"></i> الآن</span>'
+                        : '<span class="pcd-pill upcoming"><i class="fas fa-clock"></i> قادمة</span>');
+                const rowDelay = (cardIdx === 0 ? 300 : 440) + (idx * 70);
+                return `
+                    <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
+                        <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
+                        <div class="pcd-main">
+                            <div class="pcd-course">${escapeHtml(entry.item.course_name || 'محاضرة')}</div>
+                            <div class="pcd-code">${escapeHtml(entry.item.course_code || '')}</div>
+                        </div>
+                        <div class="pcd-teacher">
+                            <i class="fas fa-user-tie"></i>
+                            <span>${escapeHtml(entry.item.instructor || 'غير محدد')}</span>
+                        </div>
+                        <div class="pcd-state">${pill}</div>
+                    </div>
+                `;
+            }).join('');
+
+            bodyHTML = `
+                <div class="pcd-col-head">
+                    <div>التوقيت</div>
+                    <div>المقرر</div>
+                    <div>المحاضر</div>
+                    <div style="text-align:center">الحالة</div>
+                </div>
+                <div class="pcd-rows" style="--pcd-rows:${rowCount}">
+                    ${rowsMarkup}
+                </div>
+            `;
+        } else {
+            const emptyMsg = info.isFallbackSummary
+                ? 'جميع القاعات الأخرى متاحة حالياً — تابع التحديث المباشر'
+                : (info.totalToday > 0 ? 'انتهت محاضرات هذه القاعة اليوم — القاعة متاحة الآن' : 'لا توجد محاضرات متبقية — القاعة متاحة الآن');
+            bodyHTML = `
+                <div class="pcd-rows" style="--pcd-rows:1">
+                    <div class="pcd-empty">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>${escapeHtml(emptyMsg)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="pcd-card pcd-card-${cardIdx + 1}">
+                <div class="pcd-card-head">
+                    <div class="pcd-room-id">
+                        <div class="pcd-room-badge"><i class="fas fa-door-open"></i></div>
+                        <div>
+                            <div class="pcd-room-name">${escapeHtml(info.roomName)}</div>
+                            <div class="pcd-room-sub">جدول المحاضرات المباشر</div>
+                        </div>
+                    </div>
+                    <div class="pcd-head-badges">
+                        ${countTag}
+                        ${statusTag}
+                    </div>
+                </div>
+                ${bodyHTML}
+            </div>
+        `;
+    };
+
+    const roomNamesSummary = selectedRooms.map(r => r.roomName).join(' • ');
+    return `
+        <section id="poster-companion-dock" class="poster-companion-dock" aria-label="جداول القاعات المباشرة">
+            <div class="pcd-topbar">
+                <div class="pcd-topbar-title">
+                    <span class="pcd-live-badge"><span class="pcd-live-dot"></span> متابعة حية</span>
+                    <span>جداول القاعات الجارية والقادمة</span>
+                </div>
+                <div class="pcd-topbar-hint font-english">${escapeHtml(roomNamesSummary)}</div>
+            </div>
+            <div class="pcd-grid">
+                ${renderMiniTable(selectedRooms[0], 0)}
+                ${renderMiniTable(selectedRooms[1], 1)}
+            </div>
+        </section>
+    `;
+}
+
+function lockVideoNaturalAspect(stageEl, hostEl, poster) {
+    if (!stageEl || !hostEl) return;
+    const isNativeCW = poster?.video_layout === 'native-cw';
+    const applyFromVideo = (videoEl) => {
+        if (!videoEl) return;
+        const setRatio = () => {
+            if (videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
+                // For native-cw (pre-rotated 90° CW for Samsung portrait), visual aspect ratio is swapped (H / W)
+                const w = isNativeCW ? videoEl.videoHeight : videoEl.videoWidth;
+                const h = isNativeCW ? videoEl.videoWidth : videoEl.videoHeight;
+                stageEl.style.setProperty('--video-ar', `${w} / ${h}`);
+            }
+        };
+        setRatio();
+        videoEl.addEventListener('loadedmetadata', setRatio, { once: true });
+    };
+
+    const existing = hostEl.querySelector('video');
+    if (existing) {
+        applyFromVideo(existing);
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        const v = hostEl.querySelector('video');
+        if (v) {
+            applyFromVideo(v);
+            observer.disconnect();
+        }
+    });
+    observer.observe(hostEl, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 8000);
+}
+
 async function showPoster(poster, currentNumber, totalCount) {
     renderedPosterSignature = posterSignature(poster);
     displayedPoster = poster;
@@ -2182,13 +2381,15 @@ async function showPoster(poster, currentNumber, totalCount) {
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-    const objectFitClass = poster.fit_mode === 'contain' ? 'object-contain' : 'object-cover';
+    const isVideoPoster = Boolean(window.CITLTVMedia && typeof window.CITLTVMedia.video === 'function' && window.CITLTVMedia.video(poster));
+    const stageTypeClass = isVideoPoster ? 'is-video-stage' : 'is-image-stage';
+    const companionDockHTML = buildPosterCompanionDockHTML();
 
     // بناء الهيكل فوراً لحماية الشاشة من اللاج البصري
     const shell = document.createElement('div');
     shell.innerHTML = `
-        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide" style="background: #090d16 !important;">
-            <div class="room-hero flex justify-between items-center px-6 py-4" style="background: linear-gradient(135deg, #1e255a 0%, #11183d 100%) !important; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <div class="glass-panel room-card w-full max-w-6xl mx-auto flex flex-col h-full overflow-hidden poster-slide" style="background: #070b14 !important;">
+            <div class="room-hero poster-hero-bar flex justify-between items-center px-6 py-4">
                 <div class="flex items-center gap-3">
                     <button type="button" class="room-icon" data-tv-audio-control title="تفعيل واختبار الصوت" aria-label="تفعيل واختبار الصوت"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><!-- Font Awesome Free 6.4.0 by @fontawesome: https://fontawesome.com License https://fontawesome.com/license/free (Icons: CC BY 4.0). Copyright 2023 Fonticons, Inc. --><path d="M480 32c0-12.9-7.8-24.6-19.8-29.6s-25.7-2.2-34.9 6.9L381.7 53c-48 48-113.1 75-181 75H192 160 64c-35.3 0-64 28.7-64 64v96c0 35.3 28.7 64 64 64l0 128c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V352l8.7 0c67.9 0 133 27 181 75l43.6 43.6c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V300.4c18.6-8.8 32-32.5 32-60.4s-13.4-51.6-32-60.4V32zm-64 76.7V240 371.3C357.2 317.8 280.5 288 200.7 288H192V192h8.7c79.8 0 156.5-29.8 215.3-83.3z"/></svg></button>
                     <div>
@@ -2196,28 +2397,48 @@ async function showPoster(poster, currentNumber, totalCount) {
                     </div>
                 </div>
                 <div class="slide-counter !bg-white/5 !border-white/10 !text-[#F3A628]">
-                    <i class="fas fa-images ml-1"></i>
-                    <span>إعلان</span>
+                    <i class="fas ${isVideoPoster ? 'fa-film' : 'fa-images'} ml-1"></i>
+                    <span>${isVideoPoster ? 'فيديو' : 'إعلان'}</span>
                     <strong class="font-english ml-1">${currentNumber} / ${totalCount}</strong>
                 </div>
             </div>
             
-            <div class="flex-1 bg-[#090d16] flex items-center justify-center p-1 relative overflow-hidden" style="min-height:0">
-                <div id="poster-media-host" class="w-full h-full" style="position:relative;min-height:0;overflow:hidden;background:#090d16"></div>
+            <div class="poster-media-stage ${stageTypeClass}">
+                <div id="poster-media-host" class="w-full h-full"></div>
             </div>
+
+            ${companionDockHTML}
         </div>
     `;
 
+    const slideEl = shell.firstElementChild;
+    const stageEl = slideEl.querySelector('.poster-media-stage');
+    const hostEl = slideEl.querySelector('#poster-media-host');
+    if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl, poster);
 
-    await window.CITLTVMedia.show(poster, shell.firstElementChild, shell.querySelector('#poster-media-host'), container, videoDuration => {
+    const triggerReveal = () => {
+        if (!slideEl || slideEl.classList.contains('pcd-revealed')) return;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                slideEl.classList.add('pcd-revealed');
+            });
+        });
+    };
+
+    await window.CITLTVMedia.show(poster, slideEl, hostEl, container, videoDuration => {
         if (videoDuration !== null) currentSlideDurationMs = videoDuration * 1000;
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         const visibleSettings=displayedPoster||poster;
         window.CITLTVMedia.updateSettings(visibleSettings);
+        if (isVideoPoster) lockVideoNaturalAspect(stageEl, hostEl, poster);
+        triggerReveal();
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);
         window.CITLTVMedia.preload(tvPosters[(index + 1) % Math.max(1,tvPosters.length)]);
-    }, () => { currentSlideDurationMs = 3000; });
+    }, () => {
+        triggerReveal();
+        currentSlideDurationMs = 3000;
+    });
 }
 
 // دالة لتغيير عنوان الهيدر بنعومة (Fade Animation)

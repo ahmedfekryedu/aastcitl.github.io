@@ -17,6 +17,26 @@
     const time=lastGood?new Date(lastGood.at).toLocaleTimeString('ar-EG',{timeZone:'Africa/Cairo',hour:'2-digit',minute:'2-digit'}):'';
     return `<div class="study-sync" role="status"><i class="fas fa-wifi" aria-hidden="true"></i> ${(root.navigator.onLine===false?'الجهاز غير متصل بالإنترنت':'تعذر تحديث الجداول مؤقتًا')+(lastGood?' · نعرض آخر تحديث اليوم '+M.escape(time):' · جارٍ إعادة المحاولة')}</div>`;
   }
+  function formatDurationAr(totalMins){
+    const m=Math.max(0,Math.round(totalMins));
+    const minWord=n=>n===1?'دقيقة':n===2?'دقيقتين':(n>=3&&n<=10)?`${n} دقائق`:`${n} دقيقة`;
+    const hrWord=n=>n===1?'ساعة':n===2?'ساعتين':(n>=3&&n<=10)?`${n} ساعات`:`${n} ساعة`;
+    if(m<60)return minWord(m);
+    const h=Math.floor(m/60),rem=m%60;
+    return rem?`${hrWord(h)} و ${minWord(rem)}`:hrWord(h);
+  }
+  function isStartingSoon(row,now){
+    if(M.state(row,now)!=='next')return false;
+    const t=M.slot(row.time_slot);
+    if(t.start===null)return false;
+    const diff=t.start-now.minutes;
+    return diff>0&&diff<=15;
+  }
+  function liveProgressPct(row,now){
+    const t=M.slot(row.time_slot);
+    if(t.start===null||t.end===null||t.end<=t.start)return 0;
+    return Math.max(3,Math.min(100,Math.round(((now.minutes-t.start)/(t.end-t.start))*100)));
+  }
   function capacity(){const h=document.getElementById('content-container')?.clientHeight||1100;return Math.min(config.enabled?(config.rows||4):5,Math.max(2,Math.floor((h-330)/125)));}
   function build(rooms,data,posters){
     const now=M.cairo(),limit=capacity(),pages=[];
@@ -52,11 +72,29 @@
     return index>=0?index:0;
   }
   function nextCycle(){posterOffset+=Math.max(1,adsPerCycle);}
-  function focus(row,title){
+  function focus(row,title,now){
     const isLive=title==='الآن';
     const icon=isLive?'fa-broadcast-tower':'fa-forward';
-    const badge=isLive?(row?'<span class="study-focus-pill live"><i class="fas fa-circle" aria-hidden="true"></i> الآن</span>':'<span class="study-focus-pill idle">متاحة</span>'):'<span class="study-focus-pill next"><i class="fas fa-clock" aria-hidden="true"></i> التالي</span>';
-    return `<div class="study-focus ${isLive?(row?'study-focus-live':'study-focus-idle'):'study-focus-next'}">
+    let countdownHtml='';
+    let soon=false;
+    if(row){
+      const t=M.slot(row.time_slot);
+      if(isLive&&t.end!==null){
+        const rem=t.end-now.minutes;
+        const txt=rem>0?`متبقي ${formatDurationAr(rem)}`:'تنتهي الآن';
+        countdownHtml=`<span class="study-focus-countdown live"><i class="fas fa-hourglass-half" aria-hidden="true"></i> ${txt}</span>`;
+      }else if(!isLive&&t.start!==null){
+        const diff=t.start-now.minutes;
+        soon=diff>0&&diff<=15;
+        const txt=diff>0?`تبدأ بعد ${formatDurationAr(diff)}`:'تبدأ الآن';
+        countdownHtml=`<span class="study-focus-countdown ${soon?'soon':'next'}"><i class="fas fa-hourglass-start" aria-hidden="true"></i> ${txt}</span>`;
+      }
+    }
+    const badge=isLive
+      ?(row?(countdownHtml||'<span class="study-focus-pill live"><i class="fas fa-circle" aria-hidden="true"></i> الآن</span>'):'<span class="study-focus-pill idle">متاحة</span>')
+      :(row?(countdownHtml||'<span class="study-focus-pill next"><i class="fas fa-clock" aria-hidden="true"></i> التالي</span>'):'<span class="study-focus-pill next"><i class="fas fa-clock" aria-hidden="true"></i> التالي</span>');
+    const cardClass=isLive?(row?'study-focus-live':'study-focus-idle'):(soon?'study-focus-soon':'study-focus-next');
+    return `<div class="study-focus ${cardClass}">
       <div class="study-focus-top"><span class="study-focus-label"><i class="fas ${icon}" aria-hidden="true"></i> ${title}</span>${badge}</div>
       <strong>${row?M.escape(row.course_name):isLive?'القاعة متاحة حاليًا':'لا توجد محاضرات تالية'}</strong>
       <div class="study-focus-meta">${row?`<small class="study-focus-time" dir="ltr"><i class="far fa-clock" aria-hidden="true"></i> ${M.escape(M.slot(row.time_slot).label)}</small>${row.instructor?`<span class="study-focus-inst"><i class="fas fa-user-tie" aria-hidden="true"></i> ${M.escape(row.instructor)}</span>`:''}`:`<span class="study-focus-inst">${isLive?'جاهزة للاستخدام أو انتظار المحاضرة القادمة':'انتهت باقي الفترات المجدولة'}</span>`}</div>
@@ -65,8 +103,8 @@
   function renderRoom(page,container){
     const now=M.cairo(),all=page.all,live=all.find(r=>M.state(r,now)==='live'),next=all.find(r=>M.state(r,now)==='next');
     const formattedDate=new Intl.DateTimeFormat('ar-EG',{timeZone:'Africa/Cairo',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date());
-    const labels={live:'جارية الآن',next:'قادمة',cancelled:'ملغاة',scheduled:'مجدولة',ended:'انتهت'};
-    const icons={live:'fa-circle-play',next:'fa-clock',cancelled:'fa-ban',scheduled:'fa-calendar-check',ended:'fa-check'};
+    const labels={live:'جارية الآن',next:'قادمة',soon:'تبدأ قريباً',cancelled:'ملغاة',scheduled:'مجدولة',ended:'انتهت'};
+    const icons={live:'fa-circle-play',next:'fa-clock',soon:'fa-hourglass-half',cancelled:'fa-ban',scheduled:'fa-calendar-check',ended:'fa-check'};
     const roomBadge=live
       ? `<span class="study-room-pill is-live"><span class="study-dot"></span> مشغولة الآن</span>`
       : `<span class="study-room-pill is-free"><i class="fas fa-check-circle" aria-hidden="true"></i> متاحة الآن</span>`;
@@ -82,9 +120,9 @@
         </div>
         ${page.total>1?`<div class="study-page"><i class="fas fa-layer-group" aria-hidden="true"></i><span>صفحة ${page.page} من ${page.total}</span></div>`:''}
       </header>
-      ${status()}<div class="study-focus-grid">${focus(live,'الآن')}${focus(next,'التالي')}</div>
+      ${status()}<div class="study-focus-grid">${focus(live,'الآن',now)}${focus(next,'التالي',now)}</div>
       <div class="study-table-head"><span><i class="far fa-clock" aria-hidden="true"></i> التوقيت</span><span><i class="fas fa-book-open" aria-hidden="true"></i> المقرر والمحاضر</span><span><i class="fas fa-signal" aria-hidden="true"></i> الحالة</span></div>
-      <div class="study-rows" style="--study-count:${page.rows.length}">${page.rows.map((row,idx)=>{const state=M.state(row,now);const codeHtml=row.course_code?`<small class="study-code-pill" dir="auto"><i class="fas fa-hashtag" aria-hidden="true"></i> ${M.escape(row.course_code)}</small>`:'';return `<article class="study-row study-${state}" style="--row-delay:${idx*55}ms"><div class="study-time" dir="ltr">${M.escape(M.slot(row.time_slot).label).replace(' – ','<br><span>إلى</span><br>')}</div><div class="study-subject"><h3>${M.escape(row.course_name||'مقرر غير مسمى')}</h3><div class="study-subject-meta"><p><span class="study-inst-ico"><i class="fas fa-user-tie" aria-hidden="true"></i></span><span>${M.escape(row.instructor||'المحاضر غير محدد')}</span></p>${codeHtml}</div></div><span class="study-state"><i class="fas ${icons[state]||'fa-clock'}" aria-hidden="true"></i> ${labels[state]}</span></article>`;}).join('')}</div>
+      <div class="study-rows" style="--study-count:${page.rows.length}">${page.rows.map((row,idx)=>{const rawState=M.state(row,now);const soon=isStartingSoon(row,now);const stateKey=soon?'soon':rawState;const pct=rawState==='live'?liveProgressPct(row,now):0;const liveBar=rawState==='live'?`<div class="study-live-progress" aria-hidden="true"><div class="study-live-progress-fill" style="width:${pct}%"></div></div>`:'';const codeHtml=row.course_code?`<small class="study-code-pill" dir="auto"><i class="fas fa-hashtag" aria-hidden="true"></i> ${M.escape(row.course_code)}</small>`:'';return `<article class="study-row study-${rawState}${soon?' study-soon':''}" style="--row-delay:${idx*55}ms"><div class="study-time" dir="ltr">${M.escape(M.slot(row.time_slot).label).replace(' – ','<br><span>إلى</span><br>')}</div><div class="study-subject"><h3>${M.escape(row.course_name||'مقرر غير مسمى')}</h3><div class="study-subject-meta"><p><span class="study-inst-ico"><i class="fas fa-user-tie" aria-hidden="true"></i></span><span>${M.escape(row.instructor||'المحاضر غير محدد')}</span></p>${codeHtml}</div></div><span class="study-state"><i class="fas ${icons[stateKey]||'fa-clock'}" aria-hidden="true"></i> ${labels[stateKey]}</span>${liveBar}</article>`;}).join('')}</div>
       <div class="study-screen-foot"><span><i class="fas fa-university" aria-hidden="true"></i> جدول القاعة · ${all.length} محاضرات متبقية</span><span><i class="far fa-clock" aria-hidden="true"></i> التوقيت المحلي للقاهرة</span></div>
     </section>`;
     if(lastMarkup===markup&&container.querySelector('.study-rows')){const card=container.firstElementChild;card.style.opacity='';card.style.transform='';return;}

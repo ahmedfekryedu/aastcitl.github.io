@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro3">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro4">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro3"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro4"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2323,7 +2323,7 @@ function buildPosterCompanionCardHTML(cycleMs) {
                     <div class="pcd-room-id">
                         <div class="pcd-room-badge"><i class="fas fa-door-open"></i></div>
                         <div class="pcd-room-title-line">
-                            <span class="pcd-room-name">قاعة ${escapeHtml(selected.roomName)}</span>
+                            <span class="pcd-room-name">قاعة <bdi dir="auto">${escapeHtml(selected.roomName)}</bdi></span>
                             <span class="pcd-live-badge"><span class="pcd-live-dot"></span> ${escapeHtml(roomPosLabel)}</span>
                         </div>
                     </div>

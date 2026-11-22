@@ -404,7 +404,7 @@ body.tv-display-page .poster-slide{
 }
 .pcd-room-title-line{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
 .pcd-room-name{
-  font-family:'Roboto',sans-serif;
+  font-family:'Cairo',sans-serif;
   font-size:clamp(17px,1.6vw,23px);
   font-weight:900;color:#ffffff;line-height:1.05;white-space:nowrap;
 }

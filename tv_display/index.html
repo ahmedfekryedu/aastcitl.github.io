@@ -1168,10 +1168,10 @@ body.tv-display-page .schedule-instructor {
     outline: none !important;
 }
 </style>
-<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro4">
+<link rel="stylesheet" href="/assets/tv-study.css?v=20261122-tv-pro5">
 <script src="/assets/read-timeout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/study-model.js?v=20261028-r7.3.3.8-wa-ui"></script>
 <script src="/vendor/qrcode-1.5.4.min.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-audio.js?v=20261028-r7.3.3.8-wa-ui"></script>
-<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro4"></script>
+<script src="/assets/tv-display-dates.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-room-catalog.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/video-layout.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-media-player.js?v=20261028-r7.3.3.8-wa-ui"></script><script src="/assets/tv-study.js?v=20261122-tv-pro5"></script>
 <link rel="preload" href="/assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=20261028-r7.3.3.8-wa-ui">
 <script src="/assets/news-ticker.js?v=20261028-r7.3.3.8-wa-ui"></script>
@@ -2196,9 +2196,32 @@ let posterCompanionTimer = null;
 
 function stopPosterCompanionRotation() {
     if (posterCompanionTimer) {
-        clearInterval(posterCompanionTimer);
+        clearTimeout(posterCompanionTimer);
         posterCompanionTimer = null;
     }
+}
+
+function initPosterCompanionMarquee(rootEl) {
+    if (!rootEl) return;
+    requestAnimationFrame(() => {
+        const boxes = rootEl.querySelectorAll('.pcd-course');
+        boxes.forEach(box => {
+            const track = box.querySelector('.pcd-course-track');
+            if (!track) return;
+            box.classList.remove('is-marquee');
+            const overflow = Math.ceil(track.scrollWidth - box.clientWidth);
+            if (overflow > 4) {
+                const shift = overflow + 14;
+                const dur = Math.max(4.5, Math.min(12, 3.2 + (shift / 36)));
+                box.style.setProperty('--pcd-marquee-shift', `${shift}px`);
+                box.style.setProperty('--pcd-marquee-dur', `${dur.toFixed(2)}s`);
+                box.classList.add('is-marquee');
+            } else {
+                box.style.removeProperty('--pcd-marquee-shift');
+                box.style.removeProperty('--pcd-marquee-dur');
+            }
+        });
+    });
 }
 
 function getOrderedCompanionRooms() {
@@ -2287,7 +2310,7 @@ function buildPosterCompanionCardHTML(cycleMs) {
                 <div class="pcd-row ${stateClass}" style="animation-delay:${rowDelay}ms">
                     <div class="pcd-time">${escapeHtml(entry.displayTime)}</div>
                     <div class="pcd-main">
-                        <div class="pcd-course">${escapeHtml(entry.item.course_name || 'محاضرة')}</div>
+                        <div class="pcd-course"><span class="pcd-course-track">${escapeHtml(entry.item.course_name || 'محاضرة')}</span></div>
                         <div class="pcd-code">${escapeHtml(entry.item.course_code || '')}</div>
                     </div>
                     <div class="pcd-teacher">
@@ -2340,22 +2363,29 @@ function buildPosterCompanionCardHTML(cycleMs) {
 
 function startPosterCompanionRotation(slideEl) {
     stopPosterCompanionRotation();
-    const cycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
-    posterCompanionTimer = setInterval(() => {
-        if (!slideEl || !slideEl.isConnected) {
-            stopPosterCompanionRotation();
-            return;
-        }
-        const dock = slideEl.querySelector('#poster-companion-dock');
-        if (!dock) {
-            stopPosterCompanionRotation();
-            return;
-        }
-        const ordered = getOrderedCompanionRooms();
-        if (ordered.length <= 1) return;
-        const nextCard = buildPosterCompanionCardHTML(cycleMs);
-        dock.innerHTML = nextCard.html;
-    }, cycleMs);
+    const scheduleNext = () => {
+        const cycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
+        posterCompanionTimer = setTimeout(() => {
+            if (!slideEl || !slideEl.isConnected) {
+                stopPosterCompanionRotation();
+                return;
+            }
+            const dock = slideEl.querySelector('#poster-companion-dock');
+            if (!dock) {
+                stopPosterCompanionRotation();
+                return;
+            }
+            const ordered = getOrderedCompanionRooms();
+            if (ordered.length > 1) {
+                const nextCycleMs = Math.max(3000, Number(roomDurationMs) || 7000);
+                const nextCard = buildPosterCompanionCardHTML(nextCycleMs);
+                dock.innerHTML = nextCard.html;
+                initPosterCompanionMarquee(dock);
+            }
+            scheduleNext();
+        }, cycleMs);
+    };
+    scheduleNext();
 }
 
 async function showPoster(poster, currentNumber, totalCount) {
@@ -2430,13 +2460,17 @@ async function showPoster(poster, currentNumber, totalCount) {
         updateHeaderTitle('لوحة الإعلانات والفعاليات الأكاديمية');
         window.CITLTVMedia.updateSettings(visibleSettings);
         triggerReveal();
+        initPosterCompanionMarquee(slideEl.querySelector('#poster-companion-dock'));
         // تشغيل مؤقت مستقل تماماً لتبديل القاعات أسفل البوستر/الفيديو حسب توقيت الجداول (roomDurationMs)
         startPosterCompanionRotation(slideEl);
         if (visibleSettings.play_sound && !window.CITLTVMedia.video(poster)) playPosterAlarm();
         const index = tvPosters.findIndex(p => p.id === poster.id);
         window.CITLTVMedia.preload(tvPosters[(index + 1) % Math.max(1,tvPosters.length)]);
     }, () => {
+        stopPosterCompanionRotation();
         triggerReveal();
+        initPosterCompanionMarquee(slideEl.querySelector('#poster-companion-dock'));
+        mediaProgressEpoch++;
         currentSlideDurationMs = 3000;
     });
 }

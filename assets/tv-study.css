@@ -490,8 +490,23 @@ body.tv-display-page.tv-rotate-ccw .pcd-rows{
 
 .pcd-main{min-width:0;overflow:hidden;display:flex;align-items:center;gap:8px}
 .pcd-course{
+  flex:1 1 auto;min-width:0;overflow:hidden;
+  direction:rtl;text-align:right;
   color:#0f172a;font-size:clamp(12px,1.08vw,16px);font-weight:900;line-height:1.25;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  white-space:nowrap;
+}
+.pcd-course-track{
+  display:inline-block;
+  white-space:nowrap;
+  will-change:transform;
+}
+.pcd-course.is-marquee .pcd-course-track{
+  animation:pcdCourseMarquee var(--pcd-marquee-dur,6s) ease-in-out 0.9s infinite!important;
+}
+@keyframes pcdCourseMarquee{
+  0%,16%{transform:translateX(0)}
+  52%,68%{transform:translateX(var(--pcd-marquee-shift,0px))}
+  100%{transform:translateX(0)}
 }
 .pcd-code{
   flex-shrink:0;font-family:'Roboto',sans-serif;

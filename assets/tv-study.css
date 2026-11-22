@@ -627,17 +627,58 @@ body.tv-display-page #content-container .study-screen.study-handoff-expand{
 .study-focus-soon .study-focus-label{color:#c2410c!important}
 .study-focus-soon .study-focus-time{background:#ffedd5!important;color:#9a3412!important}
 
-/* 2. Live Progress Bar inside Active Lecture Row */
+/* 2. Crystal-Clear Live Progress Bars (Study Row + Focus Card + Companion Dock) */
 .study-row{position:relative}
+.study-row.study-live{padding-bottom:18px}
+.study-live-meter{
+  display:flex;align-items:center;gap:10px;margin-top:4px;width:100%;max-width:460px;
+}
+.study-live-meter-track{
+  flex:1 1 auto;height:10px;border-radius:999px;
+  background:rgba(5,150,105,0.18);
+  border:1px solid rgba(5,150,105,0.32);
+  overflow:hidden;position:relative;
+}
+.study-live-meter-fill{
+  height:100%;min-width:10px;border-radius:999px;
+  background:linear-gradient(270deg,#047857 0%,#059669 52%,#10b981 100%);
+  box-shadow:0 0 10px rgba(16,185,129,0.45);
+  transition:width .6s ease;
+}
+.study-live-meter-pct{
+  flex-shrink:0;font-size:13px;font-weight:900;color:#047857;
+  background:#d1fae5;border:1px solid #6ee7b7;border-radius:999px;
+  padding:1px 8px;line-height:1.4;
+}
 .study-live-progress{
-  position:absolute;bottom:0;left:0;right:0;height:5px;
-  background:rgba(5,150,105,0.14);overflow:hidden;pointer-events:none;
+  position:absolute;bottom:0;left:0;right:0;height:7px;z-index:4;
+  background:rgba(5,150,105,0.20);overflow:hidden;pointer-events:none;
 }
 .study-live-progress-fill{
-  height:100%;
-  background:linear-gradient(270deg,#10b981 0%,#059669 65%,#34d399 100%);
+  height:100%;min-width:12px;
+  background:linear-gradient(270deg,#047857 0%,#059669 55%,#10b981 100%);
   border-radius:999px 0 0 999px;
   transition:width .6s ease;
+}
+.study-focus-progress{
+  position:absolute;bottom:0;left:0;right:0;height:6px;z-index:3;
+  background:rgba(5,150,105,0.18);overflow:hidden;pointer-events:none;
+}
+.study-focus-progress-fill{
+  height:100%;min-width:10px;
+  background:linear-gradient(270deg,#047857 0%,#059669 55%,#10b981 100%);
+  border-radius:999px 0 0 999px;
+}
+.pcd-row{position:relative}
+.pcd-row.is-current{padding-bottom:11px}
+.pcd-live-progress{
+  position:absolute;bottom:0;left:0;right:0;height:5px;z-index:4;
+  background:rgba(5,150,105,0.18);overflow:hidden;pointer-events:none;
+}
+.pcd-live-progress-fill{
+  height:100%;min-width:10px;
+  background:linear-gradient(270deg,#047857 0%,#059669 55%,#10b981 100%);
+  border-radius:999px 0 0 999px;
 }
 
 /* 3. "تبدأ قريباً" (Within 15 min) Distinction on Study Rows & Companion Rows */
